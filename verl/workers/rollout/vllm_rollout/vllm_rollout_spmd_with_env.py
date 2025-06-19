@@ -224,7 +224,9 @@ class vLLMRollout(BaseRollout):
         print(f"kwargs: {kwargs}")
         self.sampling_params = SamplingParams(**kwargs)
         self.pad_token_id = tokenizer.pad_token_id
-
+        self.action_parse_res_factor = 1000
+        self.max_steps = config.get("max_steps", 5)
+        self.limit_images = config.get("limit_images", 5)
 
     def create_env(self, n:int = 1, configs: list[dict] = None) -> list[TrajectoryRunner]:
         envs = []
@@ -267,7 +269,6 @@ class vLLMRollout(BaseRollout):
             batch_size = len(prompts.non_tensor_batch["messages"])
             task_configs = prompts.non_tensor_batch["task_config"]
             
-            max_steps = 50
             print("generate_sequences get", batch_size, self.sampling_params.n)
             if not do_sample:
                 kwargs = {
@@ -292,16 +293,26 @@ class vLLMRollout(BaseRollout):
                 messages = list(np.repeat(prompts.non_tensor_batch["messages"], self.sampling_params.n, axis=0))
                 messages = [list(copy.deepcopy(msg)) for msg in messages]
                 runners = [TrajectoryRunner.remote(task_config) for task_config in task_configs]
-                dataset_ids = run_agent_loop(self.inference_engine, runners, messages, self.sampling_params, self.processor, max_steps)
+                dataset_ids = run_agent_loop(
+                    self.inference_engine, 
+                    runners, 
+                    messages, 
+                    self.sampling_params, 
+                    self.processor, 
+                    self.max_steps,
+                    self.action_parse_res_factor
+                )
                 prompts.non_tensor_batch["dataset_ids"] = dataset_ids
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             print("Error in generate_sequences: ", e)
         finally:
             self.close_env(runners)
         non_tensor_batch = {
-            "messages": messages,
-            "task_config": task_configs,
-            "dataset_ids": dataset_ids,
+            "messages": np.array(messages, dtype=object),
+            "task_config": np.array(task_configs, dtype=object),
+            "dataset_ids": np.array(dataset_ids, dtype=object),
         }
         return DataProto(batch=None, non_tensor_batch=non_tensor_batch)
 

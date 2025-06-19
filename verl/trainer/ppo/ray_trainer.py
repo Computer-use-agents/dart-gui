@@ -1243,22 +1243,22 @@ class RayOSWorldTrainer(RayPPOTrainer):
 
                             del gen_baseline_batch, gen_baseline_output
 
-                    batch.non_tensor_batch["uid"] = np.array([batch.non_tensor_batch["dataset_ids"][i] for i in range(len(batch.non_tensor_batch["dataset_ids"]))], dtype=object)
-                    # repeat to align with repeated responses in rollout
-                    batch = batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=True)
-                    batch = batch.union(gen_batch_output)
-
-                    batch.batch["response_mask"] = compute_response_mask(batch)
+                    # batch.non_tensor_batch["uid"] = np.array([str(uuid.uuid4()) for _ in range(len(batch.non_tensor_batch["messages"]))], dtype=object)
+                    # # repeat to align with repeated responses in rollout
+                    # batch = batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=True)
+                    # batch = batch.union(gen_batch_output)
+                    batch = gen_batch_output
+                    # batch.batch["response_mask"] = compute_response_mask(batch)
                     # Balance the number of valid tokens across DP ranks.
                     # NOTE: This usually changes the order of data in the `batch`,
                     # which won't affect the advantage calculation (since it's based on uid),
                     # but might affect the loss calculation (due to the change of mini-batching).
                     # TODO: Decouple the DP balancing and mini-batching.
-                    if self.config.trainer.balance_batch:
-                        self._balance_batch(batch, metrics=metrics)
+                    # if self.config.trainer.balance_batch:
+                    #     self._balance_batch(batch, metrics=metrics)
 
                     # compute global_valid tokens
-                    batch.meta_info["global_token_num"] = torch.sum(batch.batch["attention_mask"], dim=-1).tolist()
+                    # batch.meta_info["global_token_num"] = torch.sum(batch.batch["attention_mask"], dim=-1).tolist()
 
                     with _timer("reward", timing_raw):
                         # compute reward model score
@@ -1270,7 +1270,7 @@ class RayOSWorldTrainer(RayPPOTrainer):
                             future_reward = compute_reward_async.remote(batch, self.config, self.tokenizer)
                         else:
                             reward_tensor, reward_extra_infos_dict = compute_reward(batch, self.reward_fn)
-
+                    print("reward_tensor", reward_tensor)
                     # recompute old_log_probs
                     with _timer("old_log_prob", timing_raw):
                         old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)
