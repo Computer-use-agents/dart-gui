@@ -1,0 +1,54 @@
+{
+   "os": [
+        "94d95f96-9699-4208-98ba-3c3119edf9c2",
+        "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+        "a462a795-fdc7-4b23-b689-e8b6df786b78",
+        "f9be0997-4b7c-45c5-b05c-4612b44a6118",
+        "28cc3b7e-b194-4bc9-8353-d04c0f4d56d2",
+        "5ea617a3-0e86-4ba6-aab2-dac9aa2e8d57",
+        "e0df059f-28a6-4169-924f-b9623e7184cc",
+        "fe41f596-a71b-4c2f-9b2f-9dcd40b568c3",
+        "a4d98375-215b-4a4d-aee9-3d4370fccc41",
+        "c288e301-e626-4b98-a1ab-159dcb162af5",
+        "4783cc41-c03c-4e1b-89b4-50658f642bd5",
+        "4d117223-a354-47fb-8b45-62ab1390a95f"
+    ],
+    "thunderbird": [
+        "dfac9ee8-9bc4-4cdc-b465-4a4bfcd2f397",
+        "3f28fe4f-5d9d-4994-a456-efd78cfae1a3",
+        "dd84e895-72fd-4023-a336-97689ded257c",
+        "d38192b0-17dc-4e1d-99c3-786d0117de77",
+        "a10b69e1-6034-4a2b-93e1-571d45194f75",
+        "10a730d5-d414-4b40-b479-684bed1ae522",
+        "a1af9f1c-50d5-4bc3-a51e-4d9b425ff638"
+    ],
+    "vlc": [
+        "59f21cfb-0120-4326-b255-a5b827b38967",
+        "8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89",
+        "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
+        "5ac2891a-eacd-4954-b339-98abba077adb",
+        "cb130f0d-d36f-4302-9838-b3baf46139b6",
+        "7882ed6e-bece-4bf0-bada-c32dc1ddae72"
+    ],
+    "vs_code": [
+        "0ed39f63-6049-43d4-ba4d-5fa2fe04a951",
+        "53ad5833-3455-407b-bbc6-45b4c79ab8fb",
+        "eabc805a-bfcf-4460-b250-ac92135819f6",
+        "982d12a5-beab-424f-8d38-d2a48429e511",
+        "4e60007a-f5be-4bfc-9723-c39affa0a6d3",
+        "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
+        "9439a27b-18ae-42d8-9778-5f68f891805e",
+        "9d425400-e9b2-4424-9a4b-d4c7abac4140",
+        "5e2d93d8-8ad0-4435-b150-1692aacaa994",
+        "ec71221e-ac43-46f9-89b8-ee7d80f7e1c5",
+        "70745df8-f2f5-42bd-8074-fbc10334fcc5",
+        "57242fad-77ca-454f-b71b-f187181a9f23",
+        "c6bf789c-ba3a-4209-971d-b63abf0ab733",
+        "0512bb38-d531-4acf-9e7e-0add90816068",
+        "847a96b6-df94-4927-97e6-8cc9ea66ced7",
+        "7aeae0e2-70ee-4705-821d-1bba5d5b2ddd",
+        "dcbe20e8-647f-4f1d-8696-f1c5bbb570e3",
+        "7c4cc09e-7a92-40dd-8338-b2286535c4ed",
+        "971cbb5b-3cbf-4ff7-9e24-b5c84fcebfa6"
+    ]
+}
