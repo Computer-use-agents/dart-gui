@@ -19,14 +19,28 @@ class TrajectoryRunner:
     def __init__(self, task_config: dict| None = None, max_images: int = 5):
         print("TrajectoryRunner init", task_config)
         self.max_images = max_images
-        self.env = RemoteDesktopEnv(
-            server_url="http://39.107.54.167:4999",
-            action_space="pyautogui",
-            screen_size=(1920, 1080),
-            headless=True,
-            os_type="Ubuntu",
-            require_a11y_tree=False
-        )
+        
+        # Add retry logic for RemoteDesktopEnv initialization
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                self.env = RemoteDesktopEnv(
+                    server_url="http://39.107.54.167:4999",
+                    action_space="pyautogui",
+                    screen_size=(1920, 1080),
+                    headless=True,
+                    os_type="Ubuntu",
+                    require_a11y_tree=False
+                )
+                print(f"RemoteDesktopEnv initialized successfully on attempt {attempt + 1}")
+                break
+            except Exception as e:
+                print(f"Failed to initialize RemoteDesktopEnv on attempt {attempt + 1}: {e}")
+                if attempt == max_retries - 1:
+                    print("All retry attempts failed. Raising the last exception.")
+                    raise
+                print(f"Retrying... ({attempt + 2}/{max_retries})")
+        
         if task_config is not None:
             self.reset(task_config)
     
@@ -85,6 +99,7 @@ def generate_trajectory_vllm_inputs(messages: np.ndarray, processor):
             tokenize=False
         )
         image_inputs, _ = process_vision_info(msg)
+        print("Get Prompt", prompt)
         vllm_input = {
             "prompt": prompt,
             "multi_modal_data": {
