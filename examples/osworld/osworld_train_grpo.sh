@@ -1,9 +1,9 @@
 set -x
 ENGINE=${1:-vllm_osworld}
-# pip install backoff
-# pip install nvitop
-# pip install swanlab
-
+pip install backoff
+pip install nvitop
+pip install swanlab
+cd /app/data/arpo_workspace/verl
 # Detect number of GPUs on the current machine
 N_GPUS=$(nvidia-smi --list-gpus | wc -l)
 echo "Detected $N_GPUS GPUs on this machine"
@@ -12,6 +12,8 @@ MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
 export SWANLAB_API_KEY=r8dG8z3q9n9xGomA1r5yY
+export REWARD_SERVER_URL=https://sv-8cf0b533-6da2-423f-a6cb-4c737a630b4c-8000-x-aps-o-c4ef12a40d.sproxy.hd-01.alayanew.com:22443/v1
+export REWARD_MODEL=qwen2.5_vl_7b
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \

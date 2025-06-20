@@ -97,6 +97,86 @@ def remove_image_from_content(content):
         return None
     return content_new
 
+def limit_images_in_messages(msg, limit_images: int = 5):
+    """
+    Limit the number of images in a message to ensure it doesn't exceed limit_images.
+    
+    Args:
+        msg: The message to process
+        limit_images: Maximum number of images allowed in the message
+    
+    Returns:
+        Processed message with limited images
+    """
+    msg = copy.deepcopy(msg)
+    image_count = 0
+    
+    # Count total images in the message
+    for m in msg:
+        if not isinstance(m["content"], list):
+            continue
+        
+        for c in m["content"]:
+            if c["type"] == "image":
+                image_count += 1
+    
+    # If image count is within limit, return original message
+    if image_count <= limit_images:
+        return msg
+    
+    # Process message to limit images
+    msg_for_prompt = []
+    current_image_count = 0
+    
+    for m in msg:
+        if m["role"] in ["assistant", "system"]:
+            msg_for_prompt.append(m)
+            continue
+        
+        # Count images in current message
+        message_image_count = 0
+        if isinstance(m["content"], list):
+            for c in m["content"]:
+                if c["type"] == "image":
+                    message_image_count += 1
+        
+        # Check if adding this message would exceed the limit
+        if current_image_count + message_image_count <= limit_images:
+            msg_for_prompt.append(m)
+            current_image_count += message_image_count
+        else:
+            # Need to remove some images from this message
+            if current_image_count >= limit_images:
+                # Already at limit, remove all images from this message
+                content = remove_image_from_content(m["content"])
+                if content is not None:
+                    msg_new = {
+                        "role": "user",
+                        "content": content
+                    }
+                    msg_for_prompt.append(msg_new)
+            else:
+                # Remove excess images to fit within limit
+                remaining_slots = limit_images - current_image_count
+                if remaining_slots > 0:
+                    # Keep some images and remove the rest
+                    content = m["content"].copy()
+                    image_items = [c for c in content if c["type"] == "image"]
+                    non_image_items = [c for c in content if c["type"] != "image"]
+                    
+                    # Keep only the first remaining_slots images
+                    kept_images = image_items[:remaining_slots]
+                    content_new = non_image_items + kept_images
+                    
+                    msg_new = {
+                        "role": "user",
+                        "content": content_new
+                    }
+                    msg_for_prompt.append(msg_new)
+                    current_image_count += remaining_slots
+    
+    return msg_for_prompt
+
 def generate_trajectory_vllm_inputs(
     messages: np.ndarray, 
     processor,
@@ -109,35 +189,10 @@ def generate_trajectory_vllm_inputs(
         msg = copy.deepcopy(msg)
         print("Item ", i, "prompt length", len(msg))
         msg = list(msg)
-        image_count = 0
-        for m in msg:
-            if not isinstance(m["content"], list):
-                continue
-
-            for c in m["content"]:
-                if c["type"] == "image":
-                    image_count += 1
-        msg_for_prompt = msg
-        if image_count > limit_images:
-            for m in msg:
-                if m["role"] in ["assistant", "system"]:
-                    msg_for_prompt.append(m)
-                    continue
-                elif image_count <= limit_images:
-                    msg_for_prompt.append(m)
-                    continue
-
-                # do remove the image
-                content = remove_image_from_content(m["content"])
-                if content is None:
-                    continue
-                msg_new = {
-                    "role": "user",
-                    "content": content
-                }
-                msg_for_prompt.append(msg_new)
-                image_count -= 1
-
+        
+        # Use the new function to limit images in the message
+        msg_for_prompt = limit_images_in_messages(msg, limit_images)
+        
         prompt = processor.apply_chat_template(
             msg_for_prompt,
             add_generation_prompt=True,
@@ -194,7 +249,10 @@ def run_agent_loop(
                 "image": "data:image;base64," + pil_to_base64(Image.open(BytesIO(obs[i]["screenshot"])))
             }
         )
-    vllm_inputs = generate_trajectory_vllm_inputs(messages, processor)
+    vllm_inputs = generate_trajectory_vllm_inputs(
+        messages, 
+        processor, 
+        limit_images=limit_images)
     step = 0
     
     # Create directories for each runner and save initial messages
@@ -390,7 +448,11 @@ def run_agent_loop(
             active_runners = new_active_runners
             if active_runners:
                 # update observation
-                vllm_inputs = generate_trajectory_vllm_inputs(new_messages, processor)
+                vllm_inputs = generate_trajectory_vllm_inputs(
+                    new_messages, 
+                    processor, 
+                    limit_images=limit_images
+                )
             
             step += 1
             
