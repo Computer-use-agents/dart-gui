@@ -125,6 +125,7 @@ class OSWorldDataset(Dataset):
                             "task_type": task_type,
                             "task_id": task_id,
                         })
+        print("Total number of tasks: ", len(self.dataframe))
         
 
     def __len__(self):

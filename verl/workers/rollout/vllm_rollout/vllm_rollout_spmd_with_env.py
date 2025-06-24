@@ -158,28 +158,6 @@ class vLLMRollout(BaseRollout):
         engine_kwargs = {key: val for key, val in engine_kwargs.items() if val is not None}
         if config.get("limit_images", None):  # support for multi-image data
             engine_kwargs["limit_mm_per_prompt"] = {"image": config.get("limit_images")}
-        print("Init configs:", dict(
-            model=model_path,
-            enable_sleep_mode=True,
-            tensor_parallel_size=tensor_parallel_size,
-            distributed_executor_backend="external_launcher",
-            dtype=config.dtype,
-            enforce_eager=config.enforce_eager,
-            gpu_memory_utilization=config.gpu_memory_utilization,
-            disable_custom_all_reduce=True,
-            disable_mm_preprocessor_cache=True,
-            skip_tokenizer_init=False,
-            max_model_len=max_model_len,
-            load_format=load_format,
-            disable_log_stats=config.disable_log_stats,
-            max_num_batched_tokens=max_num_batched_tokens,
-            enable_chunked_prefill=config.enable_chunked_prefill,
-            enable_prefix_caching=True,
-            trust_remote_code=trust_remote_code,
-            seed=config.get("seed", 0),
-            **lora_kwargs,
-            **engine_kwargs,
-        ))
         self.inference_engine = LLM(
             model=model_path,
             enable_sleep_mode=True,
@@ -224,7 +202,9 @@ class vLLMRollout(BaseRollout):
         print(f"kwargs: {kwargs}")
         self.sampling_params = SamplingParams(**kwargs)
         self.pad_token_id = tokenizer.pad_token_id
-
+        self.action_parse_res_factor = 1000
+        self.max_steps = config.get("max_steps", 5)
+        self.limit_images = config.get("limit_images", 5)
 
     def create_env(self, n:int = 1, configs: list[dict] = None) -> list[TrajectoryRunner]:
         envs = []
@@ -234,10 +214,12 @@ class vLLMRollout(BaseRollout):
         return envs
 
     def close_env(self, envs: list[TrajectoryRunner]):
+        print("Close env", len(envs))
+        close_refs = []
         for env in envs:
             close_ref = env.close.remote()
-            print("Close env", type(env))
-            ray.get(close_ref)
+            close_refs.append(close_ref)
+        ray.get(close_refs)
 
     @contextmanager
     def update_sampling_params(self, **kwargs):
@@ -256,42 +238,66 @@ class vLLMRollout(BaseRollout):
             setattr(self.sampling_params, key, value)
                 
 
-    # @GPUMemoryLogger(role="vllm rollout spmd", logger=logger)
+    @GPUMemoryLogger(role="vllm rollout spmd", logger=logger)
     @torch.no_grad()
     def generate_sequences(self, prompts: DataProto, **kwargs) -> DataProto:
-        do_sample = prompts.meta_info.get("do_sample", True)
-        is_validate = prompts.meta_info.get("validate", False)
-        batch_size = len(prompts.non_tensor_batch["messages"])
-        task_configs = prompts.non_tensor_batch["task_config"]
-        
-        max_steps = 50
-        print("generate_sequences get", batch_size, self.sampling_params.n)
-        if not do_sample:
-            kwargs = {
-                "best_of": 1,
-                "top_p": 1.0,
-                "top_k": -1,
-                "min_p": 0.0,
-                "temperature": 0,
-                "n": 1,  # if greedy, only 1 response
-            }
-        elif is_validate:
-            # TODO: try **
-            kwargs = {
-                "top_k": self.config.val_kwargs.top_k,
-                "top_p": self.config.val_kwargs.top_p,
-                "temperature": self.config.val_kwargs.temperature,
-                "n": 1,  # if validate, already repeat in ray_trainer
-            }
-        with self.update_sampling_params(**kwargs):
-            task_configs = list(np.repeat(task_configs, self.sampling_params.n, axis=0))
-            task_configs = [copy.deepcopy(task_config) for task_config in task_configs]
-            messages = list(np.repeat(prompts.non_tensor_batch["messages"], self.sampling_params.n, axis=0))
-            messages = [list(copy.deepcopy(msg)) for msg in messages]
-            runners = [TrajectoryRunner.remote(task_config) for task_config in task_configs]
-            dataset_ids = run_agent_loop(self.inference_engine, runners, messages, self.sampling_params, self.processor, max_steps)
-            prompts.non_tensor_batch["dataset_ids"] = dataset_ids
-        return prompts
+        try:
+            do_sample = prompts.meta_info.get("do_sample", True)
+            is_validate = prompts.meta_info.get("validate", False)
+            batch_size = len(prompts.non_tensor_batch["messages"])
+            task_configs = prompts.non_tensor_batch["task_config"]
+            
+            print("generate_sequences get", batch_size, self.sampling_params.n)
+            if not do_sample:
+                kwargs = {
+                    "best_of": 1,
+                    "top_p": 1.0,
+                    "top_k": -1,
+                    "min_p": 0.0,
+                    "temperature": 0,
+                    "n": 1,  # if greedy, only 1 response
+                }
+            elif is_validate:
+                # TODO: try **
+                kwargs = {
+                    "top_k": self.config.val_kwargs.top_k,
+                    "top_p": self.config.val_kwargs.top_p,
+                    "temperature": self.config.val_kwargs.temperature,
+                    "n": 1,  # if validate, already repeat in ray_trainer
+                }
+            with self.update_sampling_params(**kwargs):
+                task_configs = list(np.repeat(task_configs, self.sampling_params.n, axis=0))
+                task_configs = [copy.deepcopy(task_config) for task_config in task_configs]
+                messages = list(np.repeat(prompts.non_tensor_batch["messages"], self.sampling_params.n, axis=0))
+                messages = [list(copy.deepcopy(msg)) for msg in messages]
+                runners = [TrajectoryRunner.remote(task_config) for task_config in task_configs]
+                dataset_ids = run_agent_loop(
+                    self.inference_engine, 
+                    runners, 
+                    messages, 
+                    self.sampling_params, 
+                    self.processor, 
+                    self.max_steps,
+                    self.action_parse_res_factor,
+                    self.limit_images
+                )
+                prompts.non_tensor_batch["dataset_ids"] = dataset_ids
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print("Error in generate_sequences: ", e)
+        finally:
+            try:
+                self.close_env(runners)
+            except Exception as e:
+                print("close env met exception:", e)
+                
+        non_tensor_batch = {
+            "messages": np.array(messages, dtype=object),
+            "task_config": np.array(task_configs, dtype=object),
+            "dataset_ids": np.array(dataset_ids, dtype=object),
+        }
+        return DataProto(batch=None, non_tensor_batch=non_tensor_batch)
 
 class vLLMAsyncRollout:
     """vLLMAsyncRollout is a thin wrapper of WorkerWrapperBase,

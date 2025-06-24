@@ -109,7 +109,7 @@ class DataParallelPPOActor(BasePPOActor):
                     position_ids_rmpad = index_first_axis(rearrange(position_ids, "c b s ... -> (b s) c ..."), indices).transpose(0, 1).unsqueeze(1)  # (3, bsz, seqlen) -> (3, 1, bsz * seqlen)
                 else:
                     position_ids_rmpad = index_first_axis(rearrange(position_ids.unsqueeze(-1), "b s ... -> (b s) ..."), indices).transpose(0, 1)
-
+                print("_forward_micro_batch", position_ids_rmpad.shape, input_ids_rmpad.shape)
                 # for compute the log_prob
                 input_ids_rmpad_rolled = torch.roll(input_ids_rmpad, shifts=-1, dims=1)  # (1, total_nnz)
 
@@ -238,7 +238,7 @@ class DataParallelPPOActor(BasePPOActor):
                     log_probs = logprobs_from_logits(logits, micro_batch["responses"])
                     if calculate_entropy:
                         entropy = verl_F.entropy_from_logits(logits)  # (bsz, response_length)
-
+            print("_forward_micro_batch Final", entropy.shape if entropy is not None else None, log_probs.shape if log_probs is not None else None)
             return entropy, log_probs
 
     def _optimizer_step(self):

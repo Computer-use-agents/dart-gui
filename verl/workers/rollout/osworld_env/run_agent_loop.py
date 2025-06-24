@@ -10,6 +10,7 @@ import ray
 import uuid
 import os
 from verl.workers.rollout.osworld_env.env import add_box_token
+from transformers import AutoProcessor
 
 DATA_ROOT_DIR = "./tmp"
 os.makedirs(DATA_ROOT_DIR, exist_ok=True)
@@ -19,14 +20,28 @@ class TrajectoryRunner:
     def __init__(self, task_config: dict| None = None, max_images: int = 5):
         print("TrajectoryRunner init", task_config)
         self.max_images = max_images
-        self.env = RemoteDesktopEnv(
-            server_url="http://39.107.54.167:4999",
-            action_space="pyautogui",
-            screen_size=(1920, 1080),
-            headless=True,
-            os_type="Ubuntu",
-            require_a11y_tree=False
-        )
+        
+        # Add retry logic for RemoteDesktopEnv initialization
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                self.env = RemoteDesktopEnv(
+                    server_url="http://39.107.54.167:4999",
+                    action_space="pyautogui",
+                    screen_size=(1920, 1080),
+                    headless=True,
+                    os_type="Ubuntu",
+                    require_a11y_tree=False
+                )
+                print(f"RemoteDesktopEnv initialized successfully on attempt {attempt + 1}")
+                break
+            except Exception as e:
+                print(f"Failed to initialize RemoteDesktopEnv on attempt {attempt + 1}: {e}")
+                if attempt == max_retries - 1:
+                    print("All retry attempts failed. Raising the last exception.")
+                    raise
+                print(f"Retrying... ({attempt + 2}/{max_retries})")
+        
         if task_config is not None:
             self.reset(task_config)
     
@@ -72,19 +87,119 @@ def pil_to_base64(image):
     image.save(buffer, format="PNG")  # 你可以改成 "JPEG" 等格式
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-def generate_trajectory_vllm_inputs(messages: np.ndarray, processor):
+def remove_image_from_content(content):
+    content_new = []
+    for c in content:
+        if c["type"] == "image":
+            continue
+        content_new.append(c)
+    if len(content_new) == 0:
+        return None
+    return content_new
+
+def limit_images_in_messages(msg, limit_images: int = 5):
+    """
+    Limit the number of images in a message to ensure it doesn't exceed limit_images.
+    
+    Args:
+        msg: The message to process
+        limit_images: Maximum number of images allowed in the message
+    
+    Returns:
+        Processed message with limited images
+    """
+    msg = copy.deepcopy(msg)
+    image_count = 0
+    
+    # Count total images in the message
+    for m in msg:
+        if not isinstance(m["content"], list):
+            continue
+        
+        for c in m["content"]:
+            if c["type"] == "image":
+                image_count += 1
+    
+    # If image count is within limit, return original message
+    if image_count <= limit_images:
+        return msg
+    
+    # Process message to limit images
+    msg_for_prompt = []
+    current_image_count = 0
+    
+    for m in msg:
+        if m["role"] in ["assistant", "system"]:
+            msg_for_prompt.append(m)
+            continue
+        
+        # Count images in current message
+        message_image_count = 0
+        if isinstance(m["content"], list):
+            for c in m["content"]:
+                if c["type"] == "image":
+                    message_image_count += 1
+        
+        # Check if adding this message would exceed the limit
+        if current_image_count + message_image_count <= limit_images:
+            msg_for_prompt.append(m)
+            current_image_count += message_image_count
+        else:
+            # Need to remove some images from this message
+            if current_image_count >= limit_images:
+                # Already at limit, remove all images from this message
+                content = remove_image_from_content(m["content"])
+                if content is not None:
+                    msg_new = {
+                        "role": "user",
+                        "content": content
+                    }
+                    msg_for_prompt.append(msg_new)
+            else:
+                # Remove excess images to fit within limit
+                remaining_slots = limit_images - current_image_count
+                if remaining_slots > 0:
+                    # Keep some images and remove the rest
+                    content = m["content"].copy()
+                    image_items = [c for c in content if c["type"] == "image"]
+                    non_image_items = [c for c in content if c["type"] != "image"]
+                    
+                    # Keep only the first remaining_slots images
+                    kept_images = image_items[:remaining_slots]
+                    content_new = non_image_items + kept_images
+                    
+                    msg_new = {
+                        "role": "user",
+                        "content": content_new
+                    }
+                    msg_for_prompt.append(msg_new)
+                    current_image_count += remaining_slots
+    
+    return msg_for_prompt
+
+def generate_trajectory_vllm_inputs(
+    messages: np.ndarray, 
+    processor,
+    limit_images: int = 5,
+):
     # for each message, repeat n times
     print("messages length", len(messages))
     vllm_inputs = []
     for i, msg in enumerate(messages):
         msg = copy.deepcopy(msg)
         print("Item ", i, "prompt length", len(msg))
+        msg = list(msg)
+        
+        # Use the new function to limit images in the message
+        msg_for_prompt = limit_images_in_messages(msg, limit_images)
+        
         prompt = processor.apply_chat_template(
-            list(msg),
+            msg_for_prompt,
             add_generation_prompt=True,
             tokenize=False
         )
-        image_inputs, _ = process_vision_info(msg)
+        image_inputs, _ = process_vision_info(msg_for_prompt)
+        print("Get Prompt", prompt, "Image input size", len(image_inputs))
         vllm_input = {
             "prompt": prompt,
             "multi_modal_data": {
@@ -99,8 +214,10 @@ def run_agent_loop(
     runners: list[TrajectoryRunner], 
     messages: np.ndarray,  
     sampling_params: SamplingParams,
-    processor,
+    processor: AutoProcessor,
     max_steps: int = 1,
+    action_parse_res_factor: int = 1000,
+    limit_images: int = 5,
 ):
     """
     Run the agent loop for multiple runners in parallel.
@@ -132,13 +249,18 @@ def run_agent_loop(
                 "image": "data:image;base64," + pil_to_base64(Image.open(BytesIO(obs[i]["screenshot"])))
             }
         )
-    vllm_inputs = generate_trajectory_vllm_inputs(messages, processor)
+    vllm_inputs = generate_trajectory_vllm_inputs(
+        messages, 
+        processor, 
+        limit_images=limit_images)
     step = 0
     
     # Create directories for each runner and save initial messages
     runner_dirs = {}
     # Keep original messages for model input, create separate messages for saving
     messages_for_saving = {}
+    # Track image counter for each runner to ensure sequential naming
+    image_counters = {}
     
     for runner_idx in active_runners:
         # Generate a unique ID for each runner
@@ -146,6 +268,7 @@ def run_agent_loop(
         runner_dir = os.path.join(DATA_ROOT_DIR, run_id)
         os.makedirs(runner_dir, exist_ok=True)
         runner_dirs[runner_idx] = runner_dir
+        image_counters[runner_idx] = 0  # Initialize image counter for this runner
         
         # Create a copy of messages for saving (with image IDs)
         messages_for_saving[runner_idx] = copy.deepcopy(messages[runner_idx])
@@ -154,7 +277,8 @@ def run_agent_loop(
                 for content in msg["content"]:
                     if content.get("type") == "image":
                         # Replace base64 with image ID for saving
-                        image_id = f"image_{uuid.uuid4()}"
+                        image_counters[runner_idx] += 1
+                        image_id = f"image_{image_counters[runner_idx]:04d}"
                         original_image_data = content["image"]
                         content["image"] = image_id
                         # Save the actual image
@@ -197,7 +321,12 @@ def run_agent_loop(
     try:
         while step < max_steps and active_runners:
             # Generate responses for active runners
-            outputs = llm.generate(vllm_inputs, sampling_params=sampling_params, use_tqdm=False)
+            print("generate with sampling_params", sampling_params)
+            outputs = llm.generate(
+                vllm_inputs, 
+                sampling_params=sampling_params, 
+                use_tqdm=False
+            )
             
             # Process each output and execute actions
             new_active_runners = []
@@ -207,7 +336,14 @@ def run_agent_loop(
             for i, (runner_idx, output) in enumerate(zip(active_runners, outputs)):
                 try:
                     generated_text = output.outputs[0].text
-                    print(f"Runner {runner_idx} generated: {generated_text}")
+                    generated_text_with_sp_token = None
+                    if len(generated_text) == 0:
+                        # try use token ids
+                        token_ids = output.outputs[0].token_ids
+                        assert len(token_ids) > 0, "No token ids generated"
+                        generated_text_with_sp_token = processor.tokenizer.decode(token_ids)
+                        generated_text = processor.tokenizer.decode(token_ids, skip_special_tokens=True)
+                    print(f"Runner {runner_idx} generated: {generated_text}\nWith sp token: {generated_text_with_sp_token}")
                     messages[runner_idx] = copy.deepcopy(messages[runner_idx])
                     messages[runner_idx].append(
                         {
@@ -216,11 +352,11 @@ def run_agent_loop(
                         }
                     )
                     messages_for_saving[runner_idx].append(
-                            {
-                                "role": "assistant",
-                                "content": add_box_token(generated_text)
-                            }
-                        )
+                        {
+                            "role": "assistant",
+                            "content": add_box_token(generated_text)
+                        }
+                    )
                     
                     new_vllm_inputs.append(vllm_inputs[i])
                     
@@ -233,7 +369,7 @@ def run_agent_loop(
                     
                     parsed_responses = parse_action_to_structure_output(
                         generated_text,
-                        factor=14,  # TODO: Make this configurable
+                        factor=action_parse_res_factor,  # TODO: Make this configurable
                         origin_resized_height=image.height,
                         origin_resized_width=image.width,
                         model_type="qwen25vl",
@@ -254,10 +390,6 @@ def run_agent_loop(
                     if action_code == "DONE":
                         print(f"Runner {runner_idx} finished")
                         continue
-                    elif action_code == "WAIT":
-                        print(f"Runner {runner_idx} waiting")
-                        new_active_runners.append(runner_idx)
-                        new_messages.append(messages[runner_idx])
                     else:
                         # Execute the action
                         ray.get(runners[runner_idx].execute_action.remote(action_code))
@@ -268,7 +400,8 @@ def run_agent_loop(
                         screenshot = Image.open(BytesIO(obs[i]["screenshot"]))
                         
                         # Save the new screenshot with a unique ID
-                        new_image_id = f"image_{uuid.uuid4()}"
+                        image_counters[runner_idx] += 1
+                        new_image_id = f"image_{image_counters[runner_idx]:04d}"
                         new_image_path = os.path.join(runner_dirs[runner_idx], f"{new_image_id}.png")
                         screenshot.save(new_image_path)
                         
@@ -311,7 +444,11 @@ def run_agent_loop(
             active_runners = new_active_runners
             if active_runners:
                 # update observation
-                vllm_inputs = generate_trajectory_vllm_inputs(new_messages, processor)
+                vllm_inputs = generate_trajectory_vllm_inputs(
+                    new_messages, 
+                    processor, 
+                    limit_images=limit_images
+                )
             
             step += 1
             
@@ -322,7 +459,7 @@ def run_agent_loop(
             save_partial_trajectory(runner_idx, messages, e)
     
     # Save final messages for each active runner
-    for runner_idx in active_runners:
+    for runner_idx in range(len(runners)):
         try:
             messages_copy = copy.deepcopy(messages_for_saving[runner_idx])
             with open(os.path.join(runner_dirs[runner_idx], "final_messages.json"), "w") as f:

@@ -18,7 +18,7 @@ Note that we don't combine the main with ray_trainer as ray_trainer is used by o
 import hydra
 import ray
 
-from verl.trainer.ppo.ray_trainer import RayPPOTrainer
+from verl.trainer.ppo.ray_trainer import RayPPOTrainer, RayOSWorldTrainer
 from verl.trainer.ppo.reward import load_reward_manager
 
 
@@ -158,23 +158,40 @@ class TaskRunner:
         train_dataset = create_rl_dataset(config.data.train_files, config.data, tokenizer, processor)
         val_dataset = create_rl_dataset(config.data.val_files, config.data, tokenizer, processor)
         train_sampler = create_rl_sampler(config.data, train_dataset)
-
+        print("train_dataset", train_dataset, type(train_dataset), len(train_dataset))
         # Initialize the PPO trainer.
-        trainer = RayPPOTrainer(
-            config=config,
-            tokenizer=tokenizer,
-            processor=processor,
-            role_worker_mapping=role_worker_mapping,
-            resource_pool_manager=resource_pool_manager,
-            ray_worker_group_cls=ray_worker_group_cls,
-            reward_fn=reward_fn,
-            val_reward_fn=val_reward_fn,
-            train_dataset=train_dataset,
-            val_dataset=val_dataset,
-            collate_fn=collate_fn,
-            train_sampler=train_sampler,
-            device_name=config.trainer.device,
-        )
+        if config.data.custom_cls.name == "OSWorldDataset":
+            trainer = RayOSWorldTrainer(
+                config=config,
+                tokenizer=tokenizer,
+                processor=processor,
+                role_worker_mapping=role_worker_mapping,
+                resource_pool_manager=resource_pool_manager,
+                ray_worker_group_cls=ray_worker_group_cls,
+                reward_fn=reward_fn,
+                val_reward_fn=val_reward_fn,
+                train_dataset=train_dataset,
+                val_dataset=val_dataset,
+                collate_fn=collate_fn,
+                train_sampler=train_sampler,
+                device_name=config.trainer.device,
+            )
+        else:
+            trainer = RayPPOTrainer(
+                config=config,
+                tokenizer=tokenizer,
+                processor=processor,
+                role_worker_mapping=role_worker_mapping,
+                resource_pool_manager=resource_pool_manager,
+                ray_worker_group_cls=ray_worker_group_cls,
+                reward_fn=reward_fn,
+                val_reward_fn=val_reward_fn,
+                train_dataset=train_dataset,
+                val_dataset=val_dataset,
+                collate_fn=collate_fn,
+                train_sampler=train_sampler,
+                device_name=config.trainer.device,
+            )
         # Initialize the workers of the trainer.
         trainer.init_workers()
         # Start the training process.

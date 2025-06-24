@@ -172,4 +172,4 @@ def test_agent():
     messages = list(np.repeat(batch["messages"], rollout_n, axis=0))
     print("task_configs", len(task_configs), type(task_configs[0]))
     runners = [TrajectoryRunner.remote(task_config) for task_config in task_configs]
-    run_agent_loop(llm, runners, messages, sampling_params, processor, max_steps=3)
+    run_agent_loop(llm, runners, messages, sampling_params, processor, max_steps=15)
