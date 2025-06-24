@@ -198,7 +198,7 @@ class RemoteDesktopEnv(gym.Env):
             "instruction": self.instruction,
         }
 
-    def step(self, action, pause=2):
+    def step(self, action, pause=5):
         """Execute an action in the environment."""
         self._step_no += 1
         self.action_history.append(action)

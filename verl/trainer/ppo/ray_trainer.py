@@ -58,7 +58,7 @@ from verl.utils.metric import (
 from verl.utils.seqlen_balancing import get_seqlen_balanced_partitions, log_seqlen_unbalance
 from verl.utils.torch_functional import masked_mean
 from verl.utils.tracking import ValidationGenerationsLogger
-
+from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter
 WorkerType = Type[Worker]
 
 
@@ -1259,7 +1259,7 @@ class RayOSWorldTrainer(RayPPOTrainer):
 
                     # compute global_valid tokens
                     # batch.meta_info["global_token_num"] = torch.sum(batch.batch["attention_mask"], dim=-1).tolist()
-
+                    reward_tensor = None
                     with _timer("reward", timing_raw):
                         # compute reward model score
                         if self.use_rm:
@@ -1271,13 +1271,33 @@ class RayOSWorldTrainer(RayPPOTrainer):
                         else:
                             reward_tensor, reward_extra_infos_dict = compute_reward(batch, self.reward_fn)
                     print("reward_tensor", reward_tensor)
-                    
+                    splitter = TrajectorySplitter(
+                        processor=self.processor,
+                        root_dir=self.config.data.root_data_dir,
+                        window_size=self.config.data.window_size,
+                        stride_size=self.config.data.stride_size,
+                        max_prompt_length=self.config.data.max_prompt_length,
+                        max_response_length=self.config.data.max_response_length,
+                        truncation=self.config.data.truncation
+                    )
+                    old_batch = batch
+                    dataset_ids = old_batch.non_tensor_batch["dataset_ids"]
+                    batch = splitter.split(dataset_ids, reward_tensor)
+                    batch = DataProto.from_single_dict(batch)
+                    batch = self._up_sample(batch, self.actor_rollout_wg.world_size)
+                    if "reward_tensor" in batch.batch.keys():
+                        reward_tensor = batch.batch.pop("reward_tensor")
+                        print("Reward tensor is refreshed!", reward_tensor.shape)
+
+                    # compute global_valid tokens
+                    batch.meta_info["global_token_num"] = torch.sum(batch.batch["attention_mask"], dim=-1).tolist()
                     # recompute old_log_probs
                     with _timer("old_log_prob", timing_raw):
                         old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)
                         entropys = old_log_prob.batch["entropys"]
                         response_masks = batch.batch["response_mask"]
                         loss_agg_mode = self.config.actor_rollout_ref.actor.loss_agg_mode
+                        print("compute_log_prob", entropys.shape, response_masks.shape)
                         entropy_agg = agg_loss(loss_mat=entropys, loss_mask=response_masks, loss_agg_mode=loss_agg_mode)
                         old_log_prob_metrics = {"actor/entropy": entropy_agg.detach().item()}
                         metrics.update(old_log_prob_metrics)
@@ -1422,3 +1442,22 @@ class RayOSWorldTrainer(RayPPOTrainer):
                     pprint(f"Final validation metrics: {last_val_metrics}")
                     progress_bar.close()
                     return
+    
+    def _up_sample(self, batch: DataProto, world_size: int) -> DataProto:
+        if len(batch) % world_size == 0:
+            return batch
+        print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch))
+        try:
+            import random
+            dataset_ids = batch.non_tensor_batch["dataset_ids"]
+            target_size = (len(batch) // world_size + 1) * world_size
+            up_sample_size = target_size - len(batch)
+            print("Need upsample", up_sample_size)
+            idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
+            upsampel_batch = batch.select_idxs(idx)
+            batch = DataProto.concat([batch, upsampel_batch])
+            print("After upsample", len(batch))
+        except Exception as e:
+            print("_up_sample failed due to", e)
+
+        return batch

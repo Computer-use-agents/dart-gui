@@ -390,10 +390,6 @@ def run_agent_loop(
                     if action_code == "DONE":
                         print(f"Runner {runner_idx} finished")
                         continue
-                    elif action_code == "WAIT":
-                        print(f"Runner {runner_idx} waiting")
-                        new_active_runners.append(runner_idx)
-                        new_messages.append(messages[runner_idx])
                     else:
                         # Execute the action
                         ray.get(runners[runner_idx].execute_action.remote(action_code))
@@ -463,7 +459,7 @@ def run_agent_loop(
             save_partial_trajectory(runner_idx, messages, e)
     
     # Save final messages for each active runner
-    for runner_idx in active_runners:
+    for runner_idx in range(len(runners)):
         try:
             messages_copy = copy.deepcopy(messages_for_saving[runner_idx])
             with open(os.path.join(runner_dirs[runner_idx], "final_messages.json"), "w") as f:

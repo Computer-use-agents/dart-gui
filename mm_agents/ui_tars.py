@@ -458,7 +458,8 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
         
         elif action_type in ["finished"]:
             pyautogui_code = f"DONE"
-        
+        elif action_type in ["wait"]:
+            pyautogui_code = "WAIT"
         else:
             pyautogui_code += f"\n# Unrecognized action type: {action_type}"
 
@@ -485,8 +486,8 @@ def add_box_token(input_string):
         final_string = suffix + "\n\n".join(processed_actions)
     else:
         final_string = input_string
-    print(f"Input string: {input_string}")
-    print(f"Final string: {final_string}")
+    # print(f"Input string: {input_string}")
+    # print(f"Final string: {final_string}")
     return [{"type": "text", "text": final_string}]
 
 def pil_to_base64(image):

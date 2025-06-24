@@ -158,28 +158,6 @@ class vLLMRollout(BaseRollout):
         engine_kwargs = {key: val for key, val in engine_kwargs.items() if val is not None}
         if config.get("limit_images", None):  # support for multi-image data
             engine_kwargs["limit_mm_per_prompt"] = {"image": config.get("limit_images")}
-        print("Init configs:", dict(
-            model=model_path,
-            enable_sleep_mode=True,
-            tensor_parallel_size=tensor_parallel_size,
-            distributed_executor_backend="external_launcher",
-            dtype=config.dtype,
-            enforce_eager=config.enforce_eager,
-            gpu_memory_utilization=config.gpu_memory_utilization,
-            disable_custom_all_reduce=True,
-            disable_mm_preprocessor_cache=True,
-            skip_tokenizer_init=False,
-            max_model_len=max_model_len,
-            load_format=load_format,
-            disable_log_stats=config.disable_log_stats,
-            max_num_batched_tokens=max_num_batched_tokens,
-            enable_chunked_prefill=config.enable_chunked_prefill,
-            enable_prefix_caching=True,
-            trust_remote_code=trust_remote_code,
-            seed=config.get("seed", 0),
-            **lora_kwargs,
-            **engine_kwargs,
-        ))
         self.inference_engine = LLM(
             model=model_path,
             enable_sleep_mode=True,
@@ -309,7 +287,11 @@ class vLLMRollout(BaseRollout):
             traceback.print_exc()
             print("Error in generate_sequences: ", e)
         finally:
-            self.close_env(runners)
+            try:
+                self.close_env(runners)
+            except Exception as e:
+                print("close env met exception:", e)
+                
         non_tensor_batch = {
             "messages": np.array(messages, dtype=object),
             "task_config": np.array(task_configs, dtype=object),

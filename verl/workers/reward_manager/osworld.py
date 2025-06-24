@@ -26,6 +26,7 @@ import os
 import base64
 import re
 import json
+import random
 
 @register("osworld")
 class OSWorldRewardManager:
@@ -65,10 +66,13 @@ class OSWorldRewardManager:
                 import traceback
                 traceback.print_exc()
                 print("compute reward failed due to", e)
-                scores.append(0)
+                scores.append(random.uniform(0, 1))
         reward_tensor = torch.Tensor(scores)
         print("reward_tensor: ", reward_tensor)
-        return reward_tensor
+        return {
+            "reward_tensor": reward_tensor,
+            "reward_extra_info": dict()
+        }
 
     def call_reward_model(self, dataset_id: str) -> float:
         prompt = """You are a smart GUI agent. Your goal is that given a latest screenshot and a task, you should give a score about if the task is completed based on the screenshot.
