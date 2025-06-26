@@ -4,7 +4,27 @@
         "a746add2-cab0-4740-ac36-c3769d9bfb46",
         "72f83cdc-bf76-4531-9a1b-eb893a13f8aa"
     ],
+    "libreoffice_calc": [
+        "3aaa4e37-dc91-482e-99af-132a612d40f3",
+        "1e8df695-bd1b-45b3-b557-e7d599cf7597",
+        "4172ea6e-6b77-4edb-a9cc-c0014bd1603b"
+    ],
+    "libreoffice_impress": [
+        "2cd43775-7085-45d8-89fa-9e35c0a915cf",
+        "15aece23-a215-4579-91b4-69eec72e18da"
+    ],
+    "libreoffice_writer": [
+        "0b17a146-2934-46c7-8727-73ff6b6483e8",
+        "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
+        "72b810ef-4156-4d09-8f08-a0cf57e7cefe"
+    ],
     "os": [
         "94d95f96-9699-4208-98ba-3c3119edf9c2"
+    ],
+    "vs_code": [
+        "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
+        "9439a27b-18ae-42d8-9778-5f68f891805e",
+        "ec71221e-ac43-46f9-89b8-ee7d80f7e1c5",
+        "c6bf789c-ba3a-4209-971d-b63abf0ab733"
     ]
 }
