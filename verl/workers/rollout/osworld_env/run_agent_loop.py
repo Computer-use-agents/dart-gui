@@ -11,7 +11,7 @@ import uuid
 import os
 from verl.workers.rollout.osworld_env.env import add_box_token
 from transformers import AutoProcessor
-
+import json
 DATA_ROOT_DIR = "./tmp"
 os.makedirs(DATA_ROOT_DIR, exist_ok=True)
 
@@ -20,7 +20,8 @@ class TrajectoryRunner:
     def __init__(self, task_config: dict| None = None, max_images: int = 5):
         print("TrajectoryRunner init", task_config)
         self.max_images = max_images
-        
+        self.task_config = task_config
+        self.is_init = False
         # Add retry logic for RemoteDesktopEnv initialization
         max_retries = 3
         for attempt in range(max_retries):
@@ -31,7 +32,8 @@ class TrajectoryRunner:
                     screen_size=(1920, 1080),
                     headless=True,
                     os_type="Ubuntu",
-                    require_a11y_tree=False
+                    require_a11y_tree=False,
+                    task_config=task_config
                 )
                 print(f"RemoteDesktopEnv initialized successfully on attempt {attempt + 1}")
                 break
@@ -42,8 +44,9 @@ class TrajectoryRunner:
                     raise
                 print(f"Retrying... ({attempt + 2}/{max_retries})")
         
-        if task_config is not None:
-            self.reset(task_config)
+        self.is_init = True
+        # if task_config is not None:
+        #     self.reset(task_config)
     
     def close(self):
         self.env.close()
@@ -56,6 +59,7 @@ class TrajectoryRunner:
         self.env.reset(task_config)
 
     def get_obs(self):
+        print("get_obs called!")
         return self.env._get_obs()
 
     def execute_action(self, action_code):
@@ -75,6 +79,13 @@ class TrajectoryRunner:
                 print("info", info)
                 if done:
                     break
+    
+    def get_task_config(self):
+        return self.task_config
+
+
+    def get_is_init(self):
+        return self.is_init
 
     
 # Convert bytes to base64 string
@@ -234,6 +245,7 @@ def run_agent_loop(
         List of final states for each runner
     """
     assert len(runners) == len(messages), "The number of runners and messages must be the same"
+    
     messages = list(messages)
     messages = [list(copy.deepcopy(msg)) for msg in messages]
     print("messages type", type(messages), type(messages[0]))
@@ -267,6 +279,10 @@ def run_agent_loop(
         run_id = str(uuid.uuid4())
         runner_dir = os.path.join(DATA_ROOT_DIR, run_id)
         os.makedirs(runner_dir, exist_ok=True)
+        task_config = ray.get(runners[runner_idx].get_task_config.remote())
+        with open(os.path.join(runner_dir, "task_config.json"), "w") as f:
+            json.dump(task_config, f, indent=2, ensure_ascii=False)
+
         runner_dirs[runner_idx] = runner_dir
         image_counters[runner_idx] = 0  # Initialize image counter for this runner
         
@@ -302,13 +318,11 @@ def run_agent_loop(
                 # Save current messages
                 messages_to_save = copy.deepcopy(current_messages[runner_idx])
                 with open(os.path.join(runner_dir, "partial_messages.json"), "w") as f:
-                    import json
-                    json.dump(messages_to_save, f, indent=2)
+                    json.dump(messages_to_save, f, indent=2, ensure_ascii=False)
                 
                 # Save error information if provided
                 if error_info:
                     with open(os.path.join(runner_dir, "error_info.json"), "w") as f:
-                        import json
                         json.dump({
                             "error": str(error_info),
                             "step": step,
@@ -383,7 +397,7 @@ def run_agent_loop(
                         parsed_responses,
                         image_height=image.height,
                         image_width=image.width,
-                        input_swap=True  # TODO: Make this configurable
+                        input_swap=False  # TODO: Make this configurable
                     )
                     
                     # Execute action
@@ -463,8 +477,7 @@ def run_agent_loop(
         try:
             messages_copy = copy.deepcopy(messages_for_saving[runner_idx])
             with open(os.path.join(runner_dirs[runner_idx], "final_messages.json"), "w") as f:
-                import json
-                json.dump(messages_copy, f, indent=2)
+                json.dump(messages_copy, f, indent=2, ensure_ascii=False)
         except Exception as e:
             print(f"Error saving final messages for runner {runner_idx}: {e}")
     

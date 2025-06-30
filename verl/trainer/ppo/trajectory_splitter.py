@@ -51,6 +51,7 @@ class TrajectorySplitter():
             max_prompt_length: int = 32048,
             max_response_length: int = 32000,
             truncation: str = "error",
+            limit_images: int = 5,
         ) -> None:
         self.processor = processor
         self.root_dir = root_dir
@@ -59,25 +60,23 @@ class TrajectorySplitter():
         self.max_prompt_length = max_prompt_length
         self.truncation = truncation
         self.max_response_length = max_response_length
+        self.limit_images = limit_images
 
     def split(
             self, 
             dataset_ids: list[str], 
-            reward_tensor: torch.Tensor | None = None) -> DataProto:
-        batch_size = len(dataset_ids)
+            reward_tensor: torch.Tensor | None = None
+        ) -> DataProto:
         batch_output = []
         for idx, dataset_id in enumerate(dataset_ids):
             batch_messages = self.split_dataset_id(dataset_id)
             batch_tokenized_messages = self.tokenize(
                 batch_messages, 
                 dataset_id,
-                reward=reward_tensor[idx].item())
+                reward=reward_tensor[idx].item()
+            )
             batch_output += batch_tokenized_messages
-        
         batch_output = collate_fn(batch_output)
-        print("Output batch")
-        for k, v in batch_output.items():
-            print(k, len(v))
         return batch_output
     
     def split_dataset_id(self, dataset_id: str) -> list[list[dict]]:
@@ -94,9 +93,9 @@ class TrajectorySplitter():
         while end < n_msg:
             assert dataset[start]["role"] == "user"
             if len(dataset[start]["content"]) == 1:
-                # do update instruction
-                instruction["content"][1] = copy.deepcopy(dataset[start]["content"][0])
-            item = self._process_item(dataset, instruction, start+1, end)
+                # remove image from instruction
+                instruction["content"] = instruction["content"][:1]
+            item = self._process_item(dataset, instruction, start, end)
             
             batch_data.append(item)
             start += 2 * self.stride_size
@@ -105,8 +104,12 @@ class TrajectorySplitter():
 
     def _process_item(self, dataset, instruction, start, end) -> dict:
         system_prompt = dataset[0]
-
-        message_body = copy.deepcopy(dataset[start: end])
+        message_body = []
+        for i in range(start):
+            if dataset[i]["role"] == "assistant":
+                message_body.append(copy.deepcopy(dataset[i]))
+            
+        message_body.extend(copy.deepcopy(dataset[start+1: end]))
         item = [
             copy.deepcopy(system_prompt),
         ]
@@ -145,20 +148,32 @@ class TrajectorySplitter():
             row_dict["input_ids"] = seq[0]
             row_dict["position_ids"] = position_ids
             row_dict["reward_tensor"] = reward_tensor
-            # for k, v in row_dict.items():
-            #     print(k, v.shape)
-            # There's a trap here, multi_modal_inputs has to be a dict, not BatchFeature
             row_dict["multi_modal_data"] = multi_modal_data
             row_dict["multi_modal_inputs"] = dict(model_inputs)
             row_dict["dataset_ids"] = dataset_id
             row_dict["uid"] = str(uuid.uuid4())
-            # row_dict["raw_prompt_ids"] = raw_prompt_ids
             self.compute_mask(row_dict)
             tokenized_batch_data.append(row_dict)
         return tokenized_batch_data
     
+    def _locate_context(self, messages: list[dict]):
+        has_first_observation = False
+        index = 0
+        for msg in messages:
+            if msg["role"] == "user":
+                assert isinstance(msg["content"], list), "user message must be a list"
+                for c in msg["content"]:
+                    if c["type"] == "image":
+                        has_first_observation = True
+                        break
+            index += 1
+            if has_first_observation:
+                break
+        return index
+
     def _get_inputs(self, messages: list[dict], dataset_id: str):
-        raw_prompt = self.processor.apply_chat_template(messages[:2], add_generation_prompt=False, tokenize=False)
+        context_len = self._locate_context(messages)
+        raw_prompt = self.processor.apply_chat_template(messages[:context_len], add_generation_prompt=False, tokenize=False)
         multi_modal_data = {}
         image_paths = []
         for msg in messages:
@@ -230,13 +245,15 @@ class TrajectorySplitter():
                 left_pad=True,
                 truncation=self.truncation,
             )
-        role_assistant = "<|im_start|>assistant"
-        assist_position = find_subsequence_positions_efficient(
+        # role_assistant = "<|im_start|>assistant"
+        image_placeholder = "<|vision_end|><|im_end|>"
+        image_placeholder_token = self.processor.tokenizer.encode(image_placeholder)
+        image_placeholder_pos = find_subsequence_positions_efficient(
             input_ids[0], 
-            self.processor.tokenizer.encode(role_assistant)
+            image_placeholder_token
         )
-        response_position = assist_position[0].item()
-        
+
+        response_position = image_placeholder_pos[0].item() + len(image_placeholder_token)
         response = input_ids[..., response_position:]
         # print("Decode response:")
         # print("Find position:", response_position)
@@ -295,16 +312,30 @@ class TrajectorySplitter():
             input_ids, 
             self.processor.tokenizer.encode(im_end)
         )
-
+        image_placeholder = "<|vision_end|><|im_end|>"
+        image_placeholder_token = self.processor.tokenizer.encode(image_placeholder)
+        image_placeholder_pos = find_subsequence_positions_efficient(
+            input_ids, 
+            image_placeholder_token
+        )
         # print("Position", assist_position, im_end_position)
         response_mask = torch.zeros_like(input_ids)
         loss_mask = torch.zeros_like(input_ids)
-        
+        after = int(image_placeholder_pos[0].item())
+        assist_position = get_position_after(assist_position, after)
+        im_end_position = get_position_after(im_end_position, after + len(image_placeholder_token))
+        print("size of pos tensor", assist_position.shape, im_end_position.shape, assist_position, im_end_position, after, len(image_placeholder_token))
+        # print("Debug decoding", self.processor.tokenizer.decode(input_ids[:32144]))
         im_end_position = get_im_end_tag_for_assist(im_end_position)
+        
+        print("size of pos tensor", assist_position.shape, im_end_position.shape, assist_position, im_end_position)
         for assist_pos, im_pos in zip(assist_position, im_end_position):
             assert assist_pos < im_pos
-            # print("Decoding checking")
-            # print(self.processor.tokenizer.decode(input_ids[assist_pos: im_pos+1]))
+            print("Decoding checking")
+            print(self.processor.tokenizer.decode(input_ids[assist_pos: im_pos+1]))
+            # TODO: here loss mask and response mask has same logic - only mask assistant: ... <|im_end|>.
+            # Not sure if the correct way to do both of the mask.
+            # Need to double check later logic how to use these two mask computing logp and entropy
             loss_mask[assist_pos: im_pos+1] = 1
             response_mask[assist_pos: im_pos+1] = 1
         # response_mask[assist_position[0]:im_end_position[-1]] = 1
@@ -313,12 +344,20 @@ class TrajectorySplitter():
         row_dict["response_mask"] = response_mask[self.max_prompt_length:]
         row_dict["loss_mask"] = loss_mask
 
-def get_im_end_tag_for_assist(im_end_position):
-    """Assume system, user, assistant, user, assistant... format"""
+def get_position_after(pos: torch.Tensor, after: int):
     positions = []
-    for i in range(2, len(im_end_position), 2):
-        positions.append(im_end_position[i].item())
+    for i in range(len(pos)):
+        p = pos[i].item()
+        if p <= after:
+            continue
+        positions.append(p)
+    return torch.tensor(positions, dtype=pos.dtype, device=pos.device)
 
+def get_im_end_tag_for_assist(im_end_position: torch.Tensor):
+    """assistant, user, assistant... format"""
+    positions = []
+    for i in range(0, len(im_end_position), 2):
+        positions.append(im_end_position[i].item())
 
     return torch.tensor(positions, dtype=im_end_position.dtype, device=im_end_position.device)
 

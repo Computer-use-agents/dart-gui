@@ -14,17 +14,18 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+MODEL_PATH=/app/data/arpo_workspace/UI-TARS-1.5-7B
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
 export SWANLAB_API_KEY=r8dG8z3q9n9xGomA1r5yY
 export REWARD_SERVER_URL=https://sv-f6d94218-4896-4642-be77-7665e5d9d794-8000-x-aps-o-454646e3ee.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
+export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=ed6d579b-dd72-4153-a58e-249e8ca366b8
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files=evaluation_examples/training_set.json \
-    data.val_files=evaluation_examples/training_set.json \
+    data.train_files=evaluation_examples/training_set_arpo.json \
+    data.val_files=evaluation_examples/training_set_arpo.json \
     data.train_batch_size=8 \
     data.max_prompt_length=32000 \
     data.max_response_length=32000 \
@@ -57,6 +58,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.enforce_eager=False \
     actor_rollout_ref.rollout.free_cache_engine=False \
     actor_rollout_ref.rollout.n=4 \
+    actor_rollout_ref.rollout.top_k=200 \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
@@ -68,7 +70,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.experiment_name='osworld_grpo' \
     trainer.n_gpus_per_node=$N_GPUS \
     trainer.nnodes=1 \
-    trainer.save_freq=20 \
+    trainer.save_freq=10 \
     trainer.test_freq=5 \
     trainer.val_before_train=False \
     trainer.total_epochs=15 $@

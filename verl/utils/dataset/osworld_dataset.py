@@ -161,6 +161,10 @@ class OSWorldDataset(Dataset):
         with open(task_path, "r") as f:
             task_data = json.load(f)
 
+        task_data["raw"] = {
+            "task_type": task_type,
+            "task_id": task_id
+        }
         instruction = task_data["instruction"]
         messages = [
             {

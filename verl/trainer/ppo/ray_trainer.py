@@ -1267,6 +1267,8 @@ class RayOSWorldTrainer(RayPPOTrainer):
                     # generate a batch
                     with marked_timer("gen", timing_raw):
                         if not self.async_rollout_mode:
+                            result = self.actor_rollout_wg.clear_envs()
+                            print("actor_rollout_wg clear envs:", result)
                             gen_batch_output = self.actor_rollout_wg.generate_sequences(gen_batch)
                         else:
                             self.async_rollout_manager.wake_up()
@@ -1296,6 +1298,10 @@ class RayOSWorldTrainer(RayPPOTrainer):
                     # batch = batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=True)
                     # batch = batch.union(gen_batch_output)
                     batch = gen_batch_output
+                    if len(batch.non_tensor_batch["dataset_ids"]) == 0:
+                        print("[Warning] For some reason, rollout failed for all, skip this step!")
+                        continue
+
                     # batch.batch["response_mask"] = compute_response_mask(batch)
                     # Balance the number of valid tokens across DP ranks.
                     # NOTE: This usually changes the order of data in the `batch`,
@@ -1333,8 +1339,10 @@ class RayOSWorldTrainer(RayPPOTrainer):
                     batch = splitter.split(dataset_ids, reward_tensor)
                     batch = DataProto.from_single_dict(batch)
                     config = self.actor_rollout_wg.get_config()
-                    print("Do upsample!", type(self.actor_rollout_wg), len(config), config[0].actor)
-                    config = config[0] # current ONE_TO_ALL
+                    if isinstance(config, list):
+                        print("Warning: config is a list?", config)
+                        config = config[0]
+                    print("Do upsample!", type(self.actor_rollout_wg), len(config), config.actor)
                     batch = self._up_sample(
                         batch, 
                         self.actor_rollout_wg.world_size, 
@@ -1450,7 +1458,6 @@ class RayOSWorldTrainer(RayPPOTrainer):
                     rollout_data_dir = self.config.trainer.get("rollout_data_dir", None)
                     if rollout_data_dir:
                         with marked_timer("dump_rollout_generations", timing_raw):
-                            print(batch.batch.keys())
                             inputs = self.tokenizer.batch_decode(batch.batch["prompts"], skip_special_tokens=True)
                             outputs = self.tokenizer.batch_decode(batch.batch["responses"], skip_special_tokens=True)
                             scores = batch.batch["token_level_scores"].sum(-1).cpu().tolist()
