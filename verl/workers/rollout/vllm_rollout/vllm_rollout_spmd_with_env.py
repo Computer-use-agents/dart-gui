@@ -270,6 +270,14 @@ class vLLMRollout(BaseRollout):
                 messages = list(np.repeat(prompts.non_tensor_batch["messages"], self.sampling_params.n, axis=0))
                 messages = [list(copy.deepcopy(msg)) for msg in messages]
                 runners = [TrajectoryRunner.remote(task_config) for task_config in task_configs]
+                all_inited = [False]
+                while not all(all_inited):
+                    all_inited = ray.get([runner.get_is_init.remote() for runner in runners])
+                    print("Wait for all env init!", all_inited)
+                    time.sleep(1)
+                print("All env init done!")
+                time.sleep(5)
+                dataset_ids = []
                 dataset_ids = run_agent_loop(
                     self.inference_engine, 
                     runners, 

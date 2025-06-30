@@ -87,13 +87,27 @@ class Tracking:
 
             if config is None:
                 config = {}  # make sure config is not None, otherwise **config will raise error
-            swanlab.init(
-                project=project_name,
-                experiment_name=experiment_name,
-                config={"FRAMEWORK": "verl", **config},
-                logdir=SWANLAB_LOG_DIR,
-                mode=SWANLAB_MODE,
-            )
+            
+            SWAN_WX_GROUP_HOOK = os.environ.get("SWAN_WX_GROUP_HOOK", None)
+            if SWAN_WX_GROUP_HOOK:
+                from swanlab.plugin.notification import WXWorkCallback
+
+                swanlab.init(
+                    project=project_name,
+                    experiment_name=experiment_name,
+                    config={"FRAMEWORK": "verl", **config},
+                    logdir=SWANLAB_LOG_DIR,
+                    mode=SWANLAB_MODE,
+                    callbacks=[WXWorkCallback(webhook_url=SWAN_WX_GROUP_HOOK)]
+                )
+            else:
+                 swanlab.init(
+                    project=project_name,
+                    experiment_name=experiment_name,
+                    config={"FRAMEWORK": "verl", **config},
+                    logdir=SWANLAB_LOG_DIR,
+                    mode=SWANLAB_MODE,
+                )
             self.logger["swanlab"] = swanlab
 
         if "vemlp_wandb" in default_backend:

@@ -44,7 +44,8 @@ class RemoteDesktopEnv(gym.Env):
         require_terminal: bool = False,
         os_type: str = "Ubuntu",
         service_id: Optional[str] = None,
-        evaluation_mode: str = "server" # server or dummy
+        evaluation_mode: str = "server", # server or dummy，
+        task_config: dict | None = None
     ):
         """
         Args:
@@ -69,7 +70,8 @@ class RemoteDesktopEnv(gym.Env):
         # Create a session with default headers
         self.session = requests.Session()
         self.session.headers.update({
-            "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
+            "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J",
+            "Content-Type": "application/json"
         })
         
         # Episodic stuff
@@ -85,7 +87,7 @@ class RemoteDesktopEnv(gym.Env):
         self.service_id = None
         # Service ID management
         if service_id is None:
-            self._create_remote_env()
+            self._create_remote_env(task_config=task_config)
         else:
             # Reuse existing environment
             self.service_id = service_id
@@ -104,24 +106,52 @@ class RemoteDesktopEnv(gym.Env):
                 print(f"Warning: Could not verify environment {self.service_id}: {e}")
                 # Continue anyway - the environment might still be usable
 
-    def _create_remote_env(self):
+    def _create_remote_env(self, task_config: dict | None = None):
+        print("_create_remote_env called", task_config)
         if self.service_id is not None:
             print(f"Close existing environment {self.service_id}")
             try:
                 self.close()
             except Exception as e:
                 print(f"Warning: Close environment {self.service_id} failed: {e}")
+        if task_config is not None:
+            task_type = task_config["raw"]["task_type"]
+            task_id = task_config["raw"]["task_id"]
+            # if task_type == "vscode":
+            #     task_type = "vs_code"
+            # if len(task_config["related_apps"]) > 1:
+            #     task_type = "multi_apps"
+            payload = {
+                "id": task_id,
+                "type": task_type
+            }
+            print("init_env request", payload)
+            response = self.session.post(
+                f"{self.server_url}/server/init_env", 
+                data=json.dumps(payload), 
+                timeout=120
+            )
 
-        response = self.session.post(f"{self.server_url}/server/create", timeout=120)
-        if response.status_code != 200:
-            raise Exception(f"Failed to create environment: {response.text}; code={response.status_code}")
-        
-        # Handle both service_id and server_id field names
-        response_data = response.json()
-        self.service_id = response_data.get("service_id") or response_data.get("server_id")
-        if not self.service_id:
-            raise Exception(f"No service_id or server_id in response: {response_data}")
-        
+            if response.status_code != 200:
+                raise Exception(f"Failed to create environment: {response.text}; code={response.status_code}; {payload}")
+            
+            # Handle both service_id and server_id field names
+            response_data = response.json()
+            print("init_env resp", response_data)
+            self.service_id = response_data.get("service_id") or response_data.get("server_id")
+            if not self.service_id:
+                raise Exception(f"No service_id or server_id in response: {response_data}")
+        else:
+            response = self.session.post(f"{self.server_url}/server/create", timeout=120)
+            if response.status_code != 200:
+                raise Exception(f"Failed to create environment: {response.text}; code={response.status_code}")
+            
+            # Handle both service_id and server_id field names
+            response_data = response.json()
+            self.service_id = response_data.get("service_id") or response_data.get("server_id")
+            if not self.service_id:
+                raise Exception(f"No service_id or server_id in response: {response_data}")
+
     def reset(self, task_config: Optional[Dict[str, Any]] = None, seed=None, options=None) -> Dict[str, Any]:
         """Reset the environment to a new task."""
         self._traj_no += 1

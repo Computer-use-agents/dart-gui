@@ -1,4 +1,4 @@
-from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter
+from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter, find_subsequence_positions_efficient
 from transformers import AutoProcessor
 from verl import DataProto
 import torch
@@ -15,11 +15,19 @@ def test_split():
     result = splitter.split_dataset_id("osworld_trajectory")
     # print(result)
     print(len(result))
-
     for each in result:
-
         print(each)
         print("#" * 100)
+
+    # print(processor.apply_chat_template(result[0]))
+    dataset_id = "osworld_trajectory"
+    input_ids, attention_mask, position_ids, multi_modal_data, model_inputs = splitter._get_inputs(result[0], dataset_id)
+    input_ids, attention_mask, position_ids, multi_modal_data, model_inputs = splitter._get_responses(result[0], dataset_id)
+    debug_str = processor.tokenizer.decode(input_ids[0])
+    with open("debug.txt", "w") as f:
+        f.write(debug_str)
+    print("Has image!", len(multi_modal_data["image"]))
+    assert len(multi_modal_data["image"]) == 5
 
     result = splitter.tokenize(result, "osworld_trajectory", 1)
 

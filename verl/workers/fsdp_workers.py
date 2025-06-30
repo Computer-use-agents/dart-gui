@@ -37,7 +37,7 @@ import verl.utils.torch_functional as verl_F
 from verl import DataProto
 from verl.models.transformers.monkey_patch import apply_monkey_patch
 from verl.single_controller.base import Worker
-from verl.single_controller.base.decorator import Dispatch, register
+from verl.single_controller.base.decorator import Dispatch, Execute, register
 from verl.utils import hf_processor, hf_tokenizer, omega_conf_to_dataclass
 from verl.utils.activation_offload import enable_activation_offloading
 from verl.utils.checkpoint.fsdp_checkpoint_manager import FSDPCheckpointManager
@@ -830,9 +830,33 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
         """Stop profiling for the current rank in the current training step."""
         self.profiler.stop()
     
-    @register(dispatch_mode=Dispatch.ONE_TO_ALL)
+    @register(dispatch_mode=Dispatch.ONE_TO_ALL, execute_mode=Execute.RANK_ZERO)
     def get_config(self):
+        current_rank = os.environ["RANK"]
+        print("get_config called at rank", current_rank)
         return self.config
+    
+    @register(dispatch_mode=Dispatch.ONE_TO_ALL, execute_mode=Execute.RANK_ZERO)
+    def clear_envs(self):
+        current_rank = os.environ["RANK"]
+        print("clear_envs called at rank", current_rank)
+        import requests
+        from verl.workers.rollout.vllm_rollout.vllm_rollout_spmd_with_env import RemoteDesktopEnv
+        try:
+            base_url = "http://39.107.54.167:4999"
+            envs = RemoteDesktopEnv.list_environments(base_url)
+            print(envs)
+            session = requests.Session()
+            session.headers.update({
+                "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
+            })
+            for env in envs:
+                response = session.post(f"{base_url}/server/delete/{env['server_id']}")
+                print(response.json())
+        except Exception as e:
+            print("clear_envs failed!", e)
+            return "failed"
+        return "success"
 
 
 class CriticWorker(Worker, DistProfilerExtension):

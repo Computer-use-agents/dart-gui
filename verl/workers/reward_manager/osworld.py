@@ -61,6 +61,9 @@ class OSWorldRewardManager:
         for dataset_id in dataset_ids:
             try:
                 score = self.call_reward_model(dataset_id)
+                with open(os.path.join(self.root_dir, dataset_id, "reward.txt"), "w") as f:
+                    f.write(str(score))
+                    
                 scores.append(score)
             except Exception as e:
                 import traceback
@@ -81,7 +84,7 @@ You will also have a history of agent actions. You should consider if the histor
 Format your response as
 ```
 Thought: <your reasoning process>
-Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed, Give a value between 0 and 1 if you are not sure>
+Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed, Give a value between 0 and 1 if the task is partially complete>
 ```
 Important note for score:
 - You shuold check if the action history is consistent with the task
@@ -89,12 +92,21 @@ Important note for score:
 ## Task
 {task}
 
+## Related app
+{related_app}
+
 ## Action History
 {action_history}
 
 ## Screenshot History
 """
+
         dataset_path = os.path.join(self.root_dir, dataset_id)
+        with open(os.path.join(dataset_path, "task_config.json"), "w") as f:
+            task_config = json.load(f)
+        task = task_config["instruction"]
+        related_app = task_config["related_app"]
+
         image_paths = get_last_image_file(dataset_path, mode="sample", n=3)
         print("Get image", len(image_paths))
         image_body = []
@@ -113,7 +125,6 @@ Important note for score:
 
         with open(os.path.join(dataset_path, "final_messages.json"), "r") as f:
             messages = json.load(f)
-        task = messages[1]["content"][0]["text"].split("## User Instruction")[1].strip()
         action_history = ""
         step_idx = 0
         for msg in messages:
@@ -130,7 +141,11 @@ Important note for score:
                 "content": [
                     {
                         "type": "text",
-                        "text": prompt.format(task=task, action_history=action_history)
+                        "text": prompt.format(
+                            task=task, 
+                            action_history=action_history,
+                            related_app=related_app
+                        )
                     }    
                 ]
         }]
