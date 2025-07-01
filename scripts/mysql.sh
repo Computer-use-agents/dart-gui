@@ -1,0 +1,1 @@
+mysql -h 112.125.88.107 -u agentictrl -p'`1qaz~!QAZ' BIGAI 

@@ -18,9 +18,9 @@ MODEL_PATH=/app/data/arpo_workspace/UI-TARS-1.5-7B
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
 export SWANLAB_API_KEY=r8dG8z3q9n9xGomA1r5yY
-export REWARD_SERVER_URL=https://sv-f6d94218-4896-4642-be77-7665e5d9d794-8000-x-aps-o-454646e3ee.sproxy.hd-01.alayanew.com:22443/v1
+export REWARD_SERVER_URL=https://sv-23d8e907-c0f6-4b59-8b9a-1927d5969bf7-8000-x-aps-o-9a5f35d165.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
-export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=ed6d579b-dd72-4153-a58e-249e8ca366b8
+export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \

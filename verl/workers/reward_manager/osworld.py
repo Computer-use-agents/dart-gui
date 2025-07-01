@@ -12,21 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import defaultdict
+
+import base64
+import json
+import os
+import random
+import re
 
 import torch
+from openai import OpenAI
 
 from verl import DataProto
 from verl.utils.reward_score import default_compute_score
 from verl.workers.reward_manager import register
 
-
-from openai import OpenAI
-import os
-import base64
-import re
-import json
-import random
 
 @register("osworld")
 class OSWorldRewardManager:
@@ -61,15 +60,20 @@ class OSWorldRewardManager:
         for dataset_id in dataset_ids:
             try:
                 score = self.call_reward_model(dataset_id)
-                with open(os.path.join(self.root_dir, dataset_id, "reward.txt"), "w") as f:
-                    f.write(str(score))
-                    
                 scores.append(score)
             except Exception as e:
                 import traceback
                 traceback.print_exc()
                 print("compute reward failed due to", e)
                 scores.append(random.uniform(0, 1))
+
+            try:
+                with open(os.path.join(self.root_dir, dataset_id, "reward.txt"), "w") as f:
+                    f.write(str(scores[-1]))
+            except Exception as e:
+                print("write to reward failed!", e)
+                
+
         reward_tensor = torch.Tensor(scores)
         print("reward_tensor: ", reward_tensor)
         return {
@@ -102,12 +106,14 @@ Important note for score:
 """
 
         dataset_path = os.path.join(self.root_dir, dataset_id)
-        with open(os.path.join(dataset_path, "task_config.json"), "w") as f:
+        with open(os.path.join(dataset_path, "task_config.json"), "r") as f:
             task_config = json.load(f)
         task = task_config["instruction"]
-        related_app = task_config["related_app"]
+        related_app = task_config["related_apps"]
 
         image_paths = get_last_image_file(dataset_path, mode="sample", n=3)
+        if isinstance(image_paths, str):
+            image_paths = [image_paths]
         print("Get image", len(image_paths))
         image_body = []
         for image_path in image_paths:
@@ -123,7 +129,7 @@ Important note for score:
 
 
 
-        with open(os.path.join(dataset_path, "final_messages.json"), "r") as f:
+        with open(os.path.join(dataset_path, "final_messages.json")) as f:
             messages = json.load(f)
         action_history = ""
         step_idx = 0

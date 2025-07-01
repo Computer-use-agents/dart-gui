@@ -1,32 +1,28 @@
-import ast
-import re
-import math
-from PIL import Image
-import ray
-import os
-from io import BytesIO
 import base64
 import datetime
-import traceback
-import torch
-import requests
 import json
-import time
-from typing import Dict, Any, Optional, Tuple, List
-import gymnasium as gym
-
-from qwen_vl_utils import process_vision_info
-from verl.utils import hf_processor, hf_tokenizer
-import verl.utils.torch_functional as VF
-from verl.models.transformers.qwen2_vl import get_rope_index
-
-from openai import OpenAI
-import os
-import base64
 import logging
+import os
+import re
+import time
+import traceback
 import uuid
+from io import BytesIO
+from typing import Any, Dict, List, Optional, Tuple
+
+import gymnasium as gym
+import ray
+import requests
+import torch
+from openai import OpenAI
+from qwen_vl_utils import process_vision_info
+
+import verl.utils.torch_functional as VF
 from mm_agents.prompts import COMPUTER_USE_DOUBAO
-from mm_agents.ui_tars import parse_action_to_structure_output, parsing_response_to_pyautogui_code, add_box_token
+from mm_agents.ui_tars import add_box_token, parse_action_to_structure_output, parsing_response_to_pyautogui_code
+from verl.models.transformers.qwen2_vl import get_rope_index
+from verl.utils import hf_processor, hf_tokenizer
+
 logger = logging.getLogger("desktopenv.experiment")
 
 class RemoteDesktopEnv(gym.Env):
@@ -258,12 +254,13 @@ class RemoteDesktopEnv(gym.Env):
             python_code = f"import pyautogui; {action}"
 
         # Send action to server
+        
         response = self.session.post(
             f"{self.server_url}/server/execute/{self.service_id}",
             json={"action": python_code}
         )
         if response.status_code != 200:
-            raise Exception(f"Failed to execute action: {response.text}")
+            raise Exception(f"Failed to execute action: {response.text}; request: {python_code}")
 
         time.sleep(pause)
         observation = self._get_obs()
@@ -446,7 +443,7 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
     
     
 @ray.remote(num_cpus=1)
-class EnvWorker():
+class EnvWorker:
     system_prompt = COMPUTER_USE_DOUBAO
 
     def __init__(self, worker_idx, max_steps=15, config=None):
@@ -1033,7 +1030,7 @@ def pretty_print_messages(messages):
             if type(content) == list:
                 for c in content:
                     if c['type'] == 'image_url':
-                        content_printing += f"<image_url>\n"
+                        content_printing += "<image_url>\n"
                     elif c['type'] == 'text':
                         content_printing += f"{c['text']}\n"
             elif type(content) == str:

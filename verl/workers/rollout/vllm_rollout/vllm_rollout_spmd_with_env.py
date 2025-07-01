@@ -26,39 +26,32 @@ When working with Megatron:
 - After inference, all the parameters that doesn't belong to this pp rank is freed.
 """
 
+import copy
 import logging
 import os
+import time
 from contextlib import contextmanager
 from copy import deepcopy
 from typing import Any, Dict, List, Union
-import time
+
 import numpy as np
+import ray
 import torch
 import torch.distributed
-import copy
-from io import BytesIO
-
-
 from omegaconf import DictConfig, OmegaConf
-from tensordict import TensorDict
+from transformers import AutoProcessor
 from vllm import LLM, SamplingParams
 from vllm.distributed import parallel_state as vllm_ps
-from vllm.lora.request import LoRARequest
 from vllm.worker.worker_base import WorkerWrapperBase
-from verl.workers.rollout.osworld_env.run_agent_loop import pil_to_base64, TrajectoryRunner, run_agent_loop
+
 from verl import DataProto
 from verl.third_party.vllm import vllm_version
 from verl.utils.debug import GPUMemoryLogger
-from verl.utils.torch_functional import get_response_mask, pad_2d_list_to_length
 from verl.workers.rollout.base import BaseRollout
-from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv
-from qwen_vl_utils import process_vision_info
-from transformers import AutoProcessor
-from PIL import Image
-import ray
+from verl.workers.rollout.osworld_env.run_agent_loop import TrajectoryRunner, run_agent_loop
+
 logger = logging.getLogger(__file__)
 logger.setLevel(os.getenv("VERL_LOGGING_LEVEL", "WARN"))
-import base64
 
 
 # TODO
@@ -264,6 +257,7 @@ class vLLMRollout(BaseRollout):
                     "temperature": self.config.val_kwargs.temperature,
                     "n": 1,  # if validate, already repeat in ray_trainer
                 }
+            dataset_ids = []
             with self.update_sampling_params(**kwargs):
                 task_configs = list(np.repeat(task_configs, self.sampling_params.n, axis=0))
                 task_configs = [copy.deepcopy(task_config) for task_config in task_configs]
@@ -277,7 +271,7 @@ class vLLMRollout(BaseRollout):
                     time.sleep(1)
                 print("All env init done!")
                 time.sleep(5)
-                dataset_ids = []
+                
                 dataset_ids = run_agent_loop(
                     self.inference_engine, 
                     runners, 
