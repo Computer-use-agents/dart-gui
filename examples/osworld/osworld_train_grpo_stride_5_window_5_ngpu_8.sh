@@ -24,8 +24,8 @@ export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files=evaluation_examples/training_set_arpo.json \
-    data.val_files=evaluation_examples/training_set_arpo.json \
+    data.train_files=evaluation_examples/test_success_uitars1.5_wo_impossible.json \
+    data.val_files=evaluation_examples/test_success_uitars1.5_wo_impossible.json \
     data.train_batch_size=8 \
     data.max_prompt_length=32000 \
     data.max_response_length=32000 \

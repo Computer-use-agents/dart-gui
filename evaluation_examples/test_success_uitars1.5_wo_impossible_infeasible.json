@@ -7,8 +7,6 @@
         "2ad9387a-65d8-4e33-ad5b-7580065a27ca",
         "2ae9ba84-3a0d-4d4c-8338-3a1478dc5fe3",
         "af630914-714e-4a24-a7bb-f9af687d3b91",
-        "3720f614-37fd-4d04-8a6b-76f54f8c222d",
-        "ae78f875-5b98-4907-bbb5-9c737fc68c03",
         "3299584d-8f11-4457-bf4c-ce98f7600250",
         "9656a811-9b5b-4ddf-99c7-5117bcef0626",
         "c1fa57f3-c3db-4596-8f09-020701085416",
@@ -30,19 +28,10 @@
         "e2dd0213-26db-4349-abe5-d5667bfd725c",
         "f723c744-e62c-4ae6-98d1-750d3cd7d79d",
         "72f83cdc-bf76-4531-9a1b-eb893a13f8aa",
-        "7767eef2-56a3-4cea-8c9f-48c070c7d65b",
-        "e19bd559-633b-4b02-940f-d946248f088e",
-        "38f48d40-764e-4e77-a7cf-51dfce880291",
-        "fbb548ca-c2a6-4601-9204-e39a2efc507b",
-        "5ca86c6f-f317-49d8-b6a7-b527541caae8",
-        "62f7fd55-0687-4a43-b6e1-3eda16fc6252",
-        "2e6f678f-472d-4c55-99cc-8e7c5c402a71",
-        "045bf3ff-9077-4b86-b483-a1040a949cff",
-        "dbbf4b99-2253-4b10-9274-45f246af2466"
+        "7767eef2-56a3-4cea-8c9f-48c070c7d65b"
     ],
     "libreoffice_calc": [
         "357ef137-7eeb-4c80-a3bb-0951f26a8aff",
-        "2bd59342-0664-4ccb-ba87-79379096cc08",
         "3aaa4e37-dc91-482e-99af-132a612d40f3",
         "1273e544-688f-496b-8d89-3e0f40aa0606",
         "aa3a8974-2e85-438b-b29e-a64df44deb4b",
@@ -79,8 +68,7 @@
         "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
         "d53ff5ee-3b1a-431e-b2be-30ed2673079b",
         "e528b65e-1107-4b8c-8988-490e4fece599",
-        "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
-        "bb8ccc78-479f-4a2f-a71e-d565e439436b"
+        "ecc2413d-8a48-416e-a3a2-d30106ca36cb"
     ],
     "multi_apps": [
         "2b9493d7-49b8-493a-a71b-56cd1f4d6908",
@@ -89,7 +77,6 @@
         "58565672-7bfe-48ab-b828-db349231de6b",
         "937087b6-f668-4ba6-9110-60682ee33441",
         "ee9a3c83-f437-4879-8918-be5efbb9fac7",
-        "6d72aad6-187a-4392-a4c4-ed87269c51cf",
         "acb0f96b-e27c-44d8-b55f-7cb76609dfcd",
         "3a93cae4-ad3e-403e-8c12-65303b271818",
         "9219480b-3aed-47fc-8bac-d2cffc5849f7",
@@ -98,15 +85,11 @@
     "os": [
         "94d95f96-9699-4208-98ba-3c3119edf9c2",
         "bedcedc4-4d72-425e-ad62-21960b11fe0d",
-        "a462a795-fdc7-4b23-b689-e8b6df786b78",
         "f9be0997-4b7c-45c5-b05c-4612b44a6118",
         "28cc3b7e-b194-4bc9-8353-d04c0f4d56d2",
         "5ea617a3-0e86-4ba6-aab2-dac9aa2e8d57",
         "e0df059f-28a6-4169-924f-b9623e7184cc",
-        "fe41f596-a71b-4c2f-9b2f-9dcd40b568c3",
         "a4d98375-215b-4a4d-aee9-3d4370fccc41",
-        "c288e301-e626-4b98-a1ab-159dcb162af5",
-        "4783cc41-c03c-4e1b-89b4-50658f642bd5",
         "4d117223-a354-47fb-8b45-62ab1390a95f"
     ],
     "thunderbird": [
@@ -115,16 +98,12 @@
         "dd84e895-72fd-4023-a336-97689ded257c",
         "d38192b0-17dc-4e1d-99c3-786d0117de77",
         "a10b69e1-6034-4a2b-93e1-571d45194f75",
-        "10a730d5-d414-4b40-b479-684bed1ae522",
-        "a1af9f1c-50d5-4bc3-a51e-4d9b425ff638"
+        "10a730d5-d414-4b40-b479-684bed1ae522"
     ],
     "vlc": [
         "59f21cfb-0120-4326-b255-a5b827b38967",
         "8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89",
-        "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
-        "5ac2891a-eacd-4954-b339-98abba077adb",
-        "cb130f0d-d36f-4302-9838-b3baf46139b6",
-        "7882ed6e-bece-4bf0-bada-c32dc1ddae72"
+        "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f"
     ],
     "vs_code": [
         "0ed39f63-6049-43d4-ba4d-5fa2fe04a951",
@@ -140,11 +119,6 @@
         "70745df8-f2f5-42bd-8074-fbc10334fcc5",
         "57242fad-77ca-454f-b71b-f187181a9f23",
         "c6bf789c-ba3a-4209-971d-b63abf0ab733",
-        "0512bb38-d531-4acf-9e7e-0add90816068",
-        "847a96b6-df94-4927-97e6-8cc9ea66ced7",
-        "7aeae0e2-70ee-4705-821d-1bba5d5b2ddd",
-        "dcbe20e8-647f-4f1d-8696-f1c5bbb570e3",
-        "7c4cc09e-7a92-40dd-8338-b2286535c4ed",
-        "971cbb5b-3cbf-4ff7-9e24-b5c84fcebfa6"
+        "0512bb38-d531-4acf-9e7e-0add90816068"
     ]
 }

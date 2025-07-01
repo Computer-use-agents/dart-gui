@@ -173,7 +173,13 @@ Important note for score:
         print("reward model:", response_text, "token usage", response.usage)
         score_match = re.search(r"Score:\s*(\d*\.?\d+)", response_text)
         print("reward model final score", score_match)
-        return float(score_match.group(1))
+        score = float(score_match.group(1))
+        if task_config["evaluator"]["func"] == "infeasible":
+            print("This task is infeasible!")
+            if score < 0.3:
+                score = 1.0
+            print("Infeasible task final score:", score)
+        return score
 
 
 def get_last_image_file(directory, mode="last", n=None) -> list[str]:

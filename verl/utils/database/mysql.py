@@ -38,7 +38,7 @@ class Dataset(Base):
     trajectory_id = Column(String(255), nullable=False, unique=True, comment='轨迹ID，唯一')
     created_at = Column(TIMESTAMP, default=func.current_timestamp(), comment='创建时间')
     used = Column(Integer, default=0, comment='使用该数据训过几次')
-    modle_version = Column(Integer, default=0, comment="使用哪个版本生成的数据")
+    model_version = Column(Integer, default=0, comment="使用哪个版本生成的数据")
     run_id = Column(String(255), comment='运行ID')
 
     
@@ -58,7 +58,7 @@ class Dataset(Base):
             'trajectory_id': self.trajectory_id,
             'created_at': self.created_at,
             'usage_time': self.used,
-            "model_version": self.modle_version,
+            "model_version": self.model_version,
             'run_id': self.run_id
         }
 
@@ -131,7 +131,7 @@ class MySQLDatasetsORM:
                 session.expunge(obj)
         return objects
     
-    def create_dataset(self, trajectory_id: str, run_id: str, usage_time: int = 0) -> Dict[str, Any]:
+    def create_dataset(self, trajectory_id: str, run_id: str, used: int = 0) -> Dict[str, Any]:
         """创建新的dataset记录
         
         Args:
@@ -147,7 +147,7 @@ class MySQLDatasetsORM:
                 dataset = Dataset(
                     trajectory_id=trajectory_id,
                     run_id=run_id,
-                    usage_time=usage_time
+                    used=used
                 )
                 session.add(dataset)
                 session.flush()  # 刷新以获取ID
@@ -198,7 +198,7 @@ class MySQLDatasetsORM:
             logger.error(f"Error getting datasets by run_id: {e}")
             raise
     
-    def update_usage_time(self, trajectory_id: str, usage_time: int) -> bool:
+    def update_usage_time(self, trajectory_id: str, used: int) -> bool:
         """更新使用时间
         
         Args:
@@ -215,7 +215,7 @@ class MySQLDatasetsORM:
                 ).first()
                 
                 if dataset:
-                    dataset.usage_time = usage_time
+                    dataset.used = used
                     logger.info(f"Updated usage_time for trajectory_id: {trajectory_id}")
                     return True
                 else:
