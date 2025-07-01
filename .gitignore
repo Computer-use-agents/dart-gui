@@ -1,4 +1,4 @@
-
+*.csv
 **/*.pt
 **/checkpoints
 **/wget-log

@@ -858,8 +858,7 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
             print("clear_envs failed!", e)
             return "failed"
         return "success"
-
-
+    
 class CriticWorker(Worker, DistProfilerExtension):
     def __init__(self, config):
         Worker.__init__(self)
