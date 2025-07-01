@@ -1,17 +1,19 @@
-from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv, parse_action_to_structure_output, parsing_response_to_pyautogui_code
-from vllm import LLM, SamplingParams
-import numpy as np
-import copy
-from PIL import Image
-from io import BytesIO
-from qwen_vl_utils import process_vision_info
 import base64
-import ray
-import uuid
-import os
-from verl.workers.rollout.osworld_env.env import add_box_token
-from transformers import AutoProcessor
+import copy
 import json
+import os
+import uuid
+from io import BytesIO
+
+import numpy as np
+import ray
+from PIL import Image
+from qwen_vl_utils import process_vision_info
+from transformers import AutoProcessor
+from vllm import LLM, SamplingParams
+
+from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv, add_box_token, parse_action_to_structure_output, parsing_response_to_pyautogui_code
+
 DATA_ROOT_DIR = "./tmp"
 os.makedirs(DATA_ROOT_DIR, exist_ok=True)
 
@@ -317,6 +319,11 @@ def run_agent_loop(
                 runner_dir = runner_dirs[runner_idx]
                 # Save current messages
                 messages_to_save = copy.deepcopy(current_messages[runner_idx])
+                for msg in messages_to_save:
+                    if isinstance(msg["content"], list):
+                        for c in msg["content"]:
+                            if c['type'] == "image":
+                                c["image"] = "<image>"
                 with open(os.path.join(runner_dir, "partial_messages.json"), "w") as f:
                     json.dump(messages_to_save, f, indent=2, ensure_ascii=False)
                 

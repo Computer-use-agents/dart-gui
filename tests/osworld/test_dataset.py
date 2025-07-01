@@ -1,13 +1,15 @@
-from verl.utils.dataset.osworld_dataset import OSWorldDataset
-from omegaconf import DictConfig
-from verl.workers.rollout.vllm_rollout.vllm_rollout_spmd_with_env import RemoteDesktopEnv
-from verl.workers.rollout.vllm_rollout.vllm_rollout_spmd_with_env import TrajectoryRunner
-import requests
 import json
-from PIL import Image
-from io import BytesIO
 import time
+from io import BytesIO
+
+import requests
+from omegaconf import DictConfig
+from PIL import Image
+
+from verl.utils.dataset.osworld_dataset import OSWorldDataset
 from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv, parse_action_to_structure_output, parsing_response_to_pyautogui_code
+from verl.workers.rollout.vllm_rollout.vllm_rollout_spmd_with_env import TrajectoryRunner
+
 
 def test_osworld_dataset():
     dataset = OSWorldDataset(
@@ -31,9 +33,10 @@ def test_list_env():
         response = session.post(f"{base_url}/server/delete/{env['server_id']}")
         print(response.json())
 
+
 import ray
-import time
-import asyncio
+
+
 async def create_env():
     print("try create")
     try:
@@ -56,9 +59,10 @@ async def create_env():
 
 def test_create_env():
     import json
-    from PIL import Image
     from io import BytesIO
-    with open("/app/data/arpo_workspace/verl/evaluation_examples/examples/libreoffice_impress/2cd43775-7085-45d8-89fa-9e35c0a915cf.json", "r") as f:
+
+    from PIL import Image
+    with open("/app/data/arpo_workspace/verl/evaluation_examples/examples/libreoffice_impress/2cd43775-7085-45d8-89fa-9e35c0a915cf.json") as f:
         task_config = json.load(f)
     print(task_config)
     env = RemoteDesktopEnv(
@@ -77,7 +81,7 @@ def test_create_env():
 
 def test_create_env_case2():
 
-    with open("evaluation_examples/examples/libreoffice_impress/2cd43775-7085-45d8-89fa-9e35c0a915cf.json", "r") as f:
+    with open("evaluation_examples/examples/libreoffice_impress/2cd43775-7085-45d8-89fa-9e35c0a915cf.json") as f:
         task_config = json.load(f)
     print(task_config)
     print("Fire!")
@@ -96,7 +100,7 @@ def test_create_env_case2():
 
 
 def test_action():
-    with open("evaluation_examples/examples/libreoffice_calc/1e8df695-bd1b-45b3-b557-e7d599cf7597.json", "r") as f:
+    with open("evaluation_examples/examples/libreoffice_calc/1e8df695-bd1b-45b3-b557-e7d599cf7597.json") as f:
         task_config = json.load(f)
     print(task_config)
     print("Fire!")
@@ -142,3 +146,44 @@ def test_action():
         obs = ray.get(runner.get_obs.remote())
         image = Image.open(BytesIO(obs["screenshot"]))
         image.save(f"test{action_idx+1}.png")
+
+
+def test_parse_action():
+    actions = [
+        "Thought: It seems that GIMP is indicating that my system is missing the plugin to handle RAW files. This is something I’ve encountered before, and I need to address it first. The quickest solution is to click \"OK\" to close this popup and then use the software's internal plugin management feature to install the necessary plugin.\nAction: click(start_box='(1188,554)')",
+        "Thought: It seems that the attempt to move the table just now didn't work, as the page still appears exactly the same as before. I need to think about this differently. By holding down the Shift key, I should be able to bring up more precise movement options. I checked the bottom area of the page, and there indeed seem to be options for moving the element out of the current position.\nAction: hotkey(key='shift')\n\ndrag(start_box='(1139,958)', end_box='(1141,1029)')"
+    ]
+    action_parse_res_factor = 1000
+    image = Image.open("examples/osworld_trajectory/image_0001.png")
+    for action_idx, generated_text in enumerate(actions):
+        parsed_responses = parse_action_to_structure_output(
+            generated_text,
+            factor=action_parse_res_factor,  # TODO: Make this configurable
+            origin_resized_height=image.height,
+            origin_resized_width=image.width,
+            model_type="qwen25vl",
+            max_pixels=16384*28*28,
+            min_pixels=100*28*28
+        )
+        print("Action parsed!", generated_text, parsed_responses)
+
+        action_code = parsing_response_to_pyautogui_code(
+            parsed_responses,
+            image_height=image.height,
+            image_width=image.width,
+            input_swap=False  # TODO: Make this configurable
+        )
+        print("action code", action_code)
+
+
+def test_get_images():
+    from verl.workers.reward_manager.osworld import get_last_image_file
+
+    folder_path = "examples/4a7bf110-6577-4434-b6c9-a29117fd1d12"
+
+    image_paths = get_last_image_file(
+        folder_path, 
+        mode = "sample", 
+        n = 3
+    )
+    print(image_paths, type(image_paths))

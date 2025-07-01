@@ -841,7 +841,8 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
         current_rank = os.environ["RANK"]
         print("clear_envs called at rank", current_rank)
         import requests
-        from verl.workers.rollout.vllm_rollout.vllm_rollout_spmd_with_env import RemoteDesktopEnv
+
+        from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv
         try:
             base_url = "http://39.107.54.167:4999"
             envs = RemoteDesktopEnv.list_environments(base_url)
