@@ -1,19 +1,16 @@
-import os
 
+import numpy as np
 import torch
-from transformers import AutoTokenizer, AutoProcessor
-from transformers import Qwen2_5_VLForConditionalGeneration
-
+from omegaconf import DictConfig, OmegaConf
+from PIL import Image
+from transformers import AutoProcessor, AutoTokenizer, Qwen2_5_VLForConditionalGeneration
 from vllm import LLM, SamplingParams
 
+from verl.utils.dataset.osworld_dataset import OSWorldDataset, collate_fn
 from verl.utils.distributed import initialize_global_process_group
 from verl.utils.torch_functional import pad_sequence_to_length
-from omegaconf import DictConfig
-from omegaconf import OmegaConf
-from verl.utils.dataset.osworld_dataset import OSWorldDataset, collate_fn
-from PIL import Image
-from verl.workers.rollout.osworld_env.run_agent_loop import run_agent_loop, TrajectoryRunner
-import numpy as np
+from verl.workers.rollout.osworld_env.run_agent_loop import TrajectoryRunner, run_agent_loop
+
 MODEL_PATH = "/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"
 config = OmegaConf.load('examples/config_debug.yml')
 

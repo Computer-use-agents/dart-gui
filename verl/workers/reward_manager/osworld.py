@@ -88,11 +88,12 @@ You will also have a history of agent actions. You should consider if the histor
 Format your response as
 ```
 Thought: <your reasoning process>
-Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed, Give a value between 0 and 1 if the task is partially complete>
+Score: <a float value between 0 and 1.0. When task is feasible, 0 means the task is not completed, 1 means the task is completed, Give a value between 0 and 1 if the task is partially complete>
 ```
-Important note for score:
+Important notes for score:
 - You shuold check if the action history is consistent with the task
-- You should check if the latest screenshot contains necessary and relevant information about the task
+- Screenshot History is in time order, you should check if the screenshots contains necessary and relevant information about the task.
+- When the task is marked as infeasible, give a high score for shorter action history. Give a high score if the model decide use action call_user.
 ## Task
 {task}
 
@@ -110,7 +111,9 @@ Important note for score:
             task_config = json.load(f)
         task = task_config["instruction"]
         related_app = task_config["related_apps"]
-
+        if task_config["evaluator"]["func"] == "infeasible":
+            print("Note:", task, "is infeasible!")
+            task += "\nNote: this task is infeasible in the enironment."
         image_paths = get_last_image_file(dataset_path, mode="sample", n=3)
         if isinstance(image_paths, str):
             image_paths = [image_paths]
@@ -174,11 +177,6 @@ Important note for score:
         score_match = re.search(r"Score:\s*(\d*\.?\d+)", response_text)
         print("reward model final score", score_match)
         score = float(score_match.group(1))
-        if task_config["evaluator"]["func"] == "infeasible":
-            print("This task is infeasible!")
-            if score < 0.3:
-                score = 1.0
-            print("Infeasible task final score:", score)
         return score
 
 

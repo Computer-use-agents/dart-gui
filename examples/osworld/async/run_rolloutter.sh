@@ -22,7 +22,7 @@ export REWARD_SERVER_URL=https://sv-23d8e907-c0f6-4b59-8b9a-1927d5969bf7-8000-x-
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 
-python3 -m verl.trainer.main_ppo \
+python3 -m verl.trainer.main_rollout_async \
     algorithm.adv_estimator=grpo \
     data.train_files=evaluation_examples/test_success_uitars1.5_wo_impossible_infeasible.json \
     data.val_files=evaluation_examples/test_success_uitars1.5_wo_impossible_infeasible.json \
@@ -73,4 +73,5 @@ python3 -m verl.trainer.main_ppo \
     trainer.save_freq=10 \
     trainer.test_freq=5 \
     trainer.val_before_train=False \
-    trainer.total_epochs=15 $@
+    trainer.total_epochs=15 \
+    +trainer.run_id=12345 $@
