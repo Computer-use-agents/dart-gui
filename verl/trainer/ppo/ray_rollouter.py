@@ -33,11 +33,29 @@ from verl.trainer.ppo.core_algos import AdvantageEstimator
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer, ResourcePoolManager, Role, WorkerType
 from verl.trainer.ppo.reward import compute_reward, compute_reward_async
 from verl.utils.checkpoint.checkpoint_manager import find_latest_ckpt_path
+from verl.utils.database.mysql import create_database_manager
 from verl.utils.debug import marked_timer
 
 
 class RayOSWorldRollout(RayPPOTrainer):
-    def __init__(self, config, tokenizer, role_worker_mapping: dict[Role, WorkerType], resource_pool_manager: ResourcePoolManager, ray_worker_group_cls: RayWorkerGroup = RayWorkerGroup, processor=None, reward_fn=None, val_reward_fn=None, train_dataset: Optional[Dataset] = None, val_dataset: Optional[Dataset] = None, collate_fn=None, train_sampler: Optional[Sampler] = None, device_name="cuda"):
+    def __init__(
+            self, 
+            config, 
+            tokenizer, 
+            role_worker_mapping: dict[Role, WorkerType], 
+            resource_pool_manager: ResourcePoolManager, 
+            ray_worker_group_cls: RayWorkerGroup = RayWorkerGroup, 
+            processor=None, 
+            reward_fn=None, 
+            val_reward_fn=None, 
+            train_dataset: Optional[Dataset] = None, 
+            val_dataset: Optional[Dataset] = None, 
+            collate_fn=None, 
+            train_sampler: Optional[Sampler] = None, 
+            device_name="cuda",
+            run_id: str | None = None
+        ):
+        
         super().__init__(
             config, 
             tokenizer, 
@@ -51,7 +69,11 @@ class RayOSWorldRollout(RayPPOTrainer):
             val_dataset, 
             collate_fn, 
             train_sampler, 
-            device_name)
+            device_name
+        )
+        self.run_id = run_id
+        self.dataset_manager = create_database_manager()
+        
 
     def _validate(self):
         print("Not validate for OSWorld")
@@ -92,15 +114,13 @@ class RayOSWorldRollout(RayPPOTrainer):
                 return
 
         # add tqdm
-        progress_bar = tqdm(total=self.total_training_steps, initial=self.global_steps, desc="Training Progress")
+        progress_bar = tqdm(total=self.total_training_steps, initial=self.global_steps, desc="Rollout Progress")
 
         # we start from step 1
         self.global_steps += 1
-        last_val_metrics = None
 
         for epoch in range(self.config.trainer.total_epochs):
             for batch_dict in self.train_dataloader:
-                metrics = {}
                 timing_raw = {}
                 batch: DataProto = DataProto.from_single_dict(batch_dict)
 
@@ -174,10 +194,18 @@ class RayOSWorldRollout(RayPPOTrainer):
     
                     dataset_ids = batch.non_tensor_batch["dataset_ids"]
                     #TODO 1 write this dataset_ids into mysql database
-
+                    for dataset_id in dataset_ids:
+                        self.dataset_manager.create_dataset(
+                            trajectory_id=dataset_id,
+                            run_id=str(self.run_id),
+                            used=0
+                        )
 
                     #TODO 2 load checkpoint 
                     self._load_checkpoint_for_actor_rollout_wg(actor_path="?????")
+
+            progress_bar.update(1)
+
 
     def _load_checkpoint_for_actor_rollout_wg(self, actor_path: str):
         self.actor_rollout_wg.load_checkpoint(actor_path, del_local_after_load=False)

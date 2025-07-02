@@ -1,7 +1,9 @@
-from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter, find_subsequence_positions_efficient
-from transformers import AutoProcessor
-from verl import DataProto
 import torch
+from transformers import AutoProcessor
+
+from verl import DataProto
+from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter
+
 
 def test_split():
     processor = AutoProcessor.from_pretrained("/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5")

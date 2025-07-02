@@ -1294,10 +1294,6 @@ class RayOSWorldTrainer(RayPPOTrainer):
 
                             del gen_baseline_batch, gen_baseline_output
 
-                    # batch.non_tensor_batch["uid"] = np.array([str(uuid.uuid4()) for _ in range(len(batch.non_tensor_batch["messages"]))], dtype=object)
-                    # # repeat to align with repeated responses in rollout
-                    # batch = batch.repeat(repeat_times=self.config.actor_rollout_ref.rollout.n, interleave=True)
-                    # batch = batch.union(gen_batch_output)
                     batch = gen_batch_output
                     if len(batch.non_tensor_batch["dataset_ids"]) == 0:
                         print("[Warning] For some reason, rollout failed for all, skip this step!")
@@ -1326,6 +1322,7 @@ class RayOSWorldTrainer(RayPPOTrainer):
                         else:
                             reward_tensor, reward_extra_infos_dict = compute_reward(batch, self.reward_fn)
                     print("reward_tensor", reward_tensor)
+                    
                     splitter = TrajectorySplitter(
                         processor=self.processor,
                         root_dir=self.config.data.root_data_dir,

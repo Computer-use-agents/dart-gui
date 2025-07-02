@@ -1,13 +1,14 @@
-from verl.workers.rollout.vllm_rollout.vllm_rollout_spmd_with_env import vLLMRollout
-from verl import DataProto
-from omegaconf import DictConfig
-from omegaconf import OmegaConf
-from verl.utils import hf_tokenizer
-from transformers import AutoConfig
 import os
-import torch.distributed as dist
+
 import numpy as np
+import torch.distributed as dist
+from omegaconf import DictConfig, OmegaConf
+from transformers import AutoConfig
+
+from verl import DataProto
+from verl.utils import hf_tokenizer
 from verl.utils.dataset.osworld_dataset import OSWorldDataset, collate_fn
+from verl.workers.rollout.vllm_rollout.vllm_rollout_spmd_with_env import vLLMRollout
 
 config = OmegaConf.load('examples/config_debug.yml')
 

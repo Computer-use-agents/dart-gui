@@ -185,6 +185,7 @@ class TaskRunner:
             collate_fn=collate_fn,
             train_sampler=train_sampler,
             device_name=config.trainer.device,
+            
         )
         # Initialize the workers of the trainer.
         trainer.init_workers()
