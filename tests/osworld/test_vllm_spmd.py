@@ -15,28 +15,18 @@
 import os
 
 import torch
+from omegaconf import DictConfig, OmegaConf
 from torch.distributed.fsdp import CPUOffload, MixedPrecision
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 from torch.distributed.fsdp.api import ShardedStateDictConfig, ShardingStrategy, StateDictType
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
-
+from transformers import AutoConfig, AutoTokenizer, Qwen2_5_VLForConditionalGeneration
 from vllm import LLM, SamplingParams
 
+from verl import DataProto
+from verl.utils.dataset.osworld_dataset import OSWorldDataset, collate_fn
 from verl.utils.distributed import initialize_global_process_group
 from verl.utils.torch_functional import pad_sequence_to_length
-import torch.distributed as dist
-from verl.utils.fsdp_utils import offload_fsdp_model_to_cpu
 from verl.workers.rollout.vllm_rollout.vllm_rollout_spmd_with_env import vLLMRollout
-from verl import DataProto
-from omegaconf import DictConfig
-from omegaconf import OmegaConf
-from verl.utils import hf_tokenizer
-from transformers import AutoConfig
-import os
-import torch.distributed as dist
-import numpy as np
-from verl.utils.dataset.osworld_dataset import OSWorldDataset, collate_fn
 
 MODEL_PATH = "/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"
 config = OmegaConf.load('examples/config_debug.yml')

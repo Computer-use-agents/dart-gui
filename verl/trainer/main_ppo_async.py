@@ -22,14 +22,12 @@ import hydra
 import ray
 from omegaconf import OmegaConf
 
-from verl.trainer.ppo.ray_rollouter import RayOSWorldRollout
+from verl.trainer.ppo.ray_trainer_async import RayOSWorldAsyncTrainer
 from verl.trainer.ppo.reward import load_reward_manager
 
 
 @hydra.main(config_path="config", config_name="ppo_trainer", version_base=None)
 def main(config):
-    print("config", config, type(config))
-    
     run_ppo(config)
 
 
@@ -171,7 +169,7 @@ class TaskRunner:
         train_sampler = create_rl_sampler(config.data, train_dataset)
         print("train_dataset", train_dataset, type(train_dataset), len(train_dataset))
         # Initialize the PPO trainer.
-        trainer = RayOSWorldRollout(
+        trainer = RayOSWorldAsyncTrainer(
             config=config,
             tokenizer=tokenizer,
             processor=processor,
@@ -185,7 +183,6 @@ class TaskRunner:
             collate_fn=collate_fn,
             train_sampler=train_sampler,
             device_name=config.trainer.device,
-            
         )
         # Initialize the workers of the trainer.
         trainer.init_workers()

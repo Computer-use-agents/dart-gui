@@ -1,6 +1,9 @@
 import os
+
 import pytest
+
 from verl.workers.reward_manager.osworld import OSWorldRewardManager
+
 
 @pytest.fixture(autouse=True)
 def setup_env_vars(monkeypatch):

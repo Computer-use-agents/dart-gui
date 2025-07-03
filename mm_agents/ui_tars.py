@@ -471,9 +471,11 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
                     pyautogui_code += f"\npyautogui.moveTo({x}, {y})"
         
         elif action_type in ["finished"]:
-            pyautogui_code = f"DONE"
+            pyautogui_code = "DONE"
         elif action_type in ["wait"]:
             pyautogui_code = "WAIT"
+        elif action_type in ["call_user"]:
+            pyautogui_code = "FAIL"
         else:
             pyautogui_code += f"\n# Unrecognized action type: {action_type}"
 

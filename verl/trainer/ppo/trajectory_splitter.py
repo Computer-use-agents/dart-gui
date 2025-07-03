@@ -1,16 +1,19 @@
-from transformers import AutoProcessor, AutoTokenizer
-from verl import DataProto
-import os
-import json
 import copy
-from verl.utils.dataset.vision_utils import process_image
-from PIL import Image
-import verl.utils.torch_functional as verl_F
-from verl.models.transformers.qwen2_vl import get_rope_index
-import torch
+import json
+import os
 from collections import defaultdict
+
 import numpy as np
-import uuid
+import torch
+from PIL import Image
+from transformers import AutoProcessor
+
+import verl.utils.torch_functional as verl_F
+from verl import DataProto
+from verl.models.transformers.qwen2_vl import get_rope_index
+from verl.utils.dataset.vision_utils import process_image
+
+
 def collate_fn(data_list: list[dict]) -> dict:
     """
     Collate a batch of sample dicts into batched tensors and arrays.
@@ -41,7 +44,7 @@ def collate_fn(data_list: list[dict]) -> dict:
 
     return {**tensors, **non_tensors}
 
-class TrajectorySplitter():
+class TrajectorySplitter:
     def __init__(
             self, 
             processor: AutoProcessor,
@@ -82,8 +85,11 @@ class TrajectorySplitter():
     def split_dataset_id(self, dataset_id: str) -> list[list[dict]]:
         dataset_dir = os.path.join(self.root_dir, dataset_id)
         message_path = os.path.join(dataset_dir, "final_messages.json")
-        with open(message_path, "r") as f:
+        with open(message_path) as f:
             dataset = json.load(f)
+        config_path = os.path.join(dataset_dir, "task_config.json")
+        with open(config_path) as f:
+            task_config = json.load(f)
 
         start = 1
         end = start + 2 * self.window_size
@@ -97,7 +103,7 @@ class TrajectorySplitter():
                 instruction["content"] = instruction["content"][:1]
             item = self._process_item(dataset, instruction, start, end)
             
-            batch_data.append(item)
+            batch_data.append((item, copy.deepcopy(task_config)))
             start += 2 * self.stride_size
             end = start + 2 * self.window_size
         return batch_data
@@ -121,7 +127,7 @@ class TrajectorySplitter():
     def tokenize(self, batch_data: list[list[dict]], dataset_id: str, reward: float) -> list[list[dict]]:
         tokenized_batch_data = []
         # print("Tokenize with", dataset_id, "reward =", reward)
-        for messages in batch_data:
+        for (messages, task_config) in batch_data:
             row_dict = dict()
             input_ids, attention_mask, position_ids, _, _ = self._get_inputs(messages, dataset_id)
             input_attention_mask = attention_mask
@@ -137,10 +143,6 @@ class TrajectorySplitter():
             reward_tensor = torch.zeros_like(response_ids[0], dtype=torch.float32)
             valid_response_length = response_attention_mask.sum()
             # debuging valid response length
-            # val = self.processor.tokenizer.decode(response_ids[0, :valid_response_length])
-            # print("Debug decoding", val)
-            # print("shape", attention_mask.shape, input_attention_mask.shape, response_attention_mask.shape)
-            # print("index", valid_response_length, attention_mask.sum(), input_attention_mask.sum(), response_attention_mask.sum())
             reward_tensor[valid_response_length-1] = reward
             row_dict["prompts"] = input_ids[0]
             row_dict["responses"] = response_ids[0]
@@ -151,7 +153,7 @@ class TrajectorySplitter():
             row_dict["multi_modal_data"] = multi_modal_data
             row_dict["multi_modal_inputs"] = dict(model_inputs)
             row_dict["dataset_ids"] = dataset_id
-            row_dict["uid"] = str(uuid.uuid4())
+            row_dict["uid"] = task_config["id"]
             self.compute_mask(row_dict)
             tokenized_batch_data.append(row_dict)
         return tokenized_batch_data
@@ -324,15 +326,15 @@ class TrajectorySplitter():
         after = int(image_placeholder_pos[0].item())
         assist_position = get_position_after(assist_position, after)
         im_end_position = get_position_after(im_end_position, after + len(image_placeholder_token))
-        print("size of pos tensor", assist_position.shape, im_end_position.shape, assist_position, im_end_position, after, len(image_placeholder_token))
+        # print("size of pos tensor", assist_position.shape, im_end_position.shape, assist_position, im_end_position, after, len(image_placeholder_token))
         # print("Debug decoding", self.processor.tokenizer.decode(input_ids[:32144]))
         im_end_position = get_im_end_tag_for_assist(im_end_position)
         
-        print("size of pos tensor", assist_position.shape, im_end_position.shape, assist_position, im_end_position)
+        # print("size of pos tensor", assist_position.shape, im_end_position.shape, assist_position, im_end_position)
         for assist_pos, im_pos in zip(assist_position, im_end_position):
             assert assist_pos < im_pos
-            print("Decoding checking")
-            print(self.processor.tokenizer.decode(input_ids[assist_pos: im_pos+1]))
+            # print("Decoding checking")
+            # print(self.processor.tokenizer.decode(input_ids[assist_pos: im_pos+1]))
             # TODO: here loss mask and response mask has same logic - only mask assistant: ... <|im_end|>.
             # Not sure if the correct way to do both of the mask.
             # Need to double check later logic how to use these two mask computing logp and entropy

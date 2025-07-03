@@ -2,14 +2,14 @@
 MySQL Datasets表管理 - 使用SQLAlchemy ORM (修复Session绑定问题)
 """
 
-from sqlalchemy import create_engine, Column, Integer, String, TIMESTAMP, Index, func
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session, make_transient
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from contextlib import contextmanager
-from typing import List, Optional, Dict, Any
-from datetime import datetime
 import logging
+from contextlib import contextmanager
+from typing import Any, Dict, List, Optional
+
+from sqlalchemy import TIMESTAMP, Column, Index, Integer, String, create_engine, func
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session, sessionmaker
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -49,7 +49,7 @@ class Dataset(Base):
     )
     
     def __repr__(self):
-        return f"<Dataset(id={self.id}, trajectory_id='{self.trajectory_id}', usage_time={self.usage_time})>"
+        return f"<Dataset(id={self.id}, trajectory_id='{self.trajectory_id}', used={self.used})>"
     
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典"""
@@ -57,7 +57,7 @@ class Dataset(Base):
             'id': self.id,
             'trajectory_id': self.trajectory_id,
             'created_at': self.created_at,
-            'usage_time': self.used,
+            'used': self.used,
             "model_version": self.model_version,
             'run_id': self.run_id
         }
@@ -137,7 +137,7 @@ class MySQLDatasetsORM:
         Args:
             trajectory_id: 轨迹ID（必须唯一）
             run_id: 运行ID
-            usage_time: 使用时间，默认为0
+            used: 使用过几次
             
         Returns:
             Dict: 创建的数据记录字典
@@ -157,7 +157,7 @@ class MySQLDatasetsORM:
                 logger.info(f"Created dataset record with ID: {dataset.id}")
                 return result
                 
-        except IntegrityError as e:
+        except IntegrityError:
             logger.error(f"Duplicate trajectory_id: {trajectory_id}")
             raise ValueError(f"trajectory_id '{trajectory_id}' already exists")
         except SQLAlchemyError as e:
@@ -186,24 +186,24 @@ class MySQLDatasetsORM:
             logger.error(f"Error getting dataset by trajectory_id: {e}")
             raise
     
-    def get_datasets_by_run_id(self, run_id: str) -> List[Dict[str, Any]]:
+    def get_datasets_by_run_id(self, run_id: str, offset: int = 0, limit: int = 1) -> List[Dict[str, Any]]:
         """根据run_id查询dataset记录列表"""
         try:
             with self.get_session() as session:
                 datasets = session.query(Dataset).filter(
                     Dataset.run_id == run_id
-                ).order_by(Dataset.created_at.desc()).all()
+                ).order_by(Dataset.created_at.asc()).offset(offset).limit(limit).all()
                 return [dataset.to_dict() for dataset in datasets]
         except SQLAlchemyError as e:
             logger.error(f"Error getting datasets by run_id: {e}")
             raise
     
-    def update_usage_time(self, trajectory_id: str, used: int) -> bool:
+    def update_used(self, trajectory_id: str, used: int) -> bool:
         """更新使用时间
         
         Args:
             trajectory_id: 轨迹ID
-            usage_time: 新的使用时间
+            used: how many times training
             
         Returns:
             bool: 是否更新成功
@@ -216,7 +216,7 @@ class MySQLDatasetsORM:
                 
                 if dataset:
                     dataset.used = used
-                    logger.info(f"Updated usage_time for trajectory_id: {trajectory_id}")
+                    logger.info(f"Updated used for trajectory_id: {trajectory_id}")
                     return True
                 else:
                     logger.warning(f"Dataset with trajectory_id '{trajectory_id}' not found")
@@ -388,10 +388,10 @@ class MySQLDatasetsORM:
                     query = query.filter(Dataset.run_id == filters['run_id'])
                 
                 if 'usage_time_min' in filters:
-                    query = query.filter(Dataset.usage_time >= filters['usage_time_min'])
+                    query = query.filter(Dataset.used >= filters['usage_time_min'])
                 
                 if 'usage_time_max' in filters:
-                    query = query.filter(Dataset.usage_time <= filters['usage_time_max'])
+                    query = query.filter(Dataset.used <= filters['usage_time_max'])
                 
                 if 'created_after' in filters:
                     query = query.filter(Dataset.created_at >= filters['created_after'])
@@ -424,6 +424,8 @@ class MySQLDatasetsORM:
             logger.error(f"Error getting dataset ORM object: {e}")
             raise
 
+def create_database_manager() -> MySQLDatasetsORM:
+    return MySQLDatasetsORM(DB_CONFIG)
 
 def demo_datasets_orm_operations():
     """演示datasets表的ORM操作"""
@@ -438,7 +440,7 @@ def demo_datasets_orm_operations():
         dataset1 = manager.create_dataset("traj_orm_001_fixed", "run_alpha", 100)
         dataset2 = manager.create_dataset("traj_orm_002_fixed", "run_alpha", 200)
         dataset3 = manager.create_dataset("traj_orm_003_fixed", "run_beta", 150)
-        print(f"创建了3条记录：")
+        print("创建了3条记录：")
         print(f"  {dataset1}")
         print(f"  {dataset2}")
         print(f"  {dataset3}")
@@ -480,7 +482,7 @@ def demo_datasets_orm_operations():
         # 分页获取所有记录
         print("\n6. 分页查询...")
         all_datasets = manager.get_all_datasets(limit=5, offset=0)
-        print(f"前5条记录:")
+        print("前5条记录:")
         for dataset in all_datasets:
             print(f"  ID: {dataset['id']}, trajectory_id: {dataset['trajectory_id']}, "
                   f"usage_time: {dataset['usage_time']}, created_at: {dataset['created_at']}")
