@@ -88,33 +88,28 @@ You will also have a history of agent actions. You should consider if the histor
 Format your response as
 ```
 Thought: <your reasoning process>
-Score: <a float value between 0 and 1.0. When task is feasible, 0 means the task is not completed, 1 means the task is completed, Give a value between 0 and 1 if the task is partially complete>
+Score: <0 or 1. When task is feasible, 0 means the task is not completed, 1 means the task is completed. No partial score.>
 ```
 Important notes for score:
-- You shuold check if the action history is consistent with the task
-- Screenshot History is in time order, you should check if the screenshots contains necessary and relevant information about the task.
-- When the task is marked as infeasible, give a high score for shorter action history. Give a high score if the model decide use action call_user.
+- Give score 1 if and only if you found task relevant information in both action history and screenshot.
+- If you are not sure and cannot tell from what you are given, do not guess and just give score 0.
+
 ## Task
 {task}
-
-## Related app
-{related_app}
 
 ## Action History
 {action_history}
 
 ## Screenshot History
 """
-
         dataset_path = os.path.join(self.root_dir, dataset_id)
         with open(os.path.join(dataset_path, "task_config.json"), "r") as f:
             task_config = json.load(f)
         task = task_config["instruction"]
-        related_app = task_config["related_apps"]
         if task_config["evaluator"]["func"] == "infeasible":
             print("Note:", task, "is infeasible!")
             task += "\nNote: this task is infeasible in the enironment."
-        image_paths = get_last_image_file(dataset_path, mode="sample", n=3)
+        image_paths = get_last_image_file(dataset_path, mode="last", n=1)
         if isinstance(image_paths, str):
             image_paths = [image_paths]
         print("Get image", len(image_paths))
@@ -129,8 +124,6 @@ Important notes for score:
                     "url": f"data:image/jpeg;base64,{encoded_string}"
                 }
             })
-
-
 
         with open(os.path.join(dataset_path, "final_messages.json")) as f:
             messages = json.load(f)
@@ -153,7 +146,6 @@ Important notes for score:
                         "text": prompt.format(
                             task=task, 
                             action_history=action_history,
-                            related_app=related_app
                         )
                     }    
                 ]

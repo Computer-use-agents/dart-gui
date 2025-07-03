@@ -226,7 +226,7 @@ def compute_grpo_outcome_advantage(
             shape is (bs, response_length)
     """
     scores = token_level_rewards.sum(dim=-1)
-
+    print("compute_grpo_outcome_advantage token_level_rewards", scores)
     id2score = defaultdict(list)
     id2mean = {}
     id2std = {}
@@ -236,6 +236,7 @@ def compute_grpo_outcome_advantage(
         for i in range(bsz):
             id2score[index[i]].append(scores[i])
         for idx in id2score:
+            print("compute_grpo_outcome_advantage idx", len(id2score[idx]))
             if len(id2score[idx]) == 1:
                 id2mean[idx] = torch.tensor(0.0)
                 id2std[idx] = torch.tensor(1.0)

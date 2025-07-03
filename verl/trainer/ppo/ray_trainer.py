@@ -1321,6 +1321,12 @@ class RayOSWorldTrainer(RayPPOTrainer):
                             future_reward = compute_reward_async.remote(batch, self.config, self.tokenizer)
                         else:
                             reward_tensor, reward_extra_infos_dict = compute_reward(batch, self.reward_fn)
+                            trajectory_metrics = {
+                                "critic/trajectory_score/mean": torch.mean(reward_tensor).detach().item(),
+                                "critic/trajectory_score/max": torch.max(reward_tensor).detach().item(),
+                                "critic/trajectory_score/min": torch.min(reward_tensor).detach().item(),
+                            }
+                            metrics.update(trajectory_metrics)
                     print("reward_tensor", reward_tensor)
                     
                     splitter = TrajectorySplitter(
