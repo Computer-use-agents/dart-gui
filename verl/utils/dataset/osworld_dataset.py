@@ -19,6 +19,7 @@ import json
 import logging
 import os
 import re
+import time
 from collections import defaultdict
 from typing import List, Optional, Union
 
@@ -283,25 +284,33 @@ class OSWorldAsyncDataset(Dataset):
 
         return messages
 
+    def _get_item_with_wait(self, item_index: int) -> list[dict]:
+        while True:
+            row_dicts = self.db_manager.get_datasets_by_run_id(
+                run_id=self.run_id,
+                offset=item_index
+            )
+            print(self.run_id, "try get data", len(row_dicts))
+            if len(row_dicts) > 0:
+                return row_dicts
+            time.sleep(1)
+
+
     def __getitem__(self, item):
         """
         Note that we also return the raw_input_ids so that it can be combined with other chat template
         """
-        row_dict = self.db_manager.get_datasets_by_run_id(
-            run_id=self.run_id,
-            offset=item
-        )
-        # row_dict: dict = self.dataframe[item]
-        task_type = row_dict["task_type"]
-        task_id = row_dict["task_id"]
-        task_path = os.path.join(self.osworld_root, task_type, task_id + ".json")
-        with open(task_path) as f:
+        row_dicts = self._get_item_with_wait(item_index=item)
+        assert len(row_dicts) == 1
+        row_dict = row_dicts[0]
+        trajectory_id = row_dict["trajectory_id"]
+        data_dir = os.path.join(self.config.root_data_dir, trajectory_id)
+        with open(os.path.join(data_dir, "task_config.json")) as f:
             task_data = json.load(f)
-
-        task_data["raw"] = {
-            "task_type": task_type,
-            "task_id": task_id
-        }
+        with open(os.path.join(data_dir, "reward.txt")) as f:
+            reward_tensor = float(f.read().strip())
+            reward_tensor = torch.Tensor([reward_tensor])
+        output_row_dict = dict()
         instruction = task_data["instruction"]
         system_prompt = COMPUTER_USE_DOUBAO if not self.use_call_user else COMPUTER_USE_DOUBAO_WITH_CALL_USER
         messages = [
@@ -321,10 +330,12 @@ class OSWorldAsyncDataset(Dataset):
                 ]
             }
         ]
-        row_dict["messages"] = messages
-        row_dict["instruction"] = instruction
-        row_dict["task_config"] = task_data
-        return row_dict
+        output_row_dict["messages"] = messages
+        output_row_dict["instruction"] = instruction
+        output_row_dict["task_config"] = task_data
+        output_row_dict["dataset_ids"] = trajectory_id
+        output_row_dict["reward_tensors"] = reward_tensor
+        return output_row_dict
 
 
     def __getstate__(self):

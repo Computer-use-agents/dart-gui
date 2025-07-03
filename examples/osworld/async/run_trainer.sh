@@ -33,7 +33,7 @@ python3 -m verl.trainer.main_ppo_async \
     data.truncation='error' \
     data.image_key=images \
     data.custom_cls.path=verl/utils/dataset/osworld_dataset.py \
-    data.custom_cls.name=OSWorldDataset \
+    data.custom_cls.name=OSWorldAsyncDataset \
     +data.root_data_dir=tmp \
     +data.window_size=5 \
     +data.stride_size=5 \

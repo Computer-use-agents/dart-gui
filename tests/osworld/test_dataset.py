@@ -2,10 +2,13 @@ import json
 import time
 from io import BytesIO
 
+import pytest
+import ray
 import requests
 from omegaconf import DictConfig
 from PIL import Image
 
+from verl.utils.database.mysql import create_database_manager
 from verl.utils.dataset.osworld_dataset import OSWorldDataset
 from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv, parse_action_to_structure_output, parsing_response_to_pyautogui_code
 from verl.workers.rollout.vllm_rollout.vllm_rollout_spmd_with_env import TrajectoryRunner
@@ -34,7 +37,6 @@ def test_list_env():
         print(response.json())
 
 
-import ray
 
 
 async def create_env():
@@ -186,7 +188,53 @@ def test_get_images():
 
     image_paths = get_last_image_file(
         folder_path, 
-        mode = "sample", 
-        n = 3
+        mode = "last", 
+        n = 1
     )
     print(image_paths, type(image_paths))
+
+@pytest.mark.asyncio
+async def test_async_dataset():
+    from verl.utils.dataset.osworld_dataset import OSWorldAsyncDataset
+    trajectory_id = "0aa1f184-7549-4bcd-9c91-4d8c6242b10c"
+    run_id = "bofei_test_2"
+    db_manager = create_database_manager()
+    del_cnts = db_manager.delete_datasets_by_run_id(
+        run_id=run_id
+    )
+    print("Delete count", del_cnts)
+    db_manager.create_dataset(
+        trajectory_id=trajectory_id,
+        run_id=run_id,
+        used=0
+    )
+    async def _insert_data():
+        print("Insert data start")
+        time.sleep(10)
+        trajectory_id = "00c58be8-caf6-4b7b-a8ca-39a54e67890f"
+        db_manager.create_dataset(
+            trajectory_id=trajectory_id,
+            run_id=run_id,
+            used=0
+        )
+        print("Insert data done")
+    
+    future = _insert_data()
+    dataset = OSWorldAsyncDataset(
+        data_files=[],
+        tokenizer=None,
+        config=DictConfig({
+            "max_steps": 1000,
+            "run_id": run_id,
+            "root_data_dir": "tmp"
+        }),
+        processor=None,
+    )
+    print("Dataset size", len(dataset))
+    is_await = False
+    for item in dataset:
+        print(item)
+        if not is_await:
+            await future
+            is_await = True
+
