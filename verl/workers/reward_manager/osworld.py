@@ -47,7 +47,7 @@ class OSWorldRewardManager:
         self.reward_fn_key = reward_fn_key  # Store the key for accessing the data source
         self.root_dir = root_dir
         self.client = OpenAI(
-            api_key="empty",
+            api_key=os.getenv("REWARD_SERVER_API_KEY"),
             base_url=os.getenv("REWARD_SERVER_URL")
         )
         self.model = os.getenv("REWARD_MODEL")
@@ -82,26 +82,106 @@ class OSWorldRewardManager:
         }
 
     def call_reward_model(self, dataset_id: str) -> float:
-        prompt = """You are a smart GUI agent. Your goal is that given a latest screenshot and a task, you should give a score about if the task is completed based on the screenshot.
-You will also have a history of agent actions. You should consider if the history is consistent with the task and latest screenshot.
-
-Format your response as
-```
-Thought: <your reasoning process>
-Score: <0 or 1. When task is feasible, 0 means the task is not completed, 1 means the task is completed. No partial score.>
-```
-Important notes for score:
-- Give score 1 if and only if you found task relevant information in both action history and screenshot.
-- If you are not sure and cannot tell from what you are given, do not guess and just give score 0.
-
-## Task
-{task}
-
-## Action History
-{action_history}
-
-## Screenshot History
-"""
+        
+        
+        user_prompt = """
+        You will be given a task instruction and a series of screenshots of the task
+        execution.
+        Please analyze the screenshots and provide a detailed analysis of the task
+        completion by following the steps below:
+        1. First, analyze and understand the task instruction. Describe what should the
+        screenshots look like if the task is completed successfully.
+        2. Describe what you observe in each screenshot, analysis what actions were
+        taken and what changes were made to the UI to achieve the task (or mistakes
+        made).
+        3. When you analyze the screenshots, please pay attention to the very detailed
+        elements and changes in the UI. Every small detail may affect the final result.
+        4. After all screenshots are analyzed, provide a overall reasoning about how
+        the task was completed or failed at **the final state**. Make sure you have
+        considered all demands of the task instruction.
+        5. Determine if the task was completed at **the final state** (the last
+        screenshot) successfully (score 1 for success, 0 for failure). If the task is
+        completed during the process but not at the final state, it should be considered
+        as failure (0 score).
+        Provide your response strictly in the following format:
+        TASK REQUIREMENT:
+        [Your understanding of the task instruction]
+        SCREENSHOT ANALYSIS:
+        Screenshot 1:
+        [Analysis of first screenshot]
+        Screenshot 2:
+        [Analysis of second screenshot]
+        ...
+        REASONING:
+        [Your reasoning]
+        FINAL ANSWER:
+        [Your final answer]
+        SCORE: [0/1]
+        Here is an example:
+        (Task Instruction: Please help me backup my emails in "Bills" folder in
+        Thunderbird and store the .eml files with only subject names to my Google Drive
+        folder called "emails".)
+        TASK REQUIREMENT:
+        - Backup the emails in "Bills" folder in Thunderbird.
+        - Store the backup .eml files with only subject names, and the emails should be
+        saved in the Google Drive folder called "emails".
+        - Once succeed, the emails should be visible in the Google Drive folder "emails".
+        Or at least there should be a saving action performed.
+        SCREENSHOT ANALYSIS:
+        Screenshot 1:
+        - Thunderbird email client is open.
+        - The "Bills" folder is visible under "Local Folders."
+        - There is no observable action performed yet in this screenshot.
+        Screenshot 2:
+        - The "Bills" folder has been selected, and the folder content is displayed.
+        - Two emails are visible: "Amazon Web Services Invoice Available" and "Your
+        receipt from X (formerly Twitter)."
+        11
+        - No further actions are taken on the emails.
+        Screenshot 3:
+        - Both emails in the "Bills" folder are selected.
+        - Content previews of both emails are displayed on the right-hand side.
+        - No observable attempt to export or save the emails is visible.
+        Screenshot 4:
+        - The right-click context menu is accessed for the selected emails.
+        - The "Save As..." option is hovered over, indicating intent to save the selected
+        emails.
+        Screenshot 5:
+        - The file navigation window opens, allowing the user to choose a save
+        destination.
+        - No specific Google Drive folder (e.g., "emails") is accessed or visible in this
+        screenshot.
+        Screenshot 6:
+        - The "Desktop" option in the file picker is hovered over.
+        - Still no indication of Google Drive folder ("emails") selection.
+        Screenshot 7:
+        - The "Show other locations" option is hovered over in the file picker.
+        - No confirmation that the user is navigating to Google Drive or saving the files
+        with subject names only.
+        Screenshot 8:
+        - The "Software Updates Available" notification appears. The file picker is
+        still open without any observable confirmation of file saving or destination
+        selection.
+        - It remains unclear where or if the emails have been saved.
+        REASONING:
+        Based on the screenshots provided:
+        1. While there was some intent to save the emails (as shown by the selection
+        and access of the "Save As..." function), there is no confirmation that the .eml
+        files were saved with subject names only and placed in the required Google Drive
+        folder ("emails").
+        2. The screenshots lack evidence of the completion of the task as per the
+        instructions.
+        FINAL ANSWER:
+        The task was not completed successfully due to the lack of observable saving
+        action.
+        SCORE: 0
+        Now, please **strictly follow the format** and analyze the following screenshots
+        (The last line should only be SCORE: [0/1], no other text):
+        Task Instruction: {task_description}
+        Screenshots (by order): 
+        """
+        
+        
         dataset_path = os.path.join(self.root_dir, dataset_id)
         with open(os.path.join(dataset_path, "task_config.json"), "r") as f:
             task_config = json.load(f)
@@ -124,52 +204,67 @@ Important notes for score:
                     "url": f"data:image/jpeg;base64,{encoded_string}"
                 }
             })
-
-        with open(os.path.join(dataset_path, "final_messages.json")) as f:
-            messages = json.load(f)
-        action_history = ""
-        step_idx = 0
-        for msg in messages:
-            if msg["role"] in ["system", "user"]:
-                continue
-            action_history += f"Step {step_idx+1}:"
-            action_history += f"{msg['content'][0]['text']}"
-            action_history += "\n"
+            
+        # Do Not Contain History Responses!
+        # with open(os.path.join(dataset_path, "final_messages.json")) as f:
+        #     messages = json.load(f)
+        # action_history = ""
+        # step_idx = 0
+        # for msg in messages:
+        #     if msg["role"] in ["system", "user"]:
+        #         continue
+        #     action_history += f"Step {step_idx+1}:"
+        #     action_history += f"{msg['content'][0]['text']}"
+        #     action_history += "\n"
 
         # Get task from environment if not provided
         # Call reward model
+       
         messages = [
-                {"role": "user", 
-                "content": [
-                    {
-                        "type": "text",
-                        "text": prompt.format(
-                            task=task, 
-                            action_history=action_history,
+        {
+            "role": "system",
+            "content": "You are an expert at analyzing computer usage task completion from screenshots.",
+        },
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": user_prompt.format(task_description=task)},
+                
+            ],
+        }
+        ]
+        
+        messages[1]["content"].extend(image_body)
+        
+        results = []
+        contents = []
+        
+        n_completions = 4 # Number of completions to generate , set to 4 as the same as ZeroGUI
+        for i in range(n_completions):
+            self.client = OpenAI(
+            api_key=os.getenv("REWARD_SERVER_API_KEY"),
+            base_url=os.getenv("REWARD_SERVER_URL")
+            )
+            response = self.client.chat.completions.create(
+                        model=self.model,
+                        messages=messages,
+                        extra_body={
+                            "mm_processor_kwargs": {
+                                "min_pixels": 100*28*28,
+                                "max_pixels": 16384*28*28,
+                            },
+                            "top_k": 50,
+                        }
                         )
-                    }    
-                ]
-        }]
-        messages[0]["content"].extend(image_body)
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            extra_body={
-                "mm_processor_kwargs": {
-                    "min_pixels": 100*28*28,
-                    "max_pixels": 16384*28*28,
-                },
-                "top_k": 50,
-            }
-        )
-
-        # Parse response to get score
-        response_text = response.choices[0].message.content
-        print("reward model:", response_text, "token usage", response.usage)
-        score_match = re.search(r"Score:\s*(\d*\.?\d+)", response_text)
-        print("reward model final score", score_match)
-        score = float(score_match.group(1))
-        return score
+            content = response.choices[0].message.content
+            match = re.search(r"Score:\s*(\d*\.?\d+)", content)
+            score = float(match.group(1)) if match else 0
+            results.append(score)
+            contents.append(content)
+            
+        voting_reward_avg = sum(results)/len(results) if results else 0
+        
+        return voting_reward_avg
 
 
 def get_last_image_file(directory, mode="last", n=None) -> list[str]:
