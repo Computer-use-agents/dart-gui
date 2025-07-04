@@ -238,15 +238,18 @@ class TrajectorySplitter:
 
         if "second_per_grid_ts" in model_inputs:
             model_inputs.pop("second_per_grid_ts")
-
-        input_ids, attention_mask = verl_F.postprocess_data(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                max_length=self.max_prompt_length,
-                pad_token_id=self.processor.tokenizer.pad_token_id,
-                left_pad=True,
-                truncation=self.truncation,
-            )
+        try:
+            input_ids, attention_mask = verl_F.postprocess_data(
+                    input_ids=input_ids,
+                    attention_mask=attention_mask,
+                    max_length=self.max_prompt_length,
+                    pad_token_id=self.processor.tokenizer.pad_token_id,
+                    left_pad=True,
+                    truncation=self.truncation,
+                )
+        except Exception as e:
+            print(f"[Error] _get_responses failed for wired data point {dataset_id}")
+            raise e
         # role_assistant = "<|im_start|>assistant"
         image_placeholder = "<|vision_end|><|im_end|>"
         image_placeholder_token = self.processor.tokenizer.encode(image_placeholder)
@@ -326,23 +329,14 @@ class TrajectorySplitter:
         after = int(image_placeholder_pos[0].item())
         assist_position = get_position_after(assist_position, after)
         im_end_position = get_position_after(im_end_position, after + len(image_placeholder_token))
-        # print("size of pos tensor", assist_position.shape, im_end_position.shape, assist_position, im_end_position, after, len(image_placeholder_token))
-        # print("Debug decoding", self.processor.tokenizer.decode(input_ids[:32144]))
         im_end_position = get_im_end_tag_for_assist(im_end_position)
-        
-        # print("size of pos tensor", assist_position.shape, im_end_position.shape, assist_position, im_end_position)
         for assist_pos, im_pos in zip(assist_position, im_end_position):
             assert assist_pos < im_pos
-            # print("Decoding checking")
-            # print(self.processor.tokenizer.decode(input_ids[assist_pos: im_pos+1]))
             # TODO: here loss mask and response mask has same logic - only mask assistant: ... <|im_end|>.
             # Not sure if the correct way to do both of the mask.
             # Need to double check later logic how to use these two mask computing logp and entropy
             loss_mask[assist_pos: im_pos+1] = 1
             response_mask[assist_pos: im_pos+1] = 1
-        # response_mask[assist_position[0]:im_end_position[-1]] = 1
-        # print("Decoding check for response mask")
-        # print(self.processor.tokenizer.decode(input_ids[assist_position[0]:im_end_position[-1]]))
         row_dict["response_mask"] = response_mask[self.max_prompt_length:]
         row_dict["loss_mask"] = loss_mask
 
