@@ -14,6 +14,7 @@
 
 
 import base64
+import concurrent.futures
 import json
 import os
 import random
@@ -81,6 +82,10 @@ class OSWorldRewardManager:
             "reward_extra_info": dict()
         }
 
+    
+    
+        
+        
     def call_reward_model(self, dataset_id: str) -> float:
         
         
@@ -236,36 +241,81 @@ class OSWorldRewardManager:
         
         messages[1]["content"].extend(image_body)
         
+        n_completions = 4 # Number of completions to generate , set to 4 as the same as ZeroGUI
         results = []
         contents = []
         
-        n_completions = 4 # Number of completions to generate , set to 4 as the same as ZeroGUI
-        for i in range(n_completions):
-            self.client = OpenAI(
-            api_key=os.getenv("REWARD_SERVER_API_KEY"),
-            base_url=os.getenv("REWARD_SERVER_URL")
+        # version 1 : sequentially call the reward model to generate multiple completions
+        # This is the original version, which is slow but works.
+        # It generates 4 completions for each task and takes about 167 seconds for each
+        # for i in range(n_completions):
+        #     self.client = OpenAI(
+        #     api_key=os.getenv("REWARD_SERVER_API_KEY"),
+        #     base_url=os.getenv("REWARD_SERVER_URL")
+        #     )
+        #     response = self.client.chat.completions.create(
+        #                 model=self.model,
+        #                 messages=messages,
+        #                 extra_body={
+        #                     "mm_processor_kwargs": {
+        #                         "min_pixels": 100*28*28,
+        #                         "max_pixels": 16384*28*28,
+        #                     },
+        #                     "top_k": 50,
+        #                 }
+        #                 )
+        #     content = response.choices[0].message.content
+        #     match = re.search(r"SCORE:\s*(\d*\.?\d+)", content)
+        #     score = float(match.group(1)) if match else 0
+        #     results.append(score)
+        #     contents.append(content)
+        ########### ########### ########### ########### ########### ########### ########### ###########
+        
+        ###########
+        # Version 1.2: parallelly call the reward model to generate multiple completions
+        # This version uses a ThreadPoolExecutor to parallelize the calls to the reward model.
+        
+        with concurrent.futures.ProcessPoolExecutor(max_workers=6) as executor:
+            response_list = list(
+                executor.map(
+                    response_gen,
+                    [self.model]*n_completions,
+                    [os.getenv("REWARD_SERVER_API_KEY")]*n_completions,
+                    [os.getenv("REWARD_SERVER_URL")]*n_completions,
+                    [messages]*n_completions
+                )
             )
-            response = self.client.chat.completions.create(
-                        model=self.model,
-                        messages=messages,
-                        extra_body={
-                            "mm_processor_kwargs": {
-                                "min_pixels": 100*28*28,
-                                "max_pixels": 16384*28*28,
-                            },
-                            "top_k": 50,
-                        }
-                        )
-            content = response.choices[0].message.content
-            match = re.search(r"Score:\s*(\d*\.?\d+)", content)
-            score = float(match.group(1)) if match else 0
+        for score, content in response_list:
             results.append(score)
             contents.append(content)
-            
+        
+        print("Get results: ", results)
+        print("Get contents: ", contents)
+        
         voting_reward_avg = sum(results)/len(results) if results else 0
         
         return voting_reward_avg
 
+def response_gen(model: str,api_key: str,api_server: str,messages: list) -> tuple[float, str]:
+    client = OpenAI(
+        api_key=api_key,
+        base_url=api_server
+    )
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        extra_body={
+            "mm_processor_kwargs": {
+                "min_pixels": 100*28*28,
+                "max_pixels": 16384*28*28,
+            },
+            "top_k": 50,
+        }
+    )
+    content = response.choices[0].message.content
+    match = re.search(r"SCORE:\s*(\d*\.?\d+)", content)
+    score = float(match.group(1)) if match else 0
+    return score, content
 
 def get_last_image_file(directory, mode="last", n=None) -> list[str]:
     """
