@@ -12,6 +12,10 @@ def setup_env_vars(monkeypatch):
     monkeypatch.setenv("REWARD_SERVER_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
     monkeypatch.setenv("REWARD_MODEL", "qwen2.5-32b-instruct")
     monkeypatch.setenv("REWARD_SERVER_API_KEY", "sk-075466341a4d4bf584ccb233c85cb6c1")
+    monkeypatch.setenv("WINDOW_SIZE", 5)
+    monkeypatch.setenv("STRIDE_SIZE", 1)
+    monkeypatch.setenv("N_COMPLETIONS", 4)
+    monkeypatch.setenv("IMAGE_NAME_CHECK", "FALSE")  # Set to "TRUE" to check image names in the dataset
     
     # You can add more OSWorld-specific environment variables if needed
     # monkeypatch.setenv("OSWORLD_SERVER_URL", "http://localhost:4999")
@@ -47,8 +51,8 @@ def test_reward():
     import time
     start_time = time.time()
     print("Start time:", start_time)
-    score = manager.call_reward_model(dataset_id)
+    results = manager.call_reward_model(dataset_id)
     print("End time:", time.time())
     print("Time taken:", time.time() - start_time)  
-    print("Final score:", score)
+    print("Final results:", results)
     # 每一个query 询问4次 做投票，耗时 167秒约 qwen32binstruct

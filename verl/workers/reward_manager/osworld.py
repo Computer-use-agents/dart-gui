@@ -15,6 +15,7 @@
 
 import base64
 import concurrent.futures
+import copy
 import json
 import os
 import random
@@ -51,8 +52,39 @@ class OSWorldRewardManager:
             api_key=os.getenv("REWARD_SERVER_API_KEY"),
             base_url=os.getenv("REWARD_SERVER_URL")
         )
+        self.window_size = int(os.getenv("WINDOW_SIZE",5))  # The number of messages to consider in each batch
+        self.stride_size = int(os.getenv("STRIDE_SIZE",1)) # The number of messages to skip between batches
         self.model = os.getenv("REWARD_MODEL")
+        self.n_completions = int(os.getenv("N_COMPLETIONS", 4))  # Number of completions to generate for each task
+        self.image_name_check = os.getenv("IMAGE_NAME_CHECK", "TRUE")  # Whether to check the image name in the dataset
 
+    
+    # def split_dataset_id(self, dataset_id: str) -> list[list[dict]]:
+        
+    #     all_files = get_last_image_file(dataset_id)
+    #     start = 1
+    #     end = start + self.window_size
+    #     n_msg = len(dataset)
+    #     batch_data = []
+    #     instruction = copy.deepcopy(dataset[1])
+    #     while end < n_msg:
+    #         assert dataset[start]["role"] == "user"
+    #         if len(dataset[start]["content"]) == 1:
+    #             # remove image from first instruction
+    #             instruction["content"] = instruction["content"][:1]
+    #         # item = self._process_item(dataset, instruction, start, end)
+            
+    #         indexed_images = get_last_image_file(
+    #             dataset_dir, 
+    #             mode="index", 
+    #             index=[start,end])
+            
+    #         batch_data.append(indexed_images)
+            
+    #         start += 2 * self.stride_size
+    #         end = start + 2 * self.window_size
+    #     return batch_data
+    
     def __call__(self, data: DataProto, return_dict=False):
         """We will expand this function gradually based on the available datasets"""
         dataset_ids = data.non_tensor_batch["dataset_ids"]
@@ -81,11 +113,7 @@ class OSWorldRewardManager:
             "reward_tensor": reward_tensor,
             "reward_extra_info": dict()
         }
-
     
-    
-        
-        
     def call_reward_model(self, dataset_id: str) -> float:
         
         
@@ -194,58 +222,63 @@ class OSWorldRewardManager:
         if task_config["evaluator"]["func"] == "infeasible":
             print("Note:", task, "is infeasible!")
             task += "\nNote: this task is infeasible in the enironment."
-        image_paths = get_last_image_file(dataset_path, mode="last", n=1)
-        if isinstance(image_paths, str):
-            image_paths = [image_paths]
-        print("Get image", len(image_paths))
-        image_body = []
-        for image_path in image_paths:
+        
+        all_images = get_last_image_file(
+            dataset_path, 
+            mode="index_all"
+        )
+        all_image_encoded = []
+        for image_path in all_images:
             with open(image_path, "rb") as f:
                 screenshot_data = f.read()
             encoded_string = base64.b64encode(screenshot_data).decode('utf-8')
-            image_body.append({
+            all_image_encoded.append({
                 "type": "image_url", 
                 "image_url": {
                     "url": f"data:image/jpeg;base64,{encoded_string}"
                 }
             })
+        
+        
+        # grouped_results = [ {'window_id':i, "score_list":[],'content_list':[]} for i in range(len(messages_list))]
+        grouped_results = []
+        messages_list = []
+        for i in range(0, len(all_image_encoded)-self.window_size+1, self.stride_size):
+            # Create a batch of messages with the current window of images
             
-        # Do Not Contain History Responses!
-        # with open(os.path.join(dataset_path, "final_messages.json")) as f:
-        #     messages = json.load(f)
-        # action_history = ""
-        # step_idx = 0
-        # for msg in messages:
-        #     if msg["role"] in ["system", "user"]:
-        #         continue
-        #     action_history += f"Step {step_idx+1}:"
-        #     action_history += f"{msg['content'][0]['text']}"
-        #     action_history += "\n"
-
-        # Get task from environment if not provided
-        # Call reward model
+            grouped_results.append({'window_id':i,'images_list':[(image.replace(dataset_path+'/','')).replace('.png','') for image in all_images[i:i+self.window_size]],"score_list":[],'content_list':[]})
+            image_batch = all_image_encoded[i:i+self.window_size]
+            if not image_batch:
+                print("No images found for dataset_id:", dataset_id)
+                assert False, "No images found for dataset_id: {}".format(dataset_id)
+            
+            # print("Get image batch", len(image_batch))
+            # print("Get image batch", i, "to", i+self.window_size)
+            # print("Get image paths:", all_images[i:i+self.window_size])
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are an expert at analyzing computer usage task completion from screenshots.",
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": user_prompt.format(task_description=task)},
+                        
+                    ],
+                }
+                ]
+            messages[1]["content"].extend(image_batch)
+            messages_list.append(messages)
+        
        
-        messages = [
-        {
-            "role": "system",
-            "content": "You are an expert at analyzing computer usage task completion from screenshots.",
-        },
-        {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": user_prompt.format(task_description=task)},
-                
-            ],
-        }
-        ]
         
-        messages[1]["content"].extend(image_body)
-        
-        n_completions = 4 # Number of completions to generate , set to 4 as the same as ZeroGUI
+        n_completions = self.n_completions # Number of completions to generate , set to 4 as the same as ZeroGUI
         results = []
         contents = []
         
         # version 1 : sequentially call the reward model to generate multiple completions
+        # THIS NO LONGER WORKS, as the reward server has been updated to use a different API.
         # This is the original version, which is slow but works.
         # It generates 4 completions for each task and takes about 167 seconds for each
         # for i in range(n_completions):
@@ -269,34 +302,82 @@ class OSWorldRewardManager:
         #     score = float(match.group(1)) if match else 0
         #     results.append(score)
         #     contents.append(content)
+        # THIS NO LONGER WORKS, as the reward server has been updated to use a different API.
         ########### ########### ########### ########### ########### ########### ########### ###########
         
         ###########
         # Version 1.2: parallelly call the reward model to generate multiple completions
         # This version uses a ThreadPoolExecutor to parallelize the calls to the reward model.
+        if self.image_name_check == "TRUE":
+            check_result = 'TRUE'
+            with open(os.path.join(dataset_path, "result.json"), "r") as f:
+                result_messages = json.load(f)
+            for i, item in enumerate(result_messages):
+                
+                # i is the start index of the window
+                # item is the window messages
+                
+                # reward message list = image_list 
+                image_list = grouped_results[i]['images_list']
+                
+                # collect the image from the window messages
+                ground_truth_image_list = []
+                for result_item in item:
+                    if result_item['role'] == 'user':
+                        print(result_item)
+                        ground_truth_image_list.append(result_item['content'][-1]["image"])
+                        
+                if ground_truth_image_list != image_list:
+                    check_result = 'FALSE'
+                    print(f"Warning: Image list in result {i} does not match the expected format")
+                    print(f"Expected: {image_list}")
+                    print(f"Got: {ground_truth_image_list}")
+                    exit()
+            if check_result == 'FALSE':
+                print(f"Warning: Image list in result does not match the expected format in dataset {dataset_id}")
+            else:
+                print(f"Image list in result matches the expected format in dataset {dataset_id}")
+                
         
-        with concurrent.futures.ProcessPoolExecutor(max_workers=6) as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=16) as executor:
             response_list = list(
                 executor.map(
                     response_gen,
-                    [self.model]*n_completions,
-                    [os.getenv("REWARD_SERVER_API_KEY")]*n_completions,
-                    [os.getenv("REWARD_SERVER_URL")]*n_completions,
-                    [messages]*n_completions
+                    [self.model]*len(messages_list)*n_completions,
+                    [os.getenv("REWARD_SERVER_API_KEY")]*len(messages_list)*n_completions,
+                    [os.getenv("REWARD_SERVER_URL")]*len(messages_list)*n_completions,
+                    messages_list*n_completions
                 )
             )
-        for score, content in response_list:
-            results.append(score)
-            contents.append(content)
+            
+        # for score, content in response_list:
+        #     results.append(score)
+        #     contents.append(content)
+        # print("Get results: ", results)
+        # print("Get contents: ", contents)
+        # grouped_results = [ {'window_id':i, "score_list":[],'content_list':[]} for i in range(len(messages_list))]
+        # print("Get messages_list list: ", len(messages_list))
+        # print("get grouped_results: ", len(grouped_results))
         
-        print("Get results: ", results)
-        print("Get contents: ", contents)
         
-        voting_reward_avg = sum(results)/len(results) if results else 0
         
-        return voting_reward_avg
+        for i, (score, content) in enumerate(response_list):
+            
+            msg_idx = i % len(messages_list)
+            # print("msg_idx : ", msg_idx)
+            grouped_results[msg_idx]['score_list'].append(score)
+            grouped_results[msg_idx]['content_list'].append(content)
+            
+        # update reward score for each window
+        for item in grouped_results:
+            item['voting_reward_avg'] = sum(item['score_list']) / len(item['score_list']) if item['score_list'] else 0
+            
+        return grouped_results
+            
+        
 
 def response_gen(model: str,api_key: str,api_server: str,messages: list) -> tuple[float, str]:
+    # return [1,'testing']
     client = OpenAI(
         api_key=api_key,
         base_url=api_server
@@ -317,7 +398,10 @@ def response_gen(model: str,api_key: str,api_server: str,messages: list) -> tupl
     score = float(match.group(1)) if match else 0
     return score, content
 
-def get_last_image_file(directory, mode="last", n=None) -> list[str]:
+
+
+    
+def get_last_image_file(directory, mode="last", n=None, index = None) -> list[str]:
     """
     Lists all files in a directory, filters for .png files,
     and returns files based on the specified mode.
@@ -329,6 +413,7 @@ def get_last_image_file(directory, mode="last", n=None) -> list[str]:
             - "sample": Returns n files with equal interval sampling
         n (int): Number of files to sample when mode is "sample". 
                 If None and mode is "sample", defaults to 5.
+        index (int): Index of the file to return when mode is "index".
 
     Returns:
         str or list: The full path(s) to the selected .png file(s), 
@@ -381,7 +466,20 @@ def get_last_image_file(directory, mode="last", n=None) -> list[str]:
                 sampled_files.append(sampled_file_path)
             
             return sampled_files
-            
+        
+        elif mode == 'index':
+            indexed_files = []
+            for i in range(index[0],index[1]):
+                # index [0] starts with 1, so we need to subtract 1 to match Python's 0-based indexing
+                if i < len(png_files):
+                    indexed_files.append(os.path.join(directory, png_files[i-1]))
+            return indexed_files
+        
+        elif mode == 'index_all':
+            all_files = []
+            for i in range(len(png_files)):
+                all_files.append(os.path.join(directory, png_files[i]))
+            return all_files
         else:
             raise ValueError(f"Invalid mode '{mode}'. Supported modes are 'last' and 'sample'.")
 
