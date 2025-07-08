@@ -14,8 +14,6 @@
 
 
 import base64
-import concurrent.futures
-import copy
 import json
 import os
 import random
@@ -49,42 +47,11 @@ class OSWorldRewardManager:
         self.reward_fn_key = reward_fn_key  # Store the key for accessing the data source
         self.root_dir = root_dir
         self.client = OpenAI(
-            api_key=os.getenv("REWARD_SERVER_API_KEY"),
+            api_key="empty",
             base_url=os.getenv("REWARD_SERVER_URL")
         )
-        self.window_size = int(os.getenv("WINDOW_SIZE",5))  # The number of messages to consider in each batch
-        self.stride_size = int(os.getenv("STRIDE_SIZE",1)) # The number of messages to skip between batches
         self.model = os.getenv("REWARD_MODEL")
-        self.n_completions = int(os.getenv("N_COMPLETIONS", 4))  # Number of completions to generate for each task
-        self.image_name_check = os.getenv("IMAGE_NAME_CHECK", "TRUE")  # Whether to check the image name in the dataset
 
-    
-    # def split_dataset_id(self, dataset_id: str) -> list[list[dict]]:
-        
-    #     all_files = get_last_image_file(dataset_id)
-    #     start = 1
-    #     end = start + self.window_size
-    #     n_msg = len(dataset)
-    #     batch_data = []
-    #     instruction = copy.deepcopy(dataset[1])
-    #     while end < n_msg:
-    #         assert dataset[start]["role"] == "user"
-    #         if len(dataset[start]["content"]) == 1:
-    #             # remove image from first instruction
-    #             instruction["content"] = instruction["content"][:1]
-    #         # item = self._process_item(dataset, instruction, start, end)
-            
-    #         indexed_images = get_last_image_file(
-    #             dataset_dir, 
-    #             mode="index", 
-    #             index=[start,end])
-            
-    #         batch_data.append(indexed_images)
-            
-    #         start += 2 * self.stride_size
-    #         end = start + 2 * self.window_size
-    #     return batch_data
-    
     def __call__(self, data: DataProto, return_dict=False):
         """We will expand this function gradually based on the available datasets"""
         dataset_ids = data.non_tensor_batch["dataset_ids"]
@@ -113,108 +80,28 @@ class OSWorldRewardManager:
             "reward_tensor": reward_tensor,
             "reward_extra_info": dict()
         }
-    
+
     def call_reward_model(self, dataset_id: str) -> float:
-        
-        
-        user_prompt = """
-        You will be given a task instruction and a series of screenshots of the task
-        execution.
-        Please analyze the screenshots and provide a detailed analysis of the task
-        completion by following the steps below:
-        1. First, analyze and understand the task instruction. Describe what should the
-        screenshots look like if the task is completed successfully.
-        2. Describe what you observe in each screenshot, analysis what actions were
-        taken and what changes were made to the UI to achieve the task (or mistakes
-        made).
-        3. When you analyze the screenshots, please pay attention to the very detailed
-        elements and changes in the UI. Every small detail may affect the final result.
-        4. After all screenshots are analyzed, provide a overall reasoning about how
-        the task was completed or failed at **the final state**. Make sure you have
-        considered all demands of the task instruction.
-        5. Determine if the task was completed at **the final state** (the last
-        screenshot) successfully (score 1 for success, 0 for failure). If the task is
-        completed during the process but not at the final state, it should be considered
-        as failure (0 score).
-        Provide your response strictly in the following format:
-        TASK REQUIREMENT:
-        [Your understanding of the task instruction]
-        SCREENSHOT ANALYSIS:
-        Screenshot 1:
-        [Analysis of first screenshot]
-        Screenshot 2:
-        [Analysis of second screenshot]
-        ...
-        REASONING:
-        [Your reasoning]
-        FINAL ANSWER:
-        [Your final answer]
-        SCORE: [0/1]
-        Here is an example:
-        (Task Instruction: Please help me backup my emails in "Bills" folder in
-        Thunderbird and store the .eml files with only subject names to my Google Drive
-        folder called "emails".)
-        TASK REQUIREMENT:
-        - Backup the emails in "Bills" folder in Thunderbird.
-        - Store the backup .eml files with only subject names, and the emails should be
-        saved in the Google Drive folder called "emails".
-        - Once succeed, the emails should be visible in the Google Drive folder "emails".
-        Or at least there should be a saving action performed.
-        SCREENSHOT ANALYSIS:
-        Screenshot 1:
-        - Thunderbird email client is open.
-        - The "Bills" folder is visible under "Local Folders."
-        - There is no observable action performed yet in this screenshot.
-        Screenshot 2:
-        - The "Bills" folder has been selected, and the folder content is displayed.
-        - Two emails are visible: "Amazon Web Services Invoice Available" and "Your
-        receipt from X (formerly Twitter)."
-        11
-        - No further actions are taken on the emails.
-        Screenshot 3:
-        - Both emails in the "Bills" folder are selected.
-        - Content previews of both emails are displayed on the right-hand side.
-        - No observable attempt to export or save the emails is visible.
-        Screenshot 4:
-        - The right-click context menu is accessed for the selected emails.
-        - The "Save As..." option is hovered over, indicating intent to save the selected
-        emails.
-        Screenshot 5:
-        - The file navigation window opens, allowing the user to choose a save
-        destination.
-        - No specific Google Drive folder (e.g., "emails") is accessed or visible in this
-        screenshot.
-        Screenshot 6:
-        - The "Desktop" option in the file picker is hovered over.
-        - Still no indication of Google Drive folder ("emails") selection.
-        Screenshot 7:
-        - The "Show other locations" option is hovered over in the file picker.
-        - No confirmation that the user is navigating to Google Drive or saving the files
-        with subject names only.
-        Screenshot 8:
-        - The "Software Updates Available" notification appears. The file picker is
-        still open without any observable confirmation of file saving or destination
-        selection.
-        - It remains unclear where or if the emails have been saved.
-        REASONING:
-        Based on the screenshots provided:
-        1. While there was some intent to save the emails (as shown by the selection
-        and access of the "Save As..." function), there is no confirmation that the .eml
-        files were saved with subject names only and placed in the required Google Drive
-        folder ("emails").
-        2. The screenshots lack evidence of the completion of the task as per the
-        instructions.
-        FINAL ANSWER:
-        The task was not completed successfully due to the lack of observable saving
-        action.
-        SCORE: 0
-        Now, please **strictly follow the format** and analyze the following screenshots
-        (The last line should only be SCORE: [0/1], no other text):
-        Task Instruction: {task_description}
-        Screenshots (by order): 
-        """
-        
-        
+        prompt = """You are a smart GUI agent. Your goal is that given a latest screenshot and a task, you should give a score about if the task is completed based on the screenshot.
+You will also have a history of agent actions. You should consider if the history is consistent with the task and latest screenshot.
+
+Format your response as
+```
+Thought: <your reasoning process>
+Score: <0 or 1. When task is feasible, 0 means the task is not completed, 1 means the task is completed. No partial score.>
+```
+Important notes for score:
+- Give score 1 if and only if you found task relevant information in both action history and screenshot.
+- If you are not sure and cannot tell from what you are given, do not guess and just give score 0.
+
+## Task
+{task}
+
+## Action History
+{action_history}
+
+## Screenshot History
+"""
         dataset_path = os.path.join(self.root_dir, dataset_id)
         with open(os.path.join(dataset_path, "task_config.json"), "r") as f:
             task_config = json.load(f)
@@ -222,186 +109,70 @@ class OSWorldRewardManager:
         if task_config["evaluator"]["func"] == "infeasible":
             print("Note:", task, "is infeasible!")
             task += "\nNote: this task is infeasible in the enironment."
-        
-        all_images = get_last_image_file(
-            dataset_path, 
-            mode="index_all"
-        )
-        all_image_encoded = []
-        for image_path in all_images:
+        image_paths = get_last_image_file(dataset_path, mode="last", n=1)
+        if isinstance(image_paths, str):
+            image_paths = [image_paths]
+        print("Get image", len(image_paths))
+        image_body = []
+        for image_path in image_paths:
             with open(image_path, "rb") as f:
                 screenshot_data = f.read()
             encoded_string = base64.b64encode(screenshot_data).decode('utf-8')
-            all_image_encoded.append({
+            image_body.append({
                 "type": "image_url", 
                 "image_url": {
                     "url": f"data:image/jpeg;base64,{encoded_string}"
                 }
             })
-        
-        
-        # grouped_results = [ {'window_id':i, "score_list":[],'content_list':[]} for i in range(len(messages_list))]
-        grouped_results = []
-        messages_list = []
-        for i in range(0, len(all_image_encoded)-self.window_size+1, self.stride_size):
-            # Create a batch of messages with the current window of images
-            
-            grouped_results.append({'window_id':i,'images_list':[(image.replace(dataset_path+'/','')).replace('.png','') for image in all_images[i:i+self.window_size]],"score_list":[],'content_list':[]})
-            image_batch = all_image_encoded[i:i+self.window_size]
-            if not image_batch:
-                print("No images found for dataset_id:", dataset_id)
-                assert False, "No images found for dataset_id: {}".format(dataset_id)
-            
-            # print("Get image batch", len(image_batch))
-            # print("Get image batch", i, "to", i+self.window_size)
-            # print("Get image paths:", all_images[i:i+self.window_size])
-            messages = [
-                {
-                    "role": "system",
-                    "content": "You are an expert at analyzing computer usage task completion from screenshots.",
-                },
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": user_prompt.format(task_description=task)},
-                        
-                    ],
-                }
+
+        with open(os.path.join(dataset_path, "final_messages.json")) as f:
+            messages = json.load(f)
+        action_history = ""
+        step_idx = 0
+        for msg in messages:
+            if msg["role"] in ["system", "user"]:
+                continue
+            action_history += f"Step {step_idx+1}:"
+            action_history += f"{msg['content'][0]['text']}"
+            action_history += "\n"
+
+        # Get task from environment if not provided
+        # Call reward model
+        messages = [
+                {"role": "user", 
+                "content": [
+                    {
+                        "type": "text",
+                        "text": prompt.format(
+                            task=task, 
+                            action_history=action_history,
+                        )
+                    }    
                 ]
-            messages[1]["content"].extend(image_batch)
-            messages_list.append(messages)
-        
-       
-        
-        n_completions = self.n_completions # Number of completions to generate , set to 4 as the same as ZeroGUI
-        results = []
-        contents = []
-        
-        # version 1 : sequentially call the reward model to generate multiple completions
-        # THIS NO LONGER WORKS, as the reward server has been updated to use a different API.
-        # This is the original version, which is slow but works.
-        # It generates 4 completions for each task and takes about 167 seconds for each
-        # for i in range(n_completions):
-        #     self.client = OpenAI(
-        #     api_key=os.getenv("REWARD_SERVER_API_KEY"),
-        #     base_url=os.getenv("REWARD_SERVER_URL")
-        #     )
-        #     response = self.client.chat.completions.create(
-        #                 model=self.model,
-        #                 messages=messages,
-        #                 extra_body={
-        #                     "mm_processor_kwargs": {
-        #                         "min_pixels": 100*28*28,
-        #                         "max_pixels": 16384*28*28,
-        #                     },
-        #                     "top_k": 50,
-        #                 }
-        #                 )
-        #     content = response.choices[0].message.content
-        #     match = re.search(r"SCORE:\s*(\d*\.?\d+)", content)
-        #     score = float(match.group(1)) if match else 0
-        #     results.append(score)
-        #     contents.append(content)
-        # THIS NO LONGER WORKS, as the reward server has been updated to use a different API.
-        ########### ########### ########### ########### ########### ########### ########### ###########
-        
-        ###########
-        # Version 1.2: parallelly call the reward model to generate multiple completions
-        # This version uses a ThreadPoolExecutor to parallelize the calls to the reward model.
-        if self.image_name_check == "TRUE":
-            check_result = 'TRUE'
-            with open(os.path.join(dataset_path, "result.json"), "r") as f:
-                result_messages = json.load(f)
-            for i, item in enumerate(result_messages):
-                
-                # i is the start index of the window
-                # item is the window messages
-                
-                # reward message list = image_list 
-                image_list = grouped_results[i]['images_list']
-                
-                # collect the image from the window messages
-                ground_truth_image_list = []
-                for result_item in item:
-                    if result_item['role'] == 'user':
-                        print(result_item)
-                        ground_truth_image_list.append(result_item['content'][-1]["image"])
-                        
-                if ground_truth_image_list != image_list:
-                    check_result = 'FALSE'
-                    print(f"Warning: Image list in result {i} does not match the expected format")
-                    print(f"Expected: {image_list}")
-                    print(f"Got: {ground_truth_image_list}")
-                    exit()
-            if check_result == 'FALSE':
-                print(f"Warning: Image list in result does not match the expected format in dataset {dataset_id}")
-            else:
-                print(f"Image list in result matches the expected format in dataset {dataset_id}")
-                
-        
-        with concurrent.futures.ProcessPoolExecutor(max_workers=16) as executor:
-            response_list = list(
-                executor.map(
-                    response_gen,
-                    [self.model]*len(messages_list)*n_completions,
-                    [os.getenv("REWARD_SERVER_API_KEY")]*len(messages_list)*n_completions,
-                    [os.getenv("REWARD_SERVER_URL")]*len(messages_list)*n_completions,
-                    messages_list*n_completions
-                )
-            )
-            
-        # for score, content in response_list:
-        #     results.append(score)
-        #     contents.append(content)
-        # print("Get results: ", results)
-        # print("Get contents: ", contents)
-        # grouped_results = [ {'window_id':i, "score_list":[],'content_list':[]} for i in range(len(messages_list))]
-        # print("Get messages_list list: ", len(messages_list))
-        # print("get grouped_results: ", len(grouped_results))
-        
-        
-        
-        for i, (score, content) in enumerate(response_list):
-            
-            msg_idx = i % len(messages_list)
-            # print("msg_idx : ", msg_idx)
-            grouped_results[msg_idx]['score_list'].append(score)
-            grouped_results[msg_idx]['content_list'].append(content)
-            
-        # update reward score for each window
-        for item in grouped_results:
-            item['voting_reward_avg'] = sum(item['score_list']) / len(item['score_list']) if item['score_list'] else 0
-            
-        return grouped_results
-            
-        
+        }]
+        messages[0]["content"].extend(image_body)
+        response = self.client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            extra_body={
+                "mm_processor_kwargs": {
+                    "min_pixels": 100*28*28,
+                    "max_pixels": 16384*28*28,
+                },
+                "top_k": 50,
+            }
+        )
 
-def response_gen(model: str,api_key: str,api_server: str,messages: list) -> tuple[float, str]:
-    # return [1,'testing']
-    client = OpenAI(
-        api_key=api_key,
-        base_url=api_server
-    )
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        extra_body={
-            "mm_processor_kwargs": {
-                "min_pixels": 100*28*28,
-                "max_pixels": 16384*28*28,
-            },
-            "top_k": 50,
-        }
-    )
-    content = response.choices[0].message.content
-    match = re.search(r"SCORE:\s*(\d*\.?\d+)", content)
-    score = float(match.group(1)) if match else 0
-    return score, content
+        # Parse response to get score
+        response_text = response.choices[0].message.content
+        print("reward model:", response_text, "token usage", response.usage)
+        score_match = re.search(r"Score:\s*(\d*\.?\d+)", response_text)
+        print("reward model final score", score_match)
+        score = float(score_match.group(1))
+        return score
 
 
-
-    
-def get_last_image_file(directory, mode="last", n=None, index = None) -> list[str]:
+def get_last_image_file(directory, mode="last", n=None) -> list[str]:
     """
     Lists all files in a directory, filters for .png files,
     and returns files based on the specified mode.
@@ -413,7 +184,6 @@ def get_last_image_file(directory, mode="last", n=None, index = None) -> list[st
             - "sample": Returns n files with equal interval sampling
         n (int): Number of files to sample when mode is "sample". 
                 If None and mode is "sample", defaults to 5.
-        index (int): Index of the file to return when mode is "index".
 
     Returns:
         str or list: The full path(s) to the selected .png file(s), 
@@ -466,20 +236,7 @@ def get_last_image_file(directory, mode="last", n=None, index = None) -> list[st
                 sampled_files.append(sampled_file_path)
             
             return sampled_files
-        
-        elif mode == 'index':
-            indexed_files = []
-            for i in range(index[0],index[1]):
-                # index [0] starts with 1, so we need to subtract 1 to match Python's 0-based indexing
-                if i < len(png_files):
-                    indexed_files.append(os.path.join(directory, png_files[i-1]))
-            return indexed_files
-        
-        elif mode == 'index_all':
-            all_files = []
-            for i in range(len(png_files)):
-                all_files.append(os.path.join(directory, png_files[i]))
-            return all_files
+            
         else:
             raise ValueError(f"Invalid mode '{mode}'. Supported modes are 'last' and 'sample'.")
 

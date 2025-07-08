@@ -12,15 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import base64
-import concurrent.futures
+
+# import concurrent.futures
 import copy
 import json
 import os
 import random
 import re
 
+import ray
 import torch
 from openai import OpenAI
 
@@ -29,9 +30,9 @@ from verl.utils.reward_score import default_compute_score
 from verl.workers.reward_manager import register
 
 
-@register("osworld")
-class OSWorldRewardManager:
-    """The reward manager."""
+@register("auto_osworld")
+class AutoOSWorldRewardManager:
+    """The AUTO reward manager."""
 
     def __init__(self, tokenizer, num_examine, compute_score=None, reward_fn_key="data_source", root_dir="tmp") -> None:
         """
@@ -57,7 +58,8 @@ class OSWorldRewardManager:
         self.model = os.getenv("REWARD_MODEL")
         self.n_completions = int(os.getenv("N_COMPLETIONS", 4))  # Number of completions to generate for each task
         self.image_name_check = os.getenv("IMAGE_NAME_CHECK", "TRUE")  # Whether to check the image name in the dataset
-
+        self.trajectory_mode = os.getenv("TRAJECTORY_MODE","TRUE")
+        self.sample_num = int(os.getenv("SAMPLE_NUM",3))
     
     # def split_dataset_id(self, dataset_id: str) -> list[list[dict]]:
         
@@ -92,8 +94,13 @@ class OSWorldRewardManager:
         scores = []
         for dataset_id in dataset_ids:
             try:
-                score = self.call_reward_model(dataset_id)
-                scores.append(score)
+                if self.trajectory_mode == 'FALSE':
+                    grouped_results = self.call_reward_model(dataset_id)
+                    for item in grouped_results:
+                        scores.append(item['voting_reward_avg'])
+                else:
+                    score = self.call_reward_model_trajectory(dataset_id)
+                    scores.append(score)
             except Exception as e:
                 import traceback
                 traceback.print_exc()
@@ -102,7 +109,10 @@ class OSWorldRewardManager:
 
             try:
                 with open(os.path.join(self.root_dir, dataset_id, "reward.txt"), "w") as f:
-                    f.write(str(scores[-1]))
+                    if self.trajectory_mode == 'FALSE':
+                        f.write(str(scores))
+                    else:
+                        f.write(str(scores[-1]))
             except Exception as e:
                 print("write to reward failed!", e)
                 
@@ -339,17 +349,29 @@ class OSWorldRewardManager:
                 print(f"Image list in result matches the expected format in dataset {dataset_id}")
                 
         
-        with concurrent.futures.ProcessPoolExecutor(max_workers=16) as executor:
-            response_list = list(
-                executor.map(
-                    response_gen,
-                    [self.model]*len(messages_list)*n_completions,
+        futures = [
+         ray_response_gen.remote(model,api_key,server_url,message)
+         for model, api_key, server_url, message in zip([self.model]*len(messages_list)*n_completions,
                     [os.getenv("REWARD_SERVER_API_KEY")]*len(messages_list)*n_completions,
                     [os.getenv("REWARD_SERVER_URL")]*len(messages_list)*n_completions,
-                    messages_list*n_completions
-                )
-            )
+                    messages_list*n_completions)   
             
+        ]
+        
+        # with concurrent.futures.ProcessPoolExecutor(max_workers=16) as executor:
+        #     response_list = list(
+        #         executor.map(
+        #             response_gen,
+        #             [self.model]*len(messages_list)*n_completions,
+        #             [os.getenv("REWARD_SERVER_API_KEY")]*len(messages_list)*n_completions,
+        #             [os.getenv("REWARD_SERVER_URL")]*len(messages_list)*n_completions,
+        #             messages_list*n_completions
+        #         )
+        #     )
+        
+        response_list = ray.get(futures)
+        
+        
         # for score, content in response_list:
         #     results.append(score)
         #     contents.append(content)
@@ -373,7 +395,172 @@ class OSWorldRewardManager:
             item['voting_reward_avg'] = sum(item['score_list']) / len(item['score_list']) if item['score_list'] else 0
             
         return grouped_results
+    
+    def call_reward_model_trajectory(self, dataset_id: str) -> float:        
+        user_prompt = """
+        You will be given a task instruction and a series of screenshots of the task
+        execution.
+        Please analyze the screenshots and provide a detailed analysis of the task
+        completion by following the steps below:
+        1. First, analyze and understand the task instruction. Describe what should the
+        screenshots look like if the task is completed successfully.
+        2. Describe what you observe in each screenshot, analysis what actions were
+        taken and what changes were made to the UI to achieve the task (or mistakes
+        made).
+        3. When you analyze the screenshots, please pay attention to the very detailed
+        elements and changes in the UI. Every small detail may affect the final result.
+        4. After all screenshots are analyzed, provide a overall reasoning about how
+        the task was completed or failed at **the final state**. Make sure you have
+        considered all demands of the task instruction.
+        5. Determine if the task was completed at **the final state** (the last
+        screenshot) successfully (score 1 for success, 0 for failure). If the task is
+        completed during the process but not at the final state, it should be considered
+        as failure (0 score).
+        Provide your response strictly in the following format:
+        TASK REQUIREMENT:
+        [Your understanding of the task instruction]
+        SCREENSHOT ANALYSIS:
+        Screenshot 1:
+        [Analysis of first screenshot]
+        Screenshot 2:
+        [Analysis of second screenshot]
+        ...
+        REASONING:
+        [Your reasoning]
+        FINAL ANSWER:
+        [Your final answer]
+        SCORE: [0/1]
+        Here is an example:
+        (Task Instruction: Please help me backup my emails in "Bills" folder in
+        Thunderbird and store the .eml files with only subject names to my Google Drive
+        folder called "emails".)
+        TASK REQUIREMENT:
+        - Backup the emails in "Bills" folder in Thunderbird.
+        - Store the backup .eml files with only subject names, and the emails should be
+        saved in the Google Drive folder called "emails".
+        - Once succeed, the emails should be visible in the Google Drive folder "emails".
+        Or at least there should be a saving action performed.
+        SCREENSHOT ANALYSIS:
+        Screenshot 1:
+        - Thunderbird email client is open.
+        - The "Bills" folder is visible under "Local Folders."
+        - There is no observable action performed yet in this screenshot.
+        Screenshot 2:
+        - The "Bills" folder has been selected, and the folder content is displayed.
+        - Two emails are visible: "Amazon Web Services Invoice Available" and "Your
+        receipt from X (formerly Twitter)."
+        11
+        - No further actions are taken on the emails.
+        Screenshot 3:
+        - Both emails in the "Bills" folder are selected.
+        - Content previews of both emails are displayed on the right-hand side.
+        - No observable attempt to export or save the emails is visible.
+        Screenshot 4:
+        - The right-click context menu is accessed for the selected emails.
+        - The "Save As..." option is hovered over, indicating intent to save the selected
+        emails.
+        Screenshot 5:
+        - The file navigation window opens, allowing the user to choose a save
+        destination.
+        - No specific Google Drive folder (e.g., "emails") is accessed or visible in this
+        screenshot.
+        Screenshot 6:
+        - The "Desktop" option in the file picker is hovered over.
+        - Still no indication of Google Drive folder ("emails") selection.
+        Screenshot 7:
+        - The "Show other locations" option is hovered over in the file picker.
+        - No confirmation that the user is navigating to Google Drive or saving the files
+        with subject names only.
+        Screenshot 8:
+        - The "Software Updates Available" notification appears. The file picker is
+        still open without any observable confirmation of file saving or destination
+        selection.
+        - It remains unclear where or if the emails have been saved.
+        REASONING:
+        Based on the screenshots provided:
+        1. While there was some intent to save the emails (as shown by the selection
+        and access of the "Save As..." function), there is no confirmation that the .eml
+        files were saved with subject names only and placed in the required Google Drive
+        folder ("emails").
+        2. The screenshots lack evidence of the completion of the task as per the
+        instructions.
+        FINAL ANSWER:
+        The task was not completed successfully due to the lack of observable saving
+        action.
+        SCORE: 0
+        Now, please **strictly follow the format** and analyze the following screenshots
+        (The last line should only be SCORE: [0/1], no other text):
+        Task Instruction: {task_description}
+        Screenshots (by order): 
+        """
+        
+        
+        dataset_path = os.path.join(self.root_dir, dataset_id)
+        with open(os.path.join(dataset_path, "task_config.json"), "r") as f:
+            task_config = json.load(f)
+        task = task_config["instruction"]
+        if task_config["evaluator"]["func"] == "infeasible":
+            print("Note:", task, "is infeasible!")
+            task += "\nNote: this task is infeasible in the enironment."
+        
+        all_images = get_last_image_file(
+            dataset_path, 
+            mode="sample",
+            n=self.sample_num
+        )
+        
+        all_image_encoded = []
+        for image_path in all_images:
+            with open(image_path, "rb") as f:
+                screenshot_data = f.read()
+            encoded_string = base64.b64encode(screenshot_data).decode('utf-8')
+            all_image_encoded.append({
+                "type": "image_url", 
+                "image_url": {
+                    "url": f"data:image/jpeg;base64,{encoded_string}"
+                }
+            })
+
+        messages = [
+            {
+                "role": "system",
+                "content": "You are an expert at analyzing computer usage task completion from screenshots.",
+            },
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": user_prompt.format(task_description=task)},
+                    
+                ],
+            }
+            ]
+        messages[1]["content"].extend(all_image_encoded)
+        messages_list = []
+        messages_list.append(messages)
+        
+        n_completions = self.n_completions # Number of completions to generate , set to 4 as the same as ZeroGUI
+        results = []
+        contents = []
+        futures = [
+         ray_response_gen.remote(model,api_key,server_url,message)
+         for model, api_key, server_url, message in zip([self.model]*len(messages_list)*n_completions,
+                    [os.getenv("REWARD_SERVER_API_KEY")]*len(messages_list)*n_completions,
+                    [os.getenv("REWARD_SERVER_URL")]*len(messages_list)*n_completions,
+                    messages_list*n_completions)   
             
+        ]
+        response_list = ray.get(futures)
+        
+        
+        for score, content in response_list:
+            results.append(score)
+            contents.append(content)
+        print("Get results: ", results)
+        print("Get contents: ", contents)
+        
+        
+        return sum(results) / len(results) if results else 0
+             
         
 
 def response_gen(model: str,api_key: str,api_server: str,messages: list) -> tuple[float, str]:
@@ -398,6 +585,10 @@ def response_gen(model: str,api_key: str,api_server: str,messages: list) -> tupl
     score = float(match.group(1)) if match else 0
     return score, content
 
+
+@ray.remote
+def ray_response_gen(model, api_key, server_url, message):
+    return response_gen(model, api_key, server_url, message)
 
 
     
