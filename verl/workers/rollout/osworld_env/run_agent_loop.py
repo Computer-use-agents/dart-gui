@@ -51,6 +51,7 @@ class TrajectoryRunner:
         #     self.reset(task_config)
     
     def close(self):
+        print("call env close", self.env.service_id)
         self.env.close()
 
     def reset(self, task_config):
