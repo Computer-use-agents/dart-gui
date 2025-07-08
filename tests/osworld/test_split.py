@@ -51,6 +51,12 @@ def test_splitter():
             print(k)
     batch = DataProto.from_single_dict(batch)
     print("batch size", len(batch))
+    raw_messages = batch.non_tensor_batch["raw_messages"]
+    import json
+    for idx, item in enumerate(raw_messages):
+        with open(f"raw_message_{idx}.json", "w") as f:
+            # print(json.dumps(item, indent=4, ensure_ascii=False))
+            json.dump(item, f, indent=4, ensure_ascii=False)
     # print(batch.batch.keys())
     # reward_tensor = batch.batch.pop("reward_tensor")
     # print(batch.batch.keys())

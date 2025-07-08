@@ -96,30 +96,35 @@ class TrajectorySplitter:
         n_msg = len(dataset)
         batch_data = []
         instruction = copy.deepcopy(dataset[1])
+        is_first_turn = True
         while end < n_msg:
             assert dataset[start]["role"] == "user"
             if len(dataset[start]["content"]) == 1:
                 # remove image from instruction
                 instruction["content"] = instruction["content"][:1]
-            item = self._process_item(dataset, instruction, start, end)
+            item = self._process_item(dataset, copy.deepcopy(instruction), start, end, is_first_turn)
+            is_first_turn = False
             
             batch_data.append((item, copy.deepcopy(task_config)))
             start += 2 * self.stride_size
             end = start + 2 * self.window_size
         return batch_data
 
-    def _process_item(self, dataset, instruction, start, end) -> dict:
+    def _process_item(self, dataset, instruction, start, end, is_first_turn: bool) -> dict:
         system_prompt = dataset[0]
         message_body = []
         for i in range(start):
             if dataset[i]["role"] == "assistant":
                 message_body.append(copy.deepcopy(dataset[i]))
-            
-        message_body.extend(copy.deepcopy(dataset[start+1: end]))
+        current_instruction = copy.deepcopy(instruction)
+        if is_first_turn:
+            message_body.extend(copy.deepcopy(dataset[start+1: end]))
+        else:
+            message_body.extend(copy.deepcopy(dataset[start: end]))
         item = [
             copy.deepcopy(system_prompt),
         ]
-        current_instruction = copy.deepcopy(instruction)
+        
         item.append(current_instruction)
         item = item + message_body
         return item
@@ -132,13 +137,8 @@ class TrajectorySplitter:
             input_ids, attention_mask, position_ids, _, _ = self._get_inputs(messages, dataset_id)
             input_attention_mask = attention_mask
             response_ids, response_attention_mask, response_position_ids, multi_modal_data, model_inputs = self._get_responses(messages, dataset_id)
-            # print("Input shapes", input_ids.shape, attention_mask.shape, position_ids[0].shape)
-            # print("Response shapes", response_ids.shape, response_attention_mask.shape, response_position_ids[0].shape)
             position_ids = torch.cat([position_ids[0], response_position_ids[0]], dim=-1)
             attention_mask = torch.cat([attention_mask, response_attention_mask], dim=-1)
-            # with open("debug.json", "w") as f:
-            #     json.dump(attention_mask.numpy().tolist(), f, indent=2)
-
             seq = torch.cat([input_ids, response_ids], dim=-1)
             reward_tensor = torch.zeros_like(response_ids[0], dtype=torch.float32)
             valid_response_length = response_attention_mask.sum()
@@ -152,6 +152,7 @@ class TrajectorySplitter:
             row_dict["reward_tensor"] = reward_tensor
             row_dict["multi_modal_data"] = multi_modal_data
             row_dict["multi_modal_inputs"] = dict(model_inputs)
+            row_dict["raw_messages"] = messages
             row_dict["dataset_ids"] = dataset_id
             row_dict["uid"] = task_config["id"]
             self.compute_mask(row_dict)

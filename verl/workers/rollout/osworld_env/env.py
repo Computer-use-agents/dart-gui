@@ -392,7 +392,7 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
 
     def close(self):
         """Close the environment."""
-        response = self.session.post(f"{self.server_url}/server/delete/{self.service_id}")
+        response = self.session.post(f"{self.server_url}/server/delete/{self.service_id}", timeout=30)
         if response.status_code != 200:
             raise Exception(f"Failed to close environment: {response.text}")
 

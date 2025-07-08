@@ -208,11 +208,14 @@ class vLLMRollout(BaseRollout):
     def close_env(self, envs: list[TrajectoryRunner]):
         print("Close env", len(envs))
         close_refs = []
-        for env in envs:
+        for env_id, env in enumerate(envs):
+            print("try close env id", env_id)
             close_ref = env.close.remote()
             close_refs.append(close_ref)
-        ray.get(close_refs)
-
+        print("waiting for results")
+        results = ray.get(close_refs)
+        print("close response", results)
+        
     @contextmanager
     def update_sampling_params(self, **kwargs):
         # update sampling params
