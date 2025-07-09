@@ -9,29 +9,21 @@ from typing import Dict, List
 
 import backoff
 import numpy as np
-from PIL import Image
-from requests.exceptions import SSLError
 import openai
-from openai import OpenAI
 from google.api_core.exceptions import (
     BadRequest,
     InternalServerError,
     InvalidArgument,
     ResourceExhausted,
 )
+from openai import OpenAI
+from PIL import Image
+from requests.exceptions import SSLError
 
 from mm_agents.accessibility_tree_wrap.heuristic import (
     filter_nodes,
 )
-from mm_agents.prompts import (
-    UITARS_ACTION_SPACE,
-    UITARS_CALL_USR_ACTION_SPACE,
-    UITARS_USR_PROMPT_NOTHOUGHT,
-    UITARS_USR_PROMPT_THOUGHT,
-    UITARS_NORMAL_ACTION_SPACE,
-    COMPUTER_USE_DOUBAO
-)
-
+from mm_agents.prompts import COMPUTER_USE_DOUBAO, UITARS_ACTION_SPACE, UITARS_CALL_USR_ACTION_SPACE, UITARS_NORMAL_ACTION_SPACE
 
 logger = logging.getLogger("desktopenv.agent")
 
@@ -294,7 +286,7 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
         生成的pyautogui代码字符串
     '''
 
-    pyautogui_code = f"import pyautogui\nimport time\n"
+    pyautogui_code = "import pyautogui\nimport time\n"
     if isinstance(responses, dict):
         responses = [responses]
     for response_id, response in enumerate(responses):
@@ -311,7 +303,7 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
         if response_id == 0:
             pyautogui_code += f"'''\nObservation:\n{observation}\n\nThought:\n{thought}\n'''\n"
         else:
-            pyautogui_code += f"\ntime.sleep(1)\n"
+            pyautogui_code += "\ntime.sleep(1)\n"
 
         action_dict = response
         action_type = action_dict.get("action_type")
@@ -389,17 +381,17 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
                 stripped_content = stripped_content.rstrip("\\n").rstrip("\n")
             if content:
                 if input_swap:
-                    pyautogui_code += f"\nimport pyperclip"
+                    pyautogui_code += "\nimport pyperclip"
                     pyautogui_code += f"\npyperclip.copy('{stripped_content}')"
-                    pyautogui_code += f"\npyautogui.hotkey('ctrl', 'v')"
-                    pyautogui_code += f"\ntime.sleep(0.5)\n"
+                    pyautogui_code += "\npyautogui.hotkey('ctrl', 'v')"
+                    pyautogui_code += "\ntime.sleep(0.5)\n"
                     if content.endswith("\n") or content.endswith("\\n"):
-                        pyautogui_code += f"\npyautogui.press('enter')"
+                        pyautogui_code += "\npyautogui.press('enter')"
                 else:
                     pyautogui_code += f"\npyautogui.write('{stripped_content}', interval=0.1)"
-                    pyautogui_code += f"\ntime.sleep(0.5)\n"
+                    pyautogui_code += "\ntime.sleep(0.5)\n"
                     if content.endswith("\n") or content.endswith("\\n"):
-                        pyautogui_code += f"\npyautogui.press('enter')"
+                        pyautogui_code += "\npyautogui.press('enter')"
 
         
         elif action_type in ["drag", "select"]:
@@ -435,9 +427,9 @@ def parsing_response_to_pyautogui_code(responses, image_height: int, image_width
             
             if x == None:
                 if "up" in direction.lower():
-                    pyautogui_code += f"\npyautogui.scroll(5)"
+                    pyautogui_code += "\npyautogui.scroll(5)"
                 elif "down" in direction.lower():
-                    pyautogui_code += f"\npyautogui.scroll(-5)"
+                    pyautogui_code += "\npyautogui.scroll(-5)"
             else:
                 if "up" in direction.lower():
                     pyautogui_code += f"\npyautogui.scroll(5, x={x}, y={y})"
@@ -837,7 +829,7 @@ class UITARSAgent:
         response = None
         while True:
             if try_times <= 0:
-                print(f"Reach max retry times to fetch response from client, as error flag.")
+                print("Reach max retry times to fetch response from client, as error flag.")
                 return "client error", ["DONE"], []
 
             try:
@@ -861,7 +853,7 @@ class UITARSAgent:
                 logger.info(f"Response Usage: {response.usage}")
 
                 prediction = response.choices[0].message.content.strip()
-            except Exception as e:
+            except Exception:
                 print(f"Error when fetching response from client, with response: {response}")
                 
                 prediction = None
@@ -994,7 +986,7 @@ def pretty_print_messages(messages):
             if type(content) == list:
                 for c in content:
                     if c['type'] == 'image_url':
-                        content_printing += f"<image_url>\n"
+                        content_printing += "<image_url>\n"
                     elif c['type'] == 'text':
                         content_printing += f"{c['text']}\n"
             elif type(content) == str:
