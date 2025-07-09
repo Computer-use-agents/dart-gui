@@ -12,6 +12,7 @@ from qwen_vl_utils import process_vision_info
 from transformers import AutoProcessor
 from vllm import LLM, SamplingParams
 
+from verl.utils.osworld import limit_images_in_messages
 from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv, add_box_token, parse_action_to_structure_output, parsing_response_to_pyautogui_code
 
 DATA_ROOT_DIR = "./tmp"
@@ -101,95 +102,9 @@ def pil_to_base64(image):
     image.save(buffer, format="PNG")  # 你可以改成 "JPEG" 等格式
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-def remove_image_from_content(content):
-    content_new = []
-    for c in content:
-        if c["type"] == "image":
-            continue
-        content_new.append(c)
-    if len(content_new) == 0:
-        return None
-    return content_new
 
-def limit_images_in_messages(msg, limit_images: int = 5):
-    """
-    Limit the number of images in a message to ensure it doesn't exceed limit_images.
-    
-    Args:
-        msg: The message to process
-        limit_images: Maximum number of images allowed in the message
-    
-    Returns:
-        Processed message with limited images
-    """
-    msg = copy.deepcopy(msg)
-    image_count = 0
-    
-    # Count total images in the message
-    for m in msg:
-        if not isinstance(m["content"], list):
-            continue
-        
-        for c in m["content"]:
-            if c["type"] == "image":
-                image_count += 1
-    
-    # If image count is within limit, return original message
-    if image_count <= limit_images:
-        return msg
-    
-    # Process message to limit images
-    msg_for_prompt = []
-    current_image_count = 0
-    
-    for m in msg:
-        if m["role"] in ["assistant", "system"]:
-            msg_for_prompt.append(m)
-            continue
-        
-        # Count images in current message
-        message_image_count = 0
-        if isinstance(m["content"], list):
-            for c in m["content"]:
-                if c["type"] == "image":
-                    message_image_count += 1
-        
-        # Check if adding this message would exceed the limit
-        if current_image_count + message_image_count <= limit_images:
-            msg_for_prompt.append(m)
-            current_image_count += message_image_count
-        else:
-            # Need to remove some images from this message
-            if current_image_count >= limit_images:
-                # Already at limit, remove all images from this message
-                content = remove_image_from_content(m["content"])
-                if content is not None:
-                    msg_new = {
-                        "role": "user",
-                        "content": content
-                    }
-                    msg_for_prompt.append(msg_new)
-            else:
-                # Remove excess images to fit within limit
-                remaining_slots = limit_images - current_image_count
-                if remaining_slots > 0:
-                    # Keep some images and remove the rest
-                    content = m["content"].copy()
-                    image_items = [c for c in content if c["type"] == "image"]
-                    non_image_items = [c for c in content if c["type"] != "image"]
-                    
-                    # Keep only the first remaining_slots images
-                    kept_images = image_items[:remaining_slots]
-                    content_new = non_image_items + kept_images
-                    
-                    msg_new = {
-                        "role": "user",
-                        "content": content_new
-                    }
-                    msg_for_prompt.append(msg_new)
-                    current_image_count += remaining_slots
-    
-    return msg_for_prompt
+
+
 
 def generate_trajectory_vllm_inputs(
     messages: np.ndarray, 
@@ -197,23 +112,24 @@ def generate_trajectory_vllm_inputs(
     limit_images: int = 5,
 ):
     # for each message, repeat n times
-    print("messages length", len(messages))
+    # print("messages length", len(messages))
     vllm_inputs = []
+    msg_for_prompts = []
     for i, msg in enumerate(messages):
         msg = copy.deepcopy(msg)
-        print("Item ", i, "prompt length", len(msg))
+        # print("Item ", i, "prompt length", len(msg))
         msg = list(msg)
         
         # Use the new function to limit images in the message
         msg_for_prompt = limit_images_in_messages(msg, limit_images)
-        
+        msg_for_prompts.append(msg_for_prompt)
         prompt = processor.apply_chat_template(
             msg_for_prompt,
             add_generation_prompt=True,
             tokenize=False
         )
         image_inputs, _ = process_vision_info(msg_for_prompt)
-        print("Get Prompt", prompt, "Image input size", len(image_inputs))
+        # print("Get Prompt", prompt, "Image input size", len(image_inputs))
         vllm_input = {
             "prompt": prompt,
             "multi_modal_data": {
@@ -221,7 +137,24 @@ def generate_trajectory_vllm_inputs(
             }
         }
         vllm_inputs.append(vllm_input)
-    return vllm_inputs
+    return vllm_inputs, msg_for_prompts
+
+
+# Function to save partial trajectory when error occurs
+def save_msg_for_prompt(runner_dirs, runner_idx, current_messages, idx):
+    """Save partial trajectory data when an error occurs"""
+    try:
+        if runner_idx in runner_dirs:
+            runner_dir = runner_dirs[runner_idx]
+            for msg in current_messages:
+                if isinstance(msg["content"], list):
+                    for c in msg["content"]:
+                        if c['type'] == "image":
+                            c["image"] = "<image>"
+            with open(os.path.join(runner_dir, f"msg_for_prompt_{idx}.json"), "w") as f:
+                json.dump(current_messages, f, indent=2, ensure_ascii=False)
+    except Exception as save_error:
+        print(f"Error saving partial trajectory for runner {runner_idx}: {save_error}")
 
 def run_agent_loop(
     llm: LLM, 
@@ -264,7 +197,7 @@ def run_agent_loop(
                 "image": "data:image;base64," + pil_to_base64(Image.open(BytesIO(obs[i]["screenshot"])))
             }
         )
-    vllm_inputs = generate_trajectory_vllm_inputs(
+    vllm_inputs, msg_for_prompts = generate_trajectory_vllm_inputs(
         messages, 
         processor, 
         limit_images=limit_images)
@@ -308,6 +241,8 @@ def run_agent_loop(
                                 image_data = base64.b64decode(original_image_data)
                             image = Image.open(BytesIO(image_data))
                             image.save(os.path.join(runner_dir, f"{image_id}.png"))
+                            
+                            save_msg_for_prompt(runner_dirs, runner_idx, msg_for_prompts[runner_idx], image_id)
                         except Exception as e:
                             print(f"Error saving image for runner {runner_idx}: {e}")
                             # Continue with the process even if image saving fails
@@ -384,11 +319,6 @@ def run_agent_loop(
                     
                     # Parse the action
                     image = Image.open(BytesIO(obs[i]["screenshot"]))
-                    # Save the screenshot with a unique ID
-                    # image_id = f"image_{uuid.uuid4()}"
-                    # image_path = os.path.join(runner_dirs[runner_idx], f"{image_id}.png")
-                    # image.save(image_path)
-                    
                     parsed_responses = parse_action_to_structure_output(
                         generated_text,
                         factor=action_parse_res_factor,  # TODO: Make this configurable
@@ -466,15 +396,19 @@ def run_agent_loop(
             active_runners = new_active_runners
             if active_runners:
                 # update observation
-                vllm_inputs = generate_trajectory_vllm_inputs(
+                vllm_inputs, msg_for_prompts = generate_trajectory_vllm_inputs(
                     new_messages, 
                     processor, 
                     limit_images=limit_images
                 )
+                for runner_idx, msg_for_prompt in zip(active_runners, msg_for_prompts):
+                    save_msg_for_prompt(runner_dirs, runner_idx, msg_for_prompt, image_counters[runner_idx])
             
             step += 1
             
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"Critical error in agent loop: {e}")
         # Save partial trajectories for all active runners
         for runner_idx in active_runners:
@@ -486,6 +420,7 @@ def run_agent_loop(
             messages_copy = copy.deepcopy(messages_for_saving[runner_idx])
             with open(os.path.join(runner_dirs[runner_idx], "final_messages.json"), "w") as f:
                 json.dump(messages_copy, f, indent=2, ensure_ascii=False)
+            
         except Exception as e:
             print(f"Error saving final messages for runner {runner_idx}: {e}")
     
