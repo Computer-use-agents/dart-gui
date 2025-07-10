@@ -24,8 +24,8 @@ export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files=evaluation_examples/test_simple_task_v2.json \
-    data.val_files=evaluation_examples/test_simple_task_v2.json \
+    data.train_files=evaluation_examples/test_success_uitars1.5_wo_impossible_infeasible.json \
+    data.val_files=evaluation_examples/test_success_uitars1.5_wo_impossible_infeasible.json \
     data.train_batch_size=4 \
     data.max_prompt_length=32000 \
     data.max_response_length=32000 \
@@ -58,7 +58,6 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.enforce_eager=False \
     actor_rollout_ref.rollout.free_cache_engine=False \
     actor_rollout_ref.rollout.n=8 \
-    actor_rollout_ref.rollout.top_k=200 \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \

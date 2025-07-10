@@ -1342,8 +1342,6 @@ class RayOSWorldTrainer(RayPPOTrainer):
                         splitter = StepwiseTrajectorySplitter(
                             processor=self.processor,
                             root_dir=self.config.data.root_data_dir,
-                            window_size=self.config.data.window_size,
-                            stride_size=self.config.data.stride_size,
                             max_prompt_length=self.config.data.max_prompt_length,
                             max_response_length=self.config.data.max_response_length,
                             truncation=self.config.data.truncation

@@ -250,7 +250,8 @@ def create_rl_sampler(data_config, dataset):
     if data_config.shuffle:
         train_dataloader_generator = torch.Generator()
         train_dataloader_generator.manual_seed(data_config.get("seed", 1))
-        sampler = RandomSampler(data_source=dataset, generator=train_dataloader_generator)
+        print(f"Dataset length: {len(dataset)}")
+        sampler = RandomSampler(data_source=dataset, generator=train_dataloader_generator,num_samples=dataset.max_steps)
     else:
         # If shuffling is disabled, use a sequential sampler to iterate through the dataset in order.
         sampler = SequentialSampler(data_source=dataset)

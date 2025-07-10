@@ -81,6 +81,9 @@ class MySQLDatasetsORM:
             f"?charset={self.config['charset']}"
         )
     
+    def refresh_session(self):
+        self.SessionMaker = sessionmaker(bind=self.engine)
+
     def setup_database(self):
         """设置数据库连接和创建表"""
         try:
