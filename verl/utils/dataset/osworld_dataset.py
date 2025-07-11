@@ -116,7 +116,7 @@ class OSWorldDataset(Dataset):
         self.need_tools_kwargs = config.get("need_tools_kwargs", False)
         self.filter_prompts = config.get("filter_prompts", True)
         self.serialize_dataset = False
-        self.osworld_root = "evaluation_examples/examples"
+        self.osworld_root = config.get("osworld_root", "evaluation_examples/examples")
         self.dataframe = []
         for data_file in data_files:
             with open(data_file) as f:
@@ -247,15 +247,15 @@ class OSWorldAsyncDataset(Dataset):
         self.filter_overlong_prompts = config.get("filter_overlong_prompts", True)
         self.use_call_user = config.get("use_call_user", False)
 
-        self.num_workers = config.get("filter_overlong_prompts_workers", max(1, os.cpu_count() // 4))
-        self.num_workers = min(self.num_workers, os.cpu_count())
+        # self.num_workers = config.get("filter_overlong_prompts_workers", max(1, os.cpu_count() // 4))
+        # self.num_workers = min(self.num_workers, os.cpu_count())
+        self.num_workers = config.get("num_workers", 2)
         self.use_shm = config.get("use_shm", False)
         self.chat_template_func = config.get("chat_template_func", None)
         self.need_tools_kwargs = config.get("need_tools_kwargs", False)
         self.filter_prompts = config.get("filter_prompts", True)
         self.serialize_dataset = False
-        self.osworld_root = "evaluation_examples/examples"
-        self.max_steps = config.get("max_steps", 0)
+        self.osworld_root = config.get("osworld_root", "evaluation_examples/examples")
         self.run_id = config.get("run_id", None)
         assert self.run_id is not None
         from verl.utils.database.mysql import create_database_manager
@@ -285,15 +285,23 @@ class OSWorldAsyncDataset(Dataset):
         return messages
 
     def _get_item_with_wait(self, item_index: int) -> list[dict]:
-        while True:
+        # while True:
+        # from verl.utils.database.mysql import create_database_manager
+        # self.db_manager.refresh_session()
+        self.db_manager.setup_database()
+        try:
             row_dicts = self.db_manager.get_datasets_by_run_id(
                 run_id=self.run_id,
                 offset=item_index
             )
-            print(self.run_id, "try get data", len(row_dicts))
+            # print(self.run_id, "try get data", item_index, len(row_dicts))
+            print(f"run-id: {self.run_id}, fetcted data, offset: {item_index}, len(row_dicts): {len(row_dicts)}")
             if len(row_dicts) > 0:
                 return row_dicts
-            time.sleep(1)
+            # time.sleep(1)
+        except Exception as e:
+            print(f"run-id: {self.run_id}, offset: {item_index}, error: {e}")
+            return []
 
 
     def __getitem__(self, item):

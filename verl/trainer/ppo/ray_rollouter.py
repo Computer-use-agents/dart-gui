@@ -201,8 +201,8 @@ class RayOSWorldRollout(RayPPOTrainer):
                             used=0
                         )
 
-                    #TODO 2 load checkpoint 
-                    self._load_checkpoint_for_actor_rollout_wg(actor_path="?????")
+                    # TODO 2 load checkpoint 
+                    # self._load_checkpoint_for_actor_rollout_wg(actor_path="?????")
 
             progress_bar.update(1)
 

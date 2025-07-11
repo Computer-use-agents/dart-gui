@@ -12,7 +12,14 @@ from qwen_vl_utils import process_vision_info
 from transformers import AutoProcessor
 from vllm import LLM, SamplingParams
 
-from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv, add_box_token, parse_action_to_structure_output, parsing_response_to_pyautogui_code
+
+env_source = os.getenv("REMOTE_ENV_SOURCE")
+if env_source == "k8s":
+    from verl.workers.rollout.osworld_env.env_k8s import RemoteDesktopEnv
+else:
+    from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv
+
+from verl.workers.rollout.osworld_env.env import add_box_token, parse_action_to_structure_output, parsing_response_to_pyautogui_code
 
 DATA_ROOT_DIR = "./tmp"
 os.makedirs(DATA_ROOT_DIR, exist_ok=True)
@@ -25,11 +32,12 @@ class TrajectoryRunner:
         self.task_config = task_config
         self.is_init = False
         # Add retry logic for RemoteDesktopEnv initialization
+        server_url = os.getenv("REMOTE_ENV_SERVER_URL")
         max_retries = 3
         for attempt in range(max_retries):
             try:
                 self.env = RemoteDesktopEnv(
-                    server_url="http://39.107.54.167:4999",
+                    server_url=server_url,
                     action_space="pyautogui",
                     screen_size=(1920, 1080),
                     headless=True,

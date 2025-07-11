@@ -1,3 +1,4 @@
+import asyncio
 import json
 import time
 from io import BytesIO
@@ -196,8 +197,8 @@ def test_get_images():
 @pytest.mark.asyncio
 async def test_async_dataset():
     from verl.utils.dataset.osworld_dataset import OSWorldAsyncDataset
-    trajectory_id = "0aa1f184-7549-4bcd-9c91-4d8c6242b10c"
-    run_id = "bofei_test_2"
+    trajectory_id = "0a1a8091-c6a8-4a1d-a7d7-67d82958f8a2"
+    run_id = "pengxiang_test_2"
     db_manager = create_database_manager()
     del_cnts = db_manager.delete_datasets_by_run_id(
         run_id=run_id
@@ -238,3 +239,10 @@ async def test_async_dataset():
             await future
             is_await = True
 
+
+async def main():
+    result = await test_async_dataset()
+    print(result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
