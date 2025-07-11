@@ -1,10 +1,8 @@
 {
     "chrome": [
-        "bb5e4c0d-f964-439c-97b6-bdb9747de3f4",
         "7b6c7e24-c58a-49fc-a5bb-d57b80e5b4c3",
         "06fe7178-4491-4589-810f-2e2bc9502122",
         "e1e75309-3ddb-4d09-92ec-de869c928143",
-        "2ad9387a-65d8-4e33-ad5b-7580065a27ca",
         "2ae9ba84-3a0d-4d4c-8338-3a1478dc5fe3",
         "af630914-714e-4a24-a7bb-f9af687d3b91",
         "3299584d-8f11-4457-bf4c-ce98f7600250",
@@ -13,21 +11,15 @@
         "b4f95342-463e-4179-8c3f-193cd7241fb2",
         "368d9ba4-203c-40c1-9fa3-da2f1430ce63",
         "59155008-fe71-45ec-8a8f-dc35497b6aa8",
-        "a728a36e-8bf1-4bb6-9a03-ef039a5233f0",
-        "b070486d-e161-459b-aa2b-ef442d973b92",
-        "0d8b7de3-e8de-4d86-b9fd-dd2dce58a217"
+        "a728a36e-8bf1-4bb6-9a03-ef039a5233f0"
     ],
     "gimp": [
-        "7a4deb26-d57d-4ea9-9a73-630f66a7b568",
         "554785e9-4523-4e7a-b8e1-8016f565f56a",
         "77b8ab4d-994f-43ac-8930-8ca087d7c4b4",
         "d52d6308-ec58-42b7-a2c9-de80e4837b2b",
         "b148e375-fe0b-4bec-90e7-38632b0d73c2",
-        "a746add2-cab0-4740-ac36-c3769d9bfb46",
         "7b7617bd-57cc-468e-9c91-40c4ec2bcb3d",
         "e2dd0213-26db-4349-abe5-d5667bfd725c",
-        "f723c744-e62c-4ae6-98d1-750d3cd7d79d",
-        "72f83cdc-bf76-4531-9a1b-eb893a13f8aa",
         "7767eef2-56a3-4cea-8c9f-48c070c7d65b"
     ],
     "libreoffice_calc": [
@@ -35,46 +27,35 @@
         "3aaa4e37-dc91-482e-99af-132a612d40f3",
         "1273e544-688f-496b-8d89-3e0f40aa0606",
         "aa3a8974-2e85-438b-b29e-a64df44deb4b",
-        "51b11269-2ca8-4b2a-9163-f21758420e78",
-        "1e8df695-bd1b-45b3-b557-e7d599cf7597",
         "1d17d234-e39d-4ed7-b46f-4417922a4e7c",
         "4e6fcf72-daf3-439f-a232-c434ce416af6",
         "6e99a1ad-07d2-4b66-a1ce-ece6d99c20a5",
-        "4172ea6e-6b77-4edb-a9cc-c0014bd1603b",
-        "1334ca3e-f9e3-4db8-9ca7-b4c653be7d17"
+        "4172ea6e-6b77-4edb-a9cc-c0014bd1603b"
     ],
     "libreoffice_impress": [
         "af23762e-2bfd-4a1d-aada-20fa8de9ce07",
         "c59742c0-4323-4b9d-8a02-723c251deaa0",
-        "a097acff-6266-4291-9fbd-137af7ecd439",
         "21760ecb-8f62-40d2-8d85-0cee5725cb72",
         "2cd43775-7085-45d8-89fa-9e35c0a915cf",
         "73c99fb9-f828-43ce-b87a-01dc07faa224",
         "15aece23-a215-4579-91b4-69eec72e18da",
         "2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
-        "9cf05d24-6bd9-4dae-8967-f67d88f5d38a",
-        "08aced46-45a2-48d7-993b-ed3fb5b32302",
         "39be0d19-634d-4475-8768-09c130f5425d",
         "ac1b39ff-ee4d-4483-abce-c117e98942f0",
         "70bca0cc-c117-427e-b0be-4df7299ebeb6"
     ],
     "libreoffice_writer": [
-        "0810415c-bde4-4443-9047-d5f70165a697",
         "0b17a146-2934-46c7-8727-73ff6b6483e8",
         "0e763496-b6bb-4508-a427-fad0b6c3e195",
         "3ef2b351-8a84-4ff2-8724-d86eae9b842e",
         "4bcb1253-a636-4df4-8cb0-a35c04dfef31",
         "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
-        "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
         "d53ff5ee-3b1a-431e-b2be-30ed2673079b",
-        "e528b65e-1107-4b8c-8988-490e4fece599",
-        "ecc2413d-8a48-416e-a3a2-d30106ca36cb"
+        "e528b65e-1107-4b8c-8988-490e4fece599"
     ],
     "multi_apps": [
         "2b9493d7-49b8-493a-a71b-56cd1f4d6908",
         "2c9fc0de-3ee7-45e1-a5df-c86206ad78b5",
-        "510f64c8-9bcc-4be1-8d30-638705850618",
-        "58565672-7bfe-48ab-b828-db349231de6b",
         "937087b6-f668-4ba6-9110-60682ee33441",
         "ee9a3c83-f437-4879-8918-be5efbb9fac7",
         "acb0f96b-e27c-44d8-b55f-7cb76609dfcd",
@@ -84,9 +65,6 @@
     ],
     "os": [
         "94d95f96-9699-4208-98ba-3c3119edf9c2",
-        "bedcedc4-4d72-425e-ad62-21960b11fe0d",
-        "f9be0997-4b7c-45c5-b05c-4612b44a6118",
-        "28cc3b7e-b194-4bc9-8353-d04c0f4d56d2",
         "5ea617a3-0e86-4ba6-aab2-dac9aa2e8d57",
         "e0df059f-28a6-4169-924f-b9623e7184cc",
         "a4d98375-215b-4a4d-aee9-3d4370fccc41",
@@ -95,7 +73,6 @@
     "thunderbird": [
         "dfac9ee8-9bc4-4cdc-b465-4a4bfcd2f397",
         "3f28fe4f-5d9d-4994-a456-efd78cfae1a3",
-        "dd84e895-72fd-4023-a336-97689ded257c",
         "d38192b0-17dc-4e1d-99c3-786d0117de77",
         "a10b69e1-6034-4a2b-93e1-571d45194f75",
         "10a730d5-d414-4b40-b479-684bed1ae522"
@@ -107,10 +84,7 @@
     ],
     "vs_code": [
         "0ed39f63-6049-43d4-ba4d-5fa2fe04a951",
-        "53ad5833-3455-407b-bbc6-45b4c79ab8fb",
         "eabc805a-bfcf-4460-b250-ac92135819f6",
-        "982d12a5-beab-424f-8d38-d2a48429e511",
-        "4e60007a-f5be-4bfc-9723-c39affa0a6d3",
         "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
         "9439a27b-18ae-42d8-9778-5f68f891805e",
         "9d425400-e9b2-4424-9a4b-d4c7abac4140",

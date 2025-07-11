@@ -38,6 +38,7 @@ def collate_fn(data_list: list[dict]) -> dict:
                 non_tensors[key].append(val)
 
     for key, val in tensors.items():
+        print("stack", key)
         tensors[key] = torch.stack(val, dim=0)
 
     for key, val in non_tensors.items():
@@ -455,15 +456,22 @@ class StepwiseTrajectorySplitter:
     def _process_item(self, dataset, start, end) -> list:
         return limit_images_in_messages(dataset[start:end], limit_images=self.limit_images)
     
-    def tokenize(self, batch_data: list[list[dict]], dataset_id: str, reward: float) -> list[list[dict]]:
+    def tokenize(self, batch_data: list, dataset_id: str, reward: float) -> list[list[dict]]:
         tokenized_batch_data = []
         # print("Tokenize with", dataset_id, "reward =", reward)
         for (messages, task_config) in batch_data:
+            # print(messages)
+            # print("messages", json.dumps(messages, indent=2, ensure_ascii=False))
             row_dict = dict()
             input_ids, attention_mask, position_ids, multi_modal_data, model_inputs = self._get_inputs(messages, dataset_id)
             input_attention_mask = attention_mask
-            response_ids, response_attention_mask, response_position_ids, _, _ = self._get_responses(
-                messages, dataset_id, model_inputs, position_ids)
+            try:
+                response_ids, response_attention_mask, response_position_ids, _, _ = self._get_responses(
+                    messages, dataset_id, model_inputs, position_ids)
+            except Exception as e:
+                print("failed", e)
+                print("messages", json.dumps(messages, indent=2, ensure_ascii=False))
+                raise e
             position_ids = torch.cat([position_ids[0], response_position_ids[0]], dim=-1)
             attention_mask = torch.cat([attention_mask, response_attention_mask], dim=-1)
             seq = torch.cat([input_ids, response_ids], dim=-1)
@@ -536,26 +544,28 @@ class StepwiseTrajectorySplitter:
         context_len = self._locate_context(messages)
         raw_prompt = self.processor.apply_chat_template(messages[context_len:], add_generation_prompt=False, tokenize=False)
         raw_prompt = raw_prompt.replace("<|im_start|>system\nYou are a helpful assistant.<|im_end|>", "").strip()
-        model_inputs = self.processor(text=[raw_prompt], images=[], return_tensors="pt")
-
+        try:
+            model_inputs = self.processor(text=[raw_prompt], images=None, return_tensors="pt")
+        except Exception as e:
+            print('self.processor failed', e, raw_prompt)
+            raise e
         input_ids = model_inputs.pop("input_ids")
         attention_mask = model_inputs.pop("attention_mask")
         if "second_per_grid_ts" in model_inputs:
             model_inputs.pop("second_per_grid_ts")
         response = verl_F.pad_2d_list_to_length(input_ids, self.processor.tokenizer.pad_token_id, max_length=self.max_response_length)
-        response_length = input_ids.size(1)
+        response_length = response.size(1)
         delta_position_id = torch.arange(1, response_length + 1)
         delta_position_id = delta_position_id.unsqueeze(0).expand(1, -1)
         if position_ids[0].dim() == 3:  # qwen2vl mrope
             delta_position_id = delta_position_id.view(1, 1, -1).expand(1, 3, -1)
         response_position_ids = position_ids[0][..., -1:] + delta_position_id
-        # with open("debug.json", "w") as f:
-        #     json.dump([p.numpy().tolist() for p in response_position_ids], f)
         response_attention_mask = verl_F.get_response_mask(
             response_id=response,
             eos_token=self.processor.tokenizer.eos_token_id,
             dtype=attention_mask.dtype            
         )
+        # print("response", response.shape, response_attention_mask.shape, response_position_ids.shape)
         return response, response_attention_mask, [response_position_ids], None, None
     
     def compute_mask(self, row_dict: dict):
@@ -570,4 +580,4 @@ class StepwiseTrajectorySplitter:
         # print("Get:", val)
         response_mask[self.max_prompt_length:self.max_prompt_length + valid_response_length] = 1
         row_dict["response_mask"] = response_mask[self.max_prompt_length:]
-        row_dict["loss_mask"] = loss_mask
+        row_dict["loss_mask"] = response_mask

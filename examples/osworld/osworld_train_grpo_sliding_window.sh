@@ -58,7 +58,6 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.enforce_eager=False \
     actor_rollout_ref.rollout.free_cache_engine=False \
     actor_rollout_ref.rollout.n=8 \
-    actor_rollout_ref.rollout.top_k=200 \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
@@ -73,4 +72,5 @@ python3 -m verl.trainer.main_ppo \
     trainer.save_freq=10 \
     trainer.test_freq=5 \
     trainer.val_before_train=False \
-    trainer.total_epochs=15 $@
+    trainer.total_epochs=15 \
+    +trainer.splitter=sliding_window $@

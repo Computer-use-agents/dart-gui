@@ -829,13 +829,13 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
     def stop_profile(self) -> None:
         """Stop profiling for the current rank in the current training step."""
         self.profiler.stop()
-    
+
     @register(dispatch_mode=Dispatch.ONE_TO_ALL, execute_mode=Execute.RANK_ZERO)
     def get_config(self):
         current_rank = os.environ["RANK"]
         print("get_config called at rank", current_rank)
         return self.config
-    
+
     @register(dispatch_mode=Dispatch.ONE_TO_ALL, execute_mode=Execute.RANK_ZERO)
     def clear_envs(self):
         current_rank = os.environ["RANK"]
