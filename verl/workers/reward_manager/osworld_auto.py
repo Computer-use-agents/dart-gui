@@ -13,17 +13,17 @@
 # limitations under the License.
 
 import base64
-
-# import concurrent.futures
-import copy
 import json
 import os
 import random
 import re
+import time
+import traceback
+from typing import Literal
 
 import ray
 import torch
-from openai import OpenAI
+from openai import AzureOpenAI, OpenAI
 
 from verl import DataProto
 from verl.utils.reward_score import default_compute_score
@@ -34,7 +34,15 @@ from verl.workers.reward_manager import register
 class AutoOSWorldRewardManager:
     """The AUTO reward manager."""
 
-    def __init__(self, tokenizer, num_examine, compute_score=None, reward_fn_key="data_source", root_dir="tmp") -> None:
+    def __init__(
+            self, 
+            tokenizer, 
+            num_examine, 
+            compute_score=None, 
+            reward_fn_key="data_source", 
+            root_dir="tmp",
+            model_type: Literal["qwen", "gpt"] = "gpt"
+            ) -> None:
         """
         Initialize the OSWorldRewardManager instance.
 
@@ -49,10 +57,35 @@ class AutoOSWorldRewardManager:
         self.compute_score = compute_score or default_compute_score
         self.reward_fn_key = reward_fn_key  # Store the key for accessing the data source
         self.root_dir = root_dir
-        self.client = OpenAI(
-            api_key=os.getenv("REWARD_SERVER_API_KEY"),
-            base_url=os.getenv("REWARD_SERVER_URL")
-        )
+        self.model_type = model_type
+        if self.model_type == "qwen":
+            self.client = OpenAI(
+                api_key=os.getenv("REWARD_SERVER_API_KEY"),
+                base_url=os.getenv("REWARD_SERVER_URL")
+            )
+        elif self.model_type == "gpt":
+            endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
+            api_version = os.environ["AZURE_OPENAI_API_VERSION"]
+            api_key = os.environ["AZURE_OPENAI_API_KEY"]
+            model = os.environ["AZURE_OPENAI_MODEL"]
+            self.model = model
+
+            self.azure_gpt_args = {
+                "endpoint": endpoint,
+                "api_version": api_version,
+                "api_key": api_key,
+                "model": self.model,
+            }
+
+            client = AzureOpenAI(
+                api_key=api_key,
+                api_version=api_version,
+                azure_endpoint=endpoint
+            )
+            self.client = client
+        else:
+            raise ValueError("Unk model type:" + model_type)
+        
         self.window_size = int(os.getenv("WINDOW_SIZE",5))  # The number of messages to consider in each batch
         self.stride_size = int(os.getenv("STRIDE_SIZE",1)) # The number of messages to skip between batches
         self.model = os.getenv("REWARD_MODEL")
@@ -102,7 +135,6 @@ class AutoOSWorldRewardManager:
                     score = self.call_reward_model_trajectory(dataset_id)
                     scores.append(score)
             except Exception as e:
-                import traceback
                 traceback.print_exc()
                 print("compute reward failed due to", e)
                 scores.append(random.uniform(0, 1))
@@ -226,7 +258,7 @@ class AutoOSWorldRewardManager:
         
         
         dataset_path = os.path.join(self.root_dir, dataset_id)
-        with open(os.path.join(dataset_path, "task_config.json"), "r") as f:
+        with open(os.path.join(dataset_path, "task_config.json")) as f:
             task_config = json.load(f)
         task = task_config["instruction"]
         if task_config["evaluator"]["func"] == "infeasible":
@@ -320,7 +352,7 @@ class AutoOSWorldRewardManager:
         # This version uses a ThreadPoolExecutor to parallelize the calls to the reward model.
         if self.image_name_check == "TRUE":
             check_result = 'TRUE'
-            with open(os.path.join(dataset_path, "result.json"), "r") as f:
+            with open(os.path.join(dataset_path, "result.json")) as f:
                 result_messages = json.load(f)
             for i, item in enumerate(result_messages):
                 
@@ -348,40 +380,26 @@ class AutoOSWorldRewardManager:
             else:
                 print(f"Image list in result matches the expected format in dataset {dataset_id}")
                 
-        
-        futures = [
-         ray_response_gen.remote(model,api_key,server_url,message)
-         for model, api_key, server_url, message in zip([self.model]*len(messages_list)*n_completions,
-                    [os.getenv("REWARD_SERVER_API_KEY")]*len(messages_list)*n_completions,
-                    [os.getenv("REWARD_SERVER_URL")]*len(messages_list)*n_completions,
-                    messages_list*n_completions)   
-            
-        ]
-        
-        # with concurrent.futures.ProcessPoolExecutor(max_workers=16) as executor:
-        #     response_list = list(
-        #         executor.map(
-        #             response_gen,
-        #             [self.model]*len(messages_list)*n_completions,
-        #             [os.getenv("REWARD_SERVER_API_KEY")]*len(messages_list)*n_completions,
-        #             [os.getenv("REWARD_SERVER_URL")]*len(messages_list)*n_completions,
-        #             messages_list*n_completions
-        #         )
-        #     )
+        if self.model_type == "qwen":
+            futures = [
+            ray_response_gen.remote(model,api_key,server_url,message)
+            for model, api_key, server_url, message in zip([self.model]*len(messages_list)*n_completions,
+                        [os.getenv("REWARD_SERVER_API_KEY")]*len(messages_list)*n_completions,
+                        [os.getenv("REWARD_SERVER_URL")]*len(messages_list)*n_completions,
+                        messages_list*n_completions)   
+                
+            ]
+        elif self.model_type == "gpt":
+            batch_messages = messages_list * n_completions
+            futures = [
+                response_gen_gpt.remote(
+                    messages,
+                    self.azure_gpt_args
+                )
+                for messages in batch_messages
+            ]
         
         response_list = ray.get(futures)
-        
-        
-        # for score, content in response_list:
-        #     results.append(score)
-        #     contents.append(content)
-        # print("Get results: ", results)
-        # print("Get contents: ", contents)
-        # grouped_results = [ {'window_id':i, "score_list":[],'content_list':[]} for i in range(len(messages_list))]
-        # print("Get messages_list list: ", len(messages_list))
-        # print("get grouped_results: ", len(grouped_results))
-        
-        
         
         for i, (score, content) in enumerate(response_list):
             
@@ -496,7 +514,7 @@ class AutoOSWorldRewardManager:
         
         
         dataset_path = os.path.join(self.root_dir, dataset_id)
-        with open(os.path.join(dataset_path, "task_config.json"), "r") as f:
+        with open(os.path.join(dataset_path, "task_config.json")) as f:
             task_config = json.load(f)
         task = task_config["instruction"]
         if task_config["evaluator"]["func"] == "infeasible":
@@ -541,14 +559,24 @@ class AutoOSWorldRewardManager:
         n_completions = self.n_completions # Number of completions to generate , set to 4 as the same as ZeroGUI
         results = []
         contents = []
-        futures = [
-         ray_response_gen.remote(model,api_key,server_url,message)
-         for model, api_key, server_url, message in zip([self.model]*len(messages_list)*n_completions,
-                    [os.getenv("REWARD_SERVER_API_KEY")]*len(messages_list)*n_completions,
-                    [os.getenv("REWARD_SERVER_URL")]*len(messages_list)*n_completions,
-                    messages_list*n_completions)   
-            
-        ]
+        if self.model_type == "qwen":
+            futures = [
+            ray_response_gen.remote(model,api_key,server_url,message)
+            for model, api_key, server_url, message in zip([self.model]*len(messages_list)*n_completions,
+                        [os.getenv("REWARD_SERVER_API_KEY")]*len(messages_list)*n_completions,
+                        [os.getenv("REWARD_SERVER_URL")]*len(messages_list)*n_completions,
+                        messages_list*n_completions)   
+                
+            ]
+        elif self.model_type == "gpt":
+            batch_messages = messages_list * n_completions
+            futures = [
+                response_gen_gpt.remote(
+                    messages,
+                    self.azure_gpt_args
+                )
+                for messages in batch_messages
+            ]
         response_list = ray.get(futures)
         
         
@@ -584,6 +612,42 @@ def response_gen(model: str,api_key: str,api_server: str,messages: list) -> tupl
     match = re.search(r"SCORE:\s*(\d*\.?\d+)", content)
     score = float(match.group(1)) if match else 0
     return score, content
+
+
+@ray.remote
+def response_gen_gpt(messages: list, client_args: dict) -> tuple[float, str]:
+    # return [1,'testing']
+    endpoint = client_args["endpoint"]
+    api_version = client_args["api_version"]
+    api_key = client_args["api_key"]
+    model = client_args["model"]
+    
+
+    client = AzureOpenAI(
+        api_key=api_key,
+        api_version=api_version,
+        azure_endpoint=endpoint
+    )
+    retry = 3
+    for i in range(retry):
+        try:
+            print("call azure!", i)
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+            )
+            print("get response", response)
+            content = response.choices[0].message.content
+            match = re.search(r"SCORE:\s*(\d*\.?\d+)", content)
+            score = float(match.group(1)) if match else 0
+            return score, content
+        except Exception as e:
+            traceback.print_exc()
+            print("failed:", e, messages)
+            time.sleep(10)
+
+    score = round(random.uniform(0, 1), 2)
+    return score, f"Thought: Generate randomly\nScore: {score}"
 
 
 @ray.remote
