@@ -87,6 +87,16 @@ def demo_subdir_scanning():
             is_valid, missing = is_valid_dataset_folder(folder_path)
             print(f"验证 {folder_name}: {'✓ 合格' if is_valid else f'✗ 不合格 (缺少: {missing})'}")
 
+
+def count_data_by_run_id(run_id: str = "pengxiang_test_0709"):
+    db_manager = create_database_manager()
+    count = db_manager.count_datasets_by_run_id(run_id)
+    # print(f"run_id: {run_id}")
+    # print(f"数据记录数量: {count}")
+    # print all the loginfo in a single line and add the timestamp
+    print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] run_id: {run_id}, 数据记录数量: {count}")
+    return count
+
 def load_data_from_tmp():
     db_manager = create_database_manager()
     
@@ -230,7 +240,10 @@ async def get_data_count_by_run_id(run_id: str = "pengxiang_test_0709"):
 
 if __name__ == "__main__":
     # 运行演示
-    load_data_from_tmp()
+    # load_data_from_tmp()
+    while True:
+        count_data_by_run_id("pengxiang_test_0715")
+        time.sleep(60)
     
     # # 查询数据长度
     # import asyncio

@@ -47,6 +47,7 @@ def release_env():
     base_url = "http://112.125.88.107:4999"
     envs = RemoteDesktopEnv.list_environments(base_url)
     print(envs)
+    # envs = 
     session = requests.Session()
     session.headers.update({
         "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
@@ -344,5 +345,6 @@ if __name__ == "__main__":
     # asyncio.run(main())
     # test_k8s_list_env()
     # test_k8s_dataset()
-    release_env()
+
     # test_k8s_env()
+    release_env()

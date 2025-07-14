@@ -133,7 +133,7 @@ class RemoteDesktopEnv(gym.Env):
                 raise Exception(f"Failed to create environment: {response.text}; code={response.status_code}; {payload}")
             
             # Handle both service_id and server_id field names
-            response_data = response.json()['data']
+            response_data = response.json()
             print("k8s: k8s init_env resp", response_data)
             self.service_id = response_data.get("service_id") or response_data.get("server_id")
             if not self.service_id:
@@ -144,7 +144,7 @@ class RemoteDesktopEnv(gym.Env):
                 raise Exception(f"Failed to create environment: {response.text}; code={response.status_code}")
             
             # Handle both service_id and server_id field names
-            response_data = response.json()['data']
+            response_data = response.json()
             self.service_id = response_data.get("service_id") or response_data.get("server_id")
             if not self.service_id:
                 raise Exception(f"No service_id or server_id in response: {response_data}")
@@ -172,7 +172,7 @@ class RemoteDesktopEnv(gym.Env):
                 )
                 if init_response.status_code != 200:
                     raise Exception(f"Failed to initialize environment: {init_response.text}")
-                response_data = init_response.json()['data']
+                response_data = init_response.json()
                 print("k8s: RESET k8s init_env resp", response_data)
                 self.service_id = response_data.get("service_id") or response_data.get("server_id")
 
@@ -378,7 +378,7 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
         if response.status_code != 200:
             raise Exception(f"Failed to get environment status: {response.text}")
         
-        status = response.json()['data']
+        status = response.json()
         # Implement your evaluation logic based on the status
         return 1.0 if status.get("success", False) else 0.0
 
@@ -422,7 +422,7 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
         if response.status_code != 200:
             raise Exception(f"Failed to list environments: {response.text}")
         
-        response_data = response.json()['data']
+        response_data = response.json()
         
         # Handle different response formats
         if isinstance(response_data, dict):
@@ -438,20 +438,21 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
         else:
             return [response_data] if response_data else []
 
+    @classmethod
+    def get_environment_status(cls, server_url: str, service_id: str) -> Dict[str, Any]:
+        """Get status of a specific environment."""
+        session = requests.Session()
+        session.headers.update({
+            "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
+        })
+        response = session.get(f"{server_url}/server/status/{service_id}")
+        if response.status_code != 200:
+            raise Exception(f"Failed to get environment status: {response.text}")
+        return response.json()
 
-def release_env():
-    base_url = "http://112.125.88.107:4999"
-    envs = RemoteDesktopEnv.list_environments(base_url)
-    print(envs)
-    # envs = 
-    session = requests.Session()
-    session.headers.update({
-        "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
-    })
-    # release all the envs
-    for env in envs:
-        response = session.post(f"{base_url}/server/release/{env['server_id']}")
-        print(f"release {env['server_id']} {response.json()}")
+    
+    
+
 
 
 def pretty_print_messages(messages):

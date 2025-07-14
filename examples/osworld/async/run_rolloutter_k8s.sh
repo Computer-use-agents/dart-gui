@@ -18,14 +18,14 @@ MODEL_PATH=/root/checkpoints/UI-TARS-1.5-7B
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
 export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K
-export REWARD_SERVER_URL=https://sv-9ef69ef1-040f-4c62-b267-a62176d3426f-8000-x-defau-4d260f0491.sproxy.hd-01.alayanew.com:22443/v1
+export REWARD_SERVER_URL=https://sv-64fb071c-cce8-4fff-ba78-16c3ae08cf3c-8000-x-defau-5545d6c3b9.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export REMOTE_ENV_SERVER_URL=http://112.125.88.107:4999
 export REMOTE_ENV_SOURCE=k8s
 
-export ROOT_DATA_DIR=tmp_async
-
+export ROOT_DATA_DIR=tmp_async_0715
+export RUN_ID=pengxiang_test_0715
 
 python3 -m verl.trainer.main_rollout_async \
     algorithm.adv_estimator=grpo \
@@ -63,7 +63,7 @@ python3 -m verl.trainer.main_rollout_async \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
     actor_rollout_ref.rollout.enforce_eager=False \
     actor_rollout_ref.rollout.free_cache_engine=False \
-    actor_rollout_ref.rollout.n=4 \
+    actor_rollout_ref.rollout.n=8 \
     actor_rollout_ref.rollout.top_k=200 \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
@@ -80,4 +80,4 @@ python3 -m verl.trainer.main_rollout_async \
     trainer.test_freq=5 \
     trainer.val_before_train=False \
     trainer.total_epochs=15 \
-    +trainer.run_id=12345 $@
+    +trainer.run_id=$RUN_ID

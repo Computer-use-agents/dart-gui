@@ -29,7 +29,7 @@ try:
     DATA_ROOT_DIR = os.getenv("ROOT_DATA_DIR")
     os.makedirs(DATA_ROOT_DIR, exist_ok=True)
 except Exception as e:
-    print(f"Error getting ROOT_DATA_DIR: {e}")
+    print(f"Error getting ROOT_DATA_DIR: {e}, default to ./tmp")
     DATA_ROOT_DIR = "./tmp"
 
 @ray.remote(num_cpus=1)
