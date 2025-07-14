@@ -12,17 +12,25 @@ from qwen_vl_utils import process_vision_info
 from transformers import AutoProcessor
 from vllm import LLM, SamplingParams
 
-
-env_source = os.getenv("REMOTE_ENV_SOURCE")
-if env_source == "k8s":
-    from verl.workers.rollout.osworld_env.env_k8s import RemoteDesktopEnv
-else:
+try:
+    env_source = os.getenv("REMOTE_ENV_SOURCE")
+    if env_source == "k8s":
+        from verl.workers.rollout.osworld_env.env_k8s import RemoteDesktopEnv
+    else:
+        from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv
+except Exception as e:
+    print(f"Error importing RemoteDesktopEnv: {e}")
     from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv
 
 from verl.workers.rollout.osworld_env.env import add_box_token, parse_action_to_structure_output, parsing_response_to_pyautogui_code
 
-DATA_ROOT_DIR = "./tmp"
-os.makedirs(DATA_ROOT_DIR, exist_ok=True)
+# DATA_ROOT_DIR = "./tmp"
+try:
+    DATA_ROOT_DIR = os.getenv("ROOT_DATA_DIR")
+    os.makedirs(DATA_ROOT_DIR, exist_ok=True)
+except Exception as e:
+    print(f"Error getting ROOT_DATA_DIR: {e}")
+    DATA_ROOT_DIR = "./tmp"
 
 @ray.remote(num_cpus=1)
 class TrajectoryRunner:

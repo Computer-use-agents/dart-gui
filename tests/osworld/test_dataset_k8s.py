@@ -273,9 +273,76 @@ def test_k8s_dataset():
     )
     print(dataset[0])
 
+config = {
+    "id": "0f84bef9-9790-432e-92b7-eece357603fb",
+    "snapshot": "libreoffice_impress",
+    "instruction": "On it Whenever I launch a LibreOffice Impress, it uses both screens, one for current slide and next slide and another for actual presentation. What I want is to use only one monitor which shows presentation. I dont want the screen with Current slide and Next slide so that it can be used for other purposes. How should I achieve this?",
+    "source": "https://stackoverflow.com/questions/29036788/how-to-disable-libreoffice-impress-to-use-multiple-display",
+    "config": [
+        {
+            "type": "download",
+            "parameters": {
+                "files": [
+                    {
+                        "url": "https://drive.usercontent.google.com/download?id=1qKOdf1Wx9nGtk_3l7hjZ9gXWFzWgsyoH&export=download&authuser=0&confirm=t&uuid=0bceb604-af00-4940-a137-8dd00512d060&at=APZUnTUlTutATfe49vsbBrobLPAG:1706370599333",
+                        "path": "/home/user/Desktop/multimedia_classroom_podium-2020.pptx"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "open",
+            "parameters": {
+                "path": "/home/user/Desktop/multimedia_classroom_podium-2020.pptx"
+            }
+        }
+    ],
+    "trajectory": "trajectories/",
+    "related_apps": [
+        "libreoffice_impress"
+    ],
+    "evaluator": {
+        "func": "check_presenter_console_disable",
+        "result": {
+            "type": "vm_file",
+            "path": "/home/user/.config/libreoffice/4/user/registrymodifications.xcu",
+            "dest": "registrymodifications.xcu"
+        }
+    },
+    "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+    "os": "ubuntu",
+    "raw": {
+        "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+        "os": "ubuntu",
+        # "config": config["config"],
+        "task_type": "libreoffice_impress"
+    }
+}
 
+payload = {
+    "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+    "os": "ubuntu",
+    "config": config["config"]
+}
+
+def test_k8s_env():
+    env = RemoteDesktopEnv(
+        server_url="http://112.125.88.107:4999",
+        action_space="pyautogui",
+        screen_size=(1920, 1080),
+        headless=True,
+        os_type="Ubuntu",
+        require_a11y_tree=False,
+        task_config=config
+    )
+    time.sleep(3)
+    obs = env._get_obs()
+    image = Image.open(BytesIO(obs["screenshot"]))
+    image.save("test.png")
+    
 if __name__ == "__main__":
     # asyncio.run(main())
     # test_k8s_list_env()
-    test_k8s_dataset()
+    # test_k8s_dataset()
     release_env()
+    # test_k8s_env()

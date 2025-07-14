@@ -27,11 +27,20 @@ from verl.utils.reward_score import default_compute_score
 from verl.workers.reward_manager import register
 
 
+# DATA_ROOT_DIR = "./tmp"
+try:
+    DATA_ROOT_DIR = os.getenv("ROOT_DATA_DIR")
+    os.makedirs(DATA_ROOT_DIR, exist_ok=True)
+except Exception as e:
+    print(f"Error getting ROOT_DATA_DIR: {e}")
+    DATA_ROOT_DIR = "./tmp"
+
+
 @register("osworld")
 class OSWorldRewardManager:
     """The reward manager."""
 
-    def __init__(self, tokenizer, num_examine, compute_score=None, reward_fn_key="data_source", root_dir="tmp") -> None:
+    def __init__(self, tokenizer, num_examine, compute_score=None, reward_fn_key="data_source", root_dir=DATA_ROOT_DIR) -> None:
         """
         Initialize the OSWorldRewardManager instance.
 

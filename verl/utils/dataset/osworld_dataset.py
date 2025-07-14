@@ -255,6 +255,7 @@ class OSWorldAsyncDataset(Dataset):
         self.need_tools_kwargs = config.get("need_tools_kwargs", False)
         self.filter_prompts = config.get("filter_prompts", True)
         self.serialize_dataset = False
+        self.max_steps = config.get("max_steps", 0)
         self.osworld_root = config.get("osworld_root", "evaluation_examples/examples")
         self.run_id = config.get("run_id", None)
         assert self.run_id is not None

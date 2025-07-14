@@ -81,6 +81,7 @@ class RemoteDesktopEnv(gym.Env):
         self.evaluator = None
         self.image_cache = []
         self.service_id = None
+        self.payload = None
         # Service ID management
         if service_id is None:
             self._create_remote_env(task_config=task_config)
@@ -114,12 +115,13 @@ class RemoteDesktopEnv(gym.Env):
             task_type = task_config["raw"]["task_type"]
             task_id = task_config["raw"]["task_id"]
             os = task_config["os"]
-            
+            # self.payload = payload
             payload = {
                 "task_id": task_id,
                 "os": os,
                 "config": task_config["config"],
             }
+            self.payload = payload
             print("k8s: init_env request", payload)
             response = self.session.post(
                 f"{self.server_url}/server/getAvailableAndLock", 
@@ -166,7 +168,7 @@ class RemoteDesktopEnv(gym.Env):
             if "type" in task_config and "id" in task_config:
                 init_response = self.session.post(
                     f"{self.server_url}/server/getAvailableAndLock",
-                    json=task_config
+                    data=json.dumps(self.payload),
                 )
                 if init_response.status_code != 200:
                     raise Exception(f"Failed to initialize environment: {init_response.text}")
@@ -380,6 +382,12 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
         # Implement your evaluation logic based on the status
         return 1.0 if status.get("success", False) else 0.0
 
+    def close_all_envs(self):
+        """Close all environments."""
+        list_envs = self.list_environments()
+        for env in list_envs:
+            self.close(env["service_id"])
+
     def pause(self):
         """Pause the environment."""
         # Not supported in current API
@@ -390,9 +398,11 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
         # Not supported in current API
         pass
 
-    def close(self):
+    def close(self, service_id: str | None = None):
         """Close the environment."""
-        response = self.session.post(f"{self.server_url}/server/release/{self.service_id}", timeout=30)
+        if service_id is None:
+            service_id = self.service_id
+        response = self.session.post(f"{self.server_url}/server/release/{service_id}", timeout=30)
         if response.status_code != 200:
             raise Exception(f"Failed to close environment: {response.text}")
 

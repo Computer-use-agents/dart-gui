@@ -24,6 +24,9 @@ export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a
 export REMOTE_ENV_SERVER_URL=http://112.125.88.107:4999
 export REMOTE_ENV_SOURCE=k8s
 
+export ROOT_DATA_DIR=tmp_async
+
+
 python3 -m verl.trainer.main_rollout_async \
     algorithm.adv_estimator=grpo \
     data.train_files=evaluation_examples/test_success_uitars1.5_wo_impossible_infeasible.json \
@@ -36,7 +39,7 @@ python3 -m verl.trainer.main_rollout_async \
     data.image_key=images \
     data.custom_cls.path=verl/utils/dataset/osworld_dataset.py \
     data.custom_cls.name=OSWorldDataset \
-    +data.root_data_dir=tmp_async \
+    +data.root_data_dir=$ROOT_DATA_DIR \
     +data.window_size=5 \
     +data.stride_size=5 \
     +data.osworld_root=evaluation_examples/examples_processed \
@@ -70,7 +73,7 @@ python3 -m verl.trainer.main_rollout_async \
     trainer.critic_warmup=0 \
     trainer.logger=['console','swanlab'] \
     trainer.project_name='verl_osworld_grpo' \
-    trainer.experiment_name='osworld_grpo' \
+    trainer.experiment_name='osworld_grpo_rollout_k8s' \
     trainer.n_gpus_per_node=$N_GPUS \
     trainer.nnodes=1 \
     trainer.save_freq=10 \

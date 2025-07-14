@@ -80,4 +80,5 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.test_freq=5 \
     trainer.val_before_train=False \
     trainer.total_epochs=15 \
-    +trainer.run_id='pengxiang_test_0709'
+    +trainer.run_id='pengxiang_test_0709' \
+    # +trainer.algo=dapo

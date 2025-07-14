@@ -186,10 +186,16 @@ class RayOSWorldRollout(RayPPOTrainer):
                             reward_tensor = self.rm_wg.compute_rm_score(batch)
                             batch = batch.union(reward_tensor)
 
-                        if self.config.reward_model.launch_reward_fn_async:
-                            future_reward = compute_reward_async.remote(batch, self.config, self.tokenizer)
+                        # 确保reward_fn存在且被调用
+                        if self.reward_fn is not None:
+                            print(f"Computing reward with reward_fn: {type(self.reward_fn)}")
+                            if self.config.reward_model.launch_reward_fn_async:
+                                future_reward = compute_reward_async.remote(batch, self.config, self.tokenizer)
+                            else:
+                                reward_tensor, reward_extra_infos_dict = compute_reward(batch, self.reward_fn)
+                                print(f"Reward computation completed. Reward tensor shape: {reward_tensor.shape if reward_tensor is not None else 'None'}")
                         else:
-                            reward_tensor, reward_extra_infos_dict = compute_reward(batch, self.reward_fn)
+                            print("Warning: self.reward_fn is None, skipping reward computation")
                     print("reward_tensor", reward_tensor)
     
                     dataset_ids = batch.non_tensor_batch["dataset_ids"]
