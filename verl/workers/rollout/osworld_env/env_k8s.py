@@ -111,12 +111,14 @@ class RemoteDesktopEnv(gym.Env):
             }
             self.payload = payload
             print("k8s: init_env request", payload)
+            current = time.time()
             response = self.session.post(
                 f"{self.server_url}/server/getAvailableAndLock", 
                 data=json.dumps(payload), 
                 timeout=120
             )
-
+            end = time.time()
+            print("task_id", task_id, "init_env elapsed", round(end-current, 2))
             if response.status_code != 200:
                 raise Exception(f"Failed to create environment: {response.text}; code={response.status_code}; {payload}")
             
@@ -390,9 +392,13 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
         """Close the environment."""
         if service_id is None:
             service_id = self.service_id
-        response = self.session.post(f"{self.server_url}/server/release/{service_id}", timeout=30)
-        if response.status_code != 200:
-            raise Exception(f"Failed to close environment: {response.text}")
+        print("call close", service_id)
+        try:
+            response = self.session.post(f"{self.server_url}/server/release/{service_id}", timeout=30)
+            if response.status_code != 200:
+                raise Exception(f"Failed to close environment: {response.text}")
+        except Exception as e:
+            print("Close env exception:", e)
 
     @property
     def id(self) -> str:

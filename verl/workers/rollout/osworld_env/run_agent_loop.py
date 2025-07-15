@@ -89,7 +89,6 @@ class TrajectoryRunner:
 
     def get_is_init(self):
         return self.is_init
-
     
 # Convert bytes to base64 string
 def bytes_to_base64(image_bytes: bytes) -> str:
