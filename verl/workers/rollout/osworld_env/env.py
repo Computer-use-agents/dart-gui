@@ -66,7 +66,7 @@ class RemoteDesktopEnv(gym.Env):
         # Create a session with default headers
         self.session = requests.Session()
         self.session.headers.update({
-            "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J",
+            "Authorization": os.environ.get("ENV_USER_TOKEN"),
             "Content-Type": "application/json"
         })
         
@@ -406,7 +406,7 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
         """List all available environments."""
         session = requests.Session()
         session.headers.update({
-            "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
+            "Authorization": os.environ.get("ENV_USER_TOKEN")
         })
         response = session.get(f"{server_url}/server/list")
         if response.status_code != 200:
@@ -433,7 +433,7 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
         """Get status of a specific environment."""
         session = requests.Session()
         session.headers.update({
-            "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
+            "Authorization": os.environ.get("ENV_USER_TOKEN")
         })
         response = session.get(f"{server_url}/server/status/{service_id}")
         if response.status_code != 200:

@@ -11,5 +11,10 @@
         "initializer_list": "cpp",
         "utility": "cpp"
     },
-    "iis.configDir": ""
+    "iis.configDir": "",
+    "files.exclude": {
+         "**/.*": false
+    }
+
+
 }

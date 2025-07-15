@@ -72,6 +72,7 @@ class RayOSWorldRollout(RayPPOTrainer):
             device_name
         )
         self.run_id = run_id
+        self.actor_path = None
         self.dataset_manager = create_database_manager()
         
 
@@ -80,6 +81,10 @@ class RayOSWorldRollout(RayPPOTrainer):
         return {
             "val/metric": 0.0
         }
+    
+    def _check_model_version(self):
+        
+        pass
 
     def fit(self):
         """
@@ -103,6 +108,12 @@ class RayOSWorldRollout(RayPPOTrainer):
         # load checkpoint before doing anything
         self._load_checkpoint()
 
+        # release all the envs for initial training
+        from verl.workers.rollout.osworld_env.env_k8s import release_env
+        print("release all the envs for initial training >>> begin")
+        release_env()
+        print("release all the envs for initial training <<< done")
+        
         # perform validation before training
         # currently, we only support validation using the reward_function.
         if self.val_reward_fn is not None and self.config.trainer.get("val_before_train", True):
@@ -186,10 +197,16 @@ class RayOSWorldRollout(RayPPOTrainer):
                             reward_tensor = self.rm_wg.compute_rm_score(batch)
                             batch = batch.union(reward_tensor)
 
-                        if self.config.reward_model.launch_reward_fn_async:
-                            future_reward = compute_reward_async.remote(batch, self.config, self.tokenizer)
+                        # 确保reward_fn存在且被调用
+                        if self.reward_fn is not None:
+                            print(f"Computing reward with reward_fn: {type(self.reward_fn)}")
+                            if self.config.reward_model.launch_reward_fn_async:
+                                future_reward = compute_reward_async.remote(batch, self.config, self.tokenizer)
+                            else:
+                                reward_tensor, reward_extra_infos_dict = compute_reward(batch, self.reward_fn)
+                                print(f"Reward computation completed. Reward tensor shape: {reward_tensor.shape if reward_tensor is not None else 'None'}")
                         else:
-                            reward_tensor, reward_extra_infos_dict = compute_reward(batch, self.reward_fn)
+                            print("Warning: self.reward_fn is None, skipping reward computation")
                     print("reward_tensor", reward_tensor)
     
                     dataset_ids = batch.non_tensor_batch["dataset_ids"]
@@ -201,14 +218,40 @@ class RayOSWorldRollout(RayPPOTrainer):
                             used=0
                         )
 
-                    #TODO 2 load checkpoint 
-                    self._load_checkpoint_for_actor_rollout_wg(actor_path="?????")
+                    # TODO 2 load checkpoint 
+                    self._load_checkpoint_for_actor_rollout_wg()
+
+
 
             progress_bar.update(1)
 
 
-    def _load_checkpoint_for_actor_rollout_wg(self, actor_path: str):
-        self.actor_rollout_wg.load_checkpoint(actor_path, del_local_after_load=False)
+    def _load_checkpoint_for_actor_rollout_wg(self):
+
+
+        # load from hdfs
+        # if self.config.trainer.default_hdfs_dir is not None:
+        #     raise NotImplementedError("load from hdfs is not implemented yet")
+        # else:
+        checkpoint_folder = self.config.trainer.default_local_dir  # TODO: check path
+        if not os.path.isabs(checkpoint_folder):
+            working_dir = os.getcwd()
+            checkpoint_folder = os.path.join(working_dir, checkpoint_folder)
+        global_step_folder = find_latest_ckpt_path(checkpoint_folder)  # None if no latest
+        print(f"global_step_folder: {global_step_folder}")  
+
+        actor_path = os.path.join(global_step_folder, "actor")  
+        if self.actor_path != actor_path:
+            self.actor_path = actor_path
+            print(f"Loading actor from {actor_path}")
+            # load actor
+            self.actor_rollout_wg.load_checkpoint(actor_path, del_local_after_load=self.config.trainer.del_local_ckpt_after_load)
+        else:
+            print(f"Actor not updated, existing actor path: {self.actor_path}. Skip loading actor.")
+            return
+        
+        
+ 
 
     def _load_checkpoint(self):
         if self.config.trainer.resume_mode == "disable":
@@ -246,6 +289,8 @@ class RayOSWorldRollout(RayPPOTrainer):
 
         actor_path = os.path.join(global_step_folder, "actor")
         critic_path = os.path.join(global_step_folder, "critic")
+
+        self.actor_path = actor_path
         # load actor
         self.actor_rollout_wg.load_checkpoint(actor_path, del_local_after_load=self.config.trainer.del_local_ckpt_after_load)
         # load critic
