@@ -13,10 +13,9 @@ from transformers import AutoProcessor
 from vllm import LLM, SamplingParams
 
 from verl.utils.osworld import limit_images_in_messages
-from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv, add_box_token, parse_action_to_structure_output, parsing_response_to_pyautogui_code
+from verl.workers.rollout.osworld_env.env import add_box_token, parse_action_to_structure_output, parsing_response_to_pyautogui_code
+from verl.workers.rollout.osworld_env.env_k8s import RemoteDesktopEnv
 
-DATA_ROOT_DIR = "./tmp"
-os.makedirs(DATA_ROOT_DIR, exist_ok=True)
 
 @ray.remote(num_cpus=1)
 class TrajectoryRunner:
@@ -26,11 +25,12 @@ class TrajectoryRunner:
         self.task_config = task_config
         self.is_init = False
         # Add retry logic for RemoteDesktopEnv initialization
+        server_url = os.getenv("REMOTE_ENV_SERVER_URL")
         max_retries = 3
         for attempt in range(max_retries):
             try:
                 self.env = RemoteDesktopEnv(
-                    server_url="http://39.107.54.167:4999",
+                    server_url=server_url,
                     action_space="pyautogui",
                     screen_size=(1920, 1080),
                     headless=True,
@@ -86,7 +86,6 @@ class TrajectoryRunner:
     
     def get_task_config(self):
         return self.task_config
-
 
     def get_is_init(self):
         return self.is_init
@@ -165,6 +164,7 @@ def run_agent_loop(
     max_steps: int = 1,
     action_parse_res_factor: int = 1000,
     limit_images: int = 5,
+    data_dir: str | None = None
 ):
     """
     Run the agent loop for multiple runners in parallel.
@@ -213,7 +213,7 @@ def run_agent_loop(
     for runner_idx in active_runners:
         # Generate a unique ID for each runner
         run_id = str(uuid.uuid4())
-        runner_dir = os.path.join(DATA_ROOT_DIR, run_id)
+        runner_dir = os.path.join(data_dir, run_id)
         os.makedirs(runner_dir, exist_ok=True)
         task_config = ray.get(runners[runner_idx].get_task_config.remote())
         with open(os.path.join(runner_dir, "task_config.json"), "w") as f:

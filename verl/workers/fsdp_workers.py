@@ -829,31 +829,22 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
     def stop_profile(self) -> None:
         """Stop profiling for the current rank in the current training step."""
         self.profiler.stop()
-    
+
     @register(dispatch_mode=Dispatch.ONE_TO_ALL, execute_mode=Execute.RANK_ZERO)
     def get_config(self):
         current_rank = os.environ["RANK"]
         print("get_config called at rank", current_rank)
         return self.config
-    
+
     @register(dispatch_mode=Dispatch.ONE_TO_ALL, execute_mode=Execute.RANK_ZERO)
     def clear_envs(self):
         current_rank = os.environ["RANK"]
         print("clear_envs called at rank", current_rank)
         import requests
 
-        from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv
+        from verl.workers.rollout.osworld_env.env_k8s import release_env
         try:
-            base_url = "http://39.107.54.167:4999"
-            envs = RemoteDesktopEnv.list_environments(base_url)
-            print(envs)
-            session = requests.Session()
-            session.headers.update({
-                "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
-            })
-            for env in envs:
-                response = session.post(f"{base_url}/server/delete/{env['server_id']}")
-                print(response.json())
+            release_env()
         except Exception as e:
             print("clear_envs failed!", e)
             return "failed"

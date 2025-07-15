@@ -87,38 +87,47 @@ def test_infer():
     batch = DataProto.from_single_dict(batch)
     # from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
 
-def test_stepwise_split():
-    import json
+def test_stepwise_split_1():
     processor = AutoProcessor.from_pretrained("/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5")
     splitter = StepwiseTrajectorySplitter(
         processor,
         "examples"
     )
-    dataset_ids = ["osworld_trajectory", "osworld_trajectory"]
-    reward_tensor = torch.tensor([0.5, 0.8])
-    batch = splitter.split_dataset_id(dataset_ids[0])
-    # print(len(batch), json.dumps(batch[0], indent=2))
-    # print(json.dumps(batch[1], indent=2))
+    dataset_ids = ["osworld_trajectory"]
+    reward_tensor = torch.tensor([0.5])
+    # batch = splitter.split_dataset_id(dataset_ids[0])
+    # result = splitter.tokenize(batch, "osworld_trajectory", 1)
+    batch = splitter.split(dataset_ids, reward_tensor)
+    # print(batch)
+    for k, v in batch.items():
+        if hasattr(v, "shape"):
+            print(k, v.shape)
+        else:
+            print(k)
 
-    # print(json.dumps(batch[5], indent=2))
-    # print(json.dumps(batch[-1], indent=2))
-
-    result = splitter.tokenize(batch, "osworld_trajectory", 1)
-    # print(result)
-    # # print(batch)
-    # for k, v in batch.items():
-    #     if hasattr(v, "shape"):
-    #         print(k, v.shape)
-    #     else:
-    #         print(k)
-    # batch = DataProto.from_single_dict(batch)
-    # print("batch size", len(batch))
-    # raw_messages = batch.non_tensor_batch["raw_messages"]
-    # import json
-    # for idx, item in enumerate(raw_messages):
-    #     with open(f"raw_message_{idx}.json", "w") as f:
-    #         # print(json.dumps(item, indent=4, ensure_ascii=False))
-    #         json.dump(item, f, indent=4, ensure_ascii=False)
+def test_stepwise_split_2():
+    processor = AutoProcessor.from_pretrained(
+        "/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5",
+        use_fast=True
+    )
+    splitter = StepwiseTrajectorySplitter(
+        processor,
+        "tmp"
+    )
+    dataset_ids = [
+        "0fa623e6-94cb-46ac-9550-9e09059c9f4f", 
+        "1cae6f8a-9d52-44cf-af66-63b4f3f4301b",
+        "03d03282-1810-44a9-bbf4-18bf4bba70ac",
+        "d1613cdc-ae2c-42f2-97a8-05fcf210c58a"
+        ]
+    reward_tensor = torch.tensor([0.5, 0.8, 0.9, 0.5])
+    batch = splitter.split(dataset_ids, reward_tensor)
+    # print(batch)
+    for k, v in batch.items():
+        if hasattr(v, "shape"):
+            print(k, v.shape)
+        else:
+            print(k)
 
 def test_rm_images():
     with open("/app/data/arpo_workspace/verl/examples/osworld_trajectory/final_messages.json") as f:
@@ -126,3 +135,15 @@ def test_rm_images():
     dataset = dataset[:len(dataset)-1]
     result = limit_images_in_messages(dataset, limit_images=5)
     print(json.dumps(result, indent=2))
+
+def test_tokenize():
+    prompt = """<|im_start|>assistant
+Thought: In the Thunderbird email client, I was looking at the left-hand navigation pane to find the Bills folder. After browsing through it, I located the Bills section, which I needed to click on to access the first email contained within it. I noticed that the Bills folder was positioned just below the Local Folders, and I was all set to click on it to continue with the next action.
+Action: click(start_box='<|box_start|>(227,511)<|box_end|>')<|im_end|>"""
+    processor = AutoProcessor.from_pretrained(
+        "/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5",
+        use_fast=True
+    )
+
+    result = processor(text=[prompt], images=None, return_tensors="pt")
+    print(result)

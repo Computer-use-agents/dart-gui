@@ -22,14 +22,13 @@ import hydra
 import ray
 from omegaconf import OmegaConf
 
-from verl.trainer.ppo.ray_trainer import RayPPOTrainer, RayOSWorldTrainer
+from verl.trainer.ppo.ray_trainer import RayOSWorldTrainer, RayPPOTrainer
 from verl.trainer.ppo.reward import load_reward_manager
 
 
 @hydra.main(config_path="config", config_name="ppo_trainer", version_base=None)
 def main(config):
     print("config", config, type(config))
-    
     run_ppo(config)
 
 

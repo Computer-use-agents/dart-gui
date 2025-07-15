@@ -50,7 +50,7 @@ from verl.trainer.ppo.metric_utils import (
     process_validation_metrics,
 )
 from verl.trainer.ppo.reward import compute_reward, compute_reward_async
-from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter
+from verl.trainer.ppo.trajectory_splitter import StepwiseTrajectorySplitter, TrajectorySplitter
 from verl.utils.checkpoint.checkpoint_manager import BaseCheckpointManager, find_latest_ckpt_path
 from verl.utils.debug import marked_timer
 from verl.utils.metric import (
@@ -59,6 +59,7 @@ from verl.utils.metric import (
 from verl.utils.seqlen_balancing import get_seqlen_balanced_partitions, log_seqlen_unbalance
 from verl.utils.torch_functional import masked_mean
 from verl.utils.tracking import ValidationGenerationsLogger
+from verl.workers.rollout.osworld_env.env_k8s import release_env
 
 WorkerType = Type[Worker]
 
@@ -1194,7 +1195,9 @@ class RayPPOTrainer:
 
 class RayOSWorldTrainer(RayPPOTrainer):
     def __init__(self, config, tokenizer, role_worker_mapping: dict[Role, WorkerType], resource_pool_manager: ResourcePoolManager, ray_worker_group_cls: RayWorkerGroup = RayWorkerGroup, processor=None, reward_fn=None, val_reward_fn=None, train_dataset: Optional[Dataset] = None, val_dataset: Optional[Dataset] = None, collate_fn=None, train_sampler: Optional[Sampler] = None, device_name="cuda"):
+        OmegaConf.update(config, "actor_rollout_ref.rollout.root_data_dir", config.data.root_data_dir)
         super().__init__(config, tokenizer, role_worker_mapping, resource_pool_manager, ray_worker_group_cls, processor, reward_fn, val_reward_fn, train_dataset, val_dataset, collate_fn, train_sampler, device_name)
+        os.makedirs(self.config.data.root_data_dir, exist_ok=True)
 
     def _validate(self):
         print("Not validate for OSWorld")
@@ -1241,7 +1244,7 @@ class RayOSWorldTrainer(RayPPOTrainer):
         # we start from step 1
         self.global_steps += 1
         last_val_metrics = None
-
+        release_env()
         for epoch in range(self.config.trainer.total_epochs):
             for batch_dict in self.train_dataloader:
                 metrics = {}
@@ -1328,16 +1331,26 @@ class RayOSWorldTrainer(RayPPOTrainer):
                             }
                             metrics.update(trajectory_metrics)
                     print("reward_tensor", reward_tensor)
-                    
-                    splitter = TrajectorySplitter(
-                        processor=self.processor,
-                        root_dir=self.config.data.root_data_dir,
-                        window_size=self.config.data.window_size,
-                        stride_size=self.config.data.stride_size,
-                        max_prompt_length=self.config.data.max_prompt_length,
-                        max_response_length=self.config.data.max_response_length,
-                        truncation=self.config.data.truncation
-                    )
+                    if self.config.trainer.splitter == "sliding_window":
+                        splitter = TrajectorySplitter(
+                            processor=self.processor,
+                            root_dir=self.config.data.root_data_dir,
+                            window_size=self.config.data.window_size,
+                            stride_size=self.config.data.stride_size,
+                            max_prompt_length=self.config.data.max_prompt_length,
+                            max_response_length=self.config.data.max_response_length,
+                            truncation=self.config.data.truncation
+                        )
+                    elif self.config.trainer.splitter == "stepwise":
+                        splitter = StepwiseTrajectorySplitter(
+                            processor=self.processor,
+                            root_dir=self.config.data.root_data_dir,
+                            max_prompt_length=self.config.data.max_prompt_length,
+                            max_response_length=self.config.data.max_response_length,
+                            truncation=self.config.data.truncation
+                        )
+                    else:
+                        raise ValueError(f"Unhandled splitter type: {self.config.trainer}")
                     old_batch = batch
                     dataset_ids = old_batch.non_tensor_batch["dataset_ids"]
                     batch = splitter.split(dataset_ids, reward_tensor)

@@ -18,6 +18,7 @@ FSDP PPO Trainer with Ray-based single controller.
 This trainer supports model-agonistic model initialization with huggingface
 """
 
+import os
 from pprint import pprint
 from typing import Optional
 
@@ -46,8 +47,10 @@ from verl.utils.metric import (
 
 class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
     def __init__(self, config, tokenizer, role_worker_mapping: dict[Role, WorkerType], resource_pool_manager: ResourcePoolManager, ray_worker_group_cls: RayWorkerGroup = RayWorkerGroup, processor=None, reward_fn=None, val_reward_fn=None, train_dataset: Optional[Dataset] = None, val_dataset: Optional[Dataset] = None, collate_fn=None, train_sampler: Optional[Sampler] = None, device_name="cuda"):
+        config.actor_rollout_ref.rollout.root_data_dir = config.data.root_data_dir
         super().__init__(config, tokenizer, role_worker_mapping, resource_pool_manager, ray_worker_group_cls, processor, reward_fn, val_reward_fn, train_dataset, val_dataset, collate_fn, train_sampler, device_name)
-
+        os.makedirs(self.config.data.root_data_dir, exist_ok=True)
+        
     def _validate(self):
         print("Not validate for OSWorld")
         return {
@@ -185,12 +188,14 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     with marked_timer("adv", timing_raw):
                         # we combine with rule-based rm
                         reward_extra_infos_dict: dict[str, list]
+                        # pengxiang debug
+                        batch.batch["token_level_scores"] = reward_tensor
                         if self.config.reward_model.launch_reward_fn_async:
                             reward_tensor, reward_extra_infos_dict = ray.get(future_reward)
-                        batch.batch["token_level_scores"] = reward_tensor
-
-                        if reward_extra_infos_dict:
-                            batch.non_tensor_batch.update({k: np.array(v) for k, v in reward_extra_infos_dict.items()})
+                            batch.batch["token_level_scores"] = reward_tensor
+#pengxiang debug
+                            if reward_extra_infos_dict:
+                                batch.non_tensor_batch.update({k: np.array(v) for k, v in reward_extra_infos_dict.items()})
 
                         # compute rewards. apply_kl_penalty if available
                         if self.config.algorithm.use_kl_in_reward:

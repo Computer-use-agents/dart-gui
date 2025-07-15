@@ -276,14 +276,5 @@
         "text": "Thought: I tried using the image processing software directly, but I found that it didn't respond. Opening other software might affect that loading process. In this situation, it's better to close GIMP and return to the desktop to continue with other tasks for a while. So, let me go ahead and click the close button in the upper right corner.\nAction: click(start_box='<|box_start|>(1916,44)<|box_end|>')"
       }
     ]
-  },
-  {
-    "role": "user",
-    "content": [
-      {
-        "type": "image",
-        "image": "image_0016"
-      }
-    ]
   }
 ]
