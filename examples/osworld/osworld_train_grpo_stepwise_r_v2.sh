@@ -27,7 +27,9 @@ export AZURE_OPENAI_API_VERSION=2025-01-01-preview
 export AZURE_OPENAI_MODEL=gpt-4o
 export AZURE_OPENAI_API_KEY=480BRRH9L6PiWv0pqq1Oktlha17svDyzkrjHKNZOhEmkfOzJx9m4JQQJ99BDACYeBjFXJ3w3AAABACOGYSnW
 export AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_API_BASE}/openai/deployments/${AZURE_OPENAI_DEPLOYMENT}/chat/completions?api-version=${AZURE_OPENAI_API_VERSION}
-export ENV_USER_TOKEN=4Px6dAeZbVcYfGhUjMk9oL2iN3wS5rT
+export ENV_USER_TOKEN=kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J
+export REMOTE_ENV_SERVER_URL=http://112.125.88.107:4999
+export REMOTE_ENV_SOURCE=k8s
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
@@ -50,7 +52,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=2 \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
-    actor_rollout_ref.actor.use_kl_loss=True \
+    actor_rollout_ref.actor.use_kl_loss=False \
     actor_rollout_ref.actor.kl_loss_coef=0 \
     actor_rollout_ref.actor.kl_loss_type=low_var_kl \
     actor_rollout_ref.actor.entropy_coeff=0 \
