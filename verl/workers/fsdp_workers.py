@@ -842,18 +842,9 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
         print("clear_envs called at rank", current_rank)
         import requests
 
-        from verl.workers.rollout.osworld_env.env import RemoteDesktopEnv
+        from verl.workers.rollout.osworld_env.env_k8s import release_env
         try:
-            base_url = "http://39.107.54.167:4999"
-            envs = RemoteDesktopEnv.list_environments(base_url)
-            print(envs)
-            session = requests.Session()
-            session.headers.update({
-                "Authorization": "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
-            })
-            for env in envs:
-                response = session.post(f"{base_url}/server/delete/{env['server_id']}")
-                print(response.json())
+            release_env()
         except Exception as e:
             print("clear_envs failed!", e)
             return "failed"

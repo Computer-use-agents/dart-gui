@@ -274,7 +274,9 @@ class vLLMRollout(BaseRollout):
                     time.sleep(1)
                 print("All env init done!")
                 time.sleep(5)
-                
+                # pengxiang: 
+                # this is not async by traj level but batch level
+                # so we need to wait for all the traj to finish
                 dataset_ids = run_agent_loop(
                     self.inference_engine, 
                     runners, 

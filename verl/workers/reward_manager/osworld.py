@@ -103,7 +103,7 @@ Important notes for score:
 ## Screenshot History
 """
         dataset_path = os.path.join(self.root_dir, dataset_id)
-        with open(os.path.join(dataset_path, "task_config.json"), "r") as f:
+        with open(os.path.join(dataset_path, "task_config.json")) as f:
             task_config = json.load(f)
         task = task_config["instruction"]
         if task_config["evaluator"]["func"] == "infeasible":

@@ -103,6 +103,10 @@ class MySQLDatasetsORM:
             logger.error(f"Error setting up database: {e}")
             raise
     
+    def refresh_session(self):
+        self.SessionMaker = sessionmaker(bind=self.engine)
+
+
     @contextmanager
     def get_session(self):
         """数据库会话上下文管理器"""
@@ -191,14 +195,42 @@ class MySQLDatasetsORM:
     
     def get_datasets_by_run_id(self, run_id: str, offset: int = 0, limit: int = 1) -> List[Dict[str, Any]]:
         """根据run_id查询dataset记录列表"""
+        # self.refresh_session()
         try:
             with self.get_session() as session:
                 datasets = session.query(Dataset).filter(
                     Dataset.run_id == run_id
-                ).order_by(Dataset.created_at.asc()).offset(offset).limit(limit).all()
+                )
+                datasets = datasets.order_by(Dataset.created_at.asc()).offset(offset).limit(limit).all()
                 return [dataset.to_dict() for dataset in datasets]
+            # session = self.get_session()
+            # datasets = session.query(Dataset).filter(
+            #     Dataset.run_id == run_id
+            # )
+            # datasets = datasets.order_by(Dataset.created_at.asc()).offset(offset).limit(limit).all()
+            # return [dataset.to_dict() for dataset in datasets]
         except SQLAlchemyError as e:
             logger.error(f"Error getting datasets by run_id: {e}")
+            raise
+    
+    def get_single_dataset_by_run_id(self, run_id: str, offset: int = 0) -> Optional[Dict[str, Any]]:
+        """根据run_id查询单条dataset记录（模拟原生SQL的 LIMIT offset, 1 行为）
+        
+        Args:
+            run_id: 运行ID
+            offset: 偏移量
+            
+        Returns:
+            Optional[Dict]: 单条记录或None
+        """
+        try:
+            with self.get_session() as session:
+                dataset = session.query(Dataset).filter(
+                    Dataset.run_id == run_id
+                ).order_by(Dataset.created_at.asc()).offset(offset).limit(1).first()
+                return dataset.to_dict() if dataset else None
+        except SQLAlchemyError as e:
+            logger.error(f"Error getting single dataset by run_id: {e}")
             raise
     
     def update_used(self, trajectory_id: str, used: int) -> bool:
@@ -225,7 +257,7 @@ class MySQLDatasetsORM:
                     logger.warning(f"Dataset with trajectory_id '{trajectory_id}' not found")
                     return False
         except SQLAlchemyError as e:
-            logger.error(f"Error updating usage_time: {e}")
+            logger.error(f"Error updating used: {e}")
             raise
     
     def update_run_id(self, trajectory_id: str, new_run_id: str) -> bool:
@@ -352,6 +384,16 @@ class MySQLDatasetsORM:
             logger.error(f"Error counting datasets: {e}")
             raise
     
+    def count_datasets_by_run_id(self, run_id: str) -> int:
+        """统计指定run_id的dataset记录数量"""
+        try:
+            with self.get_session() as session:
+                count = session.query(Dataset).filter(Dataset.run_id == run_id).count()
+                return count
+        except SQLAlchemyError as e:
+            logger.error(f"Error counting datasets by run_id: {e}")
+            raise
+    
     def get_usage_stats(self) -> Dict[str, Any]:
         """获取使用统计信息"""
         try:
@@ -359,17 +401,17 @@ class MySQLDatasetsORM:
                 # 使用ORM的聚合查询
                 stats = session.query(
                     func.count(Dataset.id).label('total_count'),
-                    func.avg(Dataset.usage_time).label('avg_usage_time'),
-                    func.max(Dataset.usage_time).label('max_usage_time'),
-                    func.min(Dataset.usage_time).label('min_usage_time'),
+                    func.avg(Dataset.used).label('avg_used'),
+                    func.max(Dataset.used).label('max_used'),
+                    func.min(Dataset.used).label('min_used'),
                     func.count(func.distinct(Dataset.run_id)).label('unique_runs')
                 ).first()
                 
                 return {
                     'total_count': stats.total_count or 0,
-                    'avg_usage_time': float(stats.avg_usage_time or 0),
-                    'max_usage_time': stats.max_usage_time or 0,
-                    'min_usage_time': stats.min_usage_time or 0,
+                    'avg_used': float(stats.avg_used or 0),
+                    'max_used': stats.max_used or 0,
+                    'min_used': stats.min_used or 0,
                     'unique_runs': stats.unique_runs or 0
                 }
         except SQLAlchemyError as e:
@@ -380,7 +422,7 @@ class MySQLDatasetsORM:
         """根据条件搜索datasets
         
         Args:
-            **filters: 搜索条件，如 usage_time_min=100, run_id='test'
+            **filters: 搜索条件，如 used_min=100, run_id='test'
         """
         try:
             with self.get_session() as session:
@@ -390,11 +432,11 @@ class MySQLDatasetsORM:
                 if 'run_id' in filters:
                     query = query.filter(Dataset.run_id == filters['run_id'])
                 
-                if 'usage_time_min' in filters:
-                    query = query.filter(Dataset.used >= filters['usage_time_min'])
+                if 'used_min' in filters:
+                    query = query.filter(Dataset.used >= filters['used_min'])
                 
-                if 'usage_time_max' in filters:
-                    query = query.filter(Dataset.used <= filters['usage_time_max'])
+                if 'used_max' in filters:
+                    query = query.filter(Dataset.used <= filters['used_max'])
                 
                 if 'created_after' in filters:
                     query = query.filter(Dataset.created_at >= filters['created_after'])
@@ -460,11 +502,11 @@ def demo_datasets_orm_operations():
         
         # 更新数据
         print("\n3. 更新数据...")
-        success = manager.update_usage_time("traj_orm_001_fixed", 300)
-        print(f"更新usage_time结果: {success}")
+        success = manager.update_used("traj_orm_001_fixed", 300)
+        print(f"更新used结果: {success}")
         
         # 通用更新
-        success = manager.update_dataset("traj_orm_002_fixed", usage_time=250, run_id="run_gamma")
+        success = manager.update_dataset("traj_orm_002_fixed", used=250, run_id="run_gamma")
         print(f"通用更新结果: {success}")
         
         updated_dataset = manager.get_dataset_by_trajectory_id("traj_orm_001_fixed")
@@ -472,15 +514,13 @@ def demo_datasets_orm_operations():
         
         # 搜索功能
         print("\n4. 搜索数据...")
-        high_usage_datasets = manager.search_datasets(usage_time_min=200)
-        print(f"使用时间>=200的记录: {len(high_usage_datasets)}条")
+        high_usage_datasets = manager.search_datasets(used_min=200)
+        print(f"使用次数>=200的记录: {len(high_usage_datasets)}条")
         
         # 统计信息
         print("\n5. 统计信息...")
         count = manager.count_datasets()
-        stats = manager.get_usage_stats()
         print(f"总记录数: {count}")
-        print(f"统计信息: {stats}")
         
         # 分页获取所有记录
         print("\n6. 分页查询...")
@@ -488,7 +528,7 @@ def demo_datasets_orm_operations():
         print("前5条记录:")
         for dataset in all_datasets:
             print(f"  ID: {dataset['id']}, trajectory_id: {dataset['trajectory_id']}, "
-                  f"usage_time: {dataset['usage_time']}, created_at: {dataset['created_at']}")
+                  f"used: {dataset['used']}, created_at: {dataset['created_at']}")
         
         # 删除数据（可选，取消注释来测试）
         print("\n7. 删除数据...")
@@ -497,6 +537,49 @@ def demo_datasets_orm_operations():
         
         # deleted_count = manager.delete_datasets_by_run_id("run_beta")
         # print(f"删除run_beta的记录数: {deleted_count}")
+        
+    except Exception as e:
+        print(f"操作过程中出错: {e}")
+        import traceback
+        traceback.print_exc()
+
+
+def demo_single_record_query():
+    """演示单条记录查询（模拟原生SQL的 LIMIT offset, 1 行为）"""
+    print("=== 单条记录查询演示 ===")
+    
+    # 初始化ORM管理器
+    manager = MySQLDatasetsORM(DB_CONFIG)
+    
+    try:
+        # 创建测试数据
+        print("1. 创建测试数据...")
+        for i in range(10):
+            manager.create_dataset(f"traj_single_{i:03d}", "pengxiang_test_0709", i * 10)
+        
+        # 模拟你的原生SQL查询行为
+        print("\n2. 模拟原生SQL查询（每次取1条记录）...")
+        results = []
+        
+        def get_next_offset():
+            # 简单的offset生成逻辑，你可以根据需要修改
+            return len(results)
+        
+        for _ in range(5):  # 每个请求执行5次查询
+            offset = get_next_offset()
+            dataset = manager.get_single_dataset_by_run_id("pengxiang_test_0709", offset)
+            results.append({
+                'offset': offset,
+                'data': dataset
+            })
+            print(f"Offset {offset}: {dataset}")
+        
+        print(f"\n总共查询到 {len(results)} 条记录")
+        
+        # 清理测试数据
+        print("\n3. 清理测试数据...")
+        for i in range(10):
+            manager.delete_dataset(f"traj_single_{i:03d}")
         
     except Exception as e:
         print(f"操作过程中出错: {e}")
