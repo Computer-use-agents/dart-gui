@@ -18,14 +18,23 @@ MODEL_PATH=/root/checkpoints/UI-TARS-1.5-7B
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
 export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K
-export REWARD_SERVER_URL=https://sv-64fb071c-cce8-4fff-ba78-16c3ae08cf3c-8000-x-defau-5545d6c3b9.sproxy.hd-01.alayanew.com:22443/v1
+export REWARD_SERVER_URL=https://sv-f4872fdf-164b-4fd8-a8b8-7453b6c5aba4-8000-x-defau-3c1cba829d.sproxy.hd-01.alayanew.com:22443/v1
+
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
+export AZURE_OPENAI_API_BASE=https://teamx-4o.openai.azure.com
+export AZURE_OPENAI_DEPLOYMENT=TeamX-gpt-4o
+export AZURE_OPENAI_API_VERSION=2025-01-01-preview
+export AZURE_OPENAI_MODEL=gpt-4o
+export AZURE_OPENAI_API_KEY=480BRRH9L6PiWv0pqq1Oktlha17svDyzkrjHKNZOhEmkfOzJx9m4JQQJ99BDACYeBjFXJ3w3AAABACOGYSnW
+export AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_API_BASE}/openai/deployments/${AZURE_OPENAI_DEPLOYMENT}/chat/completions?api-version=${AZURE_OPENAI_API_VERSION}
+export ENV_USER_TOKEN=kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J
 export REMOTE_ENV_SERVER_URL=http://112.125.88.107:4999
 export REMOTE_ENV_SOURCE=k8s
 
-export ROOT_DATA_DIR=tmp_async_0715
-export RUN_ID=pengxiang_test_0715
+
+export ROOT_DATA_DIR=tmp_async_0716
+export RUN_ID=pengxiang_test_0716
 
 python3 -m verl.trainer.main_rollout_async \
     algorithm.adv_estimator=grpo \

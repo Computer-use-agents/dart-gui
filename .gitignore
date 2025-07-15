@@ -130,4 +130,8 @@ tmp/
 tmp_async/
 tmp_async_0715/
 tmp_async_0714/
+tmp*/
 .vscode/
+
+start_server.sh
+sleep.sh

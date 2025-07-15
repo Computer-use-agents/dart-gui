@@ -242,7 +242,7 @@ if __name__ == "__main__":
     # 运行演示
     # load_data_from_tmp()
     while True:
-        count_data_by_run_id("pengxiang_test_0715")
+        count_data_by_run_id("pengxiang_test_0716")
         time.sleep(60)
     
     # # 查询数据长度
