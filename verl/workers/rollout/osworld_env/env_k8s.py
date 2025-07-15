@@ -1,15 +1,12 @@
-import base64
 import json
 import logging
 import os
-import re
 import time
 import uuid
 from typing import Any, Dict, List, Optional, Tuple
 
 import gymnasium as gym
 import requests
-from openai import OpenAI
 
 logger = logging.getLogger("desktopenv.experiment")
 
@@ -70,6 +67,7 @@ class RemoteDesktopEnv(gym.Env):
         self.image_cache = []
         self.service_id = None
         self.payload = None
+        self.task_config = task_config
         # Service ID management
         if service_id is None:
             self._create_remote_env(task_config=task_config)
@@ -269,123 +267,27 @@ class RemoteDesktopEnv(gym.Env):
         self.config = task_config.get("config", [])
         self.evaluator = task_config.get("evaluator")
 
-    def evaluate(self, task: str | None = None, screenshot_path: str | None = None, action_history: str | None = None) -> float:
+    def evaluate(self) -> float:
         """Evaluate whether the task is successfully completed."""
-        logger.info(f"k8s: Evaluating task: {task}; screenshot_path: {screenshot_path}")
-        if self.evaluation_mode == "server":
-            return self._evaluate_server(task, screenshot_path, action_history)
-        elif self.evaluation_mode == "dummy":
-            return self._evaluate_dummy()
-        else:
-            raise ValueError(f"Invalid evaluation mode: {self.evaluation_mode}")
-
-    def _evaluate_server(self, task: str | None = None, screenshot_path: str | None = None, action_history: str | None = None) -> float:
-        """Evaluate whether the task is successfully completed."""
-        # Get environment status
-        logger.info(f"k8s: Evaluating task: {task}")
-        obs = self._get_obs()
-        if task is None:
-            task = obs['instruction']
-
-        base_url = os.getenv("REWARD_SERVER_URL")
-        model = os.getenv("REWARD_MODEL")
-        client = OpenAI(
-            api_key="EMPTY", 
-            base_url=base_url)
-
-        prompt = """You are a smart GUI agent. Your goal is that given a latest screenshot and a task, you should give a score about if the task is completed based on the screenshot.
-You will also have a history of agent actions. You should consider if the history is consistent with the task and latest screenshot.
-
-Format your response as
-```
-Thought: <your reasoning process>
-Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed, Give a value between 0 and 1 if you are not sure>
-```
-## Task
-{task}
-
-## Action History
-{action_history}
-
-## Latest Screenshot
-"""
-
-        # Get current screenshot if not provided
-        if screenshot_path is None:
-            screenshot_data = obs['screenshot']
-        else:
-            with open(screenshot_path, 'rb') as f:
-                screenshot_data = f.read()
-
-        # Encode screenshot to base64
-        encoded_string = base64.b64encode(screenshot_data).decode('utf-8')
-
-        # Get task from environment if not provided
-        if task is None:
-            task = self.instruction
-
-        # Call reward model
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "user", 
-                "content": [
-                    {
-                        "type": "text",
-                        "text": prompt.format(task=task, action_history=action_history)
-                    },
-                    {
-                        "type": "image_url", 
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{encoded_string}"
-                        }
-                    }
-                ]
-                }],
-            extra_body={
-                "mm_processor_kwargs": {
-                    "min_pixels": 100*28*28,
-                    "max_pixels": 16384*28*28,
-                },
-                "top_k": 50,
-            }
-        )
-
-        # Parse response to get score
-        response_text = response.choices[0].message.content
-        logger.info(f"k8s: Eval Response: {response_text}")
-        score_match = re.search(r"Score:\s*(\d*\.?\d+)", response_text)
-        if score_match:
-            return float(score_match.group(1))
-        else:
-            print(f"k8s: Warning: Could not parse score from response: {response_text}")
-            return 0.0
+        try:
+            return self._evaluate_osworld(self.task_config)
+        except Exception as e:
+            print("evaluate failed", e)
+        return 0
 
     def _evaluate_osworld(self, task_config: dict | None = None) -> float:
         """Evaluate the task using the OSWorld server."""
         url = self.server_url+"/server/evaluate/"+str(self.service_id)
-        # print("k8s: evaluate_osworld url", url)
         if task_config is not None:
-
+            print("Evaluate", url, self.service_id)
             payload = json.dumps(task_config["evaluator"])
 
             headers = self.session.headers
 
             response = requests.request("POST", url, headers=headers, data=payload)
-
-            # print(response.text)
-            return float(response.json()["data"]["result"])
-
-    def _evaluate_dummy(self) -> float:
-        """Evaluate whether the task is successfully completed."""
-        # Get environment status
-        response = requests.get(f"{self.server_url}/server/status/{self.service_id}")
-        if response.status_code != 200:
-            raise Exception(f"Failed to get environment status: {response.text}")
-        
-        status = response.json()['data']
-        # Implement your evaluation logic based on the status
-        return 1.0 if status.get("success", False) else 0.0
+            response_json = response.json()
+            print("Response", response_json)
+            return float(response_json["data"]["result"])
 
     def close_all_envs(self):
         """Close all environments."""
