@@ -55,7 +55,7 @@ class RayOSWorldRollout(RayPPOTrainer):
             device_name="cuda",
             run_id: str | None = None
         ):
-        
+        config.actor_rollout_ref.rollout.root_data_dir = config.data.root_data_dir
         super().__init__(
             config, 
             tokenizer, 
@@ -74,7 +74,7 @@ class RayOSWorldRollout(RayPPOTrainer):
         self.run_id = run_id
         self.actor_path = None
         self.dataset_manager = create_database_manager()
-        
+        os.makedirs(self.config.data.root_data_dir, exist_ok=True)
 
     def _validate(self):
         print("Not validate for OSWorld")

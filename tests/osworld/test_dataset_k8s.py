@@ -1,4 +1,3 @@
-import asyncio
 import json
 import time
 from io import BytesIO
@@ -11,7 +10,8 @@ from PIL import Image
 
 from verl.utils.database.mysql import create_database_manager
 from verl.utils.dataset.osworld_dataset import OSWorldDataset
-from verl.workers.rollout.osworld_env.env_k8s import RemoteDesktopEnv, parse_action_to_structure_output, parsing_response_to_pyautogui_code
+from verl.workers.rollout.osworld_env.env import parse_action_to_structure_output, parsing_response_to_pyautogui_code
+from verl.workers.rollout.osworld_env.env_k8s import RemoteDesktopEnv
 from verl.workers.rollout.vllm_rollout.vllm_rollout_spmd_with_env import TrajectoryRunner
 
 

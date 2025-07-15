@@ -61,8 +61,6 @@ from verl.utils.torch_functional import masked_mean
 from verl.utils.tracking import ValidationGenerationsLogger
 from verl.workers.rollout.osworld_env.env_k8s import release_env
 
-
-
 WorkerType = Type[Worker]
 
 
@@ -1197,6 +1195,7 @@ class RayPPOTrainer:
 
 class RayOSWorldTrainer(RayPPOTrainer):
     def __init__(self, config, tokenizer, role_worker_mapping: dict[Role, WorkerType], resource_pool_manager: ResourcePoolManager, ray_worker_group_cls: RayWorkerGroup = RayWorkerGroup, processor=None, reward_fn=None, val_reward_fn=None, train_dataset: Optional[Dataset] = None, val_dataset: Optional[Dataset] = None, collate_fn=None, train_sampler: Optional[Sampler] = None, device_name="cuda"):
+        OmegaConf.update(config, "actor_rollout_ref.rollout.root_data_dir", config.data.root_data_dir)
         super().__init__(config, tokenizer, role_worker_mapping, resource_pool_manager, ray_worker_group_cls, processor, reward_fn, val_reward_fn, train_dataset, val_dataset, collate_fn, train_sampler, device_name)
         os.makedirs(self.config.data.root_data_dir, exist_ok=True)
 

@@ -164,6 +164,7 @@ def run_agent_loop(
     max_steps: int = 1,
     action_parse_res_factor: int = 1000,
     limit_images: int = 5,
+    data_dir: str | None = None
 ):
     """
     Run the agent loop for multiple runners in parallel.
@@ -212,7 +213,7 @@ def run_agent_loop(
     for runner_idx in active_runners:
         # Generate a unique ID for each runner
         run_id = str(uuid.uuid4())
-        runner_dir = os.path.join(DATA_ROOT_DIR, run_id)
+        runner_dir = os.path.join(data_dir, run_id)
         os.makedirs(runner_dir, exist_ok=True)
         task_config = ray.get(runners[runner_idx].get_task_config.remote())
         with open(os.path.join(runner_dir, "task_config.json"), "w") as f:
