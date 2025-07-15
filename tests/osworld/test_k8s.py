@@ -42,6 +42,7 @@ def create():
 
 def test_create():
     release_env()
+    base_url = "http://112.125.88.107:4999"
     n_envs = 32
     futures = []
     pbar = tqdm(total=n_envs)
@@ -51,5 +52,5 @@ def test_create():
         pbar.update(1)
     print(ray.get(futures))
 
-    results = RemoteDesktopEnv.list_environments()
+    results = RemoteDesktopEnv.list_environments(base_url)
     print("Finally", len(results), results)
