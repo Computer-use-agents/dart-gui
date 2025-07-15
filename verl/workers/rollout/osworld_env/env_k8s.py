@@ -359,6 +359,21 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
             print(f"k8s: Warning: Could not parse score from response: {response_text}")
             return 0.0
 
+    def _evaluate_osworld(self, task_config: dict | None = None) -> float:
+        """Evaluate the task using the OSWorld server."""
+        url = self.server_url+"/server/evaluate/"+str(self.service_id)
+        # print("k8s: evaluate_osworld url", url)
+        if task_config is not None:
+
+            payload = json.dumps(task_config["evaluator"])
+
+            headers = self.session.headers
+
+            response = requests.request("POST", url, headers=headers, data=payload)
+
+            # print(response.text)
+            return float(response.json()["data"]["result"])
+
     def _evaluate_dummy(self) -> float:
         """Evaluate whether the task is successfully completed."""
         # Get environment status
