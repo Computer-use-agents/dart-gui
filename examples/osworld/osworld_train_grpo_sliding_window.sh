@@ -14,13 +14,16 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/app/data/arpo_workspace/UI-TARS-1.5-7B
+# MODEL_PATH=/app/data/arpo_workspace/UI-TARS-1.5-7B
+MODEL_PATH=/capacity/userdata/vcfenxd75jiv/zhangbofei/arpo_workspace/UI-TARS-1.5-7B
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export SWANLAB_API_KEY=r8dG8z3q9n9xGomA1r5yY
-export REWARD_SERVER_URL=https://sv-fbccedec-6c48-4d78-a9d1-287bbf6a2cb5-8000-x-aps-o-5c7d6479da.sproxy.hd-01.alayanew.com:22443/v1
+#export SWANLAB_API_KEY=r8dG8z3q9n9xGomA1r5yY
+export SWANLAB_API_KEY=8r9oZsghxT3bMPC1HHC8v
+
+export REWARD_SERVER_URL=https://sv-fbccedec-6c48-4d78-a9d1-287bbf6a2cb5-8000-x-aps-o-5c7d6479da.sproxy.hd-01.alayanew.com:22443/
 export REWARD_MODEL=qwen2.5_vl_7b
-export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
+export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=2185ce07-9d55-466a-9e70-04fbc3c6362c
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
