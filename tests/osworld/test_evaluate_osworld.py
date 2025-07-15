@@ -1,7 +1,6 @@
-import requests
-import json
-import time
 import os
+import time
+
 os.environ["ENV_USER_TOKEN"] = "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
 from verl.workers.rollout.osworld_env.env_k8s import RemoteDesktopEnv
 

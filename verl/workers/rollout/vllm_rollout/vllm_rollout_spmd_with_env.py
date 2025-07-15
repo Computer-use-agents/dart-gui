@@ -285,7 +285,8 @@ class vLLMRollout(BaseRollout):
                     self.processor, 
                     self.max_steps,
                     self.action_parse_res_factor,
-                    self.limit_images
+                    self.limit_images,
+                    self.config.root_data_dir,
                 )
                 prompts.non_tensor_batch["dataset_ids"] = dataset_ids
         except Exception as e:

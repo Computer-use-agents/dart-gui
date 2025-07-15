@@ -90,8 +90,8 @@ class TrajectoryRunner:
     def get_is_init(self):
         return self.is_init
     
-    def evaluate(self):
-        return self.env._evaluate_osworld(self.task_config)
+    def evaluate(self) -> float:
+        return self.env.evaluate()
     
 # Convert bytes to base64 string
 def bytes_to_base64(image_bytes: bytes) -> str:
@@ -102,10 +102,6 @@ def pil_to_base64(image):
     buffer = BytesIO()
     image.save(buffer, format="PNG")  # 你可以改成 "JPEG" 等格式
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
-
-
-
-
 
 def generate_trajectory_vllm_inputs(
     messages: np.ndarray, 
@@ -423,6 +419,13 @@ def run_agent_loop(
             with open(os.path.join(runner_dirs[runner_idx], "final_messages.json"), "w") as f:
                 json.dump(messages_copy, f, indent=2, ensure_ascii=False)
             
+            reward = ray.get(runners[runner_idx].evaluate.remote())
+            with open(os.path.join(runner_dirs[runner_idx], "reward.txt"), "w") as f:
+                f.write(str(reward))
+
+            with open(os.path.join(runner_dirs[runner_idx], "reward_from_env.txt"), "w") as f:
+                f.write(str(reward))
+    
         except Exception as e:
             print(f"Error saving final messages for runner {runner_idx}: {e}")
     
