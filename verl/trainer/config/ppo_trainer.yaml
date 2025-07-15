@@ -381,6 +381,9 @@ actor_rollout_ref:
   # Rollout model config.
   rollout:
 
+    # Where to save data for rollout
+    root_data_dir: null
+
     # actor_rollout_ref.rollout.name: hf/vllm/sglang.
     name: vllm
 
