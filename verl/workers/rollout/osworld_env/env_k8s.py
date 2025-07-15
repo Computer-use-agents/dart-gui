@@ -102,7 +102,7 @@ class RemoteDesktopEnv(gym.Env):
         if task_config is not None:
             task_type = task_config["raw"]["task_type"]
             task_id = task_config["raw"]["task_id"]
-            os = task_config["os"]
+            os = task_config.get("os", "ubuntu")
             # self.payload = payload
             payload = {
                 "task_id": task_id,
