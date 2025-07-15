@@ -56,7 +56,7 @@ class RemoteDesktopEnv(gym.Env):
         self.session.headers.update({
             "Authorization": os.environ.get("ENV_USER_TOKEN"),
             "Content-Type": "application/json"
-        })
+        }) # type: ignore
         
         # Episodic stuff
         self._traj_no: int = -1
@@ -404,8 +404,8 @@ Score: <0 to 1, 0 means the task is not completed, 1 means the task is completed
         """List all available environments."""
         session = requests.Session()
         session.headers.update({
-            "Authorization": os.environ.get("ENV_USER_TOKEN")
-        })
+            "Authorization": os.environ.get("ENV_USER_TOKEN") # type: ignore
+        }) # type: ignore
         response = session.get(f"{server_url}/server/list")
         if response.status_code != 200:
             raise Exception(f"Failed to list environments: {response.text}")
@@ -437,6 +437,7 @@ def release_env():
         "Authorization": os.environ.get("ENV_USER_TOKEN"), # type: ignore
     }) # type: ignore
     # release all the envs
+    print("Total:", len(envs))
     for env in envs:
         response = session.post(f"{base_url}/server/release/{env['server_id']}")
         print(f"release {env['server_id']} {response.json()}")

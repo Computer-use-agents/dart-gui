@@ -31,7 +31,7 @@ export ENV_USER_TOKEN=kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J
 export REMOTE_ENV_SERVER_URL=http://112.125.88.107:4999
 export REMOTE_ENV_SOURCE=k8s
 
-python3 -m verl.trainer.main_ppo \
+python3 -m verl.trainer.main_ppo_osworld \
     algorithm.adv_estimator=grpo \
     data.train_files=evaluation_examples/test_simple_task_v2.json \
     data.val_files=evaluation_examples/test_simple_task_v2.json \
@@ -43,7 +43,7 @@ python3 -m verl.trainer.main_ppo \
     data.image_key=images \
     data.custom_cls.path=verl/utils/dataset/osworld_dataset.py \
     data.custom_cls.name=OSWorldDataset \
-    +data.root_data_dir=tmp \
+    data.root_data_dir=tmp \
     +data.window_size=5 \
     +data.stride_size=5 \
     reward_model.reward_manager=auto_osworld \
