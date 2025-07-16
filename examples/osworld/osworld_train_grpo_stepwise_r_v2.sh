@@ -17,8 +17,8 @@ echo "Detected $N_GPUS GPUs on this machine"
 MODEL_PATH=/app/data/arpo_workspace/UI-TARS-1.5-7B
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export SWANLAB_API_KEY=r8dG8z3q9n9xGomA1r5yY
-export REWARD_SERVER_URL=https://sv-fbccedec-6c48-4d78-a9d1-287bbf6a2cb5-8000-x-aps-o-5c7d6479da.sproxy.hd-01.alayanew.com:22443/v1
+export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K
+export REWARD_SERVER_URL=https://sv-f4872fdf-164b-4fd8-a8b8-7453b6c5aba4-8000-x-defau-3c1cba829d.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export AZURE_OPENAI_API_BASE=https://teamx-4o.openai.azure.com

@@ -40,7 +40,7 @@ python3 -m verl.trainer.main_rollout_async \
     algorithm.adv_estimator=grpo \
     data.train_files=evaluation_examples/test_success_uitars1.5_wo_impossible_infeasible.json \
     data.val_files=evaluation_examples/test_success_uitars1.5_wo_impossible_infeasible.json \
-    data.train_batch_size=4 \
+    data.train_batch_size=8 \
     data.max_prompt_length=32000 \
     data.max_response_length=32000 \
     data.filter_overlong_prompts=True \
