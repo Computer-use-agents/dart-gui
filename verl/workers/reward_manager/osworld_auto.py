@@ -94,32 +94,6 @@ class AutoOSWorldRewardManager:
         self.trajectory_mode = os.getenv("TRAJECTORY_MODE","TRUE")
         self.sample_num = int(os.getenv("SAMPLE_NUM",3))
     
-    # def split_dataset_id(self, dataset_id: str) -> list[list[dict]]:
-        
-    #     all_files = get_last_image_file(dataset_id)
-    #     start = 1
-    #     end = start + self.window_size
-    #     n_msg = len(dataset)
-    #     batch_data = []
-    #     instruction = copy.deepcopy(dataset[1])
-    #     while end < n_msg:
-    #         assert dataset[start]["role"] == "user"
-    #         if len(dataset[start]["content"]) == 1:
-    #             # remove image from first instruction
-    #             instruction["content"] = instruction["content"][:1]
-    #         # item = self._process_item(dataset, instruction, start, end)
-            
-    #         indexed_images = get_last_image_file(
-    #             dataset_dir, 
-    #             mode="index", 
-    #             index=[start,end])
-            
-    #         batch_data.append(indexed_images)
-            
-    #         start += 2 * self.stride_size
-    #         end = start + 2 * self.window_size
-    #     return batch_data
-    
     def __call__(self, data: DataProto, return_dict=False):
         """We will expand this function gradually based on the available datasets"""
         dataset_ids = data.non_tensor_batch["dataset_ids"]
@@ -127,6 +101,15 @@ class AutoOSWorldRewardManager:
         scores = []
         for dataset_id in dataset_ids:
             try:
+                score = None
+                if os.path.exists(os.path.join(self.root_dir, dataset_id, "reward.txt")):
+                    with open(os.path.join(self.root_dir, dataset_id, "reward.txt"), "r") as f:
+                        score = float(f.read().strip())
+                
+                if score is not None and score > 0.0:
+                    scores.append(score)
+                    continue
+                
                 if self.trajectory_mode == 'FALSE':
                     grouped_results = self.call_reward_model(dataset_id)
                     for item in grouped_results:
@@ -643,7 +626,7 @@ def response_gen_gpt(messages: list, client_args: dict) -> tuple[float, str]:
             return score, content
         except Exception as e:
             traceback.print_exc()
-            print("failed:", e, messages)
+            print("failed:", e)
             time.sleep(10)
 
     score = round(random.uniform(0, 1), 2)

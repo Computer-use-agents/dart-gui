@@ -33,8 +33,8 @@ export REMOTE_ENV_SOURCE=k8s
 
 python3 -m verl.trainer.main_ppo_osworld \
     algorithm.adv_estimator=grpo \
-    data.train_files=evaluation_examples/test_simple_task_v2.json \
-    data.val_files=evaluation_examples/test_simple_task_v2.json \
+    data.train_files=evaluation_examples/test_simple_task_v3.json \
+    data.val_files=evaluation_examples/test_simple_task_v3.json \
     data.train_batch_size=4 \
     data.max_prompt_length=32000 \
     data.max_response_length=32000 \
