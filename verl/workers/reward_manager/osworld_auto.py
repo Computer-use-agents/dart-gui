@@ -106,7 +106,7 @@ class AutoOSWorldRewardManager:
                     with open(os.path.join(self.root_dir, dataset_id, "reward.txt"), "r") as f:
                         score = float(f.read().strip())
                 
-                if score is not None and score > 0.0:
+                if score is not None:
                     scores.append(score)
                     continue
                 

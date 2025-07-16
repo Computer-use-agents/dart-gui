@@ -382,6 +382,9 @@ actor_rollout_ref:
 
   # Rollout model config.
   rollout:
+    # evaluate by env?
+    enable_env_evaluate: True
+    
     # Where to save data for rollout
     root_data_dir: tmp
 
