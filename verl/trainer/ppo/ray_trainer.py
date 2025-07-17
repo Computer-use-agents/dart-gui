@@ -499,7 +499,6 @@ class RayPPOTrainer:
             train_sampler = create_rl_sampler(self.config.data, self.train_dataset)
         if collate_fn is None:
             from verl.utils.dataset.rl_dataset import collate_fn as default_collate_fn
-
             collate_fn = default_collate_fn
 
         self.train_dataloader = StatefulDataLoader(
@@ -957,8 +956,7 @@ class RayPPOTrainer:
                 metrics = {}
                 timing_raw = {}
                 batch: DataProto = DataProto.from_single_dict(batch_dict)
-
-                # pop those keys for generation
+                
                 batch_keys_to_pop = ["input_ids", "attention_mask", "position_ids"]
                 non_tensor_batch_keys_to_pop = ["raw_prompt_ids"]
                 if "multi_modal_data" in batch.non_tensor_batch:
@@ -1250,7 +1248,40 @@ class RayOSWorldTrainer(RayPPOTrainer):
                 metrics = {}
                 timing_raw = {}
                 batch: DataProto = DataProto.from_single_dict(batch_dict)
+                
+                # Export batch_dict to a txt file for debugging/inspection
+                import os
+                import pprint
+                from datetime import datetime
+                
+                # Create directory if it doesn't exist
+                save_dir = "tmp_utils/osworld_dataset"
+                os.makedirs(save_dir, exist_ok=True)
+                
+                # Create filename with timestamp and step number
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"batch_dict_export_step_{self.global_steps}_{timestamp}.txt"
+                filepath = os.path.join(save_dir, filename)
+                
+                with open(filepath, "w", encoding="utf-8") as f:
+                    f.write(f"=== Batch Dict Export - Step {self.global_steps} - {timestamp} ===\n\n")
+                    
+                    # Print raw batch_dict without any processing
+                    f.write("=== RAW batch_dict ===\n")
+                    pprint.pprint(batch_dict, stream=f)
+                    f.write("\n" + "="*80 + "\n")
+                    # batch
+                    f.write("=== batch ===\n")
+                    f.write(f"batch.batch: {batch.batch}\n")
+                    f.write(f"batch.non_tensor_batch: {batch.non_tensor_batch}\n")
+                    f.write(f"batch.meta_info: {batch.meta_info}\n")
 
+                
+                print(f"Raw batch_dict exported to: {filepath}")
+
+                # pop those keys for generation
+
+                
                 # pop those keys for generation
                 batch_keys_to_pop = []
                 non_tensor_batch_keys_to_pop = ["messages", "task_config", "instruction"]

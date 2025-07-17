@@ -64,6 +64,38 @@ def collate_fn(data_list: list[dict]) -> dict:
     return {**tensors, **non_tensors}
 
 
+def collate_async_fn(data_list: list[dict]) -> dict:
+    """
+    Collate a batch of sample dicts into batched tensors and arrays.
+
+    Args:
+        data_list: List of dicts mapping feature names to torch.Tensor or other values.
+
+    Returns:
+        Dict where tensor entries are stacked into a torch.Tensor of shape
+        (batch_size, *dims) and non-tensor entries are converted to
+        np.ndarray of dtype object with shape (batch_size,).
+    """
+    data_list = [ d for sub_d in data_list for d in sub_d ]
+    tensors = defaultdict(list)
+    non_tensors = defaultdict(list)
+
+    for data in data_list:
+        for key, val in data.items():
+            if isinstance(val, torch.Tensor):
+                tensors[key].append(val)
+            else:
+                non_tensors[key].append(val)
+
+    for key, val in tensors.items():
+        tensors[key] = torch.stack(val, dim=0)
+
+    for key, val in non_tensors.items():
+        non_tensors[key] = np.array(val, dtype=object)
+
+    return {**tensors, **non_tensors}
+
+
 class OSWorldDataset(Dataset):
     """
     Load and preprocess OSWorld data from JSON files.
@@ -188,6 +220,17 @@ class OSWorldDataset(Dataset):
         row_dict["messages"] = messages
         row_dict["instruction"] = instruction
         row_dict["task_config"] = task_data
+        # INSERT_YOUR_CODE
+        # Save row_dict to local as a JSON file for debugging or record-keeping
+        save_dir = os.path.join('tmp_utils/osworld_dataset', "row_dicts")
+        os.makedirs(save_dir, exist_ok=True)
+        save_path = os.path.join(save_dir, f"{task_type}_{task_id}.json")
+        try:
+            with open(save_path, "w", encoding="utf-8") as f:
+                json.dump(row_dict, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            # Optionally log or print the error
+            pass
         return row_dict
 
 
@@ -260,10 +303,12 @@ class OSWorldAsyncDataset(Dataset):
         assert self.run_id is not None
         from verl.utils.database.mysql import create_database_manager
         self.db_manager = create_database_manager()
+        # self.variebce_id = config.get("variebce_id", None)
+        self.task_ids = self.db_manager.get_all_task_id_by_run_id(self.run_id)
 
 
     def __len__(self):
-        return self.max_steps
+        return len(self.task_ids)
 
     def _build_messages(self, example: dict):
         messages: list = example.pop(self.prompt_key)
@@ -285,20 +330,17 @@ class OSWorldAsyncDataset(Dataset):
         return messages
 
     def _get_item_with_wait(self, item_index: int) -> list[dict]:
-        # while True:
-        # from verl.utils.database.mysql import create_database_manager
-        # self.db_manager.refresh_session()
+        
         self.db_manager.setup_database()
         try:
-            row_dicts = self.db_manager.get_datasets_by_run_id(
+            row_dicts = self.db_manager.get_datasets_by_task_id(
                 run_id=self.run_id,
-                offset=item_index
+                task_id=self.task_ids[item_index]
             )
-            # print(self.run_id, "try get data", item_index, len(row_dicts))
-            print(f"run-id: {self.run_id}, fetcted data, offset: {item_index}, len(row_dicts): {len(row_dicts)}")
+            
+            print(f"run-id: {self.run_id}, fetched data, offset: {item_index}, len(row_dicts): {len(row_dicts)}")
             if len(row_dicts) > 0:
                 return row_dicts
-            # time.sleep(1)
         except Exception as e:
             print(f"run-id: {self.run_id}, offset: {item_index}, error: {e}")
             return []
@@ -309,41 +351,48 @@ class OSWorldAsyncDataset(Dataset):
         Note that we also return the raw_input_ids so that it can be combined with other chat template
         """
         row_dicts = self._get_item_with_wait(item_index=item)
-        assert len(row_dicts) == 1
-        row_dict = row_dicts[0]
-        trajectory_id = row_dict["trajectory_id"]
-        data_dir = os.path.join(self.config.root_data_dir, trajectory_id)
-        with open(os.path.join(data_dir, "task_config.json")) as f:
-            task_data = json.load(f)
-        with open(os.path.join(data_dir, "reward.txt")) as f:
-            reward_tensor = float(f.read().strip())
-            reward_tensor = torch.Tensor([reward_tensor])
-        output_row_dict = dict()
-        instruction = task_data["instruction"]
-        system_prompt = COMPUTER_USE_DOUBAO if not self.use_call_user else COMPUTER_USE_DOUBAO_WITH_CALL_USER
-        messages = [
-            {
-                "role": "system",
-                "content": "You are a helpful assistant."
-            },
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text", 
-                        "text": system_prompt.format(
-                            instruction=instruction, 
-                            language="English"
-                    )}
-                ]
-            }
-        ]
-        output_row_dict["messages"] = messages
-        output_row_dict["instruction"] = instruction
-        output_row_dict["task_config"] = task_data
-        output_row_dict["dataset_ids"] = trajectory_id
-        output_row_dict["reward_tensors"] = reward_tensor
-        return output_row_dict
+        # assert len(row_dicts) == 1
+        # row_dict = row_dicts[0]
+        output_row_dicts = []
+        for row_dict in row_dicts:
+            output_row_dict = dict()
+            trajectory_id = row_dict["trajectory_id"]
+            data_dir = os.path.join(self.config.root_data_dir, trajectory_id)
+            with open(os.path.join(data_dir, "task_config.json")) as f:
+                task_data = json.load(f)
+            with open(os.path.join(data_dir, "reward.txt")) as f:
+                reward_tensor = float(f.read().strip())
+                reward_tensor = torch.Tensor([reward_tensor])
+            # output_row_dict = dict()
+            instruction = task_data["instruction"]
+            system_prompt = COMPUTER_USE_DOUBAO if not self.use_call_user else COMPUTER_USE_DOUBAO_WITH_CALL_USER
+            messages = [
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant."
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text", 
+                            "text": system_prompt.format(
+                                instruction=instruction, 
+                                language="English"
+                        )}
+                    ]
+                }
+            ]
+            output_row_dict["messages"] = messages
+            output_row_dict["instruction"] = instruction
+            output_row_dict["task_config"] = task_data
+            output_row_dict["dataset_ids"] = trajectory_id
+            output_row_dict["reward_tensors"] = reward_tensor
+            output_row_dicts.append(output_row_dict)
+
+        # print(f"run-id: {self.run_id}, fetched data, offset: {item}, len(output_row_dicts): {len(output_row_dicts)}")
+        # return output_row_dict
+        return output_row_dicts
 
 
     def __getstate__(self):

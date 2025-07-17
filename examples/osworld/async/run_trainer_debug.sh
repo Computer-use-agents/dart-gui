@@ -24,6 +24,9 @@ export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 
+export ROOT_DATA_DIR=tmp_async_sql_0717
+export RUN_ID=pengxiang_test_0717
+
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
     data.train_files=evaluation_examples/test_success_uitars1.5_wo_impossible_infeasible.json \
@@ -37,12 +40,12 @@ python3 -m verl.trainer.main_ppo_async \
     data.custom_cls.path=verl/utils/dataset/osworld_dataset.py \
     data.custom_cls.name=OSWorldAsyncDataset \
     data.shuffle=false \
-    +data.root_data_dir=tmp \
+    +data.root_data_dir=$ROOT_DATA_DIR \
     +data.window_size=5 \
     +data.stride_size=5 \
     +data.max_steps=1000 \
     +data.num_workers=2 \
-    +data.run_id='pengxiang_test_0709' \
+    +data.run_id=$RUN_ID \
     reward_model.reward_manager=osworld \
     actor_rollout_ref.model.path=$MODEL_PATH \
     actor_rollout_ref.actor.optim.lr=1e-6 \
@@ -80,5 +83,5 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.test_freq=5 \
     trainer.val_before_train=False \
     trainer.total_epochs=15 \
-    +trainer.run_id='pengxiang_test_0709' \
+    +trainer.run_id=$RUN_ID 
     # +trainer.algo=dapo

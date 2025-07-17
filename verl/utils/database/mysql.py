@@ -40,7 +40,7 @@ class Dataset(Base):
     used = Column(Integer, default=0, comment='使用该数据训过几次')
     model_version = Column(Integer, default=0, comment="使用哪个版本生成的数据")
     run_id = Column(String(255), comment='运行ID')
-
+    task_id = Column(String(255), comment='任务ID')
     
     # 索引定义
     __table_args__ = (
@@ -49,7 +49,7 @@ class Dataset(Base):
     )
     
     def __repr__(self):
-        return f"<Dataset(id={self.id}, trajectory_id='{self.trajectory_id}', used={self.used})>"
+        return f"<Dataset(id={self.id}, run_id='{self.run_id}', trajectory_id='{self.trajectory_id}', used={self.used}, task_id='{self.task_id}')>"
     
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典"""
@@ -59,7 +59,8 @@ class Dataset(Base):
             'created_at': self.created_at,
             'used': self.used,
             "model_version": self.model_version,
-            'run_id': self.run_id
+            'run_id': self.run_id,
+            'task_id': self.task_id,
         }
 
 
@@ -138,7 +139,7 @@ class MySQLDatasetsORM:
                 session.expunge(obj)
         return objects
     
-    def create_dataset(self, trajectory_id: str, run_id: str, used: int = 0) -> Dict[str, Any]:
+    def create_dataset(self, trajectory_id: str, run_id: str, task_id: str, used: int = 0, model_version: str = 'v0') -> Dict[str, Any]:
         """创建新的dataset记录
         
         Args:
@@ -154,7 +155,9 @@ class MySQLDatasetsORM:
                 dataset = Dataset(
                     trajectory_id=trajectory_id,
                     run_id=run_id,
-                    used=used
+                    task_id=task_id,
+                    used=used,
+                    model_version=model_version
                 )
                 session.add(dataset)
                 session.flush()  # 刷新以获取ID
@@ -181,6 +184,7 @@ class MySQLDatasetsORM:
             logger.error(f"Error getting dataset by ID: {e}")
             raise
     
+ 
     def get_dataset_by_trajectory_id(self, trajectory_id: str) -> Optional[Dict[str, Any]]:
         """根据trajectory_id查询dataset记录"""
         try:
@@ -213,6 +217,24 @@ class MySQLDatasetsORM:
             logger.error(f"Error getting datasets by run_id: {e}")
             raise
     
+    def get_datasets_by_task_id(self, run_id: str, task_id: str, offset: int = 0, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+        """根据task_id查询dataset记录列表"""
+        try:
+            with self.get_session() as session:
+                datasets = session.query(Dataset).filter(
+                    Dataset.task_id == task_id,
+                    Dataset.run_id == run_id
+                )
+                if limit is None:
+                    datasets = datasets.order_by(Dataset.created_at.asc()).all()
+                    return [dataset.to_dict() for dataset in datasets]
+                datasets = datasets.order_by(Dataset.created_at.asc()).offset(offset).limit(limit).all()
+                return [dataset.to_dict() for dataset in datasets]
+        except SQLAlchemyError as e:
+            logger.error(f"Error getting datasets by task_id: {e}")
+            raise
+    
+
     def get_single_dataset_by_run_id(self, run_id: str, offset: int = 0) -> Optional[Dict[str, Any]]:
         """根据run_id查询单条dataset记录（模拟原生SQL的 LIMIT offset, 1 行为）
         
@@ -362,6 +384,32 @@ class MySQLDatasetsORM:
             logger.error(f"Error deleting datasets by run_id: {e}")
             raise
     
+    def delete_datasets_by_task_id(self, run_id: str, task_id: str, offset: int = 0, limit: int = 8) -> int:
+        """根据task_id删除多个dataset记录
+        
+        Args:
+            task_id: 任务ID
+            
+        Returns:
+            int: 删除的记录数
+        """
+        try:
+            with self.get_session() as session:
+   
+                to_delete = session.query(Dataset).filter(
+                    Dataset.task_id == task_id,
+                    Dataset.run_id == run_id
+                ).order_by(Dataset.created_at.asc()).offset(offset).all()
+                deleted_count = 0
+                for dataset in to_delete:
+                    session.delete(dataset)
+                    deleted_count += 1
+                logger.info(f"Deleted {deleted_count} datasets with task_id: {task_id}")
+                return deleted_count
+        except SQLAlchemyError as e:
+            logger.error(f"Error deleting datasets by task_id: {e}")
+            raise
+
     def get_all_datasets(self, limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
         """获取所有dataset记录（分页）"""
         try:
@@ -374,6 +422,19 @@ class MySQLDatasetsORM:
             logger.error(f"Error getting all datasets: {e}")
             raise
     
+    def get_all_task_id_by_run_id(self, run_id: str) -> List[str]:
+        """获取某一个run_id下的所有task_id（去重，升序）"""
+        try:
+            with self.get_session() as session:
+                task_ids = session.query(Dataset.task_id).filter(
+                    Dataset.run_id == run_id
+                ).distinct().order_by(Dataset.task_id.asc()).all()
+                # SQLAlchemy returns list of tuples, extract the first element
+                return [task_id_tuple[0] for task_id_tuple in task_ids]
+        except SQLAlchemyError as e:
+            logger.error(f"Error getting all task_id by run_id: {e}")
+            raise
+        
     def count_datasets(self) -> int:
         """统计dataset记录总数"""
         try:

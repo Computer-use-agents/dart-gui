@@ -1,6 +1,6 @@
 set -x
 ENGINE=${1:-vllm_osworld}
-cd /app/data/arpo_workspace/verl
+cd /root/verl
 # Detect number of GPUs on the current machine
 N_GPUS=$(nvidia-smi --list-gpus | wc -l)
 # 生成带时间戳的唯一文件ID，后台运行
@@ -14,7 +14,7 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/app/data/arpo_workspace/UI-TARS-1.5-7B
+MODEL_PATH=/root/checkpoints/UI-TARS-1.5-7B
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
 export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K
@@ -66,7 +66,7 @@ python3 -m verl.trainer.main_ppo_osworld \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
     actor_rollout_ref.rollout.enforce_eager=False \
     actor_rollout_ref.rollout.free_cache_engine=False \
-    actor_rollout_ref.rollout.n=8 \
+    actor_rollout_ref.rollout.n=4 \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
