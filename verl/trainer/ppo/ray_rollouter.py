@@ -178,6 +178,17 @@ class RayOSWorldRollout(RayPPOTrainer):
                             batch.pop(batch_keys=list(gen_baseline_output.batch.keys()))
 
                             batch.batch["reward_baselines"] = reward_baseline_tensor
+                            
+                            # Log baseline reward metrics for REMAX
+                            if reward_baseline_tensor is not None:
+                                baseline_metrics = {
+                                    "reward/baseline_mean": reward_baseline_tensor.mean().item(),
+                                    "reward/baseline_std": reward_baseline_tensor.std().item(),
+                                    "reward/baseline_min": reward_baseline_tensor.min().item(),
+                                    "reward/baseline_max": reward_baseline_tensor.max().item(),
+                                }
+                                logger.log(data=baseline_metrics, step=self.global_steps)
+                                print(f"Logged baseline reward metrics to swanlab: {baseline_metrics}")
 
                             del gen_baseline_batch, gen_baseline_output
 
@@ -208,15 +219,38 @@ class RayOSWorldRollout(RayPPOTrainer):
                         else:
                             print("Warning: self.reward_fn is None, skipping reward computation")
                     print("reward_tensor", reward_tensor)
+                    
+                    # Log reward metrics to swanlab
+                    if reward_tensor is not None:
+                        # Convert tensor to scalar metrics for logging
+                        reward_metrics = {
+                            "reward/mean": reward_tensor.mean().item(),
+                            "reward/std": reward_tensor.std().item(),
+                            "reward/min": reward_tensor.min().item(),
+                            "reward/max": reward_tensor.max().item(),
+                        }
+                        
+                        # Add timing information
+                        if timing_raw:
+                            reward_metrics.update({
+                                "timing/reward_computation": timing_raw.get("reward", 0),
+                                "timing/generation": timing_raw.get("gen", 0),
+                                "timing/step": timing_raw.get("step", 0),
+                            })
+                        
+                        # Log to swanlab
+                        logger.log(data=reward_metrics, step=self.global_steps)
+                        print(f"Logged reward metrics to swanlab: {reward_metrics}")
     
                     dataset_ids = batch.non_tensor_batch["dataset_ids"]
-                    #TODO 1 write this dataset_ids into mysql database
-                    for dataset_id in dataset_ids:
-                        self.dataset_manager.create_dataset(
-                            trajectory_id=dataset_id,
-                            run_id=str(self.run_id),
-                            used=0
-                        )
+                    # #TODO 1 write this dataset_ids into mysql database
+                    # for dataset_id in dataset_ids:
+                    #     self.dataset_manager.create_dataset(
+                    #         trajectory_id=dataset_id,
+                    #         run_id=str(self.run_id),
+                    #         task_id=
+                    #         used=0
+                    #     )
 
                     # TODO 2 load checkpoint 
                     self._load_checkpoint_for_actor_rollout_wg()

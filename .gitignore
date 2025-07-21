@@ -135,3 +135,11 @@ tmp*/
 
 start_server.sh
 sleep.sh
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.webp

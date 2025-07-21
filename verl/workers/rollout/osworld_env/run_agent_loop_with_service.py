@@ -3,6 +3,8 @@ import copy
 import json
 import os
 import uuid
+import time
+from datetime import datetime
 from io import BytesIO
 
 import numpy as np
@@ -108,33 +110,8 @@ def generate_trajectory_vllm_inputs(
     processor,
     limit_images: int = 5,
 ):
-    # for each message, repeat n times
-    # print("messages length", len(messages))
-    vllm_inputs = []
-    msg_for_prompts = []
-    for i, msg in enumerate(messages):
-        msg = copy.deepcopy(msg)
-        # print("Item ", i, "prompt length", len(msg))
-        msg = list(msg)
-        
-        # Use the new function to limit images in the message
-        msg_for_prompt = limit_images_in_messages(msg, limit_images)
-        msg_for_prompts.append(msg_for_prompt)
-        prompt = processor.apply_chat_template(
-            msg_for_prompt,
-            add_generation_prompt=True,
-            tokenize=False
-        )
-        image_inputs, _ = process_vision_info(msg_for_prompt)
-        # print("Get Prompt", prompt, "Image input size", len(image_inputs))
-        vllm_input = {
-            "prompt": prompt,
-            "multi_modal_data": {
-                "image": image_inputs
-            }
-        }
-        vllm_inputs.append(vllm_input)
-    return vllm_inputs, msg_for_prompts
+    # 直接返回原始消息，不进行任何特殊处理
+    return messages, messages
 
 
 # Function to save partial trajectory when error occurs
@@ -153,8 +130,8 @@ def save_msg_for_prompt(runner_dirs, runner_idx, current_messages, idx):
     except Exception as save_error:
         print(f"Error saving partial trajectory for runner {runner_idx}: {save_error}")
 
-def run_agent_loop(
-    llm: LLM, 
+def run_agent_loop_with_service(
+    llm,  # 可以是LLM或OpenAI客户端
     runners: list[TrajectoryRunner], 
     messages: np.ndarray,  
     sampling_params: SamplingParams,
@@ -162,13 +139,14 @@ def run_agent_loop(
     max_steps: int = 1,
     action_parse_res_factor: int = 1000,
     limit_images: int = 5,
-    data_dir: str | None = None
+    data_dir: str | None = None,
+    model_name: str = "ui_tars_1.5"  # 添加模型名称参数
 ):
     """
-    Run the agent loop for multiple runners in parallel.
+    Run the agent loop for multiple runners in parallel with vLLM service support.
     
     Args:
-        llm: The language model to use
+        llm: The language model to use (can be LLM or VLLMClientWrapper)
         runners: List of TrajectoryRunner instances
         messages: Array of messages for each runner
         sampling_params: Sampling parameters for the LLM
@@ -187,63 +165,57 @@ def run_agent_loop(
     # Initialize observations for all runners
     active_runners = list(range(len(runners)))  # Keep track of active runner indices
     obs = ray.get([runner.get_obs.remote() for runner in runners])
+    
+    # 为每个runner添加初始截图到消息中
     for i in range(len(obs)):
-        print("len of first message", i, len(messages[i][1]["content"]))
-        messages[i][1]["content"].append(
-            {
-                "type": "image",
-                "image": "data:image;base64," + pil_to_base64(Image.open(BytesIO(obs[i]["screenshot"])))
-            }
-        )
-    vllm_inputs, msg_for_prompts = generate_trajectory_vllm_inputs(
-        messages, 
-        processor, 
-        limit_images=limit_images)
-    step = 0
-    
-    # Create directories for each runner and save initial messages
-    runner_dirs = {}
-    # Keep original messages for model input, create separate messages for saving
-    messages_for_saving = {}
-    # Track image counter for each runner to ensure sequential naming
-    image_counters = {}
-    
-    for runner_idx in active_runners:
-        # Generate a unique ID for each runner
-        run_id = str(uuid.uuid4())
-        runner_dir = os.path.join(data_dir, run_id)
-        os.makedirs(runner_dir, exist_ok=True)
-        task_config = ray.get(runners[runner_idx].get_task_config.remote())
-        with open(os.path.join(runner_dir, "task_config.json"), "w") as f:
-            json.dump(task_config, f, indent=2, ensure_ascii=False)
-
-        runner_dirs[runner_idx] = runner_dir
-        image_counters[runner_idx] = 0  # Initialize image counter for this runner
+        screenshot = Image.open(BytesIO(obs[i]["screenshot"]))
+        # 转换为base64格式，与reward manager一致
+        buffer = BytesIO()
+        screenshot.save(buffer, format="JPEG")
+        screenshot_data = buffer.getvalue()
+        encoded_string = base64.b64encode(screenshot_data).decode('utf-8')
         
-        # Create a copy of messages for saving (with image IDs)
-        messages_for_saving[runner_idx] = copy.deepcopy(messages[runner_idx])
-        for msg in messages_for_saving[runner_idx]:
-            if isinstance(msg.get("content"), list):
-                for content in msg["content"]:
-                    if content.get("type") == "image":
-                        # Replace base64 with image ID for saving
-                        image_counters[runner_idx] += 1
-                        image_id = f"image_{image_counters[runner_idx]:04d}"
-                        original_image_data = content["image"]
-                        content["image"] = image_id
-                        # Save the actual image
-                        try:
-                            if original_image_data.startswith("data:image;base64,"):
-                                image_data = base64.b64decode(original_image_data.split(",")[1])
-                            else:
-                                image_data = base64.b64decode(original_image_data)
-                            image = Image.open(BytesIO(image_data))
-                            image.save(os.path.join(runner_dir, f"{image_id}.png"))
-                            
-                            save_msg_for_prompt(runner_dirs, runner_idx, msg_for_prompts[runner_idx], image_id)
-                        except Exception as e:
-                            print(f"Error saving image for runner {runner_idx}: {e}")
-                            # Continue with the process even if image saving fails
+        # 添加用户消息，包含截图
+        messages[i].append({
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{encoded_string}"
+                    }
+                }
+            ]
+        })
+    
+    # 直接使用消息，不进行特殊处理
+    current_messages = messages
+    
+    # Create data directories for each runner
+    runner_dirs = {}
+    messages_for_saving = [copy.deepcopy(msg) for msg in messages]
+    image_counters = {i: 0 for i in range(len(runners))}
+    timestamp_info = {i: {"start_time": datetime.now().isoformat(), "steps": []} for i in range(len(runners))}
+    
+    if data_dir is not None:
+        os.makedirs(data_dir, exist_ok=True)
+        for i, runner in enumerate(runners):
+            task_config = ray.get(runner.get_task_config.remote())
+            if task_config is not None:
+                runner_dir = os.path.join(data_dir, f"runner_{i}_{task_config.get('id', 'unknown')}")
+            else:
+                runner_dir = os.path.join(data_dir, f"runner_{i}")
+            os.makedirs(runner_dir, exist_ok=True)
+            runner_dirs[i] = runner_dir
+            
+            # Save initial screenshot
+            try:
+                screenshot = Image.open(BytesIO(obs[i]["screenshot"]))
+                screenshot.save(os.path.join(runner_dir, "image_0001.png"))
+                print(f"Saved initial screenshot for runner {i}")
+            except Exception as e:
+                print(f"Error saving image for runner {i}: {e}")
+                # Continue with the process even if image saving fails
     
     # Function to save partial trajectory when error occurs
     def save_partial_trajectory(runner_idx, current_messages, error_info=None):
@@ -273,47 +245,120 @@ def run_agent_loop(
         except Exception as save_error:
             print(f"Error saving partial trajectory for runner {runner_idx}: {save_error}")
     
+    step = 0
     try:
         while step < max_steps and active_runners:
             # Generate responses for active runners
             print("generate with sampling_params", sampling_params)
-            outputs = llm.generate(
-                vllm_inputs, 
-                sampling_params=sampling_params, 
-                use_tqdm=False
-            )
+            
+            # 检查是否是OpenAI客户端
+            if hasattr(llm, 'chat') and hasattr(llm.chat, 'completions'):
+                # 使用OpenAI客户端生成
+                print("Using OpenAI client for generation")
+                outputs = []
+                
+                # 创建模拟的vLLM输出格式类（在外部定义避免作用域问题）
+                class MockOutput:
+                    def __init__(self, text, token_ids=None):
+                        self.text = text
+                        self.token_ids = token_ids or []
+                
+                class MockRequestOutput:
+                    def __init__(self, outputs):
+                        self.outputs = outputs
+                
+                # 为每个runner的消息生成响应
+                for runner_idx in active_runners:
+                    try:
+                        # 直接使用当前消息，与reward manager格式一致
+                        messages = current_messages[runner_idx]
+                        
+                        # 调用OpenAI API
+                        response = llm.chat.completions.create(
+                            model=model_name,
+                            messages=messages,
+                            extra_body={
+                                "mm_processor_kwargs": {
+                                    "min_pixels": 100*28*28,
+                                    "max_pixels": 16384*28*28,
+                                },
+                                "top_k": 50,
+                            },
+                            max_tokens=sampling_params.max_tokens,
+                            temperature=sampling_params.temperature,
+                            top_p=sampling_params.top_p,
+                        )
+                        
+                        # 提取生成的文本
+                        generated_text = response.choices[0].message.content
+                        mock_output = MockOutput(generated_text)
+                        mock_request_output = MockRequestOutput([mock_output])
+                        outputs.append(mock_request_output)
+                        
+                    except Exception as e:
+                        print(f"OpenAI API调用失败: {e}")
+                        # 返回空结果
+                        mock_output = MockOutput("")
+                        mock_request_output = MockRequestOutput([mock_output])
+                        outputs.append(mock_request_output)
+                        
+            # else:
+                # # 使用原始的vLLM generate方法
+                # print("Using original VLLM generate method")
+                # outputs = llm.generate(
+                #     vllm_inputs, 
+                #     sampling_params=sampling_params, 
+                #     use_tqdm=False
+                # )
             
             # Process each output and execute actions
             new_active_runners = []
-            new_vllm_inputs = []
-            new_messages = []
             
             for i, (runner_idx, output) in enumerate(zip(active_runners, outputs)):
                 try:
                     generated_text = output.outputs[0].text
-                    generated_text_with_sp_token = None
                     if len(generated_text) == 0:
                         # try use token ids
                         token_ids = output.outputs[0].token_ids
                         assert len(token_ids) > 0, "No token ids generated"
-                        generated_text_with_sp_token = processor.tokenizer.decode(token_ids)
                         generated_text = processor.tokenizer.decode(token_ids, skip_special_tokens=True)
-                    # pengxiang debug print(f"Runner {runner_idx} generated: {generated_text}\nWith sp token: {generated_text_with_sp_token}")
-                    messages[runner_idx] = copy.deepcopy(messages[runner_idx])
-                    messages[runner_idx].append(
-                        {
-                            "role": "assistant",
-                            "content": add_box_token(generated_text)
-                        }
-                    )
-                    messages_for_saving[runner_idx].append(
-                        {
-                            "role": "assistant",
-                            "content": add_box_token(generated_text)
-                        }
-                    )
                     
-                    new_vllm_inputs.append(vllm_inputs[i])
+                    # 添加助手回复，不添加特殊token
+                    current_messages[runner_idx].append({
+                        "role": "assistant",
+                        "content": generated_text
+                    })
+                    messages_for_saving[runner_idx].append({
+                        "role": "assistant",
+                        "content": generated_text
+                    })
+                    
+                    # 记录时间戳（轻量级操作，不会显著影响性能）
+                    timestamp_info[runner_idx]["steps"].append({
+                        "step": step,
+                        "action": "generate_response",
+                        "timestamp": datetime.now().isoformat()
+                    })
+                    
+                    # 保存中间过程的JSON（不包含图片base64）
+                    try:
+                        if runner_idx in runner_dirs:
+                            # 创建用于保存的消息副本，移除图片base64
+                            messages_to_save = copy.deepcopy(current_messages[runner_idx])
+                            for msg in messages_to_save:
+                                if isinstance(msg["content"], list):
+                                    for c in msg["content"]:
+                                        if c.get('type') == "image_url":
+                                            # 替换图片为占位符
+                                            c["image_url"]["url"] = "<image>"
+                            
+                            # 保存中间过程JSON
+                            step_json_path = os.path.join(runner_dirs[runner_idx], f"step_{step:04d}_messages.json")
+                            with open(step_json_path, "w") as f:
+                                json.dump(messages_to_save, f, indent=2, ensure_ascii=False)
+                            print(f"Saved step {step} messages for runner {runner_idx}")
+                    except Exception as save_error:
+                        print(f"Error saving step {step} messages for runner {runner_idx}: {save_error}")
                     
                     # Parse the action
                     image = Image.open(BytesIO(obs[i]["screenshot"]))
@@ -328,7 +373,8 @@ def run_agent_loop(
                     )
                     # print("parsed_responses", parsed_responses)
                     # print a message to show runnier i conduct step j
-                    print(f"task id {task_config['task_id']} runner {runner_idx} successfully conduct step {step}")
+                    task_config = ray.get(runners[runner_idx].get_task_config.remote())
+                    print(f"task id {task_config.get('task_id', 'unknown')} runner {runner_idx} successfully conduct step {step}")
 
                     # Convert to pyautogui code
                     action_code = parsing_response_to_pyautogui_code(
@@ -345,6 +391,14 @@ def run_agent_loop(
                     else:
                         # Execute the action
                         ray.get(runners[runner_idx].execute_action.remote(action_code))
+                        
+                        # 记录执行动作时间戳（轻量级操作）
+                        timestamp_info[runner_idx]["steps"].append({
+                            "step": step,
+                            "action": "execute_action",
+                            "timestamp": datetime.now().isoformat()
+                        })
+                        
                         # Get new observation
                         new_obs = ray.get(runners[runner_idx].get_obs.remote())
                         obs[i] = new_obs
@@ -357,52 +411,48 @@ def run_agent_loop(
                         new_image_path = os.path.join(runner_dirs[runner_idx], f"{new_image_id}.png")
                         screenshot.save(new_image_path)
                         
-                        # Add user message with the new image ID for saving
-                        messages_for_saving[runner_idx].append(
-                            {
-                                "role": "user",
-                                "content": [
-                                    {
-                                        "type": "image",
-                                        "image": new_image_id
+                        # 转换为base64格式，与reward manager一致
+                        buffer = BytesIO()
+                        screenshot.save(buffer, format="JPEG")
+                        screenshot_data = buffer.getvalue()
+                        encoded_string = base64.b64encode(screenshot_data).decode('utf-8')
+                        
+                        # Add user message with new screenshot for saving
+                        messages_for_saving[runner_idx].append({
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:image/jpeg;base64,{encoded_string}"
                                     }
-                                ]
-                            }
-                        )
+                                }
+                            ]
+                        })
                         
                         # Add user message with base64 for model input
-                        messages[runner_idx].append(
-                            {
-                                "role": "user",
-                                "content": [
-                                    {
-                                        "type": "image",
-                                        "image": "data:image;base64," + pil_to_base64(screenshot)
+                        current_messages[runner_idx].append({
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:image/jpeg;base64,{encoded_string}"
                                     }
-                                ]
-                            }
-                        )
+                                }
+                            ]
+                        })
                         
                         new_active_runners.append(runner_idx)
-                        new_messages.append(messages[runner_idx])
                         
                 except Exception as e:
                     print(f"Error processing runner {runner_idx}: {e}")
                     # Save partial trajectory when error occurs
-                    save_partial_trajectory(runner_idx, messages, e)
+                    save_partial_trajectory(runner_idx, current_messages, e)
                     continue
             
-            # Update active runners and inputs for next iteration
+            # Update active runners for next iteration
             active_runners = new_active_runners
-            if active_runners:
-                # update observation
-                vllm_inputs, msg_for_prompts = generate_trajectory_vllm_inputs(
-                    new_messages, 
-                    processor, 
-                    limit_images=limit_images
-                )
-                for runner_idx, msg_for_prompt in zip(active_runners, msg_for_prompts):
-                    save_msg_for_prompt(runner_dirs, runner_idx, msg_for_prompt, image_counters[runner_idx])
             
             step += 1
             
@@ -412,14 +462,27 @@ def run_agent_loop(
         print(f"Critical error in agent loop: {e}")
         # Save partial trajectories for all active runners
         for runner_idx in active_runners:
-            save_partial_trajectory(runner_idx, messages, e)
+            save_partial_trajectory(runner_idx, current_messages, e)
     
     # Save final messages for each active runner
     for runner_idx in range(len(runners)):
         try:
+            # 创建用于保存的消息副本，移除图片base64
             messages_copy = copy.deepcopy(messages_for_saving[runner_idx])
+            for msg in messages_copy:
+                if isinstance(msg["content"], list):
+                    for c in msg["content"]:
+                        if c.get('type') == "image_url":
+                            # 替换图片为占位符
+                            c["image_url"]["url"] = "<image>"
+            
             with open(os.path.join(runner_dirs[runner_idx], "final_messages.json"), "w") as f:
                 json.dump(messages_copy, f, indent=2, ensure_ascii=False)
+            
+            # 保存时间戳信息
+            timestamp_info[runner_idx]["end_time"] = datetime.now().isoformat()
+            with open(os.path.join(runner_dirs[runner_idx], "timestamp_info.json"), "w") as f:
+                json.dump(timestamp_info[runner_idx], f, indent=2, ensure_ascii=False)
             
             reward = ray.get(runners[runner_idx].evaluate.remote())
             with open(os.path.join(runner_dirs[runner_idx], "reward.txt"), "w") as f:
@@ -441,4 +504,4 @@ def run_agent_loop(
         else:
             folder_ids.append(None)  # For runners that didn't complete
     
-    return folder_ids
+    return folder_ids 

@@ -326,6 +326,12 @@ payload = {
     "config": config["config"]
 }
 
+import os
+
+os.environ["ENV_USER_TOKEN"] = "kYHj5v9LmQp3XcR2sWnB7zTq8yFgK1J"
+os.environ["REMOTE_ENV_SERVER_URL"] = "http://112.125.88.107:4999"
+os.environ["REMOTE_ENV_SOURCE"] = "k8s"
+
 def test_k8s_env():
     env = RemoteDesktopEnv(
         server_url="http://112.125.88.107:4999",
@@ -346,5 +352,5 @@ if __name__ == "__main__":
     # test_k8s_list_env()
     # test_k8s_dataset()
 
-    # test_k8s_env()
+    test_k8s_env()
     release_env()

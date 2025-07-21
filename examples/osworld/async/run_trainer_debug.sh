@@ -66,7 +66,7 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
     actor_rollout_ref.rollout.enforce_eager=False \
     actor_rollout_ref.rollout.free_cache_engine=False \
-    actor_rollout_ref.rollout.n=4 \
+    actor_rollout_ref.rollout.n=8 \
     actor_rollout_ref.rollout.top_k=200 \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
@@ -76,12 +76,13 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.critic_warmup=0 \
     trainer.logger=['console','swanlab'] \
     trainer.project_name='verl_osworld_grpo' \
-    trainer.experiment_name='osworld_grpo_async' \
+    trainer.experiment_name='osworld_all_feasible_reward_script_grpo_k8s_0718_6' \
     trainer.n_gpus_per_node=$N_GPUS \
     trainer.nnodes=1 \
     trainer.save_freq=10 \
     trainer.test_freq=5 \
     trainer.val_before_train=False \
     trainer.total_epochs=15 \
-    +trainer.run_id=$RUN_ID 
+    +trainer.run_id=$RUN_ID \
+    +trainer.splitter=stepwise
     # +trainer.algo=dapo
