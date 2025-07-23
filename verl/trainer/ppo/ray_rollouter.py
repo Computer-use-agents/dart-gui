@@ -158,7 +158,7 @@ class RayOSWorldRollout(RayPPOTrainer):
                             result = self.actor_rollout_wg.clear_envs()
                             print("actor_rollout_wg clear envs:", result)
                             gen_batch_output = self.actor_rollout_wg.generate_sequences(gen_batch)
-                        else:
+                        else: 
                             self.async_rollout_manager.wake_up()
                             gen_batch_output = self.async_rollout_manager.generate_sequences(gen_batch)
                             self.async_rollout_manager.sleep()
@@ -253,7 +253,7 @@ class RayOSWorldRollout(RayPPOTrainer):
                     #     )
 
                     # TODO 2 load checkpoint 
-                    self._load_checkpoint_for_actor_rollout_wg()
+                    # self._load_checkpoint_for_actor_rollout_wg()
 
 
 

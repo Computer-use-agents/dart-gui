@@ -128,6 +128,7 @@ def test_streaming_task_sampling():
     start_time = time.time()
     
     try:
+        
         # Run streaming task sampling with service
         results = run_streaming_task_sampling_sync_with_service(
             dataset=dataset,
