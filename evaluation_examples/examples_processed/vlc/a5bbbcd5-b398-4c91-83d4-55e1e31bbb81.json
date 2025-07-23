@@ -5,6 +5,13 @@
     "source": "https://superuser.com/questions/776056/how-to-hide-bottom-toolbar-in-vlc",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "launch",
             "parameters": {
                 "command": "vlc"

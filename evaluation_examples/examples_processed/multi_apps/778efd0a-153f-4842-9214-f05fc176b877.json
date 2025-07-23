@@ -5,6 +5,13 @@
     "source": "https://researchguides.case.edu/c.php?g=1286426",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "download",
             "parameters": {
                 "files": [

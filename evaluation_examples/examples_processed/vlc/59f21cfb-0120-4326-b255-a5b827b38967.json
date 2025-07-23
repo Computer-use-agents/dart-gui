@@ -5,6 +5,13 @@
     "source": "https://docs.videolan.me/vlc-user/desktop/3.0/en/basic/media.html#playing-a-file",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "download",
             "parameters": {
                 "files": [

@@ -5,6 +5,13 @@
     "source": "https://www.youtube.com/watch?v=XHprwDJ0-fU&t=436s",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "download",
             "parameters": {
                 "files": [

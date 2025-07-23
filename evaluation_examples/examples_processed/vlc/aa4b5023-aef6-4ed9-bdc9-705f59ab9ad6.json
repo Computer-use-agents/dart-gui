@@ -5,6 +5,13 @@
     "source": "https://www.dedoimedo.com/computers/vlc-rotate-videos.html",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "download",
             "parameters": {
                 "files": [

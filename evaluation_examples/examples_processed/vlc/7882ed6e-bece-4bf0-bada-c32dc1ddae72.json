@@ -5,6 +5,13 @@
     "source": "https://wiki.videolan.org/Digital_Restrictions_Management/",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "launch",
             "parameters": {
                 "command": "vlc"

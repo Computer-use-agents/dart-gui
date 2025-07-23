@@ -5,6 +5,13 @@
     "source": "https://superuser.com/questions/1224784/how-to-change-vlcs-splash-screen",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "launch",
             "parameters": {
                 "command": "vlc"

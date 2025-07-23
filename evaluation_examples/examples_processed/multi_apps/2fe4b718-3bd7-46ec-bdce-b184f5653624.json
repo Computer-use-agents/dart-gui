@@ -5,6 +5,13 @@
     "source": "https://www.maketecheasier.com/create-gif-from-video-gimp/",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "launch",
             "parameters": {
                 "command": [

@@ -5,6 +5,13 @@
     "source": "https://superuser.com/questions/1039392/changing-colour-of-vlc-volume-slider",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "launch",
             "parameters": {
                 "command": "vlc"

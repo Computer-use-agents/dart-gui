@@ -5,6 +5,13 @@
     "source": "https://www.vlchelp.com/increase-brightness-contrast-videos/",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "launch",
             "parameters": {
                 "command": "vlc"

@@ -3,7 +3,15 @@
     "snapshot": "vlc",
     "instruction": "I am currently using a ubuntu system. Could you help me set the default video player as VLC?",
     "source": "https://superuser.com/questions/187440/set-default-ubuntu-video-player-as-vlc",
-    "config": [],
+    "config": [
+        {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        }
+    ],
     "trajectory": "trajectories/",
     "related_apps": [
         "vlc",

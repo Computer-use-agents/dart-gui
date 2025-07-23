@@ -5,6 +5,13 @@
     "source": "https://superuser.com/questions/1708415/pause-and-play-vlc-in-background?rq=1",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "download",
             "parameters": {
                 "files": [
