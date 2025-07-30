@@ -115,7 +115,10 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     old_batch = batch
                     dataset_ids = old_batch.non_tensor_batch["dataset_ids"]
                     reward_tensor = old_batch.batch["reward_tensors"]
-                    batch = splitter.split(dataset_ids, reward_tensor)
+                    if self.config.trainer.splitter_parallel:
+                        batch = splitter.split_parallel(dataset_ids, reward_tensor)
+                    else:
+                        batch = splitter.split(dataset_ids, reward_tensor)
                     batch = DataProto.from_single_dict(batch)
                     config = self.actor_rollout_wg.get_config()
                     if isinstance(config, list):

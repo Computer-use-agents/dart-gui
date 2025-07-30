@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from PIL import Image
 from transformers import AutoProcessor
+import ray
 
 import verl.utils.torch_functional as verl_F
 from verl import DataProto
@@ -81,6 +82,53 @@ class TrajectorySplitter:
                 reward=reward_tensor[idx].item()
             )
             batch_output += batch_tokenized_messages
+        batch_output = collate_fn(batch_output)
+        return batch_output
+
+    def split_parallel(
+            self, 
+            dataset_ids: list[str], 
+            reward_tensor: torch.Tensor | None = None,
+            num_cpus: int = 4
+        ) -> DataProto:
+        """
+        Parallel version of split using Ray for distributed processing.
+        
+        Args:
+            dataset_ids: List of dataset IDs to process
+            reward_tensor: Optional tensor of rewards for each dataset
+            num_cpus: Number of CPU cores to use for parallel processing
+            
+        Returns:
+            DataProto: Collated batch output
+        """
+        if not ray.is_initialized():
+            ray.init(num_cpus=num_cpus)
+        
+        # Create remote function for processing a single dataset
+        @ray.remote
+        def process_single_dataset(splitter, dataset_id, reward):
+            batch_messages = splitter.split_dataset_id(dataset_id)
+            batch_tokenized_messages = splitter.tokenize(
+                batch_messages, 
+                dataset_id,
+                reward=reward
+            )
+            return batch_tokenized_messages
+        
+        # Submit all tasks to Ray
+        futures = []
+        for idx, dataset_id in enumerate(dataset_ids):
+            reward = reward_tensor[idx].item() if reward_tensor is not None else 0.0
+            future = process_single_dataset.remote(self, dataset_id, reward)
+            futures.append(future)
+        
+        # Collect results
+        batch_output = []
+        results = ray.get(futures)
+        for result in results:
+            batch_output += result
+            
         batch_output = collate_fn(batch_output)
         return batch_output
     
@@ -428,6 +476,53 @@ class StepwiseTrajectorySplitter:
                 reward=reward_tensor[idx].item()
             )
             batch_output += batch_tokenized_messages
+        batch_output = collate_fn(batch_output)
+        return batch_output
+
+    def split_parallel(
+            self, 
+            dataset_ids: list[str], 
+            reward_tensor: torch.Tensor | None = None,
+            num_cpus: int = 4
+        ) -> DataProto:
+        """
+        Parallel version of split using Ray for distributed processing.
+        
+        Args:
+            dataset_ids: List of dataset IDs to process
+            reward_tensor: Optional tensor of rewards for each dataset
+            num_cpus: Number of CPU cores to use for parallel processing
+            
+        Returns:
+            DataProto: Collated batch output
+        """
+        if not ray.is_initialized():
+            ray.init(num_cpus=num_cpus)
+        
+        # Create remote function for processing a single dataset
+        @ray.remote
+        def process_single_dataset(splitter, dataset_id, reward):
+            batch_messages = splitter.split_dataset_id(dataset_id)
+            batch_tokenized_messages = splitter.tokenize(
+                batch_messages, 
+                dataset_id,
+                reward=reward
+            )
+            return batch_tokenized_messages
+        
+        # Submit all tasks to Ray
+        futures = []
+        for idx, dataset_id in enumerate(dataset_ids):
+            reward = reward_tensor[idx].item() if reward_tensor is not None else 0.0
+            future = process_single_dataset.remote(self, dataset_id, reward)
+            futures.append(future)
+        
+        # Collect results
+        batch_output = []
+        results = ray.get(futures)
+        for result in results:
+            batch_output += result
+            
         batch_output = collate_fn(batch_output)
         return batch_output
     
