@@ -43,6 +43,7 @@ from verl.utils.debug import marked_timer
 from verl.utils.metric import (
     reduce_metrics,
 )
+from verl.utils.eval import validate_osworld, validate_osworld_parallel
 
 
 class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
@@ -52,10 +53,17 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         os.makedirs(self.config.data.root_data_dir, exist_ok=True)
         
     def _validate(self):
-        print("Not validate for OSWorld")
-        return {
-            "val/metric": 0.0
-        }
+        results = validate_osworld_parallel(
+            model_path=self.actor_path,
+            dataset_path=self.config.get("val_dataset_path", "evaluation_examples/test_simple_task_v3.json"),
+            save_dir=os.path.join(self.config.data.root_data_dir, "val_results"),
+            rollout_n=1,
+            max_steps=100,
+            mode="pass1",
+            tensor_parallel_size=self.actor_rollout_wg.world_size,
+            num_workers=1
+        )
+        return results
 
     def fit(self):
         """
@@ -264,6 +272,10 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     if self.config.trainer.save_freq > 0 and (is_last_step or self.global_steps % self.config.trainer.save_freq == 0):
                         with marked_timer("save_checkpoint", timing_raw):
                             self._save_checkpoint()
+                        val_metrics: dict = self._validate()
+                        if is_last_step:
+                            last_val_metrics = val_metrics
+                        metrics.update(val_metrics)
 
                 # training metrics
                 metrics.update(
