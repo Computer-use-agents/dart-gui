@@ -3,7 +3,7 @@ from verl.utils.database.mysql import create_database_manager, demo_datasets_orm
 import os
 from pathlib import Path
 from typing import List
-
+import json
 
 def is_valid_dataset_folder(folder_path: Path) -> tuple[bool, List[str]]:
     """
@@ -127,7 +127,7 @@ def load_data_from_tmp():
     
     # 使用过滤后的合格文件夹列表
     subdirs = valid_subdirs
-    run_id = "pengxiang_test_0709"
+    run_id = "pengxiang_test_0928"
     
     # 在添加新数据之前，先删除已存在的数据
     print(f"\n=== 清理已存在的数据 ===")
@@ -161,7 +161,9 @@ def load_data_from_tmp():
             db_manager.create_dataset(
                 trajectory_id=trajectory_id,
                 run_id=run_id,
-                used=0
+                used=0,
+                model_version="v0",
+                
             )
             end_time = time.time()
             operation_time = end_time - start_time
@@ -203,6 +205,26 @@ def load_data_from_tmp():
     else:
         print("没有执行任何操作")
 
+
+from tqdm import tqdm
+def load_data_from_json():
+    db_manager = create_database_manager()
+    json_path = "data/train/filtered_train.json"
+    with open(json_path, "r") as f:
+        data = json.load(f)
+    print(f"加载数据长度: {len(data)}") 
+    for item in tqdm(data):
+        print(item)
+        db_manager.create_dataset(
+            trajectory_id=item["trajectory_id"],
+            run_id="pengxiang_test_0928",
+            task_id=item["task_id"],
+            used=0,
+            model_version="ui-tars-1.5-7b",
+            reward=item["reward"]
+        )
+    print(f"加载数据完成")
+
 async def get_data_count_by_run_id(run_id: str = "pengxiang_test_0709"):
     """
     获取指定run_id的数据记录数量
@@ -241,10 +263,10 @@ async def get_data_count_by_run_id(run_id: str = "pengxiang_test_0709"):
 if __name__ == "__main__":
     # 运行演示
     # load_data_from_tmp()
-    while True:
-        count_data_by_run_id("pengxiang_test_0716")
-        time.sleep(60)
-    
+    # while True:
+    #     count_data_by_run_id("pengxiang_test_0716")
+    #     time.sleep(60)
+    load_data_from_json()
     # # 查询数据长度
     # import asyncio
     # async def main():

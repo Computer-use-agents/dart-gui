@@ -44,7 +44,7 @@ python3 -m verl.trainer.main_ppo_async \
     +data.window_size=5 \
     +data.stride_size=5 \
     +data.max_steps=1000 \
-    +data.num_workers=2 \
+    +data.num_workers=16 \
     +data.run_id=$RUN_ID \
     reward_model.reward_manager=osworld \
     actor_rollout_ref.model.path=$MODEL_PATH \
@@ -76,7 +76,7 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.critic_warmup=0 \
     trainer.logger=['console','swanlab'] \
     trainer.project_name='verl_osworld_grpo' \
-    trainer.experiment_name='osworld_all_feasible_reward_script_grpo_k8s_0728_8' \
+    trainer.experiment_name='osworld_all_feasible_reward_script_grpo_k8s_0728_16' \
     trainer.n_gpus_per_node=$N_GPUS \
     trainer.nnodes=1 \
     trainer.save_freq=10 \
@@ -84,7 +84,5 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.val_before_train=False \
     trainer.total_epochs=15 \
     +trainer.run_id=$RUN_ID \
-    +trainer.splitter=sliding_window
-    # +trainer.splitter=stepwise
-
+    +trainer.splitter=stepwise
     # +trainer.algo=dapo

@@ -143,3 +143,4 @@ sleep.sh
 *.tiff
 *.ico
 *.webp
+data/

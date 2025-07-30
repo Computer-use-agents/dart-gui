@@ -6,7 +6,7 @@ import logging
 from contextlib import contextmanager
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import TIMESTAMP, Column, Index, Integer, String, create_engine, func
+from sqlalchemy import TIMESTAMP, Column, Index, Integer, String, create_engine, func,DECIMAL
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
@@ -41,15 +41,18 @@ class Dataset(Base):
     model_version = Column(Integer, default=0, comment="使用哪个版本生成的数据")
     run_id = Column(String(255), comment='运行ID')
     task_id = Column(String(255), comment='任务ID')
+    reward = Column(DECIMAL(10, 4), nullable=True, comment='奖励值')
     
     # 索引定义
     __table_args__ = (
         Index('idx_run_id', 'run_id'),
+        Index('idx_task_id', 'task_id'),
+        Index('idx_run_task', 'run_id', 'task_id'),  # 复合索引，用于同时按run_id和task_id查询
         {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
     )
     
     def __repr__(self):
-        return f"<Dataset(id={self.id}, run_id='{self.run_id}', trajectory_id='{self.trajectory_id}', used={self.used}, task_id='{self.task_id}')>"
+        return f"<Dataset(id={self.id}, run_id='{self.run_id}', trajectory_id='{self.trajectory_id}', used={self.used},model_version={self.model_version}, task_id='{self.task_id}', reward={self.reward})>"
     
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典"""
@@ -61,6 +64,7 @@ class Dataset(Base):
             "model_version": self.model_version,
             'run_id': self.run_id,
             'task_id': self.task_id,
+            'reward': self.reward,
         }
 
 
@@ -139,13 +143,15 @@ class MySQLDatasetsORM:
                 session.expunge(obj)
         return objects
     
-    def create_dataset(self, trajectory_id: str, run_id: str, task_id: str, used: int = 0, model_version: str = 'v0') -> Dict[str, Any]:
+    def create_dataset(self, trajectory_id: str, run_id: str, task_id: str, used: int = 0, model_version: str = 'v0', reward: float = None) -> Dict[str, Any]:
         """创建新的dataset记录
         
         Args:
             trajectory_id: 轨迹ID（必须唯一）
             run_id: 运行ID
             used: 使用过几次
+            model_version: 模型版本
+            reward: 奖励值
             
         Returns:
             Dict: 创建的数据记录字典
@@ -157,7 +163,8 @@ class MySQLDatasetsORM:
                     run_id=run_id,
                     task_id=task_id,
                     used=used,
-                    model_version=model_version
+                    model_version=model_version,
+                    reward=reward
                 )
                 session.add(dataset)
                 session.flush()  # 刷新以获取ID

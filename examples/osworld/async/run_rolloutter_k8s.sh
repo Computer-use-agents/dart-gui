@@ -40,7 +40,7 @@ python3 -m verl.trainer.main_rollout_async \
     algorithm.adv_estimator=grpo \
     data.train_files=evaluation_examples/test_all_feasible.json \
     data.val_files=evaluation_examples/test_all_feasible.json \
-    data.train_batch_size=4 \
+    data.train_batch_size=2 \
     data.max_prompt_length=32000 \
     data.max_response_length=32000 \
     data.filter_overlong_prompts=True \
@@ -74,7 +74,7 @@ python3 -m verl.trainer.main_rollout_async \
     actor_rollout_ref.rollout.free_cache_engine=False \
     actor_rollout_ref.rollout.n=8 \
     actor_rollout_ref.rollout.top_k=200 \
-    +actor_rollout_ref.rollout.max_steps=15 \
+    +actor_rollout_ref.rollout.max_steps=100 \
     +actor_rollout_ref.rollout.limit_images=5 \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
