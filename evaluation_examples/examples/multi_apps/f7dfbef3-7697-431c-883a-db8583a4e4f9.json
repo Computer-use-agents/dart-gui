@@ -7,12 +7,12 @@
         {
             "type": "download",
             "parameters": {
-              "files": [
-                {
-                  "url": "https://drive.usercontent.google.com/download?id=1efUzatD7vixloPY9-XENOL3OZ5__1hod&export=download&authuser=0&confirm=t&uuid=14a3a6b1-a6e2-46cf-9e5b-bcc9e2acbc98&at=APZUnTWtyQUzT6eO5ZTcnmAZkwyX:1706704733958",
-                  "path": "/home/user/Desktop/doc.tar.gz"
-                }
-              ]
+                "files": [
+                    {
+                        "url": "https://drive.usercontent.google.com/download?id=1efUzatD7vixloPY9-XENOL3OZ5__1hod&export=download&authuser=0&confirm=t&uuid=14a3a6b1-a6e2-46cf-9e5b-bcc9e2acbc98&at=APZUnTWtyQUzT6eO5ZTcnmAZkwyX:1706704733958",
+                        "path": "/home/user/Desktop/doc.tar.gz"
+                    }
+                ]
             }
         },
         {
@@ -61,14 +61,14 @@
                 }
             },
             {
-              "type": "execute",
-              "parameters": {
-                "command": [
-                    "/bin/bash",
-                    "-c",
-                    "killall gnome-terminal-server"
-                ]
-              }
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "/bin/bash",
+                        "-c",
+                        "killall gnome-terminal-server"
+                    ]
+                }
             }
         ],
         "func": [
@@ -114,5 +114,7 @@
                 "file_type": "pdf"
             }
         ]
-    }
+    },
+    "task_id": "f7dfbef3-7697-431c-883a-db8583a4e4f9",
+    "os": "ubuntu"
 }

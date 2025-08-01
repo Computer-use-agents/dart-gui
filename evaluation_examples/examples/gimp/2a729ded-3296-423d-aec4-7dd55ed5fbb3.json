@@ -35,55 +35,55 @@
     ],
     "evaluator": {
         "postconfig": [
-			{
-				"type": "execute",
-				"parameters": {
-					"command": [
-						"python3",
-						"-c",
-						"import pyautogui; pyautogui.hotkey([\"shift\", \"ctrl\", \"e\"]);"
-					]
-				}
-			},
-			{
-				"type": "sleep",
-				"parameters": {
-					"seconds": 0.5
-				}
-			},
             {
-				"type": "execute",
-				"parameters": {
-					"command": [
-						"python3",
-						"-c",
-						"import pyautogui; pyautogui.write(\"dog_without_background\");pyautogui.press([\"enter\"]);"
-					]
-				}
-			},
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "python3",
+                        "-c",
+                        "import pyautogui; pyautogui.hotkey([\"shift\", \"ctrl\", \"e\"]);"
+                    ]
+                }
+            },
             {
-				"type": "sleep",
-				"parameters": {
-					"seconds": 2
-				}
-			},
+                "type": "sleep",
+                "parameters": {
+                    "seconds": 0.5
+                }
+            },
             {
-				"type": "execute",
-				"parameters": {
-					"command": [
-						"python3",
-						"-c",
-						"import pyautogui; pyautogui.press([\"enter\"]);"
-					]
-				}
-			},
-			{
-				"type": "sleep",
-				"parameters": {
-					"seconds": 5
-				}
-			}
-		],
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "python3",
+                        "-c",
+                        "import pyautogui; pyautogui.write(\"dog_without_background\");pyautogui.press([\"enter\"]);"
+                    ]
+                }
+            },
+            {
+                "type": "sleep",
+                "parameters": {
+                    "seconds": 2
+                }
+            },
+            {
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "python3",
+                        "-c",
+                        "import pyautogui; pyautogui.press([\"enter\"]);"
+                    ]
+                }
+            },
+            {
+                "type": "sleep",
+                "parameters": {
+                    "seconds": 5
+                }
+            }
+        ],
         "func": "check_structure_sim",
         "expected": {
             "type": "vm_file",
@@ -95,5 +95,7 @@
             "path": "/home/user/Desktop/dog_without_background.png",
             "dest": "dog_without_background.png"
         }
-    }
+    },
+    "task_id": "2a729ded-3296-423d-aec4-7dd55ed5fbb3",
+    "os": "ubuntu"
 }

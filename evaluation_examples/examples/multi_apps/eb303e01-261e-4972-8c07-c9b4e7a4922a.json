@@ -78,5 +78,7 @@
             "examine_shape": false,
             "examine_bullets": false
         }
-    }
+    },
+    "task_id": "eb303e01-261e-4972-8c07-c9b4e7a4922a",
+    "os": "ubuntu"
 }

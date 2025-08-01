@@ -8,8 +8,8 @@
             "type": "launch",
             "parameters": {
                 "command": [
-                "google-chrome",
-                "--remote-debugging-port=1337"
+                    "google-chrome",
+                    "--remote-debugging-port=1337"
                 ]
             }
         },
@@ -57,7 +57,10 @@
         "chrome"
     ],
     "evaluator": {
-        "func": ["is_expected_tabs", "compare_htmls"],
+        "func": [
+            "is_expected_tabs",
+            "compare_htmls"
+        ],
         "result": [
             {
                 "type": "open_tabs_info"
@@ -87,5 +90,7 @@
                 "dest": "annual-enterprise-survey-2021-financial-year-provisional_gold.html"
             }
         ]
-    }
+    },
+    "task_id": "e135df7c-7687-4ac0-a5f0-76b74438b53e",
+    "os": "ubuntu"
 }

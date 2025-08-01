@@ -31,23 +31,23 @@
     ],
     "evaluator": {
         "postconfig": [
-			{
-				"type": "execute",
-				"parameters": {
-					"command": [
-						"python3",
-						"-c",
-						"import pyautogui; pyautogui.hotkey([\"ctrl\", \"q\"]);"
-					]
-				}
-			},
-			{
-				"type": "sleep",
-				"parameters": {
-					"seconds": 0.5
-				}
-			}
-		],
+            {
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "python3",
+                        "-c",
+                        "import pyautogui; pyautogui.hotkey([\"ctrl\", \"q\"]);"
+                    ]
+                }
+            },
+            {
+                "type": "sleep",
+                "parameters": {
+                    "seconds": 0.5
+                }
+            }
+        ],
         "func": "check_config_status",
         "expected": {
             "type": "rule",
@@ -62,5 +62,7 @@
             "file_name": "gimprc",
             "dest": "gimprc"
         }
-    }
+    },
+    "task_id": "b148e375-fe0b-4bec-90e7-38632b0d73c2",
+    "os": "ubuntu"
 }

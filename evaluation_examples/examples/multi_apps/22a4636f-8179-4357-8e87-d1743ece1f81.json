@@ -104,5 +104,7 @@
             "path": "https://drive.usercontent.google.com/download?id=1vY9GCxczkuom8bOU6SVHe9pTYgGIm1_M&export=download&authuser=0&confirm=t",
             "dest": "gold-Meeting-Agenda.pdf"
         }
-    }
+    },
+    "task_id": "22a4636f-8179-4357-8e87-d1743ece1f81",
+    "os": "ubuntu"
 }

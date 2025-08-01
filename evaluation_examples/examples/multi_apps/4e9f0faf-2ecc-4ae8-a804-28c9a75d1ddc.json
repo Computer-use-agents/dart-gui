@@ -8,7 +8,10 @@
             "type": "googledrive",
             "parameters": {
                 "settings_file": "evaluation_examples/settings/googledrive/settings.yml",
-                "operation": ["delete", "upload"],
+                "operation": [
+                    "delete",
+                    "upload"
+                ],
                 "args": [
                     {
                         "query": "title = 'invoice.pdf'",
@@ -16,7 +19,9 @@
                     },
                     {
                         "url": "https://drive.usercontent.google.com/download?id=1KAhoPFM0AU2dgn_NRt3y7CjOr9Er4vwD&export=download&authuser=0&confirm=t&uuid=e8528cd1-5106-45f3-a644-e1bbf5e08278&at=APZUnTUnTuXfV2Ted_9Wv2QomMvA:1706181110208",
-                        "path": ["invoice.pdf"]
+                        "path": [
+                            "invoice.pdf"
+                        ]
                     }
                 ]
             }
@@ -25,8 +30,8 @@
             "type": "launch",
             "parameters": {
                 "command": [
-                "google-chrome",
-                "--remote-debugging-port=1337"
+                    "google-chrome",
+                    "--remote-debugging-port=1337"
                 ]
             }
         },
@@ -83,5 +88,7 @@
                 }
             ]
         }
-    }
+    },
+    "task_id": "4e9f0faf-2ecc-4ae8-a804-28c9a75d1ddc",
+    "os": "ubuntu"
 }

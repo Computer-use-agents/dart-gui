@@ -8,7 +8,9 @@
             "type": "googledrive",
             "parameters": {
                 "settings_file": "evaluation_examples/settings/googledrive/settings.yml",
-                "operation": ["delete"],
+                "operation": [
+                    "delete"
+                ],
                 "args": [
                     {
                         "query": "title = 'attachment' and 'root' in parents and trashed = false",
@@ -21,8 +23,8 @@
             "type": "launch",
             "parameters": {
                 "command": [
-                "google-chrome",
-                "--remote-debugging-port=1337"
+                    "google-chrome",
+                    "--remote-debugging-port=1337"
                 ]
             }
         },
@@ -173,5 +175,7 @@
             },
             {}
         ]
-    }
+    },
+    "task_id": "78aed49a-a710-4321-a793-b611a7c5b56b",
+    "os": "ubuntu"
 }

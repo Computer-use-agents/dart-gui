@@ -138,5 +138,7 @@
         "options": {
             "examine_shape": false
         }
-    }
+    },
+    "task_id": "bf4e9888-f10f-47af-8dba-76413038b73c",
+    "os": "ubuntu"
 }

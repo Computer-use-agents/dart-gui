@@ -103,5 +103,7 @@
             "type": "list",
             "ignore_case": true
         }
-    }
+    },
+    "task_id": "5990457f-2adb-467b-a4af-5c857c92d762",
+    "os": "ubuntu"
 }

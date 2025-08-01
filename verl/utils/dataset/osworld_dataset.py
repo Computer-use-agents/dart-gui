@@ -304,7 +304,16 @@ class OSWorldAsyncDataset(Dataset):
         from verl.utils.database.mysql import create_database_manager
         self.db_manager = create_database_manager()
         # self.variebce_id = config.get("variebce_id", None)
-        self.task_ids = self.db_manager.get_all_task_id_by_run_id(self.run_id)
+        
+        # 设置数据库连接并获取task_ids，然后关闭连接
+        self.db_manager.setup_database()
+        try:
+            self.task_ids = self.db_manager.get_all_task_id_by_run_id(self.run_id)
+            self.db_manager.close_database()
+        except Exception as e:
+            print(f"Error getting task_ids for run_id {self.run_id}: {e}")
+            self.db_manager.close_database()
+            raise
 
 
     def __len__(self):
@@ -331,7 +340,10 @@ class OSWorldAsyncDataset(Dataset):
 
     def _get_item_with_wait(self, item_index: int) -> list[dict]:
         
-        self.db_manager.setup_database()
+        # 只在需要时设置数据库连接
+        if not self.db_manager.is_connected():
+            self.db_manager.setup_database()
+        
         try:
             row_dicts = self.db_manager.get_datasets_by_task_id(
                 run_id=self.run_id,
@@ -340,9 +352,20 @@ class OSWorldAsyncDataset(Dataset):
             
             print(f"run-id: {self.run_id}, fetched data, offset: {item_index}, len(row_dicts): {len(row_dicts)}")
             if len(row_dicts) > 0:
+                # 成功获取数据后关闭数据库连接
+                self.db_manager.close_database()
                 return row_dicts
+            else:
+                # 即使没有数据也关闭连接
+                self.db_manager.close_database()
+                return []
         except Exception as e:
             print(f"run-id: {self.run_id}, offset: {item_index}, error: {e}")
+            # 发生异常时也要关闭连接
+            try:
+                self.db_manager.close_database()
+            except:
+                pass
             return []
 
 
@@ -401,6 +424,15 @@ class OSWorldAsyncDataset(Dataset):
 
             if "dataframe" in state:
                 del state["dataframe"]
+            
+            # 关闭数据库连接并移除数据库管理器，避免序列化问题
+            if "db_manager" in state and state["db_manager"] is not None:
+                try:
+                    state["db_manager"].close_database()
+                except:
+                    pass
+                del state["db_manager"]
+            
             return state
 
         return self.__dict__.copy()

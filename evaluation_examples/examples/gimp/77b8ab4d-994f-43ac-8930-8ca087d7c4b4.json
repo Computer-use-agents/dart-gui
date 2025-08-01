@@ -41,5 +41,7 @@
             "path": "/home/user/Desktop/export.jpg",
             "dest": "export.jpg"
         }
-    }
+    },
+    "task_id": "77b8ab4d-994f-43ac-8930-8ca087d7c4b4",
+    "os": "ubuntu"
 }

@@ -31,7 +31,7 @@ python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
     data.train_files=evaluation_examples/filtered_test_all.json \
     data.val_files=evaluation_examples/filtered_test_all.json \
-    data.train_batch_size=4 \
+    data.train_batch_size=2 \
     data.max_prompt_length=32000 \
     data.max_response_length=32000 \
     data.filter_overlong_prompts=True \

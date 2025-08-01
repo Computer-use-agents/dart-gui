@@ -57,5 +57,7 @@
         "options": {
             "reference_base_result": 0.54
         }
-    }
+    },
+    "task_id": "c2751594-0cd5-4088-be1b-b5f2f9ec97c4",
+    "os": "ubuntu"
 }

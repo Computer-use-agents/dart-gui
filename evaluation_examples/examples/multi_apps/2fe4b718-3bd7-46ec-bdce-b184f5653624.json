@@ -5,6 +5,13 @@
     "source": "https://www.maketecheasier.com/create-gif-from-video-gimp/",
     "config": [
         {
+            "type": "execute",
+            "parameters": {
+                "command": "echo password | sudo -S modprobe snd-dummy ",
+                "shell": true
+            }
+        },
+        {
             "type": "launch",
             "parameters": {
                 "command": [
@@ -49,5 +56,7 @@
             "path": "https://drive.usercontent.google.com/download?id=1kDq8pakgdZvKh8CFpR5368stf14gwFCp&export=download",
             "dest": "src_clip_gold.gif"
         }
-    }
+    },
+    "task_id": "2fe4b718-3bd7-46ec-bdce-b184f5653624",
+    "os": "ubuntu"
 }

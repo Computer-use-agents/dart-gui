@@ -8,7 +8,9 @@
             "type": "googledrive",
             "parameters": {
                 "settings_file": "evaluation_examples/settings/googledrive/settings.yml",
-                "operation": ["delete"],
+                "operation": [
+                    "delete"
+                ],
                 "args": [
                     {
                         "query": "title = 'figures' and 'root' in parents and mimeType = 'application/vnd.google-apps.folder'",
@@ -21,8 +23,8 @@
             "type": "launch",
             "parameters": {
                 "command": [
-                "google-chrome",
-                "--remote-debugging-port=1337"
+                    "google-chrome",
+                    "--remote-debugging-port=1337"
                 ]
             }
         },
@@ -67,13 +69,13 @@
             "type": "execute",
             "parameters": {
                 "command": [
-                "tar",
-                "-xz",
-                "--recursive-unlink",
-                "-f",
-                "/home/user/thunderbird-profile.tar.gz",
-                "-C",
-                "/home/user/"
+                    "tar",
+                    "-xz",
+                    "--recursive-unlink",
+                    "-f",
+                    "/home/user/thunderbird-profile.tar.gz",
+                    "-C",
+                    "/home/user/"
                 ]
             }
         },
@@ -129,7 +131,13 @@
                 "3_gold.png"
             ],
             "multi": true,
-            "gives": [0, 1, 2]
+            "gives": [
+                0,
+                1,
+                2
+            ]
         }
-    }
+    },
+    "task_id": "46407397-a7d5-4c6b-92c6-dbe038b1457b",
+    "os": "ubuntu"
 }

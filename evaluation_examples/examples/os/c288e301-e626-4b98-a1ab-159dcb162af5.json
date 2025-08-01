@@ -5,9 +5,11 @@
     "source": "https://stackoverflow.com/questions/41986507/unable-to-set-default-python-version-to-python3-in-ubuntu",
     "trajectory": "trajectories/",
     "related_apps": [
-      "os"
+        "os"
     ],
     "evaluator": {
-      "func": "infeasible"
-    }
-  }
+        "func": "infeasible"
+    },
+    "task_id": "c288e301-e626-4b98-a1ab-159dcb162af5",
+    "os": "ubuntu"
+}

@@ -54,5 +54,7 @@
             "path": "/home/user/Desktop/res.txt",
             "dest": "res.txt"
         }
-    }
+    },
+    "task_id": "20236825-b5df-46e7-89bf-62e1d640a897",
+    "os": "ubuntu"
 }

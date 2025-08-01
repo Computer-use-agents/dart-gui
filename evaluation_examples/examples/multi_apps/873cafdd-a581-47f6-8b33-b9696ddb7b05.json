@@ -7,23 +7,23 @@
         {
             "type": "launch",
             "parameters": {
-              "command": [
-                "google-chrome",
-                "--remote-debugging-port=1337"
-              ]
+                "command": [
+                    "google-chrome",
+                    "--remote-debugging-port=1337"
+                ]
             }
-          },
-          {
+        },
+        {
             "type": "launch",
             "parameters": {
-              "command": [
-                "socat",
-                "tcp-listen:9222,fork",
-                "tcp:localhost:1337"
-              ]
+                "command": [
+                    "socat",
+                    "tcp-listen:9222,fork",
+                    "tcp:localhost:1337"
+                ]
             }
-          },
-          {
+        },
+        {
             "type": "download",
             "parameters": {
                 "files": [
@@ -35,32 +35,42 @@
             }
         },
         {
-          "type": "open",
-          "parameters": {
-            "path": "/home/user/Desktop/Recommended_plugin_list.docx"
-          }
+            "type": "open",
+            "parameters": {
+                "path": "/home/user/Desktop/Recommended_plugin_list.docx"
+            }
         },
         {
-          "type": "activate_window",
-          "parameters": {
-            "window_name": "Recommended_plugin_list.docx - LibreOffice Writer"
-          }
+            "type": "activate_window",
+            "parameters": {
+                "window_name": "Recommended_plugin_list.docx - LibreOffice Writer"
+            }
         }
     ],
     "trajectory": "trajectories/",
     "related_apps": [
-      "os", "chrome", "Writer"
+        "os",
+        "chrome",
+        "Writer"
     ],
     "evaluator": {
-      "func": "is_expected_installed_extensions",
-      "expected": {
-        "type": "rule",
-        "rules":{
-          "expected": ["Zoom Chrome Extension", "Speechify Text to Speech Voice Reader", "React Developer Tools", "Momentum", "Google Translate"]
+        "func": "is_expected_installed_extensions",
+        "expected": {
+            "type": "rule",
+            "rules": {
+                "expected": [
+                    "Zoom Chrome Extension",
+                    "Speechify Text to Speech Voice Reader",
+                    "React Developer Tools",
+                    "Momentum",
+                    "Google Translate"
+                ]
+            }
+        },
+        "result": {
+            "type": "find_installed_extension_name"
         }
-      },
-      "result": {
-        "type": "find_installed_extension_name"
-      }
-    }
-  }
+    },
+    "task_id": "873cafdd-a581-47f6-8b33-b9696ddb7b05",
+    "os": "ubuntu"
+}

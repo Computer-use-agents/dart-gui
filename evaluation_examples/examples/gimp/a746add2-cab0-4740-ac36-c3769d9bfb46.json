@@ -31,29 +31,32 @@
     ],
     "evaluator": {
         "postconfig": [
-			{
-				"type": "execute",
-				"parameters": {
-					"command": [
-						"python3",
-						"-c",
-						"import pyautogui; pyautogui.press([\"esc\"]);pyautogui.hotkey([\"ctrl\", \"q\"]);"
-					]
-				}
-			},
-			{
-				"type": "sleep",
-				"parameters": {
-					"seconds": 0.5
-				}
-			}
-		],
+            {
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "python3",
+                        "-c",
+                        "import pyautogui; pyautogui.press([\"esc\"]);pyautogui.hotkey([\"ctrl\", \"q\"]);"
+                    ]
+                }
+            },
+            {
+                "type": "sleep",
+                "parameters": {
+                    "seconds": 0.5
+                }
+            }
+        ],
         "func": "check_config_status",
         "expected": {
             "type": "rule",
             "rules": {
                 "type:": "key-value",
-                "key": ["history-item", "\"filters-vignette\""],
+                "key": [
+                    "history-item",
+                    "\"filters-vignette\""
+                ],
                 "value": "1"
             }
         },
@@ -62,5 +65,7 @@
             "file_name": "action-history",
             "dest": "action-history"
         }
-    }
+    },
+    "task_id": "a746add2-cab0-4740-ac36-c3769d9bfb46",
+    "os": "ubuntu"
 }

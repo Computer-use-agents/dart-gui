@@ -8,7 +8,9 @@
             "type": "googledrive",
             "parameters": {
                 "settings_file": "evaluation_examples/settings/googledrive/settings.yml",
-                "operation": ["delete"],
+                "operation": [
+                    "delete"
+                ],
                 "args": [
                     {
                         "query": "title = 'attachment_full.pdf' and 'root' in parents",
@@ -21,8 +23,8 @@
             "type": "launch",
             "parameters": {
                 "command": [
-                "google-chrome",
-                "--remote-debugging-port=1337"
+                    "google-chrome",
+                    "--remote-debugging-port=1337"
                 ]
             }
         },
@@ -107,5 +109,7 @@
             "path": "https://drive.usercontent.google.com/download?id=1-FaONI6f5g9XyJAlx8vPFgTP_SEZ-1vV&export=download&authuser=0&confirm=t&uuid=de7b274a-25b8-4361-a614-4910a88ba4bd&at=APZUnTVRw21zrIY4ydp9sagr9ZhZ:1706609799766",
             "dest": "attachment_full_gold.pdf"
         }
-    }
+    },
+    "task_id": "b52b40a5-ad70-4c53-b5b0-5650a8387052",
+    "os": "ubuntu"
 }

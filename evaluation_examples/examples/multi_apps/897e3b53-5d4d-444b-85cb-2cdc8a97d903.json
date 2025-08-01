@@ -8,7 +8,9 @@
             "type": "googledrive",
             "parameters": {
                 "settings_file": "evaluation_examples/settings/googledrive/settings.yml",
-                "operation": ["delete"],
+                "operation": [
+                    "delete"
+                ],
                 "args": [
                     {
                         "query": "title = 'form.pdf' or title = 'form.docx' or title = 'form.docx.pdf' or title = 'forms'",
@@ -57,20 +59,20 @@
         {
             "type": "download",
             "parameters": {
-              "files": [
-                {
-                  "url": "https://drive.usercontent.google.com/download?id=18TvzE8jnULU2g9XJsT-TaPEKcLGNVfu0&export=download&authuser=0&confirm=t&uuid=d914e031-9aa6-431b-81c0-73fcb87af027&at=APZUnTUx56WM_I3gnhHo-eZX__kx:1706158167271",
-                  "path": "/home/user/Desktop/form.docx"
-                }
-              ]
+                "files": [
+                    {
+                        "url": "https://drive.usercontent.google.com/download?id=18TvzE8jnULU2g9XJsT-TaPEKcLGNVfu0&export=download&authuser=0&confirm=t&uuid=d914e031-9aa6-431b-81c0-73fcb87af027&at=APZUnTUx56WM_I3gnhHo-eZX__kx:1706158167271",
+                        "path": "/home/user/Desktop/form.docx"
+                    }
+                ]
             }
-          },
-          {
+        },
+        {
             "type": "open",
             "parameters": {
-              "path": "/home/user/Desktop/form.docx"
+                "path": "/home/user/Desktop/form.docx"
             }
-          }
+        }
     ],
     "trajectory": "trajectories/",
     "related_apps": [
@@ -93,5 +95,7 @@
             "path": "https://drive.usercontent.google.com/download?id=118wb7zmG8yP7DS1cImP9-GcOeKib3fLp&export=download&authuser=0&confirm=t&uuid=b82542fa-7731-4014-8ebc-d940f0fb83fe&at=APZUnTVkmL9rk3EpA0Ak5JLPEnJZ:1706101389421",
             "dest": "form_gold.pdf"
         }
-    }
+    },
+    "task_id": "897e3b53-5d4d-444b-85cb-2cdc8a97d903",
+    "os": "ubuntu"
 }

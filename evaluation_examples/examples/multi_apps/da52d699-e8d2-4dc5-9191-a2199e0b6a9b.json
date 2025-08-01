@@ -69,5 +69,7 @@
             "path": "/home/user/Desktop/book_list_result.docx",
             "dest": "book_list_result.docx"
         }
-    }
+    },
+    "task_id": "da52d699-e8d2-4dc5-9191-a2199e0b6a9b",
+    "os": "ubuntu"
 }

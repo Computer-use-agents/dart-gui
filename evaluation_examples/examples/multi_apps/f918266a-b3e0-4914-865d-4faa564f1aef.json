@@ -43,5 +43,7 @@
             "path": "/home/user/Desktop/log.txt",
             "dest": "log.txt"
         }
-    }
+    },
+    "task_id": "f918266a-b3e0-4914-865d-4faa564f1aef",
+    "os": "ubuntu"
 }

@@ -60,14 +60,14 @@
     "evaluator": {
         "postconfig": [
             {
-              "type": "execute",
-              "parameters": {
-                "command": [
-                    "/bin/bash",
-                    "-c",
-                    "killall gnome-terminal-server"
-                ]
-              }
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "/bin/bash",
+                        "-c",
+                        "killall gnome-terminal-server"
+                    ]
+                }
             },
             {
                 "type": "activate_window",
@@ -76,7 +76,10 @@
                 }
             }
         ],
-        "func": ["check_include_exclude", "compare_config"],
+        "func": [
+            "check_include_exclude",
+            "compare_config"
+        ],
         "result": [
             {
                 "type": "vm_command_line",
@@ -109,5 +112,7 @@
                 }
             }
         ]
-    }
+    },
+    "task_id": "510f64c8-9bcc-4be1-8d30-638705850618",
+    "os": "ubuntu"
 }

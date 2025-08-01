@@ -111,6 +111,22 @@ class MySQLDatasetsORM:
     def refresh_session(self):
         self.SessionMaker = sessionmaker(bind=self.engine)
 
+    def close_database(self):
+        """关闭数据库连接，释放资源"""
+        try:
+            if self.engine:
+                self.engine.dispose()
+                self.engine = None
+                self.SessionMaker = None
+                logger.info("Database connection closed and resources released")
+        except Exception as e:
+            logger.error(f"Error closing database: {e}")
+            raise
+
+    def is_connected(self) -> bool:
+        """检查数据库是否已连接"""
+        return self.engine is not None and self.SessionMaker is not None
+
 
     @contextmanager
     def get_session(self):

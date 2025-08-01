@@ -8,7 +8,9 @@
             "type": "googledrive",
             "parameters": {
                 "settings_file": "evaluation_examples/settings/googledrive/settings.yml",
-                "operation": ["delete"],
+                "operation": [
+                    "delete"
+                ],
                 "args": [
                     {
                         "query": "title = 'emails' and 'root' in parents",
@@ -21,8 +23,8 @@
             "type": "launch",
             "parameters": {
                 "command": [
-                "google-chrome",
-                "--remote-debugging-port=1337"
+                    "google-chrome",
+                    "--remote-debugging-port=1337"
                 ]
             }
         },
@@ -128,5 +130,7 @@
                 1
             ]
         }
-    }
+    },
+    "task_id": "a0b9dc9c-fc07-4a88-8c5d-5e3ecad91bcb",
+    "os": "ubuntu"
 }

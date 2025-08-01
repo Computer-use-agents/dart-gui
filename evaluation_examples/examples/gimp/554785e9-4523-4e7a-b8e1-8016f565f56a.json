@@ -31,55 +31,55 @@
     ],
     "evaluator": {
         "postconfig": [
-			{
-				"type": "execute",
-				"parameters": {
-					"command": [
-						"python3",
-						"-c",
-						"import pyautogui; pyautogui.hotkey([\"shift\", \"ctrl\", \"e\"]);"
-					]
-				}
-			},
-			{
-				"type": "sleep",
-				"parameters": {
-					"seconds": 0.5
-				}
-			},
             {
-				"type": "execute",
-				"parameters": {
-					"command": [
-						"python3",
-						"-c",
-						"import pyautogui; pyautogui.write(\"edited_colorful\");pyautogui.press([\"enter\"]);"
-					]
-				}
-			},
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "python3",
+                        "-c",
+                        "import pyautogui; pyautogui.hotkey([\"shift\", \"ctrl\", \"e\"]);"
+                    ]
+                }
+            },
             {
-				"type": "sleep",
-				"parameters": {
-					"seconds": 2
-				}
-			},
+                "type": "sleep",
+                "parameters": {
+                    "seconds": 0.5
+                }
+            },
             {
-				"type": "execute",
-				"parameters": {
-					"command": [
-						"python3",
-						"-c",
-						"import pyautogui; pyautogui.press([\"enter\"]);"
-					]
-				}
-			},
-			{
-				"type": "sleep",
-				"parameters": {
-					"seconds": 5
-				}
-			}
-		],
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "python3",
+                        "-c",
+                        "import pyautogui; pyautogui.write(\"edited_colorful\");pyautogui.press([\"enter\"]);"
+                    ]
+                }
+            },
+            {
+                "type": "sleep",
+                "parameters": {
+                    "seconds": 2
+                }
+            },
+            {
+                "type": "execute",
+                "parameters": {
+                    "command": [
+                        "python3",
+                        "-c",
+                        "import pyautogui; pyautogui.press([\"enter\"]);"
+                    ]
+                }
+            },
+            {
+                "type": "sleep",
+                "parameters": {
+                    "seconds": 5
+                }
+            }
+        ],
         "func": "check_saturation_increase_and_structure_sim",
         "expected": {
             "type": "vm_file",
@@ -91,5 +91,7 @@
             "path": "/home/user/Desktop/edited_colorful.png",
             "dest": "edited_colorful.png"
         }
-    }
+    },
+    "task_id": "554785e9-4523-4e7a-b8e1-8016f565f56a",
+    "os": "ubuntu"
 }

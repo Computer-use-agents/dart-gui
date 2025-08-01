@@ -8,8 +8,8 @@
             "type": "launch",
             "parameters": {
                 "command": [
-                "google-chrome",
-                "--remote-debugging-port=1337"
+                    "google-chrome",
+                    "--remote-debugging-port=1337"
                 ]
             }
         },
@@ -47,13 +47,13 @@
             "type": "execute",
             "parameters": {
                 "command": [
-                "tar",
-                "-xz",
-                "--recursive-unlink",
-                "-f",
-                "/home/user/thunderbird-profile.tar.gz",
-                "-C",
-                "/home/user/"
+                    "tar",
+                    "-xz",
+                    "--recursive-unlink",
+                    "-f",
+                    "/home/user/thunderbird-profile.tar.gz",
+                    "-C",
+                    "/home/user/"
                 ]
             }
         },
@@ -87,5 +87,7 @@
                 ]
             }
         }
-    }
+    },
+    "task_id": "58565672-7bfe-48ab-b828-db349231de6b",
+    "os": "ubuntu"
 }

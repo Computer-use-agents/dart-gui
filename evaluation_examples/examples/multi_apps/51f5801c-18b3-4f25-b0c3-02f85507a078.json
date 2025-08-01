@@ -7,12 +7,12 @@
         {
             "type": "download",
             "parameters": {
-              "files": [
-                {
-                  "url": "https://drive.usercontent.google.com/download?id=1epTcblcYh8j_wFtA-aiXPIF2Oo1IVw8A&export=download",
-                  "path": "/home/user/Desktop/Dickinson_Slides.pptx"
-                }
-              ]
+                "files": [
+                    {
+                        "url": "https://drive.usercontent.google.com/download?id=1epTcblcYh8j_wFtA-aiXPIF2Oo1IVw8A&export=download",
+                        "path": "/home/user/Desktop/Dickinson_Slides.pptx"
+                    }
+                ]
             }
         },
         {
@@ -42,5 +42,7 @@
         "options": {
             "ignore_blanks": true
         }
-    }
+    },
+    "task_id": "51f5801c-18b3-4f25-b0c3-02f85507a078",
+    "os": "ubuntu"
 }

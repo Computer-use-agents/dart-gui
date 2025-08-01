@@ -43,5 +43,7 @@
             "path": "/home/user/Recruitment_and_retention_of_health_professionals_across_Europe.zip",
             "dest": "Recruitment_and_retention_of_health_professionals_across_Europe.zip"
         }
-    }
+    },
+    "task_id": "8df7e444-8e06-4f93-8a1a-c5c974269d82",
+    "os": "ubuntu"
 }

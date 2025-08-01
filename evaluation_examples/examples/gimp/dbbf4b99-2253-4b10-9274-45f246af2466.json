@@ -31,5 +31,7 @@
     ],
     "evaluator": {
         "func": "infeasible"
-    }
+    },
+    "task_id": "dbbf4b99-2253-4b10-9274-45f246af2466",
+    "os": "ubuntu"
 }

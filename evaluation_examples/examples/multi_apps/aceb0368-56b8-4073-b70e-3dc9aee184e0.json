@@ -53,7 +53,6 @@
                     "nautilus",
                     "/home/user/exam/"
                 ]
-            
             }
         }
     ],
@@ -65,23 +64,25 @@
     "evaluator": {
         "func": "compare_table",
         "expected": {
-			"type": "cloud_file",
-			"path": "https://drive.google.com/uc?id=1a0gZwixcJuZAUtqGR3L5P20JmoWfQU_d&export=download&authuser=0&confirm=t",
-			"dest": "gold_grades.xlsx"
-		},
-		"result": {
-			"type": "vm_file",
-			"path": "/home/user/exam/grades.xlsx",
-			"dest": "grades.xlsx"
-		},
+            "type": "cloud_file",
+            "path": "https://drive.google.com/uc?id=1a0gZwixcJuZAUtqGR3L5P20JmoWfQU_d&export=download&authuser=0&confirm=t",
+            "dest": "gold_grades.xlsx"
+        },
+        "result": {
+            "type": "vm_file",
+            "path": "/home/user/exam/grades.xlsx",
+            "dest": "grades.xlsx"
+        },
         "options": {
             "rules": [
-				{
-					"type": "sheet_data",
-					"sheet_idx0": 0,
-					"sheet_idx1": "EI0"
-				}
-			]
+                {
+                    "type": "sheet_data",
+                    "sheet_idx0": 0,
+                    "sheet_idx1": "EI0"
+                }
+            ]
         }
-    }
+    },
+    "task_id": "aceb0368-56b8-4073-b70e-3dc9aee184e0",
+    "os": "ubuntu"
 }
