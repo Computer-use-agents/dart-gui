@@ -24,14 +24,14 @@ export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 
-export ROOT_DATA_DIR=tmp_async_sql_0928 
-export RUN_ID=pengxiang_test_0928
+export ROOT_DATA_DIR=tmp_async_0802_n16_ori_dis 
+export RUN_ID=pengxiang_test_0802_origin_distribution
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
     data.train_files=evaluation_examples/filtered_test_all.json \
     data.val_files=evaluation_examples/filtered_test_all.json \
-    data.train_batch_size=2 \
+    data.train_batch_size=4 \
     data.max_prompt_length=32000 \
     data.max_response_length=32000 \
     data.filter_overlong_prompts=True \
@@ -56,6 +56,7 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.kl_loss_coef=0.01 \
     actor_rollout_ref.actor.kl_loss_type=low_var_kl \
     actor_rollout_ref.actor.entropy_coeff=0 \
+    "actor_rollout_ref.actor.checkpoint.save_contents=['model', 'optimizer', 'extra', 'hf_model']" \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.actor.fsdp_config.param_offload=False \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=False \
@@ -74,9 +75,9 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     algorithm.use_kl_in_reward=False \
     trainer.critic_warmup=0 \
-    trainer.logger=['console','swanlab'] \
+    "trainer.logger=['console','swanlab']" \
     trainer.project_name='verl_osworld_grpo' \
-    trainer.experiment_name="osworld_all_feasible_reward_script_grpo_k8s_0728_8_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 6 | head -n 1)" \
+    trainer.experiment_name="osworld_all_feasible_reward_script_grpo_k8s_0802_16_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 6 | head -n 1)" \
     trainer.n_gpus_per_node=$N_GPUS \
     trainer.nnodes=1 \
     trainer.save_freq=10 \

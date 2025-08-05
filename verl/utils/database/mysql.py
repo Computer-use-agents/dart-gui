@@ -24,7 +24,7 @@ DB_CONFIG = {
     'user': 'agentictrl',
     'password': '`1qaz~!QAZ',
     'database': 'BIGAI',
-    'port': 3306,
+    'port': 5906,
     'charset': 'utf8mb4'
 }
 
@@ -35,7 +35,7 @@ class Dataset(Base):
     
     # 字段定义
     id = Column(Integer, primary_key=True, autoincrement=True, comment='自增主键')
-    trajectory_id = Column(String(255), nullable=False, unique=True, comment='轨迹ID，唯一')
+    trajectory_id = Column(String(255), nullable=False, unique=False, comment='轨迹ID，唯一')
     created_at = Column(TIMESTAMP, default=func.current_timestamp(), comment='创建时间')
     used = Column(Integer, default=0, comment='使用该数据训过几次')
     model_version = Column(Integer, default=0, comment="使用哪个版本生成的数据")
@@ -90,19 +90,21 @@ class MySQLDatasetsORM:
         self.SessionMaker = sessionmaker(bind=self.engine)
 
     def setup_database(self):
-        """设置数据库连接和创建表"""
+        """设置数据库连接和创建表 - 完全禁用连接池"""
         try:
             self.engine = create_engine(
                 self.db_url,
                 connect_args={"charset": self.config['charset']},
                 echo=False,  # 设置为True可以看到SQL语句
-                pool_pre_ping=True  # 连接池预检查
+                # 完全禁用连接池 - 每次操作都创建新连接
+                poolclass=None,  # 禁用连接池
+                pool_pre_ping=False,  # 禁用预检查
             )
             self.SessionMaker = sessionmaker(bind=self.engine)
             
             # 创建表
             Base.metadata.create_all(self.engine)
-            logger.info("Database setup completed and tables created")
+            logger.info("Database setup completed and tables created (no connection pool)")
             
         except SQLAlchemyError as e:
             logger.error(f"Error setting up database: {e}")
@@ -130,17 +132,28 @@ class MySQLDatasetsORM:
 
     @contextmanager
     def get_session(self):
-        """数据库会话上下文管理器"""
-        session = self.SessionMaker()
+        """数据库会话上下文管理器 - 无连接池模式"""
+        session = None
         try:
+            # 每次创建新的session（对应新的数据库连接）
+            session = self.SessionMaker()
             yield session
             session.commit()
         except Exception as e:
-            session.rollback()
+            if session:
+                try:
+                    session.rollback()
+                except Exception as rollback_error:
+                    logger.warning(f"Error during rollback: {rollback_error}")
             logger.error(f"Session error: {e}")
             raise
         finally:
-            session.close()
+            # 确保session总是被关闭
+            if session:
+                try:
+                    session.close()
+                except Exception as close_error:
+                    logger.warning(f"Error closing session: {close_error}")
     
     def _detach_object(self, session: Session, obj):
         """将对象从session中分离，避免session关闭后的访问问题"""

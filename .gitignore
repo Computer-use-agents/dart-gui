@@ -144,3 +144,4 @@ sleep.sh
 *.ico
 *.webp
 data/
+*results*/
