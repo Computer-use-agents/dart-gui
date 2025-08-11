@@ -777,14 +777,19 @@ class LastNTrajectorySplitter:
 
         
         # end = start + 2 * self.window_size
+        
         n_msg = len(dataset)
-        end = n_msg - 1
-        start = n_msg - 2 * self.window_size
+        if n_msg%2 == 1:
+            end = n_msg 
+            start = max(1, end - 2 * self.window_size)
+        else:
+            end = n_msg - 1
+            start = max(1, end - 2 * self.window_size)
 
         batch_data = []
         instruction = copy.deepcopy(dataset[1])
         is_first_turn = True
-        while end < n_msg:
+        while end <= n_msg:
             assert dataset[start]["role"] == "user"
             if len(dataset[start]["content"]) == 1:
                 # remove image from instruction
@@ -792,7 +797,7 @@ class LastNTrajectorySplitter:
             item = self._process_item(dataset, copy.deepcopy(instruction), start, end, is_first_turn)
             is_first_turn = False
             
-            # batch_data.append((item, copy.deepcopy(task_config)))
+            batch_data.append((item, copy.deepcopy(task_config)))
             start += 2 * self.stride_size
             end = start + 2 * self.window_size
         return batch_data
@@ -800,9 +805,9 @@ class LastNTrajectorySplitter:
     def _process_item(self, dataset, instruction, start, end, is_first_turn: bool) -> list:
         system_prompt = dataset[0]
         message_body = []
-        for i in range(start):
-            if dataset[i]["role"] == "assistant":
-                message_body.append(copy.deepcopy(dataset[i]))
+        # for i in range(start):
+        #     if dataset[i]["role"] == "assistant":
+        #         message_body.append(copy.deepcopy(dataset[i]))
         current_instruction = copy.deepcopy(instruction)
         if is_first_turn:
             message_body.extend(copy.deepcopy(dataset[start+1: end]))

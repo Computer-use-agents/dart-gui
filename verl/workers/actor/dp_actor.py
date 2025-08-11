@@ -515,6 +515,10 @@ class DataParallelPPOActor(BasePPOActor):
                     loss.backward()
 
                     data = {
+                        "actor/advantages_mean": advantages.mean().detach().item(),
+                        "actor/advantages_std": advantages.std().detach().item(),
+                        "actor/log_prob_mean": log_prob.mean().detach().item(),
+                        "actor/old_log_prob_mean": old_log_prob.mean().detach().item(),
                         "actor/pg_loss": pg_loss.detach().item(),
                         "actor/pg_clipfrac": pg_clipfrac.detach().item(),
                         "actor/ppo_kl": ppo_kl.detach().item(),

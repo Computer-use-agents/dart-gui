@@ -32,7 +32,7 @@ export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 
-export ROOT_DATA_DIR=tmp_async_0802_n16_ori_dis 
+export ROOT_DATA_DIR=tmp_async_sql_0808_ori_distribu_8 
 export RUN_ID=pengxiang_test_0808_ori_dis_8
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_16_9et14w
 export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0808_ori_dis_rollt8_bz8_mb4_micro2_last5_truncate
@@ -73,7 +73,11 @@ fsdp_size=32
 
 
 
-python3 -m verl.trainer.main_ppo_async \
+ray job submit --address="http://172.19.102.250:8265" \
+    --runtime-env=verl/trainer/runtime_env.yaml \
+    --no-wait \
+    -- \
+    python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
     data.train_files=evaluation_examples/filtered_test_all.json \
     data.val_files=evaluation_examples/filtered_test_all.json \

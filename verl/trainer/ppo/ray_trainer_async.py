@@ -38,7 +38,7 @@ from verl.trainer.ppo.metric_utils import (
     compute_timing_metrics,
 )
 from verl.trainer.ppo.ray_trainer import RayOSWorldTrainer, ResourcePoolManager, Role, WorkerType, compute_advantage
-from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter
+from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter, StepwiseTrajectorySplitter, LastNTrajectorySplitter
 from verl.utils.debug import marked_timer
 from verl.utils.metric import (
     reduce_metrics,
@@ -111,15 +111,39 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                 batch: DataProto = DataProto.from_single_dict(batch_dict)
                 is_last_step = self.global_steps >= self.total_training_steps
                 with marked_timer("step", timing_raw):
-                    splitter = TrajectorySplitter(
-                        processor=self.processor,
-                        root_dir=self.config.data.root_data_dir,
-                        window_size=self.config.data.window_size,
-                        stride_size=self.config.data.stride_size,
-                        max_prompt_length=self.config.data.max_prompt_length,
-                        max_response_length=self.config.data.max_response_length,
-                        truncation=self.config.data.truncation
-                    )
+                    if self.config.trainer.splitter == "sliding_window":
+                        print("Using sliding window splitter")
+                        splitter = TrajectorySplitter(
+                            processor=self.processor,
+                            root_dir=self.config.data.root_data_dir,
+                            window_size=self.config.data.window_size,
+                            stride_size=self.config.data.stride_size,
+                            max_prompt_length=self.config.data.max_prompt_length,
+                            max_response_length=self.config.data.max_response_length,
+                            truncation=self.config.data.truncation
+                        )
+                    elif self.config.trainer.splitter == "last_n":
+                        print("Using last n splitter")
+                        splitter = LastNTrajectorySplitter(
+                            processor=self.processor,
+                            root_dir=self.config.data.root_data_dir,
+                            window_size=self.config.data.window_size,
+                            stride_size=self.config.data.stride_size,
+                            max_prompt_length=self.config.data.max_prompt_length,
+                            max_response_length=self.config.data.max_response_length,
+                            truncation=self.config.data.truncation
+                        )
+                    elif self.config.trainer.splitter == "stepwise":
+                        print("Using stepwise splitter")
+                        splitter = StepwiseTrajectorySplitter(
+                            processor=self.processor,
+                            root_dir=self.config.data.root_data_dir,
+                            max_prompt_length=self.config.data.max_prompt_length,
+                            max_response_length=self.config.data.max_response_length,
+                            truncation=self.config.data.truncation
+                        )
+                    else:
+                        raise ValueError(f"Unhandled splitter type: {self.config.trainer}")
                     old_batch = batch
                     dataset_ids = old_batch.non_tensor_batch["dataset_ids"]
                     reward_tensor = old_batch.batch["reward_tensors"]

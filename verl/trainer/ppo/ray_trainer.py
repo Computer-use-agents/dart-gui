@@ -110,13 +110,16 @@ class ResourcePoolManager:
     def _check_resource_available(self):
         """Check if the resource pool can be satisfied in this ray cluster."""
         node_available_resources = ray.state.available_resources_per_node()
+        print(f"node_available_resources: {node_available_resources}")
         node_available_gpus = {node: node_info.get("GPU", 0) if "GPU" in node_info else node_info.get("NPU", 0) for node, node_info in node_available_resources.items()}
+        print(f"node_available_gpus: {node_available_gpus}")
 
         # check total required gpus can be satisfied
         total_available_gpus = sum(node_available_gpus.values())
+        print(f"Total available GPUs: {total_available_gpus}")
         total_required_gpus = sum([n_gpus for process_on_nodes in self.resource_pool_spec.values() for n_gpus in process_on_nodes])
-        if total_available_gpus < total_required_gpus:
-            raise ValueError(f"Total available GPUs {total_available_gpus} is less than total desired GPUs {total_required_gpus}")
+        # if total_available_gpus < total_required_gpus:
+        #     raise ValueError(f"Total available GPUs {total_available_gpus} is less than total desired GPUs {total_required_gpus}")
 
         # check each resource pool can be satisfied, O(#resource_pools * #nodes)
         for resource_pool_name, process_on_nodes in self.resource_pool_spec.items():
