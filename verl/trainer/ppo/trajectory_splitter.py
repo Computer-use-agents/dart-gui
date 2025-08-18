@@ -15,6 +15,25 @@ from verl.models.transformers.qwen2_vl import get_rope_index
 from verl.utils.dataset.vision_utils import process_image
 from verl.utils.osworld import limit_images_in_messages
 
+def replace_image_url(obj):
+    if isinstance(obj, dict):
+        new_obj = {}
+        for k, v in obj.items():
+            # 如果 key 是 image_url → 改成 image
+            new_key = "image" if k == "image_url" else k
+
+            # 如果是 type: "image_url" → 改成 type: "image"
+            if new_key == "type" and v == "image_url":
+                v = "image"
+
+            new_obj[new_key] = replace_image_url(v)
+        return new_obj
+
+    elif isinstance(obj, list):
+        return [replace_image_url(item) for item in obj]
+    else:
+        return obj
+    
 
 def collate_fn(data_list: list[dict]) -> dict:
     """
@@ -58,6 +77,7 @@ class TrajectorySplitter:
             max_response_length: int = 32000,
             truncation: str = "error",
             limit_images: int = 5,
+            limit_messages: int = 35,
         ) -> None:
         self.processor = processor
         self.root_dir = root_dir
@@ -67,6 +87,7 @@ class TrajectorySplitter:
         self.truncation = truncation
         self.max_response_length = max_response_length
         self.limit_images = limit_images
+        self.limit_messages = limit_messages
 
     def split(
             self, 
@@ -137,6 +158,7 @@ class TrajectorySplitter:
         message_path = os.path.join(dataset_dir, "final_messages.json")
         with open(message_path) as f:
             dataset = json.load(f)
+        dataset = replace_image_url(dataset)
         config_path = os.path.join(dataset_dir, "task_config.json")
         with open(config_path) as f:
             task_config = json.load(f)
@@ -144,10 +166,14 @@ class TrajectorySplitter:
         start = 1
         end = start + 2 * self.window_size
         n_msg = len(dataset)
+        if end > n_msg:
+            end = n_msg
         batch_data = []
         instruction = copy.deepcopy(dataset[1])
         is_first_turn = True
-        while end < n_msg:
+        while start < n_msg:
+            if end > n_msg:
+                end = n_msg
             assert dataset[start]["role"] == "user"
             if len(dataset[start]["content"]) == 1:
                 # remove image from instruction
@@ -163,7 +189,8 @@ class TrajectorySplitter:
     def _process_item(self, dataset, instruction, start, end, is_first_turn: bool) -> list:
         system_prompt = dataset[0]
         message_body = []
-        for i in range(start):
+        pre_start = max(0, end - self.limit_messages * 2 - 1)
+        for i in range(pre_start, start):
             if dataset[i]["role"] == "assistant":
                 message_body.append(copy.deepcopy(dataset[i]))
         current_instruction = copy.deepcopy(instruction)
@@ -235,7 +262,12 @@ class TrajectorySplitter:
             if isinstance(msg["content"], list):
                 for c in msg["content"]:
                     if c["type"] == "image":
-                        image_paths.append(os.path.join(self.root_dir, dataset_id, f"{c['image']}.png"))
+                        if '.png' in c['image']:
+                            image_paths.append(os.path.join(self.root_dir, dataset_id, c['image']))
+                        else:
+                            image_paths.append(os.path.join(self.root_dir, dataset_id, f"{c['image']}.png"))
+                    
+                    
         images = [process_image(Image.open(image)) for image in image_paths]
         multi_modal_data["image"] = images
         model_inputs = self.processor(text=[raw_prompt], images=images[:1], return_tensors="pt")
@@ -279,7 +311,10 @@ class TrajectorySplitter:
             if isinstance(msg["content"], list):
                 for c in msg["content"]:
                     if c["type"] == "image":
-                        image_paths.append(os.path.join(self.root_dir, dataset_id, f"{c['image']}.png"))
+                        if '.png' in c['image']:
+                            image_paths.append(os.path.join(self.root_dir, dataset_id, c['image']))
+                        else:
+                            image_paths.append(os.path.join(self.root_dir, dataset_id, f"{c['image']}.png"))
         images = [process_image(Image.open(image)) for image in image_paths]
         multi_modal_data["image"] = images
         model_inputs = self.processor(text=[raw_prompt], images=images, return_tensors="pt")
@@ -531,6 +566,7 @@ class StepwiseTrajectorySplitter:
         message_path = os.path.join(dataset_dir, "final_messages.json")
         with open(message_path) as f:
             dataset = json.load(f)
+        dataset = replace_image_url(dataset)
         config_path = os.path.join(dataset_dir, "task_config.json")
         with open(config_path) as f:
             task_config = json.load(f)
@@ -771,6 +807,7 @@ class LastNTrajectorySplitter:
         message_path = os.path.join(dataset_dir, "final_messages.json")
         with open(message_path) as f:
             dataset = json.load(f)
+        dataset = replace_image_url(dataset)
         config_path = os.path.join(dataset_dir, "task_config.json")
         with open(config_path) as f:
             task_config = json.load(f)

@@ -1,17 +1,18 @@
+# conda deactivate
 pip install cryptography
 
 set -x
 ENGINE=${1:-vllm_osworld}
-cd /root/verl/
+cd /workspace/computer-use/code
 
 # Initialize Ray cluster for multi-node training
 # Make sure Ray is running on all nodes before executing this script
 # On head node: ray start --head --port=6379
 # On worker nodes: ray start --address='head_node_ip:6379'
 # Detect number of GPUs on the current machine
-N_NODES=2
+N_NODES=1
 N_GPUS=$(nvidia-smi --list-gpus | wc -l) 
-N_GPUS_PER_NODE=8
+N_GPUS_PER_NODE=$N_GPUS
 
 # 生成带时间戳的唯一文件ID，后台运行
 MONITOR_ID="gpu_monitor_$(date +%Y%m%d_%H%M%S)_$$"
@@ -24,22 +25,22 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/root/checkpoints/UI-TARS-1.5-7B
+MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K
+export SWANLAB_API_KEY=rI0ezs9zkbORI8oUMsgHT #4wEX4aVA4guJHGZ553g4K
 export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-defau-bddf300d21.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 
-export ROOT_DATA_DIR=tmp_async_0802_n16_ori_dis 
-export RUN_ID=pengxiang_test_0808_ori_dis_8
+export ROOT_DATA_DIR=test_for_train_pass8_gpu8_env77_20250817_1345
+export RUN_ID=results/test_for_train_pass8_gpu8_env77_20250817_1345
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_16_9et14w
-export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0808_ori_dis_rollt8_bz8_mb4_micro2_last5_truncate
+export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0813_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
-
+export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
 
 # training parameters
 adv_estimator=grpo
@@ -58,7 +59,10 @@ max_response_length=32000
 
 loss_agg_mode="token-mean"
 
-train_prompt_bsz=16
+
+train_bz_min=4
+train_bz_max=8
+train_prompt_bsz=8
 rollout_n=8
 train_prompt_mini_bsz=8
 
@@ -84,15 +88,18 @@ python3 -m verl.trainer.main_ppo_async \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
     data.image_key=images \
-    data.custom_cls.path=verl/utils/dataset/osworld_dataset.py \
+    data.custom_cls.path=verl/utils/dataset/osworld_dataset_iter.py \
     data.custom_cls.name=OSWorldAsyncDataset \
-    data.shuffle=true \
+    data.shuffle=false \
     +data.root_data_dir=$ROOT_DATA_DIR \
     +data.window_size=5 \
     +data.stride_size=5 \
     +data.max_steps=100 \
-    +data.num_workers=16 \
+    +data.num_workers=0 \
     +data.run_id=$RUN_ID \
+    +data.steps_per_epoch=100 \
+    +data.train_batch_size_min=${train_bz_min} \
+    +data.train_batch_size_max=${train_bz_max} \
     algorithm.adv_estimator=${adv_estimator} \
     algorithm.use_kl_in_reward=${use_kl_in_reward} \
     algorithm.kl_ctrl.kl_coef=${kl_coef} \
@@ -124,12 +131,13 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=10 \
+    trainer.save_freq=2 \
     trainer.test_freq=5 \
     trainer.val_before_train=False \
-    trainer.total_epochs=5 \
+    trainer.total_epochs=1 \
+    trainer.max_actor_ckpt_to_keep=20 \
     +trainer.run_id=$RUN_ID \
-    +trainer.splitter=last_n \
+    +trainer.splitter=sliding_window \
     +trainer.splitter_parallel=False\
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
@@ -142,6 +150,7 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.rollout.top_k=200 \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
+    +actor_rollout_ref.rollout.server_url=$ROLLOUT_SERVER_URL \
     #  +trainer.splitter=sliding_window \
     # 
     #     trainer.experiment_name="osworld_all_feasible_reward_script_grpo_k8s_0802_16_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 6 | head -n 1)" \

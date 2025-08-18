@@ -21,7 +21,7 @@ import os
 import re
 from collections import defaultdict
 from typing import List, Optional, Union
-
+import  time
 import numpy as np
 import torch
 from omegaconf import DictConfig, ListConfig
@@ -292,6 +292,11 @@ class OSWorldAsyncDataset(Dataset):
         # self.num_workers = config.get("filter_overlong_prompts_workers", max(1, os.cpu_count() // 4))
         # self.num_workers = min(self.num_workers, os.cpu_count())
         self.num_workers = config.get("num_workers", 2)
+        
+        
+        self.batch_size_min =  config.get("train_batch_size_min", 4)
+        self.batch_size_max =  config.get("train_batch_size_max", 8)
+        
         self.use_shm = config.get("use_shm", False)
         self.chat_template_func = config.get("chat_template_func", None)
         self.need_tools_kwargs = config.get("need_tools_kwargs", False)
@@ -320,6 +325,7 @@ class OSWorldAsyncDataset(Dataset):
         #     print(f"Error getting task_ids for run_id {self.run_id}: {e}")
         #     self.db_manager.close_database()
         #     raise
+        self.task_ids = []
 
 
     def __len__(self):
@@ -344,25 +350,26 @@ class OSWorldAsyncDataset(Dataset):
                 message["content"] = content_list
 
         return messages
-
+    
     def _get_item_with_wait(self, item_index: int) -> list[dict]:
         
         # 只在需要时设置数据库连接
         if not self.db_manager_trainable_group.is_connected():
             self.db_manager_trainable_group.setup_database()
-        
+        print(f"run-id: {self.run_id}, item_index: {item_index}, len(self.task_ids): {len(self.task_ids)}")
         try:
-            self.task_ids = self.db_manager_trainable_group.get_all_task_id_by_run_id(self.run_id)
+            while len(self.task_ids) < self.batch_size_min:
+                self.task_ids = self.db_manager_trainable_group.get_all_task_id_by_run_id(self.run_id)
+                time.sleep(60)
+            print(f"_get item with wait len task_ids {len(self.task_ids)}" )
             row_dicts = []
+            self.task_ids = self.task_ids[:self.batch_size_max]
             for task_id in self.task_ids:
-                if not self.db_manager_trainable_group.is_connected():
-                    self.db_manager_trainable_group.setup_database()
                 row_dict = self.db_manager_trainable_group.get_datasets_by_task_id(
                     run_id=self.run_id,
                     task_id=task_id
-                )
-                print(f"type of row_dict: {type(row_dict)}")
-                row_dicts += row_dict
+                )[0]
+                row_dicts = row_dicts + row_dict
             
                 print(f"run-id: {self.run_id}, fetched data, step: {item_index}, len(row_dicts): {len(row_dict)}")
             if len(row_dicts) > 0:
@@ -395,11 +402,9 @@ class OSWorldAsyncDataset(Dataset):
 
         for row_dict in row_dicts:
             output_row_dict = dict()
-            # trajectory_id = row_dict["trajectory_id"]
-
             trajectory_id = row_dict["trajectory_id"]
 
-            ##
+            ## update the  'used' to the rollout_run sql
             if not self.db_manager_rollout_run.is_connected():
                 self.db_manager_rollout_run.setup_database()
             self.db_manager_rollout_run.update_used(trajectory_id=trajectory_id)
@@ -437,9 +442,6 @@ class OSWorldAsyncDataset(Dataset):
             output_row_dict["dataset_ids"] = trajectory_id
             output_row_dict["reward_tensors"] = reward_tensor
             output_row_dicts.append(output_row_dict)
-
-        if len(output_row_dicts) == 0:
-            print(f"run-id: {self.run_id}, fetched no data, offset: {item}, len(output_row_dicts): {len(output_row_dicts)}")
 
         # print(f"run-id: {self.run_id}, fetched data, offset: {item}, len(output_row_dicts): {len(output_row_dicts)}")
         # return output_row_dict

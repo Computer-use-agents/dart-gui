@@ -297,7 +297,7 @@ class MySQLDatasetsORM:
                 datasets = session.query(Dataset).filter(
                     Dataset.run_id == run_id
                 )
-                datasets = datasets.order_by(Dataset.create_at.asc()).offset(offset).limit(limit).all()
+                datasets = datasets.offset(offset).limit(limit).all()
                 return [dataset.to_dict() for dataset in datasets]
             # session = self.get_session()
             # datasets = session.query(Dataset).filter(

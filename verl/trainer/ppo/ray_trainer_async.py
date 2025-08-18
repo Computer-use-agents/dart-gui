@@ -28,6 +28,7 @@ import torch
 from omegaconf import OmegaConf
 from torch.utils.data import Dataset, Sampler
 from tqdm import tqdm
+import time
 
 from verl import DataProto
 from verl.single_controller.ray import RayWorkerGroup
@@ -44,6 +45,8 @@ from verl.utils.metric import (
     reduce_metrics,
 )
 from verl.utils.eval import validate_osworld, validate_osworld_parallel
+from verl.utils.database.mysql_model_version import create_database_manager as create_mysql_model_version_manager
+from verl.utils.database.rollouter_reload_model import reload_model
 
 
 class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
@@ -51,6 +54,8 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         config.actor_rollout_ref.rollout.root_data_dir = config.data.root_data_dir
         super().__init__(config, tokenizer, role_worker_mapping, resource_pool_manager, ray_worker_group_cls, processor, reward_fn, val_reward_fn, train_dataset, val_dataset, collate_fn, train_sampler, device_name)
         os.makedirs(self.config.data.root_data_dir, exist_ok=True)
+        self.save_interval = config.get("save_interval", 780)
+        self._last_ckpt_time = None
         
     def _validate(self):
         results = validate_osworld_parallel(
@@ -294,8 +299,34 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     #     metrics.update(val_metrics)
 
                     if self.config.trainer.save_freq > 0 and (is_last_step or self.global_steps % self.config.trainer.save_freq == 0):
+                        if self.save_interval and self._last_ckpt_time is not None:
+                            elapsed = time.monotonic() - self._last_ckpt_time
+                            remaining = self.save_interval - elapsed
+                            if remaining > 0:
+                                print(f"Waiting for {remaining} seconds to save checkpoint...")
+                                time.sleep(remaining)
+                                
+
                         with marked_timer("save_checkpoint", timing_raw):
-                            self._save_checkpoint()
+                            actor_local_path = self._save_checkpoint()
+                            print(f"Checkpoint saved at {actor_local_path}")
+                            actor_local_path_hf = os.path.join(actor_local_path, "huggingface")
+                            abs_path_actor_hf = os.path.abspath(actor_local_path_hf)
+                            # Insert checkpoint path into MySQL database
+                            print("Inserting checkpoint path into MySQL database...")
+                            db_manager = create_mysql_model_version_manager()
+                            db_manager.insert_checkpoint(abs_path_actor_hf)
+                            db_manager.close_database()
+                            print("Checkpoint path inserted into MySQL database.")
+
+                            print("Reloading model in rollouter...")
+                            # Reload model in rollouter
+                            reload_result = reload_model(
+                                service_url=self.config.actor_rollout_ref.rollout.server_url,
+                                new_ckpt_path=abs_path_actor_hf
+                            )
+                            
+                        self._last_ckpt_time = time.monotonic()
                         # val_metrics: dict = self._validate()
                         # if is_last_step:
                             # last_val_metrics = val_metrics
