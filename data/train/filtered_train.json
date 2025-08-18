@@ -1,0 +1,4667 @@
+[
+    {
+        "trajectory_id": "d12d72ef-d39a-4f07-a010-14b2fecfe8c5",
+        "task_id": "7b6c7e24-c58a-49fc-a5bb-d57b80e5b4c3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2fab5bc9-e08e-4917-a696-2e349d3931e7",
+        "task_id": "7b6c7e24-c58a-49fc-a5bb-d57b80e5b4c3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4e801ea8-00dc-4a67-bc7f-b4ecd978e72e",
+        "task_id": "7b6c7e24-c58a-49fc-a5bb-d57b80e5b4c3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6008812f-cbe7-4b0e-a0bf-39d2e0e6e851",
+        "task_id": "7b6c7e24-c58a-49fc-a5bb-d57b80e5b4c3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "940f8908-2e7e-4d7c-812d-37470c81c204",
+        "task_id": "7b6c7e24-c58a-49fc-a5bb-d57b80e5b4c3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "259df0ca-716d-4cc6-84b8-bf33fc067c43",
+        "task_id": "7b6c7e24-c58a-49fc-a5bb-d57b80e5b4c3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c39d4963-e1da-474e-a283-9a31978c815c",
+        "task_id": "7b6c7e24-c58a-49fc-a5bb-d57b80e5b4c3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a0f1aa8a-5947-458d-9999-8f35758437c7",
+        "task_id": "7b6c7e24-c58a-49fc-a5bb-d57b80e5b4c3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2b9d691f-b96d-48bf-ba7b-aeff8046597f",
+        "task_id": "06fe7178-4491-4589-810f-2e2bc9502122",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "759a1752-0baa-4127-b41c-4c20b1053c7c",
+        "task_id": "06fe7178-4491-4589-810f-2e2bc9502122",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e4a3a0d2-66e3-43b8-b314-f4cb87b29009",
+        "task_id": "06fe7178-4491-4589-810f-2e2bc9502122",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c2089768-9663-4988-9a1f-b94c165dc199",
+        "task_id": "06fe7178-4491-4589-810f-2e2bc9502122",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4d62fdde-0fcf-48c2-a6fd-d32d849a4bce",
+        "task_id": "06fe7178-4491-4589-810f-2e2bc9502122",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c9c75fa0-f743-445e-acb9-4915f02a1d1e",
+        "task_id": "06fe7178-4491-4589-810f-2e2bc9502122",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "315f84ca-0061-42d6-84c3-3cdece5513ef",
+        "task_id": "06fe7178-4491-4589-810f-2e2bc9502122",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "db74ca0e-c85b-49bb-b2c8-3d6121dac61c",
+        "task_id": "06fe7178-4491-4589-810f-2e2bc9502122",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0e77aa12-2bb8-470d-ad76-e2c045ef5667",
+        "task_id": "e1e75309-3ddb-4d09-92ec-de869c928143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ae879cfb-221c-426d-9c69-a20dd95a8c2e",
+        "task_id": "e1e75309-3ddb-4d09-92ec-de869c928143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "91b960d1-b53e-4da8-800b-b708ca1fcc1c",
+        "task_id": "e1e75309-3ddb-4d09-92ec-de869c928143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6570b689-554b-4647-8a6f-ce58b8e7c3ae",
+        "task_id": "e1e75309-3ddb-4d09-92ec-de869c928143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "28fbd126-0c5f-4e57-aa68-80a9029485b2",
+        "task_id": "e1e75309-3ddb-4d09-92ec-de869c928143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "c6568f4a-268f-4da2-ac27-17d6e7ade067",
+        "task_id": "2ad9387a-65d8-4e33-ad5b-7580065a27ca",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f420283c-978a-4efa-b36a-39ec6221debb",
+        "task_id": "2ad9387a-65d8-4e33-ad5b-7580065a27ca",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c578b0a2-cd5f-4260-97d4-afa3ee7c3b07",
+        "task_id": "2ad9387a-65d8-4e33-ad5b-7580065a27ca",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "bf87902c-a199-476f-8273-0917a10945f8",
+        "task_id": "2ad9387a-65d8-4e33-ad5b-7580065a27ca",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "327cca0b-4d31-4937-9520-f859f878427d",
+        "task_id": "2ad9387a-65d8-4e33-ad5b-7580065a27ca",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "899623eb-c679-43c4-9bfc-c82cda1fc803",
+        "task_id": "2ad9387a-65d8-4e33-ad5b-7580065a27ca",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a340cede-e5da-4c38-ad0e-06e5f3ecbfe5",
+        "task_id": "2ad9387a-65d8-4e33-ad5b-7580065a27ca",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f6e6c3fe-9ace-42a4-a4c4-6181afe41e72",
+        "task_id": "2ad9387a-65d8-4e33-ad5b-7580065a27ca",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c579cea4-2243-47f6-82c0-549e2c385968",
+        "task_id": "2ae9ba84-3a0d-4d4c-8338-3a1478dc5fe3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cc28f797-9173-416b-b62b-eed9e06e3e40",
+        "task_id": "2ae9ba84-3a0d-4d4c-8338-3a1478dc5fe3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "25abcaea-aa6b-4ed5-bf70-1ff9e1788363",
+        "task_id": "2ae9ba84-3a0d-4d4c-8338-3a1478dc5fe3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6e389715-65ae-4d78-ac5f-896bb0bb71a8",
+        "task_id": "2ae9ba84-3a0d-4d4c-8338-3a1478dc5fe3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "21b678df-21da-43a0-a5ee-c616017d16e2",
+        "task_id": "2ae9ba84-3a0d-4d4c-8338-3a1478dc5fe3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "569acad6-911a-4fe8-b299-c8032e9d01e5",
+        "task_id": "2ae9ba84-3a0d-4d4c-8338-3a1478dc5fe3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2150ee6e-c116-4c9a-b008-e3e7abc4f15e",
+        "task_id": "2ae9ba84-3a0d-4d4c-8338-3a1478dc5fe3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "afe5def5-046a-4af3-8bb7-3b7167114475",
+        "task_id": "2ae9ba84-3a0d-4d4c-8338-3a1478dc5fe3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f197cb8d-e980-4b84-bb45-f4d700f277a7",
+        "task_id": "12086550-11c0-466b-b367-1d9e75b3910e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "03a890c4-a410-476f-930e-e06563bb61fc",
+        "task_id": "12086550-11c0-466b-b367-1d9e75b3910e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c904bee9-c065-40fc-9aa7-0f5d285ccd7d",
+        "task_id": "12086550-11c0-466b-b367-1d9e75b3910e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "677a351b-dce7-462c-b59b-e47e159f7768",
+        "task_id": "12086550-11c0-466b-b367-1d9e75b3910e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "853890e7-019c-4578-80f4-4a9bd54435e1",
+        "task_id": "12086550-11c0-466b-b367-1d9e75b3910e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e14f1404-0eff-404a-8ccb-9d336dc8024d",
+        "task_id": "12086550-11c0-466b-b367-1d9e75b3910e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "68d7c654-b8d0-4137-bf88-2ecef4110d45",
+        "task_id": "12086550-11c0-466b-b367-1d9e75b3910e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "861c7ac6-24ea-4952-a51d-6e3354286847",
+        "task_id": "12086550-11c0-466b-b367-1d9e75b3910e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e7736628-c28d-4dc6-b436-4ab0e1fbb1d2",
+        "task_id": "6766f2b8-8a72-417f-a9e5-56fcaa735837",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "853a8af6-d4da-4979-a00f-852a1b57c0b1",
+        "task_id": "6766f2b8-8a72-417f-a9e5-56fcaa735837",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "905114ee-19fe-4f56-a7f7-d7ea4cef43cd",
+        "task_id": "6766f2b8-8a72-417f-a9e5-56fcaa735837",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e9e2b279-26cc-428d-886e-0cd36a5a818f",
+        "task_id": "6766f2b8-8a72-417f-a9e5-56fcaa735837",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3d9238e7-3138-4049-8545-22929427f345",
+        "task_id": "6766f2b8-8a72-417f-a9e5-56fcaa735837",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1e615e99-0e1e-4d0f-b9da-de9fa9cdad9a",
+        "task_id": "6766f2b8-8a72-417f-a9e5-56fcaa735837",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fa305616-52bf-401e-9bce-8c110648cefb",
+        "task_id": "6766f2b8-8a72-417f-a9e5-56fcaa735837",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "de2af0cd-a189-4929-94b9-19fa88ad03a0",
+        "task_id": "6766f2b8-8a72-417f-a9e5-56fcaa735837",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e48f7407-30ab-44a9-a129-f9238c7c2ab6",
+        "task_id": "3299584d-8f11-4457-bf4c-ce98f7600250",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f9a0f00f-e66d-4ce9-966e-5ee8fcd87ebb",
+        "task_id": "3299584d-8f11-4457-bf4c-ce98f7600250",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0be176ec-eb85-4114-ae7c-6b9ec40693cf",
+        "task_id": "3299584d-8f11-4457-bf4c-ce98f7600250",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7c0e8050-618f-4bac-89ab-4365d5fb00dd",
+        "task_id": "3299584d-8f11-4457-bf4c-ce98f7600250",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "17fb638a-4d10-4d1b-b8dd-714d074f4031",
+        "task_id": "3299584d-8f11-4457-bf4c-ce98f7600250",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c254b0e3-2c49-4279-ad48-9ca3f01fb4be",
+        "task_id": "3299584d-8f11-4457-bf4c-ce98f7600250",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7b39180b-0566-4d21-a1f9-ec2114a47797",
+        "task_id": "3299584d-8f11-4457-bf4c-ce98f7600250",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "bb93850c-dfc1-448d-b77e-1288846e6016",
+        "task_id": "3299584d-8f11-4457-bf4c-ce98f7600250",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fda64147-ba97-4479-86c2-e3897e67cc75",
+        "task_id": "9656a811-9b5b-4ddf-99c7-5117bcef0626",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "55843409-886e-4464-af31-1118b9c66b02",
+        "task_id": "9656a811-9b5b-4ddf-99c7-5117bcef0626",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8aa8d1bd-443b-41a5-ab71-5150358c20ef",
+        "task_id": "9656a811-9b5b-4ddf-99c7-5117bcef0626",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "525fef44-1e43-41df-8066-29aa1ce3fda9",
+        "task_id": "9656a811-9b5b-4ddf-99c7-5117bcef0626",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8fd234c0-1198-4711-9645-b07f889feba9",
+        "task_id": "9656a811-9b5b-4ddf-99c7-5117bcef0626",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "afb041ce-8fd1-46b6-aac3-24de543b7aa8",
+        "task_id": "9656a811-9b5b-4ddf-99c7-5117bcef0626",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "89e812ec-a3ab-4780-9391-3616b0fcfcf9",
+        "task_id": "9656a811-9b5b-4ddf-99c7-5117bcef0626",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "27e585db-8007-4458-940c-e64d79cee5af",
+        "task_id": "9656a811-9b5b-4ddf-99c7-5117bcef0626",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b1669de6-bafb-48da-b63c-c394f475d579",
+        "task_id": "f3b19d1e-2d48-44e9-b4e1-defcae1a0197",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "38ae6d14-29cb-4489-847d-4b4eaccc67d5",
+        "task_id": "f3b19d1e-2d48-44e9-b4e1-defcae1a0197",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f6d35b3f-eaa0-459a-bd45-2c04f6cf6ff0",
+        "task_id": "f3b19d1e-2d48-44e9-b4e1-defcae1a0197",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fb549c3f-faa9-4603-903c-64e395a299a4",
+        "task_id": "f3b19d1e-2d48-44e9-b4e1-defcae1a0197",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9cb10abd-2905-402d-9c66-5ed1c9d9a3be",
+        "task_id": "f3b19d1e-2d48-44e9-b4e1-defcae1a0197",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8ef8be42-ee5d-41aa-9a06-d2ffed6f4135",
+        "task_id": "f3b19d1e-2d48-44e9-b4e1-defcae1a0197",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ab5f63ca-d6b7-48b4-b75d-e7e97cc6dea8",
+        "task_id": "f3b19d1e-2d48-44e9-b4e1-defcae1a0197",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9baf664c-aec7-4eeb-8d55-82ed6b21e64d",
+        "task_id": "f3b19d1e-2d48-44e9-b4e1-defcae1a0197",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d2ca2f37-73e3-4db1-85b9-c347c3ae5419",
+        "task_id": "82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5ba835ac-4afa-447f-92f2-25e6d99a2c6a",
+        "task_id": "82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0882b554-b6e1-4a35-9db3-e5603cf3ced8",
+        "task_id": "82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "96d1ebba-4b3d-469e-9d29-f327d2240db5",
+        "task_id": "82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "beeb8eb6-b39e-49c2-a8a0-cc574423f42c",
+        "task_id": "82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "5397edd2-165f-45ea-8d51-69cf20dbaebf",
+        "task_id": "82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ab63ad00-0f18-4c1e-9301-d9d66bb5003d",
+        "task_id": "82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "10869bb9-b3a7-4765-8c9a-cb9a292f81ea",
+        "task_id": "82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b659648f-09da-4f13-af9a-d222744d2a17",
+        "task_id": "c1fa57f3-c3db-4596-8f09-020701085416",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "670b2ad6-1b04-4777-9b2a-d9ecff316e51",
+        "task_id": "c1fa57f3-c3db-4596-8f09-020701085416",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5b23d6a3-6fd8-4931-8ea1-e1547bc60871",
+        "task_id": "c1fa57f3-c3db-4596-8f09-020701085416",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a596be25-d069-47a1-91a4-6dfce207bb0e",
+        "task_id": "c1fa57f3-c3db-4596-8f09-020701085416",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b24efcf0-facb-4931-8a73-96ac170bb3f5",
+        "task_id": "c1fa57f3-c3db-4596-8f09-020701085416",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "62c9b1f5-b051-4684-95fe-bfe01df1b5c8",
+        "task_id": "c1fa57f3-c3db-4596-8f09-020701085416",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "01040e21-f87d-4670-a2f8-85966ae446db",
+        "task_id": "c1fa57f3-c3db-4596-8f09-020701085416",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "732cfa40-14cf-4205-b586-e6e3c9d4d97a",
+        "task_id": "c1fa57f3-c3db-4596-8f09-020701085416",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5fda1696-0abe-40ae-99e1-272abe118100",
+        "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1dd05392-d057-4a66-b0c3-3652f0909c49",
+        "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0d7bb8f1-2088-438f-a1c5-c2389f4f2877",
+        "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0ddaf86d-e0bb-4d5a-9784-c4591415295e",
+        "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cfd4a02e-6bd1-467f-9e2e-985a61b92e4e",
+        "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "eb32f6ad-4308-4d82-8421-d8af586d3106",
+        "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0c6ddf62-da1e-4796-a996-40b535ec50e6",
+        "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2d803430-51c3-404f-9af9-e280fc5ff020",
+        "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9cb76ca9-a83a-4351-b1bf-a44c19bf3008",
+        "task_id": "b4f95342-463e-4179-8c3f-193cd7241fb2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "94af2da8-7c2d-4fa7-a9fe-7790e7316162",
+        "task_id": "b4f95342-463e-4179-8c3f-193cd7241fb2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8beae706-72ae-4b3c-8cf9-22b01494376d",
+        "task_id": "b4f95342-463e-4179-8c3f-193cd7241fb2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a864f560-0115-4c3a-8f95-9d7cede78de8",
+        "task_id": "b4f95342-463e-4179-8c3f-193cd7241fb2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5465a5ae-1486-479e-800b-6e2f29165d76",
+        "task_id": "b4f95342-463e-4179-8c3f-193cd7241fb2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e10ac9b2-84ba-42f0-a243-030592577b5e",
+        "task_id": "b4f95342-463e-4179-8c3f-193cd7241fb2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d6e97aff-274e-458e-99be-212b8c3b3e7f",
+        "task_id": "b4f95342-463e-4179-8c3f-193cd7241fb2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c6ae3a40-177c-4dea-a7a5-82c37d1f68ae",
+        "task_id": "b4f95342-463e-4179-8c3f-193cd7241fb2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c45cf2f1-7120-4d65-9a4c-9f7fb52cda6b",
+        "task_id": "59155008-fe71-45ec-8a8f-dc35497b6aa8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d5ed7d60-e9dc-4383-b4ed-6da1ed45ed43",
+        "task_id": "59155008-fe71-45ec-8a8f-dc35497b6aa8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3bbf0224-4b47-4c89-9bcc-68f2ec6e4292",
+        "task_id": "59155008-fe71-45ec-8a8f-dc35497b6aa8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "383e668b-594c-4024-8da9-d50d66726550",
+        "task_id": "59155008-fe71-45ec-8a8f-dc35497b6aa8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "dd270d76-dd83-4dee-97a5-49563799b9a6",
+        "task_id": "59155008-fe71-45ec-8a8f-dc35497b6aa8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ff77e541-a8de-4b68-8f16-562d9b12030a",
+        "task_id": "59155008-fe71-45ec-8a8f-dc35497b6aa8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0eaa013e-3b51-45e9-855d-713e6ca8ea77",
+        "task_id": "59155008-fe71-45ec-8a8f-dc35497b6aa8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "eebdde81-ece0-4a6d-9921-00e34bffdd3e",
+        "task_id": "59155008-fe71-45ec-8a8f-dc35497b6aa8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e86ae975-b3a9-4e6c-9ae5-17ca531124c5",
+        "task_id": "b070486d-e161-459b-aa2b-ef442d973b92",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "35bfb316-142d-4d95-9422-528a711ddd83",
+        "task_id": "b070486d-e161-459b-aa2b-ef442d973b92",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "576c8509-b0aa-433c-b86e-fe6544a5d159",
+        "task_id": "b070486d-e161-459b-aa2b-ef442d973b92",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1bc8a624-db4a-4b7b-8ac9-81fd4179935c",
+        "task_id": "b070486d-e161-459b-aa2b-ef442d973b92",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "18ec7f38-e15e-4786-9bfe-4a15ac09a29d",
+        "task_id": "b070486d-e161-459b-aa2b-ef442d973b92",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "33f9c014-75bf-4afd-9438-14faa40cde70",
+        "task_id": "b070486d-e161-459b-aa2b-ef442d973b92",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b6927cd0-5293-4016-9635-ef310e05c9ee",
+        "task_id": "b070486d-e161-459b-aa2b-ef442d973b92",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "533bc28b-7aac-4fa6-9f1d-1d29394d2a00",
+        "task_id": "b070486d-e161-459b-aa2b-ef442d973b92",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "36b78602-5011-4540-a6aa-d2cda94abdc2",
+        "task_id": "0d8b7de3-e8de-4d86-b9fd-dd2dce58a217",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "312db53b-88c9-4147-aaa6-47df2e5ec8a7",
+        "task_id": "0d8b7de3-e8de-4d86-b9fd-dd2dce58a217",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9cc8dd81-b84a-4107-ac6b-b8c6a4dc8f8d",
+        "task_id": "0d8b7de3-e8de-4d86-b9fd-dd2dce58a217",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "09fbed57-89d7-40e4-9626-e387d3e35fde",
+        "task_id": "0d8b7de3-e8de-4d86-b9fd-dd2dce58a217",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5597da23-6c3a-43b3-bd2b-9319b142b0d2",
+        "task_id": "0d8b7de3-e8de-4d86-b9fd-dd2dce58a217",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a42a0505-e7e0-4c04-8c60-47c446703ad7",
+        "task_id": "0d8b7de3-e8de-4d86-b9fd-dd2dce58a217",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6bbfffc7-69d4-418b-8311-28019a031666",
+        "task_id": "0d8b7de3-e8de-4d86-b9fd-dd2dce58a217",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e4c51f84-eb61-4008-b44b-97d5ecacab2e",
+        "task_id": "0d8b7de3-e8de-4d86-b9fd-dd2dce58a217",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4dd48f83-8cd1-4267-be86-4bb649c98dee",
+        "task_id": "9f935cce-0a9f-435f-8007-817732bfc0a5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6eae9a3e-6e21-4fc6-8f6a-e9fad26fe350",
+        "task_id": "9f935cce-0a9f-435f-8007-817732bfc0a5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "64f3a5f8-7f0f-4a8b-9864-867f0dcb60b0",
+        "task_id": "9f935cce-0a9f-435f-8007-817732bfc0a5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "06b01fc2-92cf-47ae-88f1-ca95e08148e2",
+        "task_id": "9f935cce-0a9f-435f-8007-817732bfc0a5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ed45a68f-06a0-430a-b326-0db3be198e90",
+        "task_id": "9f935cce-0a9f-435f-8007-817732bfc0a5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8245c8f5-71fd-4966-867a-45f415f580c4",
+        "task_id": "9f935cce-0a9f-435f-8007-817732bfc0a5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8c916e78-5e05-47ef-ac6e-00d0f522d891",
+        "task_id": "9f935cce-0a9f-435f-8007-817732bfc0a5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4ab8929a-9aaf-41cb-9b09-a56606309bac",
+        "task_id": "9f935cce-0a9f-435f-8007-817732bfc0a5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "022ec64b-125a-4b46-bafd-4da2810e5335",
+        "task_id": "7a4deb26-d57d-4ea9-9a73-630f66a7b568",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6b656a7b-73d2-4091-adf8-3a0c5dea5315",
+        "task_id": "7a4deb26-d57d-4ea9-9a73-630f66a7b568",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "088bde1f-6cc9-49da-931c-26e6f05fe449",
+        "task_id": "7a4deb26-d57d-4ea9-9a73-630f66a7b568",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "262bae52-a69a-43e8-89fc-fe77a029fcce",
+        "task_id": "7a4deb26-d57d-4ea9-9a73-630f66a7b568",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "892df7e3-a28c-45fa-a2d0-9888c63c8a9c",
+        "task_id": "7a4deb26-d57d-4ea9-9a73-630f66a7b568",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3c642909-ee53-430f-95f5-091ea89773da",
+        "task_id": "7a4deb26-d57d-4ea9-9a73-630f66a7b568",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ebb46bba-4c32-4ae4-818e-8332f562e61a",
+        "task_id": "7a4deb26-d57d-4ea9-9a73-630f66a7b568",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0b374767-795a-49c2-9f4d-67610f9d28ad",
+        "task_id": "7a4deb26-d57d-4ea9-9a73-630f66a7b568",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4e501cf2-0a3f-4729-9bfc-64ebf1f3619c",
+        "task_id": "554785e9-4523-4e7a-b8e1-8016f565f56a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0cd1cf02-f5a4-4ec4-926d-230935941f76",
+        "task_id": "554785e9-4523-4e7a-b8e1-8016f565f56a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "deba37b6-9567-47d6-98b3-00513fca3067",
+        "task_id": "554785e9-4523-4e7a-b8e1-8016f565f56a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2b8ca9c2-83cd-45ba-818d-a69e730de9d6",
+        "task_id": "554785e9-4523-4e7a-b8e1-8016f565f56a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4875ed97-d01e-4b5f-a8b0-184548fd426f",
+        "task_id": "554785e9-4523-4e7a-b8e1-8016f565f56a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "180b82ac-8257-415b-9687-ff69fcc7e33e",
+        "task_id": "554785e9-4523-4e7a-b8e1-8016f565f56a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d33d02e5-ea2d-43ca-817f-49331f3f84a4",
+        "task_id": "554785e9-4523-4e7a-b8e1-8016f565f56a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4bb8fd62-32d3-4c51-90fa-c33da2d1e370",
+        "task_id": "554785e9-4523-4e7a-b8e1-8016f565f56a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ffda7b18-8760-4c3c-b001-c3a911d88bd0",
+        "task_id": "77b8ab4d-994f-43ac-8930-8ca087d7c4b4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b93b338b-6037-4203-b5fb-ac134f8516a2",
+        "task_id": "77b8ab4d-994f-43ac-8930-8ca087d7c4b4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "aabd3b14-4306-4fb7-b691-12bd9047bf82",
+        "task_id": "77b8ab4d-994f-43ac-8930-8ca087d7c4b4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8a8671a7-23d2-4903-9856-87831823a25a",
+        "task_id": "77b8ab4d-994f-43ac-8930-8ca087d7c4b4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9c9463a8-6438-4c3e-a112-3902ead9517d",
+        "task_id": "77b8ab4d-994f-43ac-8930-8ca087d7c4b4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c42dea1f-5135-4308-9938-a9aa2a5cbbf3",
+        "task_id": "77b8ab4d-994f-43ac-8930-8ca087d7c4b4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1c7ac9b2-8ff1-424f-9785-5be59c23a22d",
+        "task_id": "77b8ab4d-994f-43ac-8930-8ca087d7c4b4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3b7a83e4-2291-47b3-bb86-8b3661dce9a2",
+        "task_id": "77b8ab4d-994f-43ac-8930-8ca087d7c4b4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "be6f0377-0223-46ff-b15c-e8bde8991493",
+        "task_id": "f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c213e17b-3e09-435d-a31c-96c14581d138",
+        "task_id": "f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6e5f2df3-8520-4d1a-bdde-6a9404fcda20",
+        "task_id": "f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "51ebeead-37b7-40b1-ad42-783f474278d7",
+        "task_id": "f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "169c175e-3778-4228-8f01-bed4edaa85ae",
+        "task_id": "f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "300ae543-3b9b-4ba5-98af-496a132c8bd4",
+        "task_id": "f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "edf337df-7fe2-4a28-b803-3a0fcd238d44",
+        "task_id": "f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "9c14ab66-f1f2-40d7-98a6-6db3dcfad30a",
+        "task_id": "f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b20b96dd-bcb2-4dbc-95d9-1f5705c4cdeb",
+        "task_id": "06ca5602-62ca-47f6-ad4f-da151cde54cc",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1bec92f7-1a1d-4b15-bbb6-033283adcfe1",
+        "task_id": "06ca5602-62ca-47f6-ad4f-da151cde54cc",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "50da212a-02a5-49be-8f7b-332b65cff1bc",
+        "task_id": "06ca5602-62ca-47f6-ad4f-da151cde54cc",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3f6ada94-6260-4277-9162-331f6d289254",
+        "task_id": "06ca5602-62ca-47f6-ad4f-da151cde54cc",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "76db08ed-430e-4da6-8d3e-f847c2a69267",
+        "task_id": "06ca5602-62ca-47f6-ad4f-da151cde54cc",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "575dc299-7d36-4c2d-bcc5-23855254014c",
+        "task_id": "06ca5602-62ca-47f6-ad4f-da151cde54cc",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "790baca6-4fef-49dd-b399-9eeda8ec75d8",
+        "task_id": "06ca5602-62ca-47f6-ad4f-da151cde54cc",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8ce909d4-0362-42aa-b934-c1c413c614ed",
+        "task_id": "06ca5602-62ca-47f6-ad4f-da151cde54cc",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d94f516d-3225-4c7f-917f-37b08acb05c0",
+        "task_id": "e2dd0213-26db-4349-abe5-d5667bfd725c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "75d23419-6657-4829-955d-1f8ce872fa5d",
+        "task_id": "e2dd0213-26db-4349-abe5-d5667bfd725c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "bba4a8e2-ee00-4661-a6b8-120d98e53f2f",
+        "task_id": "e2dd0213-26db-4349-abe5-d5667bfd725c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "08171248-ac99-46bf-aa5d-fe4487072ee9",
+        "task_id": "e2dd0213-26db-4349-abe5-d5667bfd725c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "d0249bad-094e-46f6-9fd1-874e1103f47d",
+        "task_id": "e2dd0213-26db-4349-abe5-d5667bfd725c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "95546f9b-0108-418b-8e73-3381fd16577d",
+        "task_id": "e2dd0213-26db-4349-abe5-d5667bfd725c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "f587c1e0-9a62-4453-8812-d8301871e0ad",
+        "task_id": "e2dd0213-26db-4349-abe5-d5667bfd725c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "bb158b19-fc95-447d-b5ab-e096d510a03e",
+        "task_id": "e2dd0213-26db-4349-abe5-d5667bfd725c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "a10c6484-71f9-4a1e-b2c5-cddaae911d8e",
+        "task_id": "f723c744-e62c-4ae6-98d1-750d3cd7d79d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "da58577b-c3a8-4f5e-ab97-476585547016",
+        "task_id": "f723c744-e62c-4ae6-98d1-750d3cd7d79d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a129aa39-c3bc-4c8c-b0a5-1e7e3e2aeafe",
+        "task_id": "f723c744-e62c-4ae6-98d1-750d3cd7d79d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "84421f9a-503e-4747-8f13-acf10352d5ae",
+        "task_id": "f723c744-e62c-4ae6-98d1-750d3cd7d79d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9601011e-e227-4f78-ad5d-661bfc38266d",
+        "task_id": "f723c744-e62c-4ae6-98d1-750d3cd7d79d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d2eb453b-7d6f-4384-9abb-0e41c8220fdc",
+        "task_id": "f723c744-e62c-4ae6-98d1-750d3cd7d79d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "43fec0f8-aee3-4f65-9db0-5afa1e944fa8",
+        "task_id": "f723c744-e62c-4ae6-98d1-750d3cd7d79d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4174c6ac-eba8-4a2c-9c25-c0d21e354187",
+        "task_id": "f723c744-e62c-4ae6-98d1-750d3cd7d79d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e5760a16-7cd2-48a6-a54b-f3fb3875ae4e",
+        "task_id": "3aaa4e37-dc91-482e-99af-132a612d40f3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7047a650-feb5-4a21-9e3f-7a9b47d30602",
+        "task_id": "3aaa4e37-dc91-482e-99af-132a612d40f3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "41453116-0cc9-401f-85d3-5782445f1fb2",
+        "task_id": "3aaa4e37-dc91-482e-99af-132a612d40f3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "95c38025-2424-4407-a0aa-15ca9aafd9ed",
+        "task_id": "3aaa4e37-dc91-482e-99af-132a612d40f3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5eb2dd27-4964-44a3-bd6d-0077a26f72ed",
+        "task_id": "3aaa4e37-dc91-482e-99af-132a612d40f3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ec47c294-cad9-4548-8538-a150f349ea00",
+        "task_id": "3aaa4e37-dc91-482e-99af-132a612d40f3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "042664b4-0bf3-4d44-bcea-cecfa68f3b1b",
+        "task_id": "3aaa4e37-dc91-482e-99af-132a612d40f3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5d393d7e-1fea-4391-82c5-3e8f8f8e3e57",
+        "task_id": "3aaa4e37-dc91-482e-99af-132a612d40f3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "13e5cead-4184-4a82-ba80-48ce5766808e",
+        "task_id": "1273e544-688f-496b-8d89-3e0f40aa0606",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "262a7184-ac4a-4f8e-a6bf-92acbacd10c9",
+        "task_id": "1273e544-688f-496b-8d89-3e0f40aa0606",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ee1ad5f7-3e70-45ba-857e-16df3f8c145b",
+        "task_id": "1273e544-688f-496b-8d89-3e0f40aa0606",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b587d855-de7b-4f01-975c-0a18509f1dec",
+        "task_id": "1273e544-688f-496b-8d89-3e0f40aa0606",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "23f014b1-d3d0-43eb-94f8-672312e6833e",
+        "task_id": "1273e544-688f-496b-8d89-3e0f40aa0606",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4a844b39-a42a-4701-b430-fdfc1d603da5",
+        "task_id": "1273e544-688f-496b-8d89-3e0f40aa0606",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a84d5a08-ac86-450c-bb12-a0e1ebedd7df",
+        "task_id": "1273e544-688f-496b-8d89-3e0f40aa0606",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d4abcd9e-9fda-42a3-9b86-9649d9c3efe5",
+        "task_id": "1273e544-688f-496b-8d89-3e0f40aa0606",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5cbc7fe0-0dac-4db7-81de-8f74fd2d1bce",
+        "task_id": "12382c62-0cd1-4bf2-bdc8-1d20bf9b2371",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c51287e7-0e5b-4633-8858-739b89e0e7a4",
+        "task_id": "12382c62-0cd1-4bf2-bdc8-1d20bf9b2371",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1eb05dd1-ebfc-413a-9149-45822a8825e4",
+        "task_id": "12382c62-0cd1-4bf2-bdc8-1d20bf9b2371",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "256fcacf-692e-4e60-8bae-453bc341cc35",
+        "task_id": "12382c62-0cd1-4bf2-bdc8-1d20bf9b2371",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ef1a0c76-c3c3-42b5-8a68-c12bea321bd7",
+        "task_id": "12382c62-0cd1-4bf2-bdc8-1d20bf9b2371",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "4115bc8b-0635-41ca-8a86-d4b8b48c3dbd",
+        "task_id": "12382c62-0cd1-4bf2-bdc8-1d20bf9b2371",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "c547c105-2972-48f1-b4a9-9f30148a1686",
+        "task_id": "12382c62-0cd1-4bf2-bdc8-1d20bf9b2371",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "9444581b-e980-42db-bda1-416a22637c54",
+        "task_id": "12382c62-0cd1-4bf2-bdc8-1d20bf9b2371",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "a3177a22-f59b-4c5a-b926-4f6627a44c1b",
+        "task_id": "7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "887be793-2ce5-4730-aa09-dac4361ac9ac",
+        "task_id": "7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "45d9eb58-5f49-4334-8bd5-ce2f4105ac7a",
+        "task_id": "7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "3c6b7cd8-e505-40bf-96ce-21a8f9daea3c",
+        "task_id": "7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b61e34e4-8e09-45c1-9d71-78cf3912db95",
+        "task_id": "7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "bd5d8cdc-13bb-476f-9ba1-5969268e5747",
+        "task_id": "7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "cb30b87a-96ff-47b6-9713-a7047d59b2a0",
+        "task_id": "7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b3752a12-642d-4c2e-92f6-5be2d17886ec",
+        "task_id": "7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "a2c5fbfb-0f8b-41e3-9ddc-1bac20033030",
+        "task_id": "6054afcb-5bab-4702-90a0-b259b5d3217c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8d66ddb6-7863-425d-abdb-0ec710c0b239",
+        "task_id": "6054afcb-5bab-4702-90a0-b259b5d3217c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "90c42d46-8bc7-45ab-99a7-3ecaa8384511",
+        "task_id": "6054afcb-5bab-4702-90a0-b259b5d3217c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b147a8d4-05e6-4605-beee-5fd6c5a5a088",
+        "task_id": "6054afcb-5bab-4702-90a0-b259b5d3217c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "3841ee22-8811-41ba-ac60-a1cca098f5d0",
+        "task_id": "6054afcb-5bab-4702-90a0-b259b5d3217c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "a00e8af3-1356-426a-a068-fbda6bff7f50",
+        "task_id": "6054afcb-5bab-4702-90a0-b259b5d3217c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0cabf46b-a362-40b7-91af-4101893a80ad",
+        "task_id": "6054afcb-5bab-4702-90a0-b259b5d3217c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "f41cfec0-e12b-40a3-a8b6-0c43b8992ad1",
+        "task_id": "6054afcb-5bab-4702-90a0-b259b5d3217c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "c666567d-fe3f-49db-ab90-c7af1ad3c457",
+        "task_id": "7efeb4b1-3d19-4762-b163-63328d66303b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "53b0d256-5512-4625-864c-9bb3d01cdc62",
+        "task_id": "7efeb4b1-3d19-4762-b163-63328d66303b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d6f40577-267d-4711-a23e-e157255ca201",
+        "task_id": "7efeb4b1-3d19-4762-b163-63328d66303b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "22b54e8f-b544-4750-819f-d163b96ed785",
+        "task_id": "7efeb4b1-3d19-4762-b163-63328d66303b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "a0d7f1d3-6e17-4566-9719-4dfba8e22835",
+        "task_id": "7efeb4b1-3d19-4762-b163-63328d66303b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0f14cb3d-af01-4ef7-aa78-49c10c938ff6",
+        "task_id": "7efeb4b1-3d19-4762-b163-63328d66303b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "2a0991c7-008b-45ba-80ce-0984e5a71491",
+        "task_id": "7efeb4b1-3d19-4762-b163-63328d66303b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "74e4c24a-81ae-4652-ac6a-6655e773373c",
+        "task_id": "7efeb4b1-3d19-4762-b163-63328d66303b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "e386714b-ea96-4e7d-ba77-92669bbce22b",
+        "task_id": "aa3a8974-2e85-438b-b29e-a64df44deb4b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "dce0d391-d03f-44bd-9139-2b0ade77cd8a",
+        "task_id": "aa3a8974-2e85-438b-b29e-a64df44deb4b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6a0a0410-b8dd-4abe-afe8-1ce09a8eb405",
+        "task_id": "aa3a8974-2e85-438b-b29e-a64df44deb4b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "eff7aa66-dfa5-4f08-aa57-c1bc7c63024d",
+        "task_id": "aa3a8974-2e85-438b-b29e-a64df44deb4b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3ee0e5d1-c298-4199-936d-7f666d872f23",
+        "task_id": "aa3a8974-2e85-438b-b29e-a64df44deb4b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "76c6d8f5-cb47-4acd-b86d-829c8594cb68",
+        "task_id": "aa3a8974-2e85-438b-b29e-a64df44deb4b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6360354f-5639-4b8f-9699-821bf85870b8",
+        "task_id": "aa3a8974-2e85-438b-b29e-a64df44deb4b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "eb7bd430-116e-4275-b220-44adf624a42a",
+        "task_id": "aa3a8974-2e85-438b-b29e-a64df44deb4b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d0e6497b-c332-48de-9bf1-ff55e8789c56",
+        "task_id": "51b11269-2ca8-4b2a-9163-f21758420e78",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fef308d9-d99d-434d-b084-129f5c84f5dd",
+        "task_id": "51b11269-2ca8-4b2a-9163-f21758420e78",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5911cad6-2c83-488d-9846-9d8030bc3881",
+        "task_id": "51b11269-2ca8-4b2a-9163-f21758420e78",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f6703921-20b8-4b8c-9089-12c53b2de2bd",
+        "task_id": "51b11269-2ca8-4b2a-9163-f21758420e78",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c00d9eb7-b2f4-4b44-8b18-70f2476585a0",
+        "task_id": "51b11269-2ca8-4b2a-9163-f21758420e78",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9deadb60-aa08-4d0f-b262-014579131473",
+        "task_id": "51b11269-2ca8-4b2a-9163-f21758420e78",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "16d37729-e701-40d9-a51c-bfa5a5a26720",
+        "task_id": "51b11269-2ca8-4b2a-9163-f21758420e78",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b598ae90-a1b9-4abf-b4ce-48b02cd25f7a",
+        "task_id": "51b11269-2ca8-4b2a-9163-f21758420e78",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "66046663-b652-4ada-9156-30f7a5c3761b",
+        "task_id": "1e8df695-bd1b-45b3-b557-e7d599cf7597",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ed3610af-ba52-4731-81ab-70db30d52480",
+        "task_id": "1e8df695-bd1b-45b3-b557-e7d599cf7597",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c5c59fec-5833-432f-be35-8988752cea9e",
+        "task_id": "1e8df695-bd1b-45b3-b557-e7d599cf7597",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "992caf9e-05f0-4764-a8d1-a49c34a597cb",
+        "task_id": "1e8df695-bd1b-45b3-b557-e7d599cf7597",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "09d41acb-b7c3-4641-b855-864dff55a92f",
+        "task_id": "1e8df695-bd1b-45b3-b557-e7d599cf7597",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "aa9fc038-6bd3-4c78-8ce3-a3aaa795dc0f",
+        "task_id": "1e8df695-bd1b-45b3-b557-e7d599cf7597",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "529bc318-b0e4-4c80-9e39-50b5d7ef6f6b",
+        "task_id": "1e8df695-bd1b-45b3-b557-e7d599cf7597",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "8886d6c2-d413-469d-bd9c-c7456a58566e",
+        "task_id": "1e8df695-bd1b-45b3-b557-e7d599cf7597",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "034ffc91-6722-4e64-8462-8733377a4f29",
+        "task_id": "4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "625e2b5c-21d0-41ec-8403-48d9a92b1a70",
+        "task_id": "4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0185c930-3cf9-46ac-a7b4-835047fe8aff",
+        "task_id": "4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "05b11fb1-e93a-4142-992f-cd55503f80b7",
+        "task_id": "4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "8c528ed2-ed1f-401d-b589-a4be6af68ceb",
+        "task_id": "4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "cd2207a2-c695-4298-bc17-f8187a36f343",
+        "task_id": "4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "8ad1618a-1f37-48d1-bfd7-08af6f5d6374",
+        "task_id": "4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "2830f7a5-1265-4adb-b8e1-d8449f96f42a",
+        "task_id": "4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "53926055-36c5-4260-a046-6fd5b072daa5",
+        "task_id": "1d17d234-e39d-4ed7-b46f-4417922a4e7c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f1c4ed6c-710a-4452-95bb-c561e3fee2b5",
+        "task_id": "1d17d234-e39d-4ed7-b46f-4417922a4e7c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "db1195bf-059c-4246-a3d5-f8fdc500b02c",
+        "task_id": "1d17d234-e39d-4ed7-b46f-4417922a4e7c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "50021663-0f51-43f9-96a5-8a33ba64af0b",
+        "task_id": "1d17d234-e39d-4ed7-b46f-4417922a4e7c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d8962c93-8b33-4de8-a6f7-450dd882f273",
+        "task_id": "1d17d234-e39d-4ed7-b46f-4417922a4e7c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d765403f-4aca-4742-9b81-4e5985913f51",
+        "task_id": "1d17d234-e39d-4ed7-b46f-4417922a4e7c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "74ae94c7-a49c-4fe5-9a22-5c7ba61c4035",
+        "task_id": "1d17d234-e39d-4ed7-b46f-4417922a4e7c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "32996bdb-b4f9-4333-abff-8fed2ccaf10a",
+        "task_id": "1d17d234-e39d-4ed7-b46f-4417922a4e7c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c5609c49-fb8b-4d29-9bce-01780505b5b9",
+        "task_id": "4172ea6e-6b77-4edb-a9cc-c0014bd1603b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9040e82e-3b08-4042-bd51-b1e01e880b66",
+        "task_id": "4172ea6e-6b77-4edb-a9cc-c0014bd1603b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3426989b-6772-4ab9-bde8-5bc34309c614",
+        "task_id": "4172ea6e-6b77-4edb-a9cc-c0014bd1603b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "559aee2a-339f-4db2-b0ee-55270afeb789",
+        "task_id": "4172ea6e-6b77-4edb-a9cc-c0014bd1603b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0b1285de-a1f9-488c-a2b8-0b0a21a9f692",
+        "task_id": "4172ea6e-6b77-4edb-a9cc-c0014bd1603b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "96341c65-cc81-40d6-b682-718dfb03626f",
+        "task_id": "4172ea6e-6b77-4edb-a9cc-c0014bd1603b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "75909ebb-a324-41ee-8b97-33f704c87c25",
+        "task_id": "4172ea6e-6b77-4edb-a9cc-c0014bd1603b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ff21eed1-c290-4b52-bfab-9655aba31026",
+        "task_id": "4172ea6e-6b77-4edb-a9cc-c0014bd1603b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f560ad8c-1f83-4540-a928-214db611eaa7",
+        "task_id": "1334ca3e-f9e3-4db8-9ca7-b4c653be7d17",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9cab4f78-7686-4bea-823a-cdc1924c7a43",
+        "task_id": "1334ca3e-f9e3-4db8-9ca7-b4c653be7d17",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e0f0eb50-24e3-4da8-9dd1-b939d23971e3",
+        "task_id": "1334ca3e-f9e3-4db8-9ca7-b4c653be7d17",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3fecc2a4-dd6b-4c20-973a-b1999a5332b1",
+        "task_id": "1334ca3e-f9e3-4db8-9ca7-b4c653be7d17",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f867161a-d029-420e-b08c-e7c93bc21956",
+        "task_id": "1334ca3e-f9e3-4db8-9ca7-b4c653be7d17",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "59990a3c-07df-423f-afc5-03a9acf0acce",
+        "task_id": "1334ca3e-f9e3-4db8-9ca7-b4c653be7d17",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "54f427d6-712f-4fb3-9dcc-ad9c3f34446f",
+        "task_id": "1334ca3e-f9e3-4db8-9ca7-b4c653be7d17",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5bc575b9-9a8c-46c8-981f-37385b0c2718",
+        "task_id": "1334ca3e-f9e3-4db8-9ca7-b4c653be7d17",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3ca583a1-1582-4a0e-a7b3-b3dd880fa14f",
+        "task_id": "455d3c66-7dc6-4537-a39a-36d3e9119df7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f0c5fd90-60a5-429c-b26e-60e94ab4e113",
+        "task_id": "455d3c66-7dc6-4537-a39a-36d3e9119df7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "44ed0ba8-f6c1-4b73-b39c-57b0517e4848",
+        "task_id": "455d3c66-7dc6-4537-a39a-36d3e9119df7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4a665816-50e6-44a3-84fd-4ef76200b09d",
+        "task_id": "455d3c66-7dc6-4537-a39a-36d3e9119df7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "99714ab7-7f1e-4b1d-aafa-eb9153a2e695",
+        "task_id": "455d3c66-7dc6-4537-a39a-36d3e9119df7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "491b7d40-a591-4109-8e33-0a8a02425504",
+        "task_id": "455d3c66-7dc6-4537-a39a-36d3e9119df7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "28b1e86a-f618-4e70-8ab2-0880a110034a",
+        "task_id": "455d3c66-7dc6-4537-a39a-36d3e9119df7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "18885dd5-7420-4ca1-a696-429ddebe4769",
+        "task_id": "455d3c66-7dc6-4537-a39a-36d3e9119df7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "81e9b005-e1a8-441d-8a5e-a43e6d6c31cb",
+        "task_id": "af23762e-2bfd-4a1d-aada-20fa8de9ce07",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3c5556df-d4d3-4045-ac2d-44e7145b8a59",
+        "task_id": "af23762e-2bfd-4a1d-aada-20fa8de9ce07",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2ab94443-1f31-45a4-829f-e99516df5d33",
+        "task_id": "af23762e-2bfd-4a1d-aada-20fa8de9ce07",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ac186f5a-e275-4d75-9be3-6e1a86ea5f83",
+        "task_id": "af23762e-2bfd-4a1d-aada-20fa8de9ce07",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4b9abfed-649d-40cc-a21a-8ecf85bf4836",
+        "task_id": "af23762e-2bfd-4a1d-aada-20fa8de9ce07",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "25d365b2-4a09-4f9e-8008-e6e1986335ef",
+        "task_id": "af23762e-2bfd-4a1d-aada-20fa8de9ce07",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "68a96c57-07a5-4333-9078-1b4d04220446",
+        "task_id": "af23762e-2bfd-4a1d-aada-20fa8de9ce07",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c711faf6-b082-4456-83df-d5fda0588aca",
+        "task_id": "af23762e-2bfd-4a1d-aada-20fa8de9ce07",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5e390be2-77ef-4a40-b929-f9539c2f00c7",
+        "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "77f8444f-bd51-4d75-a990-90b4bbba6ef9",
+        "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "7a7a628b-1bc0-4033-aa65-d74c840a6f9e",
+        "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "73eba400-9450-4c4b-8ac9-0473b8056777",
+        "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "c473d541-cb5a-44cf-a4b5-1c790db0cb34",
+        "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "59f496cd-a3ec-41c3-98e7-9288ffcc5891",
+        "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "d599c991-a209-4f22-bc2f-4ab4b36e28a5",
+        "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0c9da2a0-4043-49b1-9fcc-95985bb64961",
+        "task_id": "0f84bef9-9790-432e-92b7-eece357603fb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "a3a4e316-0da0-4ee7-a40e-8ab8a00a5a09",
+        "task_id": "3b27600c-3668-4abd-8f84-7bcdebbccbdb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "fa0e6e8f-4faa-434c-a49e-a3bc15e66aa2",
+        "task_id": "3b27600c-3668-4abd-8f84-7bcdebbccbdb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b62a40c1-8b0e-4e4d-a172-c3c0041739e1",
+        "task_id": "3b27600c-3668-4abd-8f84-7bcdebbccbdb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "c5b9dc0a-f05c-4b0f-b6ed-7740759a8d4a",
+        "task_id": "3b27600c-3668-4abd-8f84-7bcdebbccbdb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "2c847ef1-19b7-49ea-b41d-4338b0d100c4",
+        "task_id": "3b27600c-3668-4abd-8f84-7bcdebbccbdb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "d16a48f3-2d3e-4dce-8e87-df2092eb35e7",
+        "task_id": "3b27600c-3668-4abd-8f84-7bcdebbccbdb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "2a568928-7655-499f-9335-0a8d10b1dcb7",
+        "task_id": "3b27600c-3668-4abd-8f84-7bcdebbccbdb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "25ebd3f9-fc72-46fe-a58d-55f39b51602f",
+        "task_id": "3b27600c-3668-4abd-8f84-7bcdebbccbdb",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "edf94ec3-8a07-43cf-a252-e911e8b3d886",
+        "task_id": "21760ecb-8f62-40d2-8d85-0cee5725cb72",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1dc774ba-ccfe-4c24-a7ec-f0bb584a1d2e",
+        "task_id": "21760ecb-8f62-40d2-8d85-0cee5725cb72",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "95abcc49-ce96-4dcf-bc9f-d2c341676892",
+        "task_id": "21760ecb-8f62-40d2-8d85-0cee5725cb72",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1206db0f-b648-4ace-a607-c8ac422fbd90",
+        "task_id": "21760ecb-8f62-40d2-8d85-0cee5725cb72",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e4a6fe60-287e-48e6-9839-c24ae2baf785",
+        "task_id": "21760ecb-8f62-40d2-8d85-0cee5725cb72",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "17f9fc80-bdec-4764-b6cd-07c8c7131f43",
+        "task_id": "21760ecb-8f62-40d2-8d85-0cee5725cb72",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "65260add-12a5-478c-9ef4-cb4ed4bb977c",
+        "task_id": "21760ecb-8f62-40d2-8d85-0cee5725cb72",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e031fe6c-2ca9-4200-ad29-2e7679c65aab",
+        "task_id": "21760ecb-8f62-40d2-8d85-0cee5725cb72",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "012db74c-052b-4dc2-b8f8-845843d446d5",
+        "task_id": "ac9bb6cb-1888-43ab-81e4-a98a547918cd",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "652375be-7f72-4292-9c03-9d86c74f11c1",
+        "task_id": "ac9bb6cb-1888-43ab-81e4-a98a547918cd",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "99e1f29b-90ea-454b-9ce4-da288a1ea016",
+        "task_id": "ac9bb6cb-1888-43ab-81e4-a98a547918cd",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5bedb2ad-f170-4d45-b47a-3bc81459ef09",
+        "task_id": "ac9bb6cb-1888-43ab-81e4-a98a547918cd",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e1945fa1-7965-418c-a447-38eb65d9c174",
+        "task_id": "ac9bb6cb-1888-43ab-81e4-a98a547918cd",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "7729ed9d-9414-4b34-b79a-a9ec2d4bea57",
+        "task_id": "ac9bb6cb-1888-43ab-81e4-a98a547918cd",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "dad4421e-bf57-431e-89dd-589401b0c780",
+        "task_id": "ac9bb6cb-1888-43ab-81e4-a98a547918cd",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "4c63b8ee-07b6-4102-a090-e1ba6502217f",
+        "task_id": "ac9bb6cb-1888-43ab-81e4-a98a547918cd",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "bd48d53a-f758-4ae3-b2aa-5b739726843f",
+        "task_id": "2cd43775-7085-45d8-89fa-9e35c0a915cf",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2df51ea4-10ee-4220-9051-27227e0afb55",
+        "task_id": "2cd43775-7085-45d8-89fa-9e35c0a915cf",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "88a840d9-5ff9-4097-9c8b-d03c3c1acf6b",
+        "task_id": "2cd43775-7085-45d8-89fa-9e35c0a915cf",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7493c460-c70e-4464-9621-662dbc632191",
+        "task_id": "2cd43775-7085-45d8-89fa-9e35c0a915cf",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1f524711-0fcd-429d-815f-adb711ec172e",
+        "task_id": "2cd43775-7085-45d8-89fa-9e35c0a915cf",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f990f1fc-1f75-4694-84d8-8744d7b66e5b",
+        "task_id": "2cd43775-7085-45d8-89fa-9e35c0a915cf",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "46d367cb-9193-4dcb-b361-d29d2a237bae",
+        "task_id": "2cd43775-7085-45d8-89fa-9e35c0a915cf",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "88784a8b-5c43-4439-a631-edf056aa397b",
+        "task_id": "2cd43775-7085-45d8-89fa-9e35c0a915cf",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a262a09d-dd75-4b4a-9df1-cb3fa6879023",
+        "task_id": "15aece23-a215-4579-91b4-69eec72e18da",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d9bc9706-54b7-44fc-bd4c-61c31bec1d2b",
+        "task_id": "15aece23-a215-4579-91b4-69eec72e18da",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6f27e864-a2dc-4776-971d-d023e5af0853",
+        "task_id": "15aece23-a215-4579-91b4-69eec72e18da",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8360766e-64ff-4bd9-860c-b2d3a608ebbf",
+        "task_id": "15aece23-a215-4579-91b4-69eec72e18da",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "78d193ef-4535-478c-ae25-222657ec859b",
+        "task_id": "15aece23-a215-4579-91b4-69eec72e18da",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2e718347-b475-4c4e-808d-623f6f4e7800",
+        "task_id": "15aece23-a215-4579-91b4-69eec72e18da",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6cb5c0b5-e985-4799-9787-d68869d64f54",
+        "task_id": "15aece23-a215-4579-91b4-69eec72e18da",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "34094c8a-d38e-4f81-b2a3-a40ec1707b9e",
+        "task_id": "15aece23-a215-4579-91b4-69eec72e18da",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b3802053-89ea-4589-8282-d354cce572f4",
+        "task_id": "986fc832-6af2-417c-8845-9272b3a1528b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2a8bfdaf-ddfe-46b2-b47b-f53ab52eb93f",
+        "task_id": "986fc832-6af2-417c-8845-9272b3a1528b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "49598f43-f0df-4d1c-8042-ebe942201d94",
+        "task_id": "986fc832-6af2-417c-8845-9272b3a1528b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b5f0ad3c-f6fd-4f5c-81a7-5ce3a62db047",
+        "task_id": "986fc832-6af2-417c-8845-9272b3a1528b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "729be885-2f3c-49f1-b076-0e1f0b194b32",
+        "task_id": "986fc832-6af2-417c-8845-9272b3a1528b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "057fbaac-85bb-459a-bd3a-5a522258acd8",
+        "task_id": "986fc832-6af2-417c-8845-9272b3a1528b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "1e0b52a6-33e5-496c-94c7-df2963c60d78",
+        "task_id": "986fc832-6af2-417c-8845-9272b3a1528b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6e33e1de-6341-40eb-a5f7-587abb8ac997",
+        "task_id": "986fc832-6af2-417c-8845-9272b3a1528b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "4ab78623-9b03-4bc2-9bdb-1b20c556fb18",
+        "task_id": "a434992a-89df-4577-925c-0c58b747f0f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "99ca5758-2924-4269-ad24-7c9bb38b2e7a",
+        "task_id": "a434992a-89df-4577-925c-0c58b747f0f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e85aab16-1bca-4cc3-a473-92cf0237c13f",
+        "task_id": "a434992a-89df-4577-925c-0c58b747f0f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8058a27a-f28a-4c44-92bb-0820879342a9",
+        "task_id": "a434992a-89df-4577-925c-0c58b747f0f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "96c1f22c-3a1f-471a-a350-73879a4dbaeb",
+        "task_id": "a434992a-89df-4577-925c-0c58b747f0f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "38ed39d3-4352-4d8e-a642-5e6c70b6e8c1",
+        "task_id": "a434992a-89df-4577-925c-0c58b747f0f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3fd6bd35-47d3-4ad5-a31f-e1cb617a17a0",
+        "task_id": "a434992a-89df-4577-925c-0c58b747f0f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4ea997c1-d355-48a5-8def-2ca2302579f1",
+        "task_id": "a434992a-89df-4577-925c-0c58b747f0f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "286fd150-4228-4099-bd27-d12b39f215bd",
+        "task_id": "2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "19a7e106-2e6e-4827-ac26-f8d6b1a41810",
+        "task_id": "2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e5c8fab2-d33c-4dc7-9b5e-4faf39c16876",
+        "task_id": "2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "71819491-9890-424c-addd-935e9473e3dd",
+        "task_id": "2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9e8c8914-6ce1-4e27-9cbc-2274246f959a",
+        "task_id": "2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cf41b26d-b71d-42e2-a346-83e831d36af7",
+        "task_id": "2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e59cf66e-3d50-4eae-8f5b-29beeb140c80",
+        "task_id": "2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9a23e89e-27aa-4bf3-a3f2-42e9098b9525",
+        "task_id": "2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1bb0b7a1-c335-4a72-9ce7-0dbd01bce66e",
+        "task_id": "08aced46-45a2-48d7-993b-ed3fb5b32302",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a5059540-004a-45e4-8ddc-ac89380ba2bd",
+        "task_id": "08aced46-45a2-48d7-993b-ed3fb5b32302",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "99bd8cbc-e895-4f1e-a10c-3af3d2dd1ade",
+        "task_id": "08aced46-45a2-48d7-993b-ed3fb5b32302",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2ba0ab41-1826-48d9-8bf2-3042bc9974c9",
+        "task_id": "08aced46-45a2-48d7-993b-ed3fb5b32302",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "dbcdd2f7-ca35-4163-994d-07b1ece6e0dc",
+        "task_id": "08aced46-45a2-48d7-993b-ed3fb5b32302",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "abea1137-b676-4435-a765-8eb5041e6281",
+        "task_id": "08aced46-45a2-48d7-993b-ed3fb5b32302",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "39e57cdb-7295-4a26-9045-66ee2b10a47f",
+        "task_id": "08aced46-45a2-48d7-993b-ed3fb5b32302",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ac7ccfb4-6438-46b0-a04f-298f422bb7e3",
+        "task_id": "08aced46-45a2-48d7-993b-ed3fb5b32302",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "228b9512-66c3-4a4d-85f9-b9db3f5e88ff",
+        "task_id": "edb61b14-a854-4bf5-a075-c8075c11293a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4c0263e7-0277-4085-ace3-41281ae3aec6",
+        "task_id": "edb61b14-a854-4bf5-a075-c8075c11293a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "24a41ef6-f125-4eb9-9d0e-a4498f042b26",
+        "task_id": "edb61b14-a854-4bf5-a075-c8075c11293a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cccb8a3c-fff2-495e-bdfa-73c2ffa9fafd",
+        "task_id": "edb61b14-a854-4bf5-a075-c8075c11293a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "142a56c7-c429-4a4e-9b4d-aa8d489f5739",
+        "task_id": "edb61b14-a854-4bf5-a075-c8075c11293a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4954d0fd-e9d2-4c21-993f-5f05906d3389",
+        "task_id": "edb61b14-a854-4bf5-a075-c8075c11293a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cf7d8e32-ffdf-4e22-9908-58e182fea2df",
+        "task_id": "edb61b14-a854-4bf5-a075-c8075c11293a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "db0a2b60-9ab4-4115-96a7-f659912e2887",
+        "task_id": "edb61b14-a854-4bf5-a075-c8075c11293a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fa172a26-e079-4192-bf78-ad3a03ed350e",
+        "task_id": "c82632a4-56b6-4db4-9dd1-3820ee3388e4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a6a693c5-e1cb-4b82-81bc-e3eb4a5f18d1",
+        "task_id": "c82632a4-56b6-4db4-9dd1-3820ee3388e4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "66658b22-6c72-4ef3-abe5-7f039a9472a6",
+        "task_id": "c82632a4-56b6-4db4-9dd1-3820ee3388e4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8dfa769c-2da3-46c2-a192-23f8a64d1f68",
+        "task_id": "c82632a4-56b6-4db4-9dd1-3820ee3388e4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cfedde2a-efe1-4ff1-b8f7-a8575e95e6e8",
+        "task_id": "c82632a4-56b6-4db4-9dd1-3820ee3388e4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "89d52858-7a65-4f10-93a0-60d7849f47cc",
+        "task_id": "c82632a4-56b6-4db4-9dd1-3820ee3388e4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7730dbcb-6877-44f4-8363-17198da24c7d",
+        "task_id": "c82632a4-56b6-4db4-9dd1-3820ee3388e4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6d2c5642-9725-428d-a5c6-dad593002704",
+        "task_id": "c82632a4-56b6-4db4-9dd1-3820ee3388e4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "275ff4c7-283c-4e9f-a73f-14dada12aa53",
+        "task_id": "39be0d19-634d-4475-8768-09c130f5425d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cd99be2c-5073-4d29-9cca-420f8d00e135",
+        "task_id": "39be0d19-634d-4475-8768-09c130f5425d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e878a3c6-43dc-48ca-9928-a9348610a98d",
+        "task_id": "39be0d19-634d-4475-8768-09c130f5425d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5760d41c-46f0-44ed-8b7f-eecf15be7850",
+        "task_id": "39be0d19-634d-4475-8768-09c130f5425d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "171f55ea-37f7-42ca-80b2-c6a93205bd54",
+        "task_id": "39be0d19-634d-4475-8768-09c130f5425d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0241ebd4-e99f-4c65-91f1-eb710a95e7b0",
+        "task_id": "39be0d19-634d-4475-8768-09c130f5425d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2c676d21-221c-4579-8304-cb31eb3a9854",
+        "task_id": "39be0d19-634d-4475-8768-09c130f5425d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1b54bdb9-1e99-4e3d-b1f8-f86578bcabbb",
+        "task_id": "39be0d19-634d-4475-8768-09c130f5425d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ba26499b-b7c3-4501-b2d4-95e46b4ecdd3",
+        "task_id": "70bca0cc-c117-427e-b0be-4df7299ebeb6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c39f6aa0-22f2-41bc-861f-4710ec4d4c6d",
+        "task_id": "70bca0cc-c117-427e-b0be-4df7299ebeb6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5bb144a3-c67e-40ef-a0e3-8c55c8d16317",
+        "task_id": "70bca0cc-c117-427e-b0be-4df7299ebeb6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7214179c-b10c-4563-8cc9-f232ca983ead",
+        "task_id": "70bca0cc-c117-427e-b0be-4df7299ebeb6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2ec42f72-a5c4-4e7e-95c3-90eebb73679c",
+        "task_id": "70bca0cc-c117-427e-b0be-4df7299ebeb6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1fecad04-fde0-449c-9a5e-277216adf113",
+        "task_id": "70bca0cc-c117-427e-b0be-4df7299ebeb6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "de34d2c0-a65e-4fde-8160-3bb97b465747",
+        "task_id": "70bca0cc-c117-427e-b0be-4df7299ebeb6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6a913c3f-7f04-440d-a2fe-1edc66d10f88",
+        "task_id": "70bca0cc-c117-427e-b0be-4df7299ebeb6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "64daf7d4-578d-4cf8-844e-5bb7c565834d",
+        "task_id": "e4ef0baf-4b52-4590-a47e-d4d464cca2d7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9305a673-8bdc-492e-bc3b-f0558434fa2e",
+        "task_id": "e4ef0baf-4b52-4590-a47e-d4d464cca2d7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "021cc919-2b66-4570-941f-dad199b35a01",
+        "task_id": "e4ef0baf-4b52-4590-a47e-d4d464cca2d7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "db1761ad-80de-4a9a-b57e-ea826eaebcb2",
+        "task_id": "e4ef0baf-4b52-4590-a47e-d4d464cca2d7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d1724b71-8d7d-46fa-b21b-6fd96244345a",
+        "task_id": "e4ef0baf-4b52-4590-a47e-d4d464cca2d7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "24d22159-3aaf-4bef-9d3c-3ec079c83662",
+        "task_id": "e4ef0baf-4b52-4590-a47e-d4d464cca2d7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7b7aaf32-07ed-4339-8abe-cc39407297d2",
+        "task_id": "e4ef0baf-4b52-4590-a47e-d4d464cca2d7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0cfda93f-f9d6-4c12-a582-8f5eaad208d0",
+        "task_id": "e4ef0baf-4b52-4590-a47e-d4d464cca2d7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a50dab3d-d8e7-4c0c-81f7-4d4b9d3a8266",
+        "task_id": "0810415c-bde4-4443-9047-d5f70165a697",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "61ffb0e4-440d-474f-9588-1bc1344d0761",
+        "task_id": "0810415c-bde4-4443-9047-d5f70165a697",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "70bb0807-baee-4442-80ed-0d1560fb1d2d",
+        "task_id": "0810415c-bde4-4443-9047-d5f70165a697",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a59ffd3c-a18b-4e95-8168-e2bd25b5b54a",
+        "task_id": "0810415c-bde4-4443-9047-d5f70165a697",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3fc47d96-87c4-4e7f-8f45-085f70e2aa46",
+        "task_id": "0810415c-bde4-4443-9047-d5f70165a697",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1a1447ea-2527-4dfe-a7b4-4f144b29df87",
+        "task_id": "0810415c-bde4-4443-9047-d5f70165a697",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "624da062-8f01-404a-8a88-1c5520c77620",
+        "task_id": "0810415c-bde4-4443-9047-d5f70165a697",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6d0cae22-aa87-4e13-b785-e90785e88674",
+        "task_id": "0810415c-bde4-4443-9047-d5f70165a697",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9bf08bd6-5567-474f-b8d2-766bb693d32f",
+        "task_id": "0b17a146-2934-46c7-8727-73ff6b6483e8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a85ea8f0-4a46-4d43-97e5-996c0461a329",
+        "task_id": "0b17a146-2934-46c7-8727-73ff6b6483e8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "22fef10f-f670-4102-b802-8aa82d009a0f",
+        "task_id": "0b17a146-2934-46c7-8727-73ff6b6483e8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b7ab0f91-d571-41d0-9c15-ecca0ad3fda0",
+        "task_id": "0b17a146-2934-46c7-8727-73ff6b6483e8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "304e891c-aee6-400b-bb2e-d0a46a5d6460",
+        "task_id": "0b17a146-2934-46c7-8727-73ff6b6483e8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d33caa38-acb3-44e0-9d60-86febec76183",
+        "task_id": "0b17a146-2934-46c7-8727-73ff6b6483e8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "87e1e839-185b-4768-a4ff-8841faaca9cd",
+        "task_id": "0b17a146-2934-46c7-8727-73ff6b6483e8",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "392ef76f-024d-4fc6-b8b3-020b25c69ce1",
+        "task_id": "0b17a146-2934-46c7-8727-73ff6b6483e8",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "7f48ca9a-a648-4bd3-a2b0-475139c1cac7",
+        "task_id": "0e47de2a-32e0-456c-a366-8c607ef7a9d2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c494566d-4e5a-4df8-84fb-86b118e60675",
+        "task_id": "0e47de2a-32e0-456c-a366-8c607ef7a9d2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d20ab069-fff4-4e55-a5ad-167ed64ec579",
+        "task_id": "0e47de2a-32e0-456c-a366-8c607ef7a9d2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e3fb6308-2696-455e-8d02-73b0cd95de01",
+        "task_id": "0e47de2a-32e0-456c-a366-8c607ef7a9d2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "07e01014-a2de-45c3-b0ae-3ccf98eb0115",
+        "task_id": "0e47de2a-32e0-456c-a366-8c607ef7a9d2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "90d17668-af07-435d-b468-38cebfff0deb",
+        "task_id": "0e47de2a-32e0-456c-a366-8c607ef7a9d2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1a2cbda5-4654-4a1c-9e39-a952d45ebe73",
+        "task_id": "0e47de2a-32e0-456c-a366-8c607ef7a9d2",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "995c35c1-dabc-4aad-be65-2d2ac62fb014",
+        "task_id": "0e47de2a-32e0-456c-a366-8c607ef7a9d2",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "3b8cf272-d02f-4844-b5b1-126513519d80",
+        "task_id": "0e763496-b6bb-4508-a427-fad0b6c3e195",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8e2bc004-7bc0-470a-ae3e-d0cf2cb4f0c4",
+        "task_id": "0e763496-b6bb-4508-a427-fad0b6c3e195",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3e48b1ef-c03c-4899-ab1a-fd144b882752",
+        "task_id": "0e763496-b6bb-4508-a427-fad0b6c3e195",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "bff90aa1-1fb2-4991-a465-10acb96ec557",
+        "task_id": "0e763496-b6bb-4508-a427-fad0b6c3e195",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "11e1cd17-975b-4e59-a28a-1b9665168e4e",
+        "task_id": "0e763496-b6bb-4508-a427-fad0b6c3e195",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3ca9f554-a256-4a52-a29a-852576ae0377",
+        "task_id": "0e763496-b6bb-4508-a427-fad0b6c3e195",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "77ddd2e9-b4e3-4263-bc40-b1b12a3fd8f8",
+        "task_id": "0e763496-b6bb-4508-a427-fad0b6c3e195",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "34197921-e6f0-4c8f-be62-a9b20adcade6",
+        "task_id": "0e763496-b6bb-4508-a427-fad0b6c3e195",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c43b07d3-7a38-4e65-a427-e34ec7638949",
+        "task_id": "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0df97fce-b79f-40eb-9b6b-a78232062a60",
+        "task_id": "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6561dccc-b356-4445-aa3d-4e48a41d1492",
+        "task_id": "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8abd004b-d6b3-4b47-9567-a087be4e337f",
+        "task_id": "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4498c0fe-75c4-41a6-8a5f-bada0735d18d",
+        "task_id": "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2c97743f-2092-46dc-b55b-afbcf36bbf41",
+        "task_id": "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "bfa5dae2-4250-429a-8213-9459b64353d9",
+        "task_id": "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "358cf193-6611-44c8-a8ce-7a01a0299ee2",
+        "task_id": "6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5ab85d8c-9037-41c5-8277-af1161deb405",
+        "task_id": "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4717ccc1-c4bf-499b-a4f6-7c6d477ed50f",
+        "task_id": "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b27c100c-84f9-4713-926b-c0535e98ab9f",
+        "task_id": "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9306e4df-60ba-4f8a-afa4-83b6ab760944",
+        "task_id": "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ddd84789-2ab4-43f6-af8d-9771c170e4b8",
+        "task_id": "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "650767f6-0ed9-4f74-a3a8-ebfcab693458",
+        "task_id": "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9f0bc8f9-4760-4976-83d7-9d80811b392a",
+        "task_id": "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "70a2430f-1005-4ba9-8283-41cf4fe9107a",
+        "task_id": "72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "472daf10-d1b3-4fba-8009-eac39f48c34e",
+        "task_id": "b21acd93-60fd-4127-8a43-2f5178f4a830",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e1130727-7af0-4e8c-a728-1d1e855c3cb8",
+        "task_id": "b21acd93-60fd-4127-8a43-2f5178f4a830",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8e7b3297-a40b-40fd-b443-198459bb41b0",
+        "task_id": "b21acd93-60fd-4127-8a43-2f5178f4a830",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "88b159c9-d659-4e00-9960-033e187f68c5",
+        "task_id": "b21acd93-60fd-4127-8a43-2f5178f4a830",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c55675d2-eb32-42b3-a262-648dc9a395a8",
+        "task_id": "b21acd93-60fd-4127-8a43-2f5178f4a830",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6fe824ef-5acf-4a16-a8c6-738cb71b4712",
+        "task_id": "b21acd93-60fd-4127-8a43-2f5178f4a830",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "655d6eb6-e58e-482a-9a9f-2c11cf126b08",
+        "task_id": "b21acd93-60fd-4127-8a43-2f5178f4a830",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "fc9fc95e-60ad-43a7-91c3-689695d729d1",
+        "task_id": "b21acd93-60fd-4127-8a43-2f5178f4a830",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "3f316c22-c2f3-4cfb-915b-d2f9d42a818f",
+        "task_id": "e246f6d8-78d7-44ac-b668-fcf47946cb50",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fa473cf3-4860-4f41-9078-708122a8544f",
+        "task_id": "e246f6d8-78d7-44ac-b668-fcf47946cb50",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7ce373eb-9170-4e16-ad97-d5677b598c44",
+        "task_id": "e246f6d8-78d7-44ac-b668-fcf47946cb50",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7d8e2688-b2bb-4dac-925f-4e2add421505",
+        "task_id": "e246f6d8-78d7-44ac-b668-fcf47946cb50",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "7daf8fd4-5752-418e-bb55-2486a61d0663",
+        "task_id": "e246f6d8-78d7-44ac-b668-fcf47946cb50",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "07e8f872-c283-4ccb-8e83-cc78a47c3f8f",
+        "task_id": "e246f6d8-78d7-44ac-b668-fcf47946cb50",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b94c8507-849c-4b7f-8f4e-107b7032a316",
+        "task_id": "e246f6d8-78d7-44ac-b668-fcf47946cb50",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "8a144c4f-7480-4ed4-a936-f53d139074ed",
+        "task_id": "e246f6d8-78d7-44ac-b668-fcf47946cb50",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "798ccb12-4db9-4919-a064-c36a6b7fb3a0",
+        "task_id": "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "62fc4918-f2f3-489b-bfe3-cea6ed8335f0",
+        "task_id": "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "382a6a57-b51f-4ca8-9e38-d2597aa25ab6",
+        "task_id": "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2acb1079-0c9b-4ed0-905e-555be464aa65",
+        "task_id": "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2ea71bce-17cf-4a10-aa9e-386a5de0453f",
+        "task_id": "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "61efd47e-ff62-4318-8270-c0a1ad685332",
+        "task_id": "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2fcef19c-cc4c-4fb7-8869-5665487a1654",
+        "task_id": "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "de3727db-3f76-4247-88fc-6a7cd6ddde8b",
+        "task_id": "ecc2413d-8a48-416e-a3a2-d30106ca36cb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b79d8756-a68b-4f5f-aa18-9308d1bca762",
+        "task_id": "2c9fc0de-3ee7-45e1-a5df-c86206ad78b5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2e21849a-797d-4354-a4d3-438461c9bd7b",
+        "task_id": "2c9fc0de-3ee7-45e1-a5df-c86206ad78b5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a983a89e-3879-4268-8e87-ffa2fa01e618",
+        "task_id": "2c9fc0de-3ee7-45e1-a5df-c86206ad78b5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3b16d2e6-eded-4eb2-916f-df8de4a0094d",
+        "task_id": "2c9fc0de-3ee7-45e1-a5df-c86206ad78b5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3044163a-6459-4bc6-918f-c19b1e1ada1f",
+        "task_id": "2c9fc0de-3ee7-45e1-a5df-c86206ad78b5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ea563d7e-3132-4a24-8354-cda18bd1da4f",
+        "task_id": "2c9fc0de-3ee7-45e1-a5df-c86206ad78b5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "aef4ce0a-60a9-42b2-ac1a-302ecb7cdebc",
+        "task_id": "2c9fc0de-3ee7-45e1-a5df-c86206ad78b5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5b0fbfa9-245e-4c9e-8c67-a3fd357b93e9",
+        "task_id": "2c9fc0de-3ee7-45e1-a5df-c86206ad78b5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "92e697a2-227d-4a4c-b5a6-85457d1e4e91",
+        "task_id": "2fe4b718-3bd7-46ec-bdce-b184f5653624",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "a67f1d56-a94c-4f22-a68f-3c30d11c7df7",
+        "task_id": "2fe4b718-3bd7-46ec-bdce-b184f5653624",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "2f7c4a0f-c584-4f79-97cf-22f8eed67f8c",
+        "task_id": "2fe4b718-3bd7-46ec-bdce-b184f5653624",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "4aef312b-a7b0-4419-8e46-24000d6e79d9",
+        "task_id": "2fe4b718-3bd7-46ec-bdce-b184f5653624",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0f21b432-be1c-41e2-a5e3-0c63833ea5ff",
+        "task_id": "2fe4b718-3bd7-46ec-bdce-b184f5653624",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "babd7153-2d16-4903-b0c7-e62500e9de31",
+        "task_id": "2fe4b718-3bd7-46ec-bdce-b184f5653624",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "682d7e19-5cdd-4819-849b-237e68dac673",
+        "task_id": "2fe4b718-3bd7-46ec-bdce-b184f5653624",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0b262cb6-87d0-4a64-827c-57b98fe023bf",
+        "task_id": "2fe4b718-3bd7-46ec-bdce-b184f5653624",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "62118fc2-583c-41a8-bb3c-f4b164b19369",
+        "task_id": "510f64c8-9bcc-4be1-8d30-638705850618",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "be540da5-7922-4434-ba84-e4db8a92deab",
+        "task_id": "510f64c8-9bcc-4be1-8d30-638705850618",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1ed4f7ca-8187-4dda-97c4-ea8505b76def",
+        "task_id": "510f64c8-9bcc-4be1-8d30-638705850618",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "91d951d8-c897-4bc2-b218-f9230362fb55",
+        "task_id": "510f64c8-9bcc-4be1-8d30-638705850618",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "652ef567-c817-496e-b1f6-8f7d04ffb696",
+        "task_id": "510f64c8-9bcc-4be1-8d30-638705850618",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a879863d-1fff-46f8-8ec6-272a360ffdde",
+        "task_id": "510f64c8-9bcc-4be1-8d30-638705850618",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f4cc30f5-69c3-4a56-8fe7-80ebca6d19e4",
+        "task_id": "510f64c8-9bcc-4be1-8d30-638705850618",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0fece8fa-54c0-48f4-940e-cc48fd93e2b1",
+        "task_id": "510f64c8-9bcc-4be1-8d30-638705850618",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "77457a66-ca65-421e-b500-cc5cc2157bd9",
+        "task_id": "58565672-7bfe-48ab-b828-db349231de6b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d455e76c-3d17-4e14-9f2a-37dd9ee871ee",
+        "task_id": "58565672-7bfe-48ab-b828-db349231de6b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ea8bda49-968b-4cc2-b8e4-3cffb11d336b",
+        "task_id": "58565672-7bfe-48ab-b828-db349231de6b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c9bdb73d-9437-4f71-9b2a-b20e91c5eb30",
+        "task_id": "58565672-7bfe-48ab-b828-db349231de6b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0661d934-8288-4c57-bdb4-0caedeea1cff",
+        "task_id": "58565672-7bfe-48ab-b828-db349231de6b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f908d47d-ba66-4b4f-a85c-c3e0f965e992",
+        "task_id": "58565672-7bfe-48ab-b828-db349231de6b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8b6273da-5485-43ab-8353-21fe4d02adf7",
+        "task_id": "58565672-7bfe-48ab-b828-db349231de6b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3c98935d-0302-4172-ba45-1184fc303b58",
+        "task_id": "58565672-7bfe-48ab-b828-db349231de6b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "84ec6f75-c3ec-4d4d-a6f8-03aff302bdfd",
+        "task_id": "937087b6-f668-4ba6-9110-60682ee33441",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6888a5d3-b554-43f3-9bc9-2072187a9fba",
+        "task_id": "937087b6-f668-4ba6-9110-60682ee33441",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e20e42cb-edcb-42a2-8aa3-f6d0622c6412",
+        "task_id": "937087b6-f668-4ba6-9110-60682ee33441",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cd49741d-a3c5-45c9-84b1-4ac8c5991c46",
+        "task_id": "937087b6-f668-4ba6-9110-60682ee33441",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2d636089-304f-4724-8a4c-32741259029a",
+        "task_id": "937087b6-f668-4ba6-9110-60682ee33441",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5edb9197-572c-424c-bd4f-501aca2bc761",
+        "task_id": "937087b6-f668-4ba6-9110-60682ee33441",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "85ee2c27-dba5-4fd2-83e5-5a78d155edab",
+        "task_id": "937087b6-f668-4ba6-9110-60682ee33441",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "16b7d0d4-ea75-4e25-b0e2-b09562b10cfc",
+        "task_id": "937087b6-f668-4ba6-9110-60682ee33441",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cba3e2c7-cdfa-4287-8e2d-abaf3fe3670a",
+        "task_id": "ee9a3c83-f437-4879-8918-be5efbb9fac7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7afc8bc4-2fd2-4075-ad66-acfc85b4262e",
+        "task_id": "ee9a3c83-f437-4879-8918-be5efbb9fac7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3313d2ca-fb85-4744-b35f-9f3fe133f854",
+        "task_id": "ee9a3c83-f437-4879-8918-be5efbb9fac7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a3584a9d-d171-45fd-8102-065153cd0632",
+        "task_id": "ee9a3c83-f437-4879-8918-be5efbb9fac7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "da9af181-3baa-45c8-b100-d841017d4865",
+        "task_id": "ee9a3c83-f437-4879-8918-be5efbb9fac7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d5847801-fb91-4945-8d01-ea64b2385aeb",
+        "task_id": "ee9a3c83-f437-4879-8918-be5efbb9fac7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6208c172-847a-4368-858b-34d948655129",
+        "task_id": "ee9a3c83-f437-4879-8918-be5efbb9fac7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7be04b2a-f1a7-45d0-b6e1-13a61d11a364",
+        "task_id": "ee9a3c83-f437-4879-8918-be5efbb9fac7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "488f0782-88b4-4910-84c5-ccca8343b51b",
+        "task_id": "f8cfa149-d1c1-4215-8dac-4a0932bad3c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5d1b86b8-a2d1-4ab7-9efb-03c3106da007",
+        "task_id": "f8cfa149-d1c1-4215-8dac-4a0932bad3c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2f50823e-5d43-446e-a44e-68c1a3903c88",
+        "task_id": "f8cfa149-d1c1-4215-8dac-4a0932bad3c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "210da789-579f-4353-92d9-eb2840f61d8c",
+        "task_id": "f8cfa149-d1c1-4215-8dac-4a0932bad3c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "de0289c7-0f4d-4031-a03e-9b37a2c2de27",
+        "task_id": "f8cfa149-d1c1-4215-8dac-4a0932bad3c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "965ee65b-8c14-42b1-81d8-5d4d9e0a32a9",
+        "task_id": "f8cfa149-d1c1-4215-8dac-4a0932bad3c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0fb69f31-b634-4905-bfe1-e9919b07251e",
+        "task_id": "f8cfa149-d1c1-4215-8dac-4a0932bad3c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2cd824a4-d4a8-4fef-8a30-d80d315fe4a5",
+        "task_id": "f8cfa149-d1c1-4215-8dac-4a0932bad3c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "05ce3425-96a7-4967-9f4c-dddcc09c4ba9",
+        "task_id": "da52d699-e8d2-4dc5-9191-a2199e0b6a9b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e7544fa2-c227-4abf-b686-2fee6930632a",
+        "task_id": "da52d699-e8d2-4dc5-9191-a2199e0b6a9b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "55dfdb40-dc58-4931-9d0c-d9253a80114b",
+        "task_id": "da52d699-e8d2-4dc5-9191-a2199e0b6a9b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "38edc44f-6b26-4378-8e5c-11f08bf331b4",
+        "task_id": "da52d699-e8d2-4dc5-9191-a2199e0b6a9b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fda242d4-747d-4781-8095-80a1536efa86",
+        "task_id": "da52d699-e8d2-4dc5-9191-a2199e0b6a9b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8ee247e3-1eee-480e-99ce-4c1c8f0315c0",
+        "task_id": "da52d699-e8d2-4dc5-9191-a2199e0b6a9b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ad7bc0dd-7bad-4f86-9942-4b0ed1bbccb8",
+        "task_id": "da52d699-e8d2-4dc5-9191-a2199e0b6a9b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "874db6c5-ece5-4317-9228-d5595d36f94e",
+        "task_id": "da52d699-e8d2-4dc5-9191-a2199e0b6a9b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "42086e65-b57b-46a8-b2e2-a1dd0b8cd71c",
+        "task_id": "337d318b-aa07-4f4f-b763-89d9a2dd013f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "59f61e61-8844-4820-adc9-0673cd13bc0b",
+        "task_id": "337d318b-aa07-4f4f-b763-89d9a2dd013f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "cdd3a3d4-be8a-45d6-bafc-35c233802eff",
+        "task_id": "337d318b-aa07-4f4f-b763-89d9a2dd013f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "65d307e2-58fd-4ed2-a69f-78116b02609f",
+        "task_id": "337d318b-aa07-4f4f-b763-89d9a2dd013f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "d6598e14-84f5-431e-ab41-f43126add3ed",
+        "task_id": "337d318b-aa07-4f4f-b763-89d9a2dd013f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "7c791bec-5314-4c3a-8cbd-54a86ce75be4",
+        "task_id": "337d318b-aa07-4f4f-b763-89d9a2dd013f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "7800040b-2f6a-466c-bb45-7704b7de15eb",
+        "task_id": "337d318b-aa07-4f4f-b763-89d9a2dd013f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "7bce9688-8250-4f87-990c-5f6cb1718508",
+        "task_id": "337d318b-aa07-4f4f-b763-89d9a2dd013f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "20a63c85-a93c-4c68-8ceb-61bde7947984",
+        "task_id": "185f29bd-5da0-40a6-b69c-ba7f4e0324ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ef15a0ae-1c9b-464c-8cc0-58a670d7391a",
+        "task_id": "185f29bd-5da0-40a6-b69c-ba7f4e0324ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "5fcda283-d391-4b75-8301-38d1726fff8a",
+        "task_id": "185f29bd-5da0-40a6-b69c-ba7f4e0324ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "5cfa9785-51ad-420c-96b3-41da3ff05c56",
+        "task_id": "185f29bd-5da0-40a6-b69c-ba7f4e0324ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "feeecd10-a21f-4b7f-aa36-9267d3e0711e",
+        "task_id": "185f29bd-5da0-40a6-b69c-ba7f4e0324ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "78f2a805-7c6b-4668-a64d-56ad81c2a371",
+        "task_id": "185f29bd-5da0-40a6-b69c-ba7f4e0324ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "02edffc8-d00a-40f1-a3fa-81ad0b00438f",
+        "task_id": "185f29bd-5da0-40a6-b69c-ba7f4e0324ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "e421071f-d39d-40a9-a38f-6ccfa7e4da06",
+        "task_id": "185f29bd-5da0-40a6-b69c-ba7f4e0324ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "49eacf2a-0c02-46d9-b2b1-68ff5f1545b6",
+        "task_id": "3a93cae4-ad3e-403e-8c12-65303b271818",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fa20bde1-0409-40da-b5e5-a66403f221e1",
+        "task_id": "3a93cae4-ad3e-403e-8c12-65303b271818",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "be15078b-47d6-420e-b4e4-ca3c01ce4418",
+        "task_id": "3a93cae4-ad3e-403e-8c12-65303b271818",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "36ab195f-8278-4f62-82c8-4dfd521ff396",
+        "task_id": "3a93cae4-ad3e-403e-8c12-65303b271818",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8d4bf767-e6e8-48de-a084-84cde4a713b3",
+        "task_id": "3a93cae4-ad3e-403e-8c12-65303b271818",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6d1921ec-a405-40a1-8cf3-04a4952b6e0e",
+        "task_id": "3a93cae4-ad3e-403e-8c12-65303b271818",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "96981972-ec3b-46a8-976c-1db585dea11e",
+        "task_id": "3a93cae4-ad3e-403e-8c12-65303b271818",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e39d6b20-a1b8-4be3-a835-6b8105cd2b19",
+        "task_id": "3a93cae4-ad3e-403e-8c12-65303b271818",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "63f5d4cb-2a3d-41d8-87c9-bb945e49016a",
+        "task_id": "9219480b-3aed-47fc-8bac-d2cffc5849f7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e35c79cc-b0e2-4aa7-92aa-07af089dd733",
+        "task_id": "9219480b-3aed-47fc-8bac-d2cffc5849f7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5f0ec270-786e-4464-b24a-385f178fb399",
+        "task_id": "9219480b-3aed-47fc-8bac-d2cffc5849f7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c75b31c4-fc2e-4246-909c-613b10790709",
+        "task_id": "9219480b-3aed-47fc-8bac-d2cffc5849f7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "357e6282-77ae-4f17-85dc-cc3d99615129",
+        "task_id": "9219480b-3aed-47fc-8bac-d2cffc5849f7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "517a565d-acf3-4c40-82d3-7f8748439c46",
+        "task_id": "9219480b-3aed-47fc-8bac-d2cffc5849f7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4978c86f-63bb-40fd-bfff-f96dee4ece25",
+        "task_id": "9219480b-3aed-47fc-8bac-d2cffc5849f7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "296530f1-fda6-42c9-bb15-0535b5649893",
+        "task_id": "9219480b-3aed-47fc-8bac-d2cffc5849f7",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "18b63012-f2b5-45ad-8a75-6f4e2f514bc7",
+        "task_id": "36037439-2044-4b50-b9d1-875b5a332143",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "06d03222-8448-4ed5-b65d-b72bc79244b0",
+        "task_id": "36037439-2044-4b50-b9d1-875b5a332143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "091d5979-d37e-4d59-8f3b-a57a167996c8",
+        "task_id": "36037439-2044-4b50-b9d1-875b5a332143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "bc7b0c86-4933-4323-a91f-293f4ead6896",
+        "task_id": "36037439-2044-4b50-b9d1-875b5a332143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "4b7ffab0-ef1e-4b2c-9c5b-b672b9c3d8a0",
+        "task_id": "36037439-2044-4b50-b9d1-875b5a332143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "99d119d4-2ca6-4be9-b926-82ab19503033",
+        "task_id": "36037439-2044-4b50-b9d1-875b5a332143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "2a2d6e5f-fa4e-4ad4-b03d-2031ce65e5a1",
+        "task_id": "36037439-2044-4b50-b9d1-875b5a332143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6b3ba31c-2d76-4f66-94f3-d50ed9f1814a",
+        "task_id": "36037439-2044-4b50-b9d1-875b5a332143",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "667eb185-62fc-41fb-9902-caaa8526a257",
+        "task_id": "716a6079-22da-47f1-ba73-c9d58f986a38",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "beeb4bbc-7868-4598-9a7c-1134df3f3215",
+        "task_id": "716a6079-22da-47f1-ba73-c9d58f986a38",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c9f7136c-be68-4a4d-ae0e-190d3d4d2a6c",
+        "task_id": "716a6079-22da-47f1-ba73-c9d58f986a38",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "042a8a9c-4814-4c52-8263-94daeb39092a",
+        "task_id": "716a6079-22da-47f1-ba73-c9d58f986a38",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "9779397b-f9d7-48cd-b6d9-a7c25fb13bf0",
+        "task_id": "716a6079-22da-47f1-ba73-c9d58f986a38",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "af49430a-8b3f-4131-b9fc-935d4d169241",
+        "task_id": "716a6079-22da-47f1-ba73-c9d58f986a38",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "bc6f98fe-3597-4bb5-ab39-f307d6fe7db4",
+        "task_id": "716a6079-22da-47f1-ba73-c9d58f986a38",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ffc1e961-6613-4c6b-97b9-9d3f4acdc5b1",
+        "task_id": "716a6079-22da-47f1-ba73-c9d58f986a38",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "e8b3b45c-9f16-40a3-aa72-dc63449dce3b",
+        "task_id": "a74b607e-6bb5-4ea8-8a7c-5d97c7bbcd2a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f8c751f3-c68f-4b65-b3e3-48e00d9374ce",
+        "task_id": "a74b607e-6bb5-4ea8-8a7c-5d97c7bbcd2a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6c9766e2-cf4a-4579-8f70-ad4044d4cae5",
+        "task_id": "a74b607e-6bb5-4ea8-8a7c-5d97c7bbcd2a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "dd09b577-0ab3-4747-b8f2-c711dfbec334",
+        "task_id": "a74b607e-6bb5-4ea8-8a7c-5d97c7bbcd2a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5fe0b53f-71da-4bcd-9297-bd7cbf074a0c",
+        "task_id": "a74b607e-6bb5-4ea8-8a7c-5d97c7bbcd2a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d09996a9-0993-40f1-bf83-79f20672ac8f",
+        "task_id": "a74b607e-6bb5-4ea8-8a7c-5d97c7bbcd2a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d917737d-a28b-4f7f-b44f-9677ce1856de",
+        "task_id": "a74b607e-6bb5-4ea8-8a7c-5d97c7bbcd2a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3767ee1b-61ba-4c72-b14b-3dae017f7b3b",
+        "task_id": "a74b607e-6bb5-4ea8-8a7c-5d97c7bbcd2a",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d1a9da4d-c2b8-4384-94f9-53f87ea52266",
+        "task_id": "2373b66a-092d-44cb-bfd7-82e86e7a3b4d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "70194bf2-fc25-4356-9a1f-07b1a7733f09",
+        "task_id": "2373b66a-092d-44cb-bfd7-82e86e7a3b4d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c5b88d19-2a0b-489f-84c8-8c96b31e2014",
+        "task_id": "2373b66a-092d-44cb-bfd7-82e86e7a3b4d",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "69516be4-d76f-4b9c-bd5a-df31c093e348",
+        "task_id": "2373b66a-092d-44cb-bfd7-82e86e7a3b4d",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "4b1c65a1-291f-42fc-999c-b2c32f4ac770",
+        "task_id": "2373b66a-092d-44cb-bfd7-82e86e7a3b4d",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "35f55dc6-5e09-481d-a6c8-a71ea5a80918",
+        "task_id": "2373b66a-092d-44cb-bfd7-82e86e7a3b4d",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "33678cf9-9c9e-45bd-bca6-74f11f100190",
+        "task_id": "2373b66a-092d-44cb-bfd7-82e86e7a3b4d",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0bbd522d-3dc0-4a07-a6c3-dc4268cbd2e4",
+        "task_id": "2373b66a-092d-44cb-bfd7-82e86e7a3b4d",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ca6b8281-1e22-418f-bc3a-d4b021f0737d",
+        "task_id": "81c425f5-78f3-4771-afd6-3d2973825947",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ac032477-6f20-4370-9b5d-9902e69c6f24",
+        "task_id": "81c425f5-78f3-4771-afd6-3d2973825947",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "67b6a091-2d45-4259-b518-b426f41c0293",
+        "task_id": "81c425f5-78f3-4771-afd6-3d2973825947",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9b16f811-9f42-499f-93a9-5bc4bc5d8de1",
+        "task_id": "81c425f5-78f3-4771-afd6-3d2973825947",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "828c62ee-04fc-415c-8564-a9169b658475",
+        "task_id": "81c425f5-78f3-4771-afd6-3d2973825947",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "234604d1-ff22-421c-ac81-fb6a652c4d3a",
+        "task_id": "81c425f5-78f3-4771-afd6-3d2973825947",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "70dd3f7d-eb92-474f-9966-610e7f970d29",
+        "task_id": "81c425f5-78f3-4771-afd6-3d2973825947",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0af1ea96-5ea7-4396-8423-cfec414a4da4",
+        "task_id": "81c425f5-78f3-4771-afd6-3d2973825947",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "c2fb4e19-d009-4ce0-9885-668edfb4a4b9",
+        "task_id": "227d2f97-562b-4ccb-ae47-a5ec9e142fbb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2a22fb0f-c4a7-4b91-9237-5105fbe6d13c",
+        "task_id": "227d2f97-562b-4ccb-ae47-a5ec9e142fbb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "456e32c5-9a09-479b-a400-04565a607c33",
+        "task_id": "227d2f97-562b-4ccb-ae47-a5ec9e142fbb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ff4d87da-2a0e-42e0-a2f3-b3289aba7807",
+        "task_id": "227d2f97-562b-4ccb-ae47-a5ec9e142fbb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ee1b326c-f330-4d97-9993-fc9e31814103",
+        "task_id": "227d2f97-562b-4ccb-ae47-a5ec9e142fbb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ae451258-89f0-4247-947c-af2b03540108",
+        "task_id": "227d2f97-562b-4ccb-ae47-a5ec9e142fbb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6cb56bd0-e0c8-4eda-a280-8365aab1aae6",
+        "task_id": "227d2f97-562b-4ccb-ae47-a5ec9e142fbb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ccd05db7-8b61-48af-93b0-f93be5afdb38",
+        "task_id": "227d2f97-562b-4ccb-ae47-a5ec9e142fbb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "93876d73-c7b4-4f24-b68b-82d42de56fe6",
+        "task_id": "b337d106-053f-4d37-8da0-7f9c4043a66b",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7c3c7879-6656-401f-9317-89b1e84a11b9",
+        "task_id": "b337d106-053f-4d37-8da0-7f9c4043a66b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ceee2966-f3a3-4c3f-a2f6-2f2213e9fd8e",
+        "task_id": "b337d106-053f-4d37-8da0-7f9c4043a66b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "4ccbd40e-2a22-466c-ad6f-6c9b79d0021e",
+        "task_id": "b337d106-053f-4d37-8da0-7f9c4043a66b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "1976377a-0923-4668-b5ae-a696b61476af",
+        "task_id": "b337d106-053f-4d37-8da0-7f9c4043a66b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "163171ba-28f4-41f6-b393-1f222fd407fe",
+        "task_id": "b337d106-053f-4d37-8da0-7f9c4043a66b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "52c8cd04-ab0d-4973-8a50-3c93715b3c54",
+        "task_id": "b337d106-053f-4d37-8da0-7f9c4043a66b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "d01fc480-3cb3-4f54-9f18-736e13142b88",
+        "task_id": "b337d106-053f-4d37-8da0-7f9c4043a66b",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "14fc3968-8548-4e9b-b94d-cf589a7ec342",
+        "task_id": "a503b07f-9119-456b-b75d-f5146737d24f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "41bb4ee0-c6b7-49df-b0ef-32be7decb45c",
+        "task_id": "a503b07f-9119-456b-b75d-f5146737d24f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9951f81c-37f0-4871-a027-d025a11aa27a",
+        "task_id": "a503b07f-9119-456b-b75d-f5146737d24f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "e21611c8-d2cc-4ede-934c-02786bc6ce6a",
+        "task_id": "a503b07f-9119-456b-b75d-f5146737d24f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "1acac6a7-177d-47ce-b49d-8766228cc6bc",
+        "task_id": "a503b07f-9119-456b-b75d-f5146737d24f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "9473b2dc-404b-4bb8-b1dc-7c11dae2852f",
+        "task_id": "a503b07f-9119-456b-b75d-f5146737d24f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "35705865-e61a-4566-8a04-706094d4e795",
+        "task_id": "a503b07f-9119-456b-b75d-f5146737d24f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ffa299dd-3d85-4b62-91c9-11ddc2ed5ad2",
+        "task_id": "a503b07f-9119-456b-b75d-f5146737d24f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b10a5b4f-8878-4737-8120-78286361c69e",
+        "task_id": "09a37c51-e625-49f4-a514-20a773797a8a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "bd1101b3-8444-446f-a11e-caef8608af47",
+        "task_id": "09a37c51-e625-49f4-a514-20a773797a8a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "d5715326-25a0-4cd5-be4e-532d341bd0fc",
+        "task_id": "09a37c51-e625-49f4-a514-20a773797a8a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b5ef00d9-31b1-4b4f-881e-492c4da583ef",
+        "task_id": "09a37c51-e625-49f4-a514-20a773797a8a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "5505d207-88a9-4393-a84c-72f2802634d1",
+        "task_id": "09a37c51-e625-49f4-a514-20a773797a8a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b33b9d87-5752-4cef-b32a-a75ca5324a07",
+        "task_id": "09a37c51-e625-49f4-a514-20a773797a8a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "69a3a649-f2e7-453a-880a-fb34e6edc5ab",
+        "task_id": "09a37c51-e625-49f4-a514-20a773797a8a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "3c6937fc-0073-47a5-9797-f4f056de4cc1",
+        "task_id": "09a37c51-e625-49f4-a514-20a773797a8a",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "9547cc3c-0313-41f9-bfa7-e4b85d1bc49b",
+        "task_id": "778efd0a-153f-4842-9214-f05fc176b877",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "97110254-6348-48e9-9670-392a0089b316",
+        "task_id": "778efd0a-153f-4842-9214-f05fc176b877",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6e999f3c-894f-4793-b258-c626415b310b",
+        "task_id": "778efd0a-153f-4842-9214-f05fc176b877",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "66b30c5b-c96f-4c75-85c4-b330e4106621",
+        "task_id": "778efd0a-153f-4842-9214-f05fc176b877",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "96de5021-b0bd-4054-ab27-7ba256b4fb6a",
+        "task_id": "778efd0a-153f-4842-9214-f05fc176b877",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6a21402a-f4f3-4a7c-95f3-a57856815b55",
+        "task_id": "778efd0a-153f-4842-9214-f05fc176b877",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "1513dc11-1694-4fae-8359-5259b3a2d4ea",
+        "task_id": "778efd0a-153f-4842-9214-f05fc176b877",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "73c7fbc7-afa5-484e-9ac4-505a78198d9d",
+        "task_id": "778efd0a-153f-4842-9214-f05fc176b877",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "e37ce10d-2074-45e7-aa56-d51aa4c3ab88",
+        "task_id": "47f7c0ce-a5fb-4100-a5e6-65cd0e7429e5",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "191bca2f-6d90-4288-b9a6-f4952e18aa6b",
+        "task_id": "47f7c0ce-a5fb-4100-a5e6-65cd0e7429e5",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ce33f768-21bc-49ae-9948-9ffb785dbeaf",
+        "task_id": "47f7c0ce-a5fb-4100-a5e6-65cd0e7429e5",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6d3cfd50-b44a-43e8-b9bf-d73388817bd2",
+        "task_id": "47f7c0ce-a5fb-4100-a5e6-65cd0e7429e5",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b96c93ce-4c46-469d-b1fb-40ad68fee4ab",
+        "task_id": "47f7c0ce-a5fb-4100-a5e6-65cd0e7429e5",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "841f358c-6f55-4387-bd7a-cf6353f60f66",
+        "task_id": "47f7c0ce-a5fb-4100-a5e6-65cd0e7429e5",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "053c858b-1e50-4299-9347-8bc4c95cdcdd",
+        "task_id": "47f7c0ce-a5fb-4100-a5e6-65cd0e7429e5",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "8cec2740-1865-40d3-872b-e2124143cd24",
+        "task_id": "47f7c0ce-a5fb-4100-a5e6-65cd0e7429e5",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6bff53e9-a5fe-4aac-9838-b754919468cc",
+        "task_id": "c2751594-0cd5-4088-be1b-b5f2f9ec97c4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0d322ce7-7948-49d9-8c89-f7a9e361c8d1",
+        "task_id": "c2751594-0cd5-4088-be1b-b5f2f9ec97c4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0d5fe889-3d7a-43cf-a3b5-5547620409c1",
+        "task_id": "c2751594-0cd5-4088-be1b-b5f2f9ec97c4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "451ebc44-65dd-4390-ac09-60141e9b8bad",
+        "task_id": "c2751594-0cd5-4088-be1b-b5f2f9ec97c4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b1721126-c6af-4e45-96c6-c9c3abe08c54",
+        "task_id": "c2751594-0cd5-4088-be1b-b5f2f9ec97c4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "496e8146-aa0a-4c2a-85ce-9cb5c687684b",
+        "task_id": "c2751594-0cd5-4088-be1b-b5f2f9ec97c4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0ebebd4c-fb49-4598-a8f5-b7e3cbce7617",
+        "task_id": "c2751594-0cd5-4088-be1b-b5f2f9ec97c4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d1867445-0ac6-4e21-9d18-894a250b89e2",
+        "task_id": "c2751594-0cd5-4088-be1b-b5f2f9ec97c4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4f3bbac5-f155-414f-866e-ed53c2f60f78",
+        "task_id": "3c8f201a-009d-4bbe-8b65-a6f8b35bb57f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "07768242-6320-4102-9815-6c695cbef283",
+        "task_id": "3c8f201a-009d-4bbe-8b65-a6f8b35bb57f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "323c6b7f-73ac-41ca-94b1-a5ecb64cd3ed",
+        "task_id": "3c8f201a-009d-4bbe-8b65-a6f8b35bb57f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6931f06e-b2be-4674-afef-aa6cb755e51f",
+        "task_id": "3c8f201a-009d-4bbe-8b65-a6f8b35bb57f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9c72e419-0e20-4fb1-b9d2-d57acc76901a",
+        "task_id": "3c8f201a-009d-4bbe-8b65-a6f8b35bb57f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0630b603-71a5-4e9b-a9a8-8cd6745d77e4",
+        "task_id": "3c8f201a-009d-4bbe-8b65-a6f8b35bb57f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "c7351273-ce16-46af-87b2-9abd3454c894",
+        "task_id": "3c8f201a-009d-4bbe-8b65-a6f8b35bb57f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "5884ae70-0118-4b33-823a-e9b13b124a7d",
+        "task_id": "3c8f201a-009d-4bbe-8b65-a6f8b35bb57f",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "7888aa41-c13b-444c-913c-9bce2159bf0a",
+        "task_id": "98e8e339-5f91-4ed2-b2b2-12647cb134f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fd13395e-babf-43b8-91d5-46732b20b4f3",
+        "task_id": "98e8e339-5f91-4ed2-b2b2-12647cb134f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "54766bdb-763c-41fa-8fc3-f3de824f3dde",
+        "task_id": "98e8e339-5f91-4ed2-b2b2-12647cb134f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d18cd1a3-2c37-4e7d-a5b2-6a480473359a",
+        "task_id": "98e8e339-5f91-4ed2-b2b2-12647cb134f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "0afccfb2-548f-4d6a-be87-76227e552988",
+        "task_id": "98e8e339-5f91-4ed2-b2b2-12647cb134f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "812a5e11-1045-41ef-859c-a22e752f8a79",
+        "task_id": "98e8e339-5f91-4ed2-b2b2-12647cb134f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "88ec9025-f649-4bd5-ab71-e677a2dc8ab1",
+        "task_id": "98e8e339-5f91-4ed2-b2b2-12647cb134f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "790ad3ad-ea49-4e62-8b7f-c36e79697cf7",
+        "task_id": "98e8e339-5f91-4ed2-b2b2-12647cb134f4",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "89d43cd6-f62d-479a-a771-01b6985b985b",
+        "task_id": "94d95f96-9699-4208-98ba-3c3119edf9c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f59fcde7-b08f-4c06-85a9-d6e969adad43",
+        "task_id": "94d95f96-9699-4208-98ba-3c3119edf9c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "33c1d9de-ac4a-46c9-a69c-bf3f63864004",
+        "task_id": "94d95f96-9699-4208-98ba-3c3119edf9c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "54cf30de-28cf-4c79-9a42-7bca1e314d5f",
+        "task_id": "94d95f96-9699-4208-98ba-3c3119edf9c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9f758159-10f9-4da0-970e-9ca183c8b7d2",
+        "task_id": "94d95f96-9699-4208-98ba-3c3119edf9c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fca74ca1-f68a-4d66-bf1f-a39c74e2f36a",
+        "task_id": "94d95f96-9699-4208-98ba-3c3119edf9c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "abc21300-3977-47db-950d-69d5c667a302",
+        "task_id": "94d95f96-9699-4208-98ba-3c3119edf9c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "111e215d-6405-431a-9e6c-4891e6201695",
+        "task_id": "94d95f96-9699-4208-98ba-3c3119edf9c2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "88a399ff-53e3-45fa-8298-433ce7fd5992",
+        "task_id": "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "41330422-1464-4b37-a69d-d1d3cd377221",
+        "task_id": "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d1229e98-dc02-4a9d-ae1f-8415568d96ae",
+        "task_id": "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9c7fb7dc-2cff-4d22-b8ca-e8f6a42a59db",
+        "task_id": "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cd0458f3-778d-490b-bd43-945f4b11aa45",
+        "task_id": "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7fb8b872-e64c-4ab5-be9d-aca695378baf",
+        "task_id": "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "41708192-d007-4275-857b-0bc1f28d885f",
+        "task_id": "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "94100756-bef7-4701-b56a-07e5800059e6",
+        "task_id": "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "702b1b32-46f5-4c02-bf09-ce5b9acdb443",
+        "task_id": "b6781586-6346-41cd-935a-a6b1487918fc",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d1c0e575-2ac6-4d5c-8c3e-e230ffc9c598",
+        "task_id": "b6781586-6346-41cd-935a-a6b1487918fc",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "562940ca-3196-4fb6-93a0-d5d607f4259b",
+        "task_id": "b6781586-6346-41cd-935a-a6b1487918fc",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ca5aed60-0963-4db4-97db-b066c42d325a",
+        "task_id": "b6781586-6346-41cd-935a-a6b1487918fc",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "cae40511-d77a-433e-ac95-7dbeda9fe204",
+        "task_id": "b6781586-6346-41cd-935a-a6b1487918fc",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "210490bb-e4c7-47d4-9d31-60598ff49935",
+        "task_id": "b6781586-6346-41cd-935a-a6b1487918fc",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "80c1753a-5906-416f-95ae-00b4a7d8641b",
+        "task_id": "b6781586-6346-41cd-935a-a6b1487918fc",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "5f6efd06-105c-436d-810d-2da8693d8a00",
+        "task_id": "b6781586-6346-41cd-935a-a6b1487918fc",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "e7a21e34-5557-4078-93ff-1f7fdee12dae",
+        "task_id": "13584542-872b-42d8-b299-866967b5c3ef",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5cf87af9-5844-4763-a0c8-9b8662d82359",
+        "task_id": "13584542-872b-42d8-b299-866967b5c3ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "5cd66713-762b-4a78-b8a6-ecf2d9b7d841",
+        "task_id": "13584542-872b-42d8-b299-866967b5c3ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "3a7eaa16-a75f-4686-96d6-109f9f4a3f6f",
+        "task_id": "13584542-872b-42d8-b299-866967b5c3ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "56452738-e660-48ba-9da2-4200a24bb4b4",
+        "task_id": "13584542-872b-42d8-b299-866967b5c3ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "e1626ee3-e5b9-4cbf-b4ed-01a3526cfbb1",
+        "task_id": "13584542-872b-42d8-b299-866967b5c3ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "cc440e6e-b265-4af9-b60c-3f6873ef5628",
+        "task_id": "13584542-872b-42d8-b299-866967b5c3ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "4ad24457-6440-4525-bea3-5415f454c150",
+        "task_id": "13584542-872b-42d8-b299-866967b5c3ef",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "a8326dba-417e-4004-b833-0ee917787990",
+        "task_id": "23393935-50c7-4a86-aeea-2b78fd089c5c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5bcced88-0e1a-4293-8a62-9ee12f00fa6e",
+        "task_id": "23393935-50c7-4a86-aeea-2b78fd089c5c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "77743ef3-970b-4911-8628-7781bf6dfaa3",
+        "task_id": "23393935-50c7-4a86-aeea-2b78fd089c5c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c6e4ce3c-bbca-47fa-912d-f1641d7a9f7d",
+        "task_id": "23393935-50c7-4a86-aeea-2b78fd089c5c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6791d13f-ebfa-4424-b2ff-1e1cae61f0ff",
+        "task_id": "23393935-50c7-4a86-aeea-2b78fd089c5c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "c1debcca-e303-4528-8600-73a30e923e2e",
+        "task_id": "23393935-50c7-4a86-aeea-2b78fd089c5c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "1033e743-dfb1-4fe6-80fd-0259432b8966",
+        "task_id": "23393935-50c7-4a86-aeea-2b78fd089c5c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "2144c1bc-b3af-4fac-a927-513edb484297",
+        "task_id": "23393935-50c7-4a86-aeea-2b78fd089c5c",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "e6bc12da-baae-443d-876b-7e04904385a7",
+        "task_id": "4d117223-a354-47fb-8b45-62ab1390a95f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a9f60371-0047-4421-b29f-b654015125b8",
+        "task_id": "4d117223-a354-47fb-8b45-62ab1390a95f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "adeb1bf4-76c0-4a67-b31d-8c31a7d50415",
+        "task_id": "4d117223-a354-47fb-8b45-62ab1390a95f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9acc2939-38ec-4cd3-be0d-99461346885b",
+        "task_id": "4d117223-a354-47fb-8b45-62ab1390a95f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1d9468f6-3efd-42e3-a067-188d7cd8b6dd",
+        "task_id": "4d117223-a354-47fb-8b45-62ab1390a95f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "23128a40-f620-45e1-a850-bfd05a6cedfb",
+        "task_id": "4d117223-a354-47fb-8b45-62ab1390a95f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4e065083-1c60-4a54-9386-6f0b8ec79862",
+        "task_id": "4d117223-a354-47fb-8b45-62ab1390a95f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e361e6cf-64e3-430c-81f1-fa931cdd912c",
+        "task_id": "4d117223-a354-47fb-8b45-62ab1390a95f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3ab4334a-ee0a-478d-8276-bd7a6f14fea6",
+        "task_id": "6f56bf42-85b8-4fbb-8e06-6c44960184ba",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "dfde3241-f130-46d9-9dcc-f8bd3a31334f",
+        "task_id": "6f56bf42-85b8-4fbb-8e06-6c44960184ba",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c56c8ea1-96f0-4738-b2e1-36330418977c",
+        "task_id": "6f56bf42-85b8-4fbb-8e06-6c44960184ba",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a69e98db-a262-49e3-b16e-dc1d6ad8e855",
+        "task_id": "6f56bf42-85b8-4fbb-8e06-6c44960184ba",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c85c7a31-0f0d-4084-a50b-0359630109e8",
+        "task_id": "6f56bf42-85b8-4fbb-8e06-6c44960184ba",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "45dd3495-a001-4e96-a71a-5dbb1bd64a88",
+        "task_id": "6f56bf42-85b8-4fbb-8e06-6c44960184ba",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b61644b2-3c92-4744-9dcc-fc43bb58ab28",
+        "task_id": "6f56bf42-85b8-4fbb-8e06-6c44960184ba",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "3cf7786d-13d3-4e42-a7aa-4f18c808d4f5",
+        "task_id": "6f56bf42-85b8-4fbb-8e06-6c44960184ba",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c6f08918-4d53-414d-a17e-aa17fc444c04",
+        "task_id": "9bc3cc16-074a-45ac-9bdc-b2a362e1daf3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a64e3221-7bb0-4281-be9e-07c8b1c57076",
+        "task_id": "9bc3cc16-074a-45ac-9bdc-b2a362e1daf3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "961ac31f-986d-4e1b-a99e-21e800a6f3fe",
+        "task_id": "9bc3cc16-074a-45ac-9bdc-b2a362e1daf3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7abbd384-b1ad-41cb-b0db-32251cc292a4",
+        "task_id": "9bc3cc16-074a-45ac-9bdc-b2a362e1daf3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f6f54826-75eb-4a25-bc08-da5a4e60c789",
+        "task_id": "9bc3cc16-074a-45ac-9bdc-b2a362e1daf3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4135168f-7c25-471f-aaa0-0705847686a4",
+        "task_id": "9bc3cc16-074a-45ac-9bdc-b2a362e1daf3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "31c46b49-50c2-482f-b8dd-5032b7fd336f",
+        "task_id": "9bc3cc16-074a-45ac-9bdc-b2a362e1daf3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d5dd60d1-405c-4991-9415-44db42288257",
+        "task_id": "9bc3cc16-074a-45ac-9bdc-b2a362e1daf3",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "24a5f7a8-1c93-4798-b60a-e7581f3c2ff6",
+        "task_id": "3f28fe4f-5d9d-4994-a456-efd78cfae1a3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "278ae63c-0178-497b-b5a5-7368eee31e51",
+        "task_id": "3f28fe4f-5d9d-4994-a456-efd78cfae1a3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "69b9f099-4d61-4be6-b7a2-30b3e35e6ced",
+        "task_id": "3f28fe4f-5d9d-4994-a456-efd78cfae1a3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "faad6e83-3fb7-4ac1-880b-868b25156f79",
+        "task_id": "3f28fe4f-5d9d-4994-a456-efd78cfae1a3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8744f058-06f8-494b-9e9a-090639a9a2c7",
+        "task_id": "3f28fe4f-5d9d-4994-a456-efd78cfae1a3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ed7e87bd-78b6-4239-9259-52a4fa7fc822",
+        "task_id": "3f28fe4f-5d9d-4994-a456-efd78cfae1a3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d851a6c7-f589-4d88-b1f2-ee218c49f549",
+        "task_id": "3f28fe4f-5d9d-4994-a456-efd78cfae1a3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "23c6be17-a9b4-45a7-80a2-154a125204cb",
+        "task_id": "3f28fe4f-5d9d-4994-a456-efd78cfae1a3",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "368dffa7-56eb-4266-891b-032475210c30",
+        "task_id": "5203d847-2572-4150-912a-03f062254390",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "47f93259-3f3f-4d7a-8c93-fae2c2a00bba",
+        "task_id": "5203d847-2572-4150-912a-03f062254390",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "73c9f4ca-2b76-49b5-9434-635daf734313",
+        "task_id": "5203d847-2572-4150-912a-03f062254390",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "60fb4322-e2f1-4b5b-9941-5e5309fc2a5d",
+        "task_id": "5203d847-2572-4150-912a-03f062254390",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "2c3faf36-e8c6-4a37-b901-3c17b8392f95",
+        "task_id": "5203d847-2572-4150-912a-03f062254390",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "dbf8225c-eed4-446b-bf9e-dabe737e7781",
+        "task_id": "5203d847-2572-4150-912a-03f062254390",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "fe3a6fd9-7eab-4ce8-a5c7-e5043ec01b00",
+        "task_id": "5203d847-2572-4150-912a-03f062254390",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "74a9a58e-845d-4dd8-b4a3-05e33d9622f5",
+        "task_id": "5203d847-2572-4150-912a-03f062254390",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "c912b0c5-92cf-4838-bc59-a47debfb662e",
+        "task_id": "d38192b0-17dc-4e1d-99c3-786d0117de77",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9c57ed99-43ce-4d84-b153-5fa368835347",
+        "task_id": "d38192b0-17dc-4e1d-99c3-786d0117de77",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1db0de53-e0ec-4758-bf71-03e4d9b79792",
+        "task_id": "d38192b0-17dc-4e1d-99c3-786d0117de77",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cdb90a0a-8d18-4c04-bc7f-8fe88478f93e",
+        "task_id": "d38192b0-17dc-4e1d-99c3-786d0117de77",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "dec2c475-057c-41c3-9272-5e3d92830a7d",
+        "task_id": "d38192b0-17dc-4e1d-99c3-786d0117de77",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "03c0ee2f-c986-4f51-a3d6-0cf7cbd16f5c",
+        "task_id": "d38192b0-17dc-4e1d-99c3-786d0117de77",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2401022e-489c-4aa7-9c70-d6328ecad3c4",
+        "task_id": "d38192b0-17dc-4e1d-99c3-786d0117de77",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "fc55ccef-72a0-4742-ab92-afe1cb8f8906",
+        "task_id": "d38192b0-17dc-4e1d-99c3-786d0117de77",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "761b2b9d-b1f9-46c1-91e4-00ba4298c5b3",
+        "task_id": "a10b69e1-6034-4a2b-93e1-571d45194f75",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4fc874aa-c558-4d71-92c9-873fa8761099",
+        "task_id": "a10b69e1-6034-4a2b-93e1-571d45194f75",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a246d759-c10b-4d5c-8bbe-b10083102924",
+        "task_id": "a10b69e1-6034-4a2b-93e1-571d45194f75",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "552c3abd-698e-4a6b-8f2f-ae63ba264a33",
+        "task_id": "a10b69e1-6034-4a2b-93e1-571d45194f75",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "647cfcc4-902c-468a-9aba-9974c7d7befc",
+        "task_id": "a10b69e1-6034-4a2b-93e1-571d45194f75",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6b5e754e-15ba-4fb6-b803-c2a1ffbfed80",
+        "task_id": "a10b69e1-6034-4a2b-93e1-571d45194f75",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d138e404-4d84-49e5-94eb-a51911dcde44",
+        "task_id": "a10b69e1-6034-4a2b-93e1-571d45194f75",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1ae075ea-0b52-4614-bc1f-3958a2b50ab3",
+        "task_id": "a10b69e1-6034-4a2b-93e1-571d45194f75",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c66de323-06d1-4606-9f95-ad90189eac5a",
+        "task_id": "3f49d2cc-f400-4e7d-90cc-9b18e401cc31",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "725a5e25-3bad-4837-a618-2f851ff56fe9",
+        "task_id": "3f49d2cc-f400-4e7d-90cc-9b18e401cc31",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "62dec17a-b883-49e9-91da-7e1002dbe4bc",
+        "task_id": "3f49d2cc-f400-4e7d-90cc-9b18e401cc31",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "8254a00b-259c-4840-b8bd-98aaf930332c",
+        "task_id": "3f49d2cc-f400-4e7d-90cc-9b18e401cc31",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "9939f2ec-a76f-4ef5-90c4-8f8688d75559",
+        "task_id": "3f49d2cc-f400-4e7d-90cc-9b18e401cc31",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6a4afb32-c32c-43be-8385-19dac19e97c3",
+        "task_id": "3f49d2cc-f400-4e7d-90cc-9b18e401cc31",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "3174217e-2404-4838-a5b8-42877f0bec94",
+        "task_id": "3f49d2cc-f400-4e7d-90cc-9b18e401cc31",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "3d6aa726-9894-4014-9723-e143e6aa4b6b",
+        "task_id": "3f49d2cc-f400-4e7d-90cc-9b18e401cc31",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "85dab462-62b2-4aed-a7a6-db298f85b17c",
+        "task_id": "f201fbc3-44e6-46fc-bcaa-432f9815454c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "00dcee1c-493d-4053-9b3a-c416e1471e4b",
+        "task_id": "f201fbc3-44e6-46fc-bcaa-432f9815454c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a8cf8b2f-dc53-41fc-ab26-806b6a6d9983",
+        "task_id": "f201fbc3-44e6-46fc-bcaa-432f9815454c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "86afd037-8fb7-4708-929d-cd5a9838ebc3",
+        "task_id": "f201fbc3-44e6-46fc-bcaa-432f9815454c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8a0ef709-92bf-498c-b0b2-77e9e2564b48",
+        "task_id": "f201fbc3-44e6-46fc-bcaa-432f9815454c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c529308f-6114-4ba0-ac92-bcc64abb5858",
+        "task_id": "f201fbc3-44e6-46fc-bcaa-432f9815454c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c18fe0c9-e6b8-4da1-b9fa-1f5e0f32f28e",
+        "task_id": "f201fbc3-44e6-46fc-bcaa-432f9815454c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1acbdb0a-7208-4085-9130-a7513ef4d51c",
+        "task_id": "f201fbc3-44e6-46fc-bcaa-432f9815454c",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "33bd24d7-588f-41c3-9e04-6555eb71bae7",
+        "task_id": "8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e6f68964-bef4-43a3-84ef-12784cc9b0aa",
+        "task_id": "8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b954685c-e977-49bb-a05a-a6af15062b74",
+        "task_id": "8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "589dc35b-8edf-4275-bfef-f74f2a79947f",
+        "task_id": "8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ae466a18-6a50-4a15-b7aa-6b6c1f318ddd",
+        "task_id": "8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9242186b-f096-4cee-b402-6c03779f4143",
+        "task_id": "8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "07efec3c-76de-497d-b165-a9418010d7ea",
+        "task_id": "8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8794f1e5-5b33-47b5-920e-199ea47d3681",
+        "task_id": "8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "aa5b612d-dcba-465c-b0ca-a68add74a000",
+        "task_id": "8f080098-ddb1-424c-b438-4e96e5e4786e",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "9ac10752-db60-4716-81ae-40f107438fc7",
+        "task_id": "8f080098-ddb1-424c-b438-4e96e5e4786e",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ae4702f5-e439-4e1b-82ea-43c70f817331",
+        "task_id": "8f080098-ddb1-424c-b438-4e96e5e4786e",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "a34d7273-93e9-471b-a549-71efcf8753b5",
+        "task_id": "8f080098-ddb1-424c-b438-4e96e5e4786e",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "8ef6291e-6783-4bb5-82fc-e7801eb610d3",
+        "task_id": "8f080098-ddb1-424c-b438-4e96e5e4786e",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "ce6a3a1f-afef-4386-bb25-a0c13e3970f2",
+        "task_id": "8f080098-ddb1-424c-b438-4e96e5e4786e",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "40ca31d1-4e3c-440d-ae72-2a93554efd65",
+        "task_id": "8f080098-ddb1-424c-b438-4e96e5e4786e",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "8de92ff3-217c-4cbb-93d5-2d8ffc051177",
+        "task_id": "8f080098-ddb1-424c-b438-4e96e5e4786e",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "b5125ec2-d080-4a27-a38e-4c39755d68bd",
+        "task_id": "fba2c100-79e8-42df-ae74-b592418d54f4",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "fde3e2a4-40f1-4d91-82f8-5490aea383d0",
+        "task_id": "fba2c100-79e8-42df-ae74-b592418d54f4",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0704fee3-d435-49c0-9d9e-9b06480fc8d7",
+        "task_id": "fba2c100-79e8-42df-ae74-b592418d54f4",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "5efed376-4f75-4792-b669-b9f0603543e0",
+        "task_id": "fba2c100-79e8-42df-ae74-b592418d54f4",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "93ae988c-e194-4e97-a801-cb3fe52c5ec2",
+        "task_id": "fba2c100-79e8-42df-ae74-b592418d54f4",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "271d1a8e-565b-480a-8f22-843bb4882149",
+        "task_id": "fba2c100-79e8-42df-ae74-b592418d54f4",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "742896ad-42ea-4fa5-bc39-b91f9edd469d",
+        "task_id": "fba2c100-79e8-42df-ae74-b592418d54f4",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "3c655051-d0cf-494e-a944-2e7436d8cd65",
+        "task_id": "fba2c100-79e8-42df-ae74-b592418d54f4",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "600bd628-e3a0-4802-b6a7-759142ae67f9",
+        "task_id": "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "75084f1b-8314-482e-88c1-3711386f1f62",
+        "task_id": "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a50dfbcc-f065-4cb9-bd65-442108362766",
+        "task_id": "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8b3f240a-a490-45af-913d-e4dc372a70ff",
+        "task_id": "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "22c7044d-f05b-44fa-9e81-7916da784fc4",
+        "task_id": "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1d868f05-89c8-408b-a9b9-b0c256837230",
+        "task_id": "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "b34ad6c6-d87e-4b9a-b024-6d9abaf8a67d",
+        "task_id": "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c8cb546c-8808-43ea-81dd-564ca7b5a308",
+        "task_id": "8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "77193f48-1456-4310-be2f-a51c285a1992",
+        "task_id": "53ad5833-3455-407b-bbc6-45b4c79ab8fb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "dcb48dc8-091e-4f1c-a116-72978dbc0276",
+        "task_id": "53ad5833-3455-407b-bbc6-45b4c79ab8fb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "99059089-c533-46f4-a28e-43aefd5849b0",
+        "task_id": "53ad5833-3455-407b-bbc6-45b4c79ab8fb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8b37d904-4e13-4b30-a281-0285c61086a4",
+        "task_id": "53ad5833-3455-407b-bbc6-45b4c79ab8fb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "09924926-7308-4d91-b47a-fea29beed372",
+        "task_id": "53ad5833-3455-407b-bbc6-45b4c79ab8fb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "c38c86f7-0678-4080-b77e-8919c03f2bbf",
+        "task_id": "53ad5833-3455-407b-bbc6-45b4c79ab8fb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "e7e237d4-7c97-4db3-b590-a1420b0b25d4",
+        "task_id": "53ad5833-3455-407b-bbc6-45b4c79ab8fb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "541b96f1-22be-403c-9d76-5e3402d8c7d1",
+        "task_id": "53ad5833-3455-407b-bbc6-45b4c79ab8fb",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5c6b4f76-9fae-465e-8c8e-f9e55830c310",
+        "task_id": "eabc805a-bfcf-4460-b250-ac92135819f6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7376e87a-7d59-4ebc-b995-00d14d451fe1",
+        "task_id": "eabc805a-bfcf-4460-b250-ac92135819f6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "140a8941-d66c-435b-aad6-1f91b64fd506",
+        "task_id": "eabc805a-bfcf-4460-b250-ac92135819f6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "916ec31f-6345-4e02-823d-d678d48d3175",
+        "task_id": "eabc805a-bfcf-4460-b250-ac92135819f6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "20b4cd30-7a77-4027-96c5-115b41ac6d3e",
+        "task_id": "eabc805a-bfcf-4460-b250-ac92135819f6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8ec1f6f9-676e-490a-a3d7-55cb9e9c8a54",
+        "task_id": "eabc805a-bfcf-4460-b250-ac92135819f6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9f63ddba-b6f0-473f-879c-5e6140c9f449",
+        "task_id": "eabc805a-bfcf-4460-b250-ac92135819f6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6144d61f-e44c-4ca7-9908-734b4aa1539c",
+        "task_id": "eabc805a-bfcf-4460-b250-ac92135819f6",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "933c044a-2140-4995-8185-ac3f0f69dfa5",
+        "task_id": "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "6e7530cd-14f8-4ccd-9fa1-0eb198bb4911",
+        "task_id": "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "6a537a64-6179-4f36-afbd-341026e531be",
+        "task_id": "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "a0390db8-a7ca-4d88-bf26-f43ef42a2c13",
+        "task_id": "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0b7df976-ade9-4ec1-a847-d759ed7d13ad",
+        "task_id": "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "c90a651f-0371-483e-ab08-c7ec990ac457",
+        "task_id": "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "209b228e-c7f2-4f90-8b00-a0485697191f",
+        "task_id": "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "0cfb8980-f0f9-4ce2-9070-a0108f681181",
+        "task_id": "e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "34545c69-9f2c-4096-9fb4-c79cad3621c2",
+        "task_id": "9439a27b-18ae-42d8-9778-5f68f891805e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "60d7a7cf-bcf2-4e6c-beb4-c99703a7c6c8",
+        "task_id": "9439a27b-18ae-42d8-9778-5f68f891805e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "11fe3df5-df1e-4a15-b28d-771f70e1a9fc",
+        "task_id": "9439a27b-18ae-42d8-9778-5f68f891805e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "19fd9fd8-5788-49c3-a7df-b69f110b2d1f",
+        "task_id": "9439a27b-18ae-42d8-9778-5f68f891805e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a5f3d0b8-aa78-485e-bca5-00c867504590",
+        "task_id": "9439a27b-18ae-42d8-9778-5f68f891805e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f10b0959-5f5b-4b8e-b01f-72852207bc8c",
+        "task_id": "9439a27b-18ae-42d8-9778-5f68f891805e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a6fa4e5d-1090-4ccc-90ab-2f44b7d7f1d9",
+        "task_id": "9439a27b-18ae-42d8-9778-5f68f891805e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2838ca36-78f7-4387-90f2-a00721aadbd1",
+        "task_id": "9439a27b-18ae-42d8-9778-5f68f891805e",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2f417a8f-2a85-4610-b562-edc82109ba91",
+        "task_id": "9d425400-e9b2-4424-9a4b-d4c7abac4140",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "a15d5237-5e9b-4938-9241-0ecc4d9e3a08",
+        "task_id": "9d425400-e9b2-4424-9a4b-d4c7abac4140",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "80956dfc-524e-4378-b9e4-5f0b131b2d10",
+        "task_id": "9d425400-e9b2-4424-9a4b-d4c7abac4140",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "457cee10-b575-4b17-adec-cf5c09d4f168",
+        "task_id": "9d425400-e9b2-4424-9a4b-d4c7abac4140",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2ac940ce-2fc7-410b-8e9d-3df945742d57",
+        "task_id": "9d425400-e9b2-4424-9a4b-d4c7abac4140",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5c86f84f-01c0-4ad6-89d2-aa31ce259b30",
+        "task_id": "9d425400-e9b2-4424-9a4b-d4c7abac4140",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "876359a1-729a-4d0f-ac7b-fef14b41a2a7",
+        "task_id": "9d425400-e9b2-4424-9a4b-d4c7abac4140",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "bcaad1cf-5e59-474c-80d8-26bd5b199e17",
+        "task_id": "9d425400-e9b2-4424-9a4b-d4c7abac4140",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "27f8e460-3f99-414d-aab3-995af7f966fa",
+        "task_id": "6ed0a554-cbee-4b44-84ea-fd6c042f4fe1",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "05d12625-41e4-4a05-8ec5-0fc4c2ee95ce",
+        "task_id": "6ed0a554-cbee-4b44-84ea-fd6c042f4fe1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "fb523a53-7469-4549-aca6-a4854dee3953",
+        "task_id": "6ed0a554-cbee-4b44-84ea-fd6c042f4fe1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "e3f62900-e6f1-44fe-aa40-ecfdc81bdb24",
+        "task_id": "6ed0a554-cbee-4b44-84ea-fd6c042f4fe1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "049c200e-0e57-4a81-b5b0-ae56254c9bbf",
+        "task_id": "6ed0a554-cbee-4b44-84ea-fd6c042f4fe1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "f532f2b0-7f4e-42e3-bb50-f0bb08a7428b",
+        "task_id": "6ed0a554-cbee-4b44-84ea-fd6c042f4fe1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "3b79738f-fea1-46b9-b907-b3cb853d7a46",
+        "task_id": "6ed0a554-cbee-4b44-84ea-fd6c042f4fe1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "1b66fe77-3923-4511-8502-056ed0cef9fc",
+        "task_id": "6ed0a554-cbee-4b44-84ea-fd6c042f4fe1",
+        "reward": 0.0
+    },
+    {
+        "trajectory_id": "47ab36dc-cce7-4d05-8375-174b35718d37",
+        "task_id": "ec71221e-ac43-46f9-89b8-ee7d80f7e1c5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cc76ec08-20f5-4cce-b5ef-1563ee17c208",
+        "task_id": "ec71221e-ac43-46f9-89b8-ee7d80f7e1c5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cad11b7f-3982-4bd9-ba41-4a7b38d48060",
+        "task_id": "ec71221e-ac43-46f9-89b8-ee7d80f7e1c5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "5cf13b89-9f1b-433b-ad03-b05688806e58",
+        "task_id": "ec71221e-ac43-46f9-89b8-ee7d80f7e1c5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2c159574-b931-4f9c-91dc-c12d3c9e99fe",
+        "task_id": "ec71221e-ac43-46f9-89b8-ee7d80f7e1c5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "736c3966-8781-4d9e-9086-935025ff66ad",
+        "task_id": "ec71221e-ac43-46f9-89b8-ee7d80f7e1c5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "9e6a946a-0fb7-40ed-bc26-5192f18f3926",
+        "task_id": "ec71221e-ac43-46f9-89b8-ee7d80f7e1c5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "f5c92e71-bf96-43f3-b4e9-f1a93b29b328",
+        "task_id": "ec71221e-ac43-46f9-89b8-ee7d80f7e1c5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "ad31cc6a-e45c-493b-b032-595296680f3d",
+        "task_id": "70745df8-f2f5-42bd-8074-fbc10334fcc5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "34694e1b-846f-4062-87d0-386467b87496",
+        "task_id": "70745df8-f2f5-42bd-8074-fbc10334fcc5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "4faeca2d-7525-4219-b61e-b213c8a67e46",
+        "task_id": "70745df8-f2f5-42bd-8074-fbc10334fcc5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "37e4b6f2-f16d-460b-ae11-331ac56b2914",
+        "task_id": "70745df8-f2f5-42bd-8074-fbc10334fcc5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "25bcc217-7471-44a0-8508-7f0a2ce78544",
+        "task_id": "70745df8-f2f5-42bd-8074-fbc10334fcc5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2f6895ef-7eac-4e79-b2c1-fdce26f751d4",
+        "task_id": "70745df8-f2f5-42bd-8074-fbc10334fcc5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "13f2fac5-db32-4ee5-af95-a961b8f82359",
+        "task_id": "70745df8-f2f5-42bd-8074-fbc10334fcc5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "cab17b6f-1f9c-40b8-b783-0ab6346eb8bd",
+        "task_id": "70745df8-f2f5-42bd-8074-fbc10334fcc5",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "34db3725-8cba-452e-8e89-9ef3e3c53b28",
+        "task_id": "0512bb38-d531-4acf-9e7e-0add90816068",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "da48b02f-593d-4c67-976d-5d5829480837",
+        "task_id": "0512bb38-d531-4acf-9e7e-0add90816068",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "61e17a94-7040-4963-a8a7-7137f57c7be5",
+        "task_id": "0512bb38-d531-4acf-9e7e-0add90816068",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "d22f0b5a-772e-4df3-9023-9bcabcef5dc2",
+        "task_id": "0512bb38-d531-4acf-9e7e-0add90816068",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "2eb1340a-d2c1-4ed3-b20e-c2b37578f5b6",
+        "task_id": "0512bb38-d531-4acf-9e7e-0add90816068",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "8ab5fb0e-0db1-4a01-b6ef-5b98bad021ac",
+        "task_id": "0512bb38-d531-4acf-9e7e-0add90816068",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "1cfa8f95-1ad1-475b-a3a4-43f4b0201cf7",
+        "task_id": "0512bb38-d531-4acf-9e7e-0add90816068",
+        "reward": 1.0
+    },
+    {
+        "trajectory_id": "7a4bb3e5-651f-424a-8c90-ec06cd8ffd9e",
+        "task_id": "0512bb38-d531-4acf-9e7e-0add90816068",
+        "reward": 1.0
+    }
+]

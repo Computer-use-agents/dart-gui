@@ -144,5 +144,5 @@ sleep.sh
 *.tiff
 *.ico
 *.webp
-data/
+data/chenrui
 *results*/
