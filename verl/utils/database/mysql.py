@@ -14,6 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.dialects import mysql
 from sqlalchemy.engine import URL
+from sqlalchemy.exc import IntegrityError
 
 
 # Configure logging
@@ -187,6 +188,46 @@ class MySQLRolloutORM:
             if not result:
                 result.append("/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5")
             return result
+        
+        # 删除指定 run_id 的全部 rollout_run 记录，返回受影响行数
+    def delete_datasets_by_run_id(self, run_id: str) -> int:
+        with self.session_scope() as s:
+            affected = s.query(RolloutRun)\
+                .filter(RolloutRun.run_id == run_id)\
+                .delete(synchronize_session=False)
+            return affected
+
+    # 创建一条 rollout_run 记录；used 默认为 0
+    def create_dataset(
+        self,
+        trajectory_id: str,
+        run_id: str,
+        task_id: str,
+        trace_id: str,
+        model_version: str,
+        reward: float,
+        used: int = 0,
+    ) -> dict:
+        with self.session_scope() as s:
+            row = RolloutRun(
+                trajectory_id=trajectory_id,
+                run_id=run_id,
+                task_id=task_id,
+                trace_id=trace_id,
+                model_version=model_version,
+                reward=reward,
+                used=used if used is not None else 0,
+                split_dir = "",
+                num_chunks = 0,
+            )
+            s.add(row)
+            try:
+                s.flush()  # 获取数据库生成字段（如 create_at）
+            except IntegrityError as e:
+                # 例如 trajectory_id 主键冲突
+                s.rollback()
+                raise
+            return row.to_dict()
          
         
 def create_database_manager() -> MySQLRolloutORM:
