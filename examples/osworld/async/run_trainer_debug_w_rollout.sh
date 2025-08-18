@@ -3,7 +3,7 @@ pip install cryptography
 
 set -x
 ENGINE=${1:-vllm_osworld}
-cd /workspace/computer-use/code
+cd /workspace/computer-use/verl
 
 # Initialize Ray cluster for multi-node training
 # Make sure Ray is running on all nodes before executing this script

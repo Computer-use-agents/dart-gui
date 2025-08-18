@@ -17,23 +17,33 @@
 import copy
 import json
 import logging
-import os
+import os, sys
 import re
 from collections import defaultdict
-from typing import List, Optional, Union
-import  time
+from typing import Any, Dict, List, Optional, Union
+import time
+import hashlib
+
 import numpy as np
 import torch
 from omegaconf import DictConfig, ListConfig
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, IterableDataset, get_worker_info
 from transformers import PreTrainedTokenizer, ProcessorMixin
+
+# === NEW: unified DB manager and trainable filter ===
+WORKSPACE_ROOT = "/workspace/computer-use/verl"
+if WORKSPACE_ROOT not in sys.path:
+    sys.path.insert(0, WORKSPACE_ROOT)
+os.chdir(WORKSPACE_ROOT)
+from verl.utils.database.mysql import create_database_manager
+from verl.utils.dataset.trainable_filter import filter_fn
 
 from mm_agents.prompts import COMPUTER_USE_DOUBAO, COMPUTER_USE_DOUBAO_WITH_CALL_USER
 
 logger = logging.getLogger(__name__)
 
 
-def collate_fn(data_list: list[dict]) -> dict:
+def collate_fn(data_list: List[dict]) -> dict:
     """
     Collate a batch of sample dicts into batched tensors and arrays.
 
@@ -64,7 +74,7 @@ def collate_fn(data_list: list[dict]) -> dict:
     return {**tensors, **non_tensors}
 
 
-def collate_async_fn(data_list: list[dict]) -> dict:
+def collate_async_fn(data_list: List[dict]) -> dict:
     """
     Collate a batch of sample dicts into batched tensors and arrays.
 
@@ -76,7 +86,7 @@ def collate_async_fn(data_list: list[dict]) -> dict:
         (batch_size, *dims) and non-tensor entries are converted to
         np.ndarray of dtype object with shape (batch_size,).
     """
-    data_list = [ d for sub_d in data_list for d in sub_d ]
+    data_list = [d for sub_d in data_list for d in sub_d]
     tensors = defaultdict(list)
     non_tensors = defaultdict(list)
 
@@ -94,35 +104,9 @@ def collate_async_fn(data_list: list[dict]) -> dict:
         non_tensors[key] = np.array(val, dtype=object)
 
     return {**tensors, **non_tensors}
-
-
-import os, re, time, json, copy, hashlib
-from typing import Union, List, Optional
-import torch
-from torch.utils.data import IterableDataset, get_worker_info
-from transformers import PreTrainedTokenizer, ProcessorMixin
-from omegaconf import DictConfig, ListConfig
 
 
 class OSWorldAsyncDataset(IterableDataset):
-    """
-    Stream OSWorld data from MySQL, yielding **one batch per iteration** (list[dict]).
-
-    - Polls DB until at least batch_size_min tasks are available, then takes up to batch_size_max.
-    - For each selected task_id, fetches rows, builds samples, and marks them 'used'.
-    - Supports multi-worker sharding to avoid duplicate consumption.
-    - If config.steps_per_epoch > 0, yields exactly that many batches per __iter__ call (one 'epoch').
-
-    DataLoader usage:
-        dataloader = DataLoader(
-            dataset,
-            batch_size=None,              # VERY IMPORTANT: dataset already yields a batch
-            num_workers=dataset.num_workers,
-            collate_fn=None,              # or: lambda x: x[0]
-            persistent_workers=(dataset.num_workers > 0),
-            pin_memory=True               # if using CUDA
-        )
-    """
 
     def __init__(
         self,
@@ -156,8 +140,8 @@ class OSWorldAsyncDataset(IterableDataset):
         self.num_workers = config.get("num_workers", 2)
 
         # how many task_ids to wait for and to take each poll
-        self.batch_size_min =  config.get("train_batch_size_min", 4)
-        self.batch_size_max =  config.get("train_batch_size_max", 8)
+        self.batch_size_min = int(config.get("train_batch_size_min", 4))
+        self.batch_size_max = int(config.get("train_batch_size_max", 8))
 
         self.use_shm = config.get("use_shm", False)
         self.chat_template_func = config.get("chat_template_func", None)
@@ -168,27 +152,22 @@ class OSWorldAsyncDataset(IterableDataset):
         # 与 IterableDataset 配合：每个 __iter__（即每个 epoch）最多产出多少“批次”
         self.steps_per_epoch = int(config.get("steps_per_epoch", 0))  # 0/None 表示不限
 
-        self.max_steps = config.get("max_steps", 0)  # 如果你想兼容老字段
+        self.max_steps = config.get("max_steps", 0)
         if self.max_steps and not self.steps_per_epoch:
             self.steps_per_epoch = int(self.max_steps)
 
         self.osworld_root = config.get("osworld_root", "evaluation_examples/examples")
         self.run_id = config.get("run_id", None)
-        self.rollout_n = config.get("rollout_n", 8)
+        self.rollout_n = int(config.get("rollout_n", 8))
         assert self.run_id is not None, "config.run_id is required"
-        
+
         self.poll_interval_sec = float(config.get("poll_interval_sec", 30.0))  # 等待间隔
 
-        # DB managers
-        from verl.utils.database.mysql_trainable_group import create_database_manager as create_database_manager_trainable_group
-        from verl.utils.database.mysql_rollout_run import create_database_manager as create_database_manager_rollout_run
-        self.db_manager_trainable_group = create_database_manager_trainable_group()
-        self.db_manager_rollout_run = create_database_manager_rollout_run()
+        # === NEW: Unified DB manager ===
+        self.db_manager = create_database_manager()
 
         # root_data_dir for files
         self.root_data_dir = getattr(self.config, "root_data_dir", ".")
-        self.task_ids=[]
-        
         self.produced_batches = 0
 
     # 你原来的 messages 组装逻辑（若仍需要）
@@ -218,61 +197,28 @@ class OSWorldAsyncDataset(IterableDataset):
         return (h % num_workers) == worker_id
 
     def _ensure_db_connected(self):
-        if not self.db_manager_trainable_group.is_connected():
-            self.db_manager_trainable_group.setup_database()
-        if not self.db_manager_rollout_run.is_connected():
-            self.db_manager_rollout_run.setup_database()
+        if not self.db_manager.is_connected():
+            self.db_manager.setup_database()
 
     def _close_dbs(self):
         try:
-            self.db_manager_trainable_group.close_database()
-        except:
-            pass
-        try:
-            self.db_manager_rollout_run.close_database()
-        except:
+            self.db_manager.close_database()
+        except Exception:
             pass
 
-    def _fetch_task_ids(self):
-        # 拉取所有可用 task_ids（你原来的 API）
-        self.task_ids = self.db_manager_trainable_group.get_all_task_id_by_run_id(self.run_id)
-        while len(self.task_ids) < self.batch_size_min:
-            # 等待足够的任务数
-            logger.info(f"[ Waiting for at least {self.batch_size_min} tasks, currently have {len(self.task_ids)}")
-            time.sleep(30)
-            self.task_ids = self.db_manager_trainable_group.get_all_task_id_by_run_id(self.run_id) 
-        logger.info(f"[ Fetched {len(self.task_ids)} tasks")
-        return self.task_ids
-
-
-    def _fetch_all_rows(self):
-        #print("run_id:", self.run_id)
-        datasets = self.db_manager_trainable_group.get_datasets_by_run_id(self.run_id)
-        return datasets
-    
-    def _fetch_rows_for_task(self, task_id):
-        """
-        返回该 task_id 下的样本行列表（list[dict]）
-        你原来是 get_datasets_by_task_id(...)[0]，再把列表拼起来。
-        """
-        data = self.db_manager_trainable_group.get_datasets_by_task_id(
-            run_id=self.run_id, 
-            task_id=task_id
-        )
-
-        if not data:
-            return []
-
-        return data or []
-
-    def _row_to_sample(self, row_dict):
+    def _row_to_sample(self, row_dict: Dict[str, Any]) -> Dict[str, Any]:
         """
         把 DB 的 row_dict 转成训练样本（单条样本：dict）
+        也会将该 rollout 标记为 used（atomic in DB layer is preferred).
+        Expected row_dict to contain: "trajectory_id"
         """
         trajectory_id = row_dict["trajectory_id"]
 
-        # 先占位（claim），避免多 worker 重复（需要 DB 层 update_used 原子性较好）
-        self.db_manager_rollout_run.update_used(trajectory_id=trajectory_id)
+        # 先占位（claim），避免多 worker 重复
+        try:
+            self.db_manager.update_rollout_used(trajectory_id=trajectory_id)
+        except Exception as e:
+            logger.warning(f"update_rollout_used failed for {trajectory_id}: {e}")
 
         data_dir = os.path.join(self.root_data_dir, trajectory_id)
         with open(os.path.join(data_dir, "task_config.json")) as f:
@@ -315,72 +261,71 @@ class OSWorldAsyncDataset(IterableDataset):
         worker_id = worker.id if worker is not None else 0
         num_workers = worker.num_workers if worker is not None else 1
 
-        batch_samples = []
-        datasets = []
         self._ensure_db_connected()
-        try:
-            # while (self.steps_per_epoch == 0) or (produced_batches < self.steps_per_epoch):
-            #     # 轮询直到聚齐最小任务数
-            #     task_ids = self._fetch_task_ids()
-            #     # 按 worker 分片，避免多 worker 重复消费
-            #     if num_workers > 1:
-            #         task_ids = [tid for tid in task_ids if self._stable_shard(tid, num_workers, worker_id)]
 
-            #     if len(task_ids) < self.batch_size_min:
-            #         time.sleep(self.poll_interval_sec)
-            #         continue
-            #     print(f"[worker {worker_id}] step {produced_batches} Fetched {len(task_ids)} tasks after polling, before truncation")
-            #     # 取本 worker 的一个“任务批次”
-            #     task_ids = task_ids[:self.batch_size_max]
-            #     print(f"[worker {worker_id}] step {produced_batches} Selected {len(task_ids)} tasks for this batch")
+        # 控制每个 epoch 产出多少批次
+        while (self.steps_per_epoch == 0) or (self.produced_batches < self.steps_per_epoch):
+            #try:
+            # 1) 获取全部候选 rollouts（原始数据）
+            data = self.db_manager.get_rollouts_by_run_id(run_id=self.run_id)
+            print("len data:", len(data))
 
-            #     # 拉取并构造“一个训练批次”的所有样本
-            #     batch_samples = []
-            #     for task_id in task_ids:
-            #         try:
-            #             rows = self._fetch_rows_for_task(task_id)
-            #             print(f"[worker {worker_id}]  step {produced_batches} Fetched {len(rows)} rows for task_id={task_id}")
-            #             print("==================")
-            #             # time.sleep(30)
-            #             if not rows:
-            #                 continue
-            #             for row in rows:
-            #                 sample = self._row_to_sample(row)
-            #                 batch_samples.append(sample)
-            #         except Exception as e:
-            #             print(f"[worker {worker_id}]  step {produced_batches}  fetch/convert error on task_id={task_id}: {e}")
-            
-            while len(datasets) < self.batch_size_min * self.rollout_n:
-                datasets = self._fetch_all_rows()
-                #print(f"len dataset: {len(datasets)}")
-            if len(datasets) > self.batch_size_max * self.rollout_n:
-                datasets = datasets[:self.batch_size_max * self.rollout_n]
-            
-            batch_samples = []
-            for dataset in datasets:
-                sample = self._row_to_sample(dataset)
-                batch_samples.append(sample)
-            
-                    # 产出一个“批次”（list[dict]）
-            if len(batch_samples) > 0:
-                print(f"[worker {worker_id}] step {self.produced_batches}, traj num: {len(batch_samples)}")
+            # 2) 获取最近的若干 checkpoint 对应的 model_versions（top_mvs）
+            top_n = int(self.config.get("top_mvs_n", 2))
+            top_mvs = self.db_manager.get_latest_n_checkpoint_paths(n=top_n)
+
+            # 3) 通过 filter_fn 选择本次要训练的 datasets（限制每 task 的数量）
+            datasets: List[Dict[str, Any]] = filter_fn(
+                data=data,
+                per_task_limit=self.rollout_n,
+                top_mvs=top_mvs,
+                random_state=self.config.get("random_state", None),
+            )
+            print("len data after filtered: ", len(datasets))
+
+            # 若数量不足，继续轮询等待
+            min_needed = self.batch_size_min * self.rollout_n
+            if len(datasets) < min_needed:
+                logger.info(f"[worker {worker_id}] datasets={len(datasets)} < min_needed={min_needed}; "
+                            f"sleep {self.poll_interval_sec}s and retry.")
+                time.sleep(self.poll_interval_sec)
+                continue
+
+            # 限制最大数量
+            max_allowed = self.batch_size_max * self.rollout_n
+            if len(datasets) > max_allowed:
+                datasets = datasets[:max_allowed]
+
+            # 构造样本
+            batch_samples: List[Dict[str, Any]] = []
+            for row in datasets:
+                try:
+                    sample = self._row_to_sample(row)
+                    #print(sample['dataset_ids'])
+                    batch_samples.append(sample)
+                except Exception as e:
+                    logger.warning(f"Failed to build sample for row={row.get('trajectory_id')}: {e}")
+
+            if batch_samples:
+                logger.info(f"[worker {worker_id}] step {self.produced_batches}, traj num: {len(batch_samples)}")
                 self.produced_batches += 1
                 yield batch_samples
             else:
-                # 没拿到有效样本，稍等一下再拉
-                print(f"[worker {worker_id}] No valid samples fetched, retrying after {self.poll_interval_sec} sec")
+                logger.info(f"[worker {worker_id}] No valid samples built; sleep {self.poll_interval_sec}s")
                 time.sleep(self.poll_interval_sec)
 
-        finally:
-            self._close_dbs()
+            # except Exception as e:
+            #     logger.error(f"[worker {worker_id}] Iteration error: {e}")
+            #     time.sleep(self.poll_interval_sec)
+            #     continue
 
-    # 可选：若某些 Trainer 需要 __len__（用于进度条等），暴露 steps_per_epoch
+        # 迭代完成
+        self._close_dbs()
+
     def __len__(self):
         if self.steps_per_epoch and self.steps_per_epoch > 0:
             return self.steps_per_epoch
-        # 没有自然长度时，遵循 IterableDataset 语义：不提供长度
         raise TypeError("This IterableDataset has no static length; set config.steps_per_epoch to use len(dataset).")
-
 
     def __getstate__(self):
         if not self.serialize_dataset:
@@ -388,15 +333,100 @@ class OSWorldAsyncDataset(IterableDataset):
 
             if "dataframe" in state:
                 del state["dataframe"]
-            
+
             # 关闭数据库连接并移除数据库管理器，避免序列化问题
             if "db_manager" in state and state["db_manager"] is not None:
                 try:
                     state["db_manager"].close_database()
-                except:
+                except Exception:
                     pass
                 del state["db_manager"]
-            
+
             return state
 
         return self.__dict__.copy()
+
+def main(run_id, root_data_dir):
+
+    import time
+    from typing import Tuple
+
+    import torch
+    from omegaconf import OmegaConf
+    
+    def tensor_shape(x) -> Tuple[int, ...] | None:
+        try:
+            if isinstance(x, torch.Tensor):
+                return tuple(x.shape)
+        except Exception:
+            pass
+        return None
+    
+    # 组装最小配置（与数据集实现里的 config.get 字段对齐）
+    cfg = OmegaConf.create({
+        "run_id": run_id,
+        "steps_per_epoch": 3,
+        "train_batch_size_min": 4,
+        "train_batch_size_max": 8,
+        "rollout_n": 8,
+        "top_mvs_n": 2,
+        "poll_interval_sec": 30,
+        "root_data_dir": root_data_dir,
+        # 你也可以按需加：cache_dir / use_call_user / prompt_key / image_key / video_key 等
+    })
+
+    dataset = OSWorldAsyncDataset(
+        data_files=[],
+        tokenizer=None,   # 本测试路径中未用到 tokenizer
+        config=cfg,
+        processor=None,
+    )
+
+    min_needed = cfg.train_batch_size_min * cfg.rollout_n
+    max_allowed = cfg.train_batch_size_max * cfg.rollout_n
+
+    print(f"[config] run_id={cfg.run_id}")
+    print(f"[config] steps={cfg.steps_per_epoch}, rollout_n={cfg.rollout_n}, "
+          f"min_needed={min_needed}, max_allowed={max_allowed}")
+    print(f"[config] top_mvs_n={cfg.top_mvs_n}, poll_interval_sec={cfg.poll_interval_sec}")
+    print(f"[config] root_data_dir={cfg.root_data_dir}")
+
+    t0 = time.time()
+    pulled = 0
+    for step_idx, batch in enumerate(dataset):
+        pulled += 1
+        print(f"\n=== Step {step_idx} ===")
+        print(f"Batch size: {len(batch)}  (expected: {min_needed} ~ {max_allowed})")
+
+        # 预览一条样本结构
+        if batch:
+            ex = batch[0]
+            keys_preview = list(ex.keys())
+            print(f"Example keys: {keys_preview}")
+
+            # 打印 messages 的首条，便于核对模板是否正确
+            first_msg = None
+            try:
+                first_msg = ex.get("messages", [None])[0]
+            except Exception:
+                pass
+            print(f"First message: {first_msg}")
+
+            # 打印 id 与奖励张量形状等关键字段
+            print(
+                "dataset_ids:", ex.get("dataset_ids"),
+                "| reward_tensors shape:", tensor_shape(ex.get("reward_tensors")),
+            )
+
+        # 数据集已通过 steps_per_epoch 控制结束，这里只是双保险
+        if pulled >= cfg.steps_per_epoch:
+            break
+
+    print(f"\nDone. Pulled {pulled} batch(es) in {time.time() - t0:.2f}s.")
+
+
+if __name__ == "__main__":
+    
+    run_id = "results/test_for_train_pass8_gpu8_env77_20250817_1345"
+    root_data_dir = "/workspace/computer-use/computer-use-rollout/results/test_for_train_pass8_gpu8_env77_20250817_1345"
+    main(run_id, root_data_dir)

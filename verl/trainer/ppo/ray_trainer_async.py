@@ -45,7 +45,7 @@ from verl.utils.metric import (
     reduce_metrics,
 )
 from verl.utils.eval import validate_osworld, validate_osworld_parallel
-from verl.utils.database.mysql_model_version import create_database_manager as create_mysql_model_version_manager
+from verl.utils.database.mysql import create_database_manager
 from verl.utils.database.rollouter_reload_model import reload_model
 
 
@@ -314,7 +314,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             abs_path_actor_hf = os.path.abspath(actor_local_path_hf)
                             # Insert checkpoint path into MySQL database
                             print("Inserting checkpoint path into MySQL database...")
-                            db_manager = create_mysql_model_version_manager()
+                            db_manager = create_database_manager()
                             db_manager.insert_checkpoint(abs_path_actor_hf)
                             db_manager.close_database()
                             print("Checkpoint path inserted into MySQL database.")

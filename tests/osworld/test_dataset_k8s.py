@@ -8,7 +8,7 @@ import requests
 from omegaconf import DictConfig
 from PIL import Image
 
-from verl.utils.database.mysql import create_database_manager
+from verl.utils.database.mysql_bak import create_database_manager
 from verl.utils.dataset.osworld_dataset import OSWorldDataset
 from verl.workers.rollout.osworld_env.env import parse_action_to_structure_output, parsing_response_to_pyautogui_code
 from verl.workers.rollout.osworld_env.env_k8s import RemoteDesktopEnv

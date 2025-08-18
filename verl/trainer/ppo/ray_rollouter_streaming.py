@@ -40,7 +40,7 @@ from verl.single_controller.ray import RayWorkerGroup
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer, ResourcePoolManager, Role, WorkerType
 from verl.trainer.ppo.reward import compute_reward, compute_reward_async
 from verl.utils.checkpoint.checkpoint_manager import find_latest_ckpt_path
-from verl.utils.database.mysql import create_database_manager
+from verl.utils.database.mysql_bak import create_database_manager
 from verl.utils.debug import marked_timer
  
 

@@ -301,7 +301,7 @@ class OSWorldAsyncDataset(Dataset):
         self.osworld_root = config.get("osworld_root", "evaluation_examples/examples")
         self.run_id = config.get("run_id", None)
         assert self.run_id is not None
-        from verl.utils.database.mysql import create_database_manager
+        from verl.utils.database.mysql_bak import create_database_manager
         self.db_manager = create_database_manager()
         # self.variebce_id = config.get("variebce_id", None)
         
