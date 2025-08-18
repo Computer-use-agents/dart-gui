@@ -6,7 +6,7 @@ import logging
 from contextlib import contextmanager
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import TIMESTAMP, Column, Index, Integer, String, create_engine, func,DECIMAL
+from sqlalchemy import TIMESTAMP, Column, Index, Integer, String, create_engine, func,DECIMAL,BigInteger
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
@@ -22,54 +22,105 @@ Base = declarative_base()
 # Database configuration
 DB_CONFIG = {
     'host': '112.125.88.107',
-    'user': 'agentictrl',
-    'password': '`1qaz~!QAZ',
-    'database': 'BIGAI',
+    'user': 'teamx',
+    'password': '#C!D123^-c12',
+    'database': 'TeamX_BIGAI',
     'port': 5906,
     'charset': 'utf8mb4'
 }
 
 
 
- 
-
 class Dataset(Base):
-    """Dataset ORM模型"""
-    __tablename__ = 'datasets'
-    
-    # 字段定义
-    id = Column(Integer, primary_key=True, autoincrement=True, comment='自增主键')
-    trajectory_id = Column(String(255), nullable=False, unique=False, comment='轨迹ID，唯一')
-    created_at = Column(TIMESTAMP, default=func.current_timestamp(), comment='创建时间')
-    used = Column(Integer, default=0, comment='使用该数据训过几次')
-    model_version = Column(Integer, default=0, comment="使用哪个版本生成的数据")
-    run_id = Column(String(255), comment='运行ID')
-    task_id = Column(String(255), comment='任务ID')
-    reward = Column(DECIMAL(10, 4), nullable=True, comment='奖励值')
-    
-    # 索引定义
+    """
+    表：rollout_run
+      - id (BIGINT)
+      - run_id (VARCHAR)
+      - trajectory_id (VARCHAR)  PK
+      - task_id (VARCHAR)
+      - trace_id (VARCHAR)
+      - split_dir (VARCHAR)
+      - reward (DOUBLE)
+      - num_chunks (INTEGER)
+      - used (INTEGER)
+      - model_version (VARCHAR)
+      - create_at (TIMESTAMP)
+    """
+    __tablename__ = "rollout_run"
+
+    id = Column(BigInteger, nullable=True)
+    trajectory_id = Column(String(191, collation="utf8mb4_unicode_ci"), primary_key=True)
+    run_id = Column(String(191, collation="utf8mb4_unicode_ci"), index=True, nullable=True)
+    task_id = Column(String(191, collation="utf8mb4_unicode_ci"), index=True, nullable=True)
+    trace_id = Column(String(191, collation="utf8mb4_unicode_ci"), nullable=True)
+    split_dir = Column(String(512, collation="utf8mb4_unicode_ci"), nullable=True)
+    reward = Column(Integer, nullable=True)  # 也可用 Float/DECIMAL；你库里是 DOUBLE，这里一般用 Float 更贴
+    num_chunks = Column(Integer, nullable=True)
+    used = Column(Integer, default=0, nullable=True)
+    model_version = Column(String(191, collation="utf8mb4_unicode_ci"), index=True, nullable=True)
+    create_at = Column(TIMESTAMP, server_default=func.current_timestamp(), index=True)
+
+    # 关系：一对多（run -> chunks）
+    # chunks = relationship("RolloutChunk", back_populates="run", primaryjoin="RolloutRun.trajectory_id==RolloutChunk.trajectory_id", viewonly=True)
+
     __table_args__ = (
-        Index('idx_run_id', 'run_id'),
-        Index('idx_task_id', 'task_id'),
-        Index('idx_run_task', 'run_id', 'task_id'),  # 复合索引，用于同时按run_id和task_id查询
-        {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+        Index("idx_runid_createat", "run_id", "create_at"),
+        Index("idx_modelver_createat", "model_version", "create_at"),
     )
-    
-    def __repr__(self):
-        return f"<Dataset(id={self.id}, run_id='{self.run_id}', trajectory_id='{self.trajectory_id}', used={self.used},model_version={self.model_version}, task_id='{self.task_id}', reward={self.reward})>"
-    
+
     def to_dict(self) -> Dict[str, Any]:
-        """转换为字典"""
         return {
-            'id': self.id,
-            'trajectory_id': self.trajectory_id,
-            'created_at': self.created_at,
-            'used': self.used,
+            "id": self.id,
+            "trajectory_id": self.trajectory_id,
+            "run_id": self.run_id,
+            "task_id": self.task_id,
+            "trace_id": self.trace_id,
+            "split_dir": self.split_dir,
+            "reward": float(self.reward) if self.reward is not None else None,
+            "num_chunks": self.num_chunks,
+            "used": self.used,
             "model_version": self.model_version,
-            'run_id': self.run_id,
-            'task_id': self.task_id,
-            'reward': self.reward,
+            "create_at": self.create_at,
         }
+
+
+# class Dataset(Base):
+#     """Dataset ORM模型"""
+#     __tablename__ = 'datasets'
+    
+#     # 字段定义
+#     id = Column(Integer, primary_key=True, autoincrement=True, comment='自增主键')
+#     trajectory_id = Column(String(255), nullable=False, unique=False, comment='轨迹ID，唯一')
+#     create_at = Column(TIMESTAMP, default=func.current_timestamp(), comment='创建时间')
+#     used = Column(Integer, default=0, comment='使用该数据训过几次')
+#     model_version = Column(Integer, default=0, comment="使用哪个版本生成的数据")
+#     run_id = Column(String(255), comment='运行ID')
+#     task_id = Column(String(255), comment='任务ID')
+#     reward = Column(DECIMAL(10, 4), nullable=True, comment='奖励值')
+    
+#     # 索引定义
+#     __table_args__ = (
+#         Index('idx_run_id', 'run_id'),
+#         Index('idx_task_id', 'task_id'),
+#         Index('idx_run_task', 'run_id', 'task_id'),  # 复合索引，用于同时按run_id和task_id查询
+#         {'mysql_engine': 'InnoDB', 'mysql_charset': 'utf8mb4'}
+#     )
+    
+#     def __repr__(self):
+#         return f"<Dataset(id={self.id}, run_id='{self.run_id}', trajectory_id='{self.trajectory_id}', used={self.used},model_version={self.model_version}, task_id='{self.task_id}', reward={self.reward})>"
+    
+#     def to_dict(self) -> Dict[str, Any]:
+#         """转换为字典"""
+#         return {
+#             'id': self.id,
+#             'trajectory_id': self.trajectory_id,
+#             'create_at': self.create_at,
+#             'used': self.used,
+#             "model_version": self.model_version,
+#             'run_id': self.run_id,
+#             'task_id': self.task_id,
+#             'reward': self.reward,
+#         }
 
 
 class MySQLDatasetsORM:
@@ -246,13 +297,13 @@ class MySQLDatasetsORM:
                 datasets = session.query(Dataset).filter(
                     Dataset.run_id == run_id
                 )
-                datasets = datasets.order_by(Dataset.created_at.asc()).offset(offset).limit(limit).all()
+                datasets = datasets.order_by(Dataset.create_at.asc()).offset(offset).limit(limit).all()
                 return [dataset.to_dict() for dataset in datasets]
             # session = self.get_session()
             # datasets = session.query(Dataset).filter(
             #     Dataset.run_id == run_id
             # )
-            # datasets = datasets.order_by(Dataset.created_at.asc()).offset(offset).limit(limit).all()
+            # datasets = datasets.order_by(Dataset.create_at.asc()).offset(offset).limit(limit).all()
             # return [dataset.to_dict() for dataset in datasets]
         except SQLAlchemyError as e:
             logger.error(f"Error getting datasets by run_id: {e}")
@@ -267,9 +318,9 @@ class MySQLDatasetsORM:
                     Dataset.run_id == run_id
                 )
                 if limit is None:
-                    datasets = datasets.order_by(Dataset.created_at.asc()).all()
+                    datasets = datasets.order_by(Dataset.create_at.asc()).all()
                     return [dataset.to_dict() for dataset in datasets]
-                datasets = datasets.order_by(Dataset.created_at.asc()).offset(offset).limit(limit).all()
+                datasets = datasets.order_by(Dataset.create_at.asc()).offset(offset).limit(limit).all()
                 return [dataset.to_dict() for dataset in datasets]
         except SQLAlchemyError as e:
             logger.error(f"Error getting datasets by task_id: {e}")
@@ -290,18 +341,17 @@ class MySQLDatasetsORM:
             with self.get_session() as session:
                 dataset = session.query(Dataset).filter(
                     Dataset.run_id == run_id
-                ).order_by(Dataset.created_at.asc()).offset(offset).limit(1).first()
+                ).order_by(Dataset.create_at.asc()).offset(offset).limit(1).first()
                 return dataset.to_dict() if dataset else None
         except SQLAlchemyError as e:
             logger.error(f"Error getting single dataset by run_id: {e}")
             raise
     
-    def update_used(self, trajectory_id: str, used: int) -> bool:
-        """更新使用时间
+    def update_used(self, trajectory_id: str) -> bool:
+        """更新使用时间，将used属性值+1
         
         Args:
             trajectory_id: 轨迹ID
-            used: how many times training
             
         Returns:
             bool: 是否更新成功
@@ -313,8 +363,10 @@ class MySQLDatasetsORM:
                 ).first()
                 
                 if dataset:
-                    dataset.used = used
-                    logger.info(f"Updated used for trajectory_id: {trajectory_id}")
+                    # 将used值+1
+                    dataset.used = dataset.used + 1
+                    session.commit()
+                    logger.info(f"Updated used for trajectory_id: {trajectory_id}, new value: {dataset.used}")
                     return True
                 else:
                     logger.warning(f"Dataset with trajectory_id '{trajectory_id}' not found")
@@ -322,6 +374,7 @@ class MySQLDatasetsORM:
         except SQLAlchemyError as e:
             logger.error(f"Error updating used: {e}")
             raise
+    
     
     def update_run_id(self, trajectory_id: str, new_run_id: str) -> bool:
         """更新run_id
@@ -440,7 +493,7 @@ class MySQLDatasetsORM:
                 to_delete = session.query(Dataset).filter(
                     Dataset.task_id == task_id,
                     Dataset.run_id == run_id
-                ).order_by(Dataset.created_at.asc()).offset(offset).all()
+                ).order_by(Dataset.create_at.asc()).offset(offset).all()
                 deleted_count = 0
                 for dataset in to_delete:
                     session.delete(dataset)
@@ -456,7 +509,7 @@ class MySQLDatasetsORM:
         try:
             with self.get_session() as session:
                 datasets = session.query(Dataset).order_by(
-                    Dataset.created_at.desc()
+                    Dataset.create_at.desc()
                 ).offset(offset).limit(limit).all()
                 return [dataset.to_dict() for dataset in datasets]
         except SQLAlchemyError as e:
@@ -541,12 +594,12 @@ class MySQLDatasetsORM:
                     query = query.filter(Dataset.used <= filters['used_max'])
                 
                 if 'created_after' in filters:
-                    query = query.filter(Dataset.created_at >= filters['created_after'])
+                    query = query.filter(Dataset.create_at >= filters['created_after'])
                 
                 if 'created_before' in filters:
-                    query = query.filter(Dataset.created_at <= filters['created_before'])
+                    query = query.filter(Dataset.create_at <= filters['created_before'])
                 
-                datasets = query.order_by(Dataset.created_at.desc()).all()
+                datasets = query.order_by(Dataset.create_at.desc()).all()
                 return [dataset.to_dict() for dataset in datasets]
                 
         except SQLAlchemyError as e:
@@ -630,7 +683,7 @@ def demo_datasets_orm_operations():
         print("前5条记录:")
         for dataset in all_datasets:
             print(f"  ID: {dataset['id']}, trajectory_id: {dataset['trajectory_id']}, "
-                  f"used: {dataset['used']}, created_at: {dataset['created_at']}")
+                  f"used: {dataset['used']}, create_at: {dataset['create_at']}")
         
         # 删除数据（可选，取消注释来测试）
         print("\n7. 删除数据...")

@@ -10,7 +10,6 @@ from sqlalchemy import TIMESTAMP, Column, Index, Integer, String, create_engine,
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy.util.typing import Self
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -22,16 +21,13 @@ Base = declarative_base()
 # Database configuration
 DB_CONFIG = {
     'host': '112.125.88.107',
-    'user': 'agentictrl',
-    'password': '`1qaz~!QAZ',
-    'database': 'BIGAI',
+    'user': 'teamx',
+    'password': '#C!D123^-c12',
+    'database': 'TeamX_BIGAI',
     'port': 5906,
     'charset': 'utf8mb4'
 }
 
-
-
- 
 
 class Dataset(Base):
     """Dataset ORM模型"""
@@ -80,7 +76,6 @@ class MySQLDatasetsORM:
         self.db_url = self._build_connection_url()
         self.engine = None
         self.SessionMaker = None
-        # Self
         self.setup_database()
     
     def _build_connection_url(self) -> str:
@@ -296,12 +291,11 @@ class MySQLDatasetsORM:
             logger.error(f"Error getting single dataset by run_id: {e}")
             raise
     
-    def update_used(self, trajectory_id: str, used: int) -> bool:
-        """更新使用时间
+    def update_used(self, trajectory_id: str) -> bool:
+        """更新使用时间，将used属性值+1
         
         Args:
             trajectory_id: 轨迹ID
-            used: how many times training
             
         Returns:
             bool: 是否更新成功
@@ -313,8 +307,10 @@ class MySQLDatasetsORM:
                 ).first()
                 
                 if dataset:
-                    dataset.used = used
-                    logger.info(f"Updated used for trajectory_id: {trajectory_id}")
+                    # 将used值+1
+                    dataset.used = dataset.used + 1
+                    session.commit()
+                    logger.info(f"Updated used for trajectory_id: {trajectory_id}, new value: {dataset.used}")
                     return True
                 else:
                     logger.warning(f"Dataset with trajectory_id '{trajectory_id}' not found")
@@ -604,7 +600,7 @@ def demo_datasets_orm_operations():
         
         # 更新数据
         print("\n3. 更新数据...")
-        success = manager.update_used("traj_orm_001_fixed", 300)
+        success = manager.update_used("traj_orm_001_fixed")
         print(f"更新used结果: {success}")
         
         # 通用更新

@@ -301,29 +301,22 @@ class OSWorldAsyncDataset(Dataset):
         self.osworld_root = config.get("osworld_root", "evaluation_examples/examples")
         self.run_id = config.get("run_id", None)
         assert self.run_id is not None
-        from verl.utils.database.mysql_trainable_group import create_database_manager as create_database_manager_trainable_group
-        from verl.utils.database.mysql_rollout_run import create_database_manager as create_database_manager_rollout_run
-        self.db_manager_trainable_group = create_database_manager_trainable_group()
-        self.db_manager_rollout_run = create_database_manager_rollout_run()
-
-
+        from verl.utils.database.mysql import create_database_manager
+        self.db_manager = create_database_manager()
         # self.variebce_id = config.get("variebce_id", None)
         
         # 设置数据库连接并获取task_ids，然后关闭连接
-
-
-        # self.db_manager_trainable_group.setup_database()
-        # try:
-        #     self.task_ids = self.db_manager_trainable_group.get_all_task_id_by_run_id(self.run_id)
-        #     self.db_manager_trainable_group.close_database()
-        # except Exception as e:
-        #     print(f"Error getting task_ids for run_id {self.run_id}: {e}")
-        #     self.db_manager.close_database()
-        #     raise
+        self.db_manager.setup_database()
+        try:
+            self.task_ids = self.db_manager.get_all_task_id_by_run_id(self.run_id)
+            self.db_manager.close_database()
+        except Exception as e:
+            print(f"Error getting task_ids for run_id {self.run_id}: {e}")
+            self.db_manager.close_database()
+            raise
 
 
     def __len__(self):
-        self.task_ids = self.db_manager_trainable_group.get_all_task_id_by_run_id(self.run_id)
         return len(self.task_ids)
 
     def _build_messages(self, example: dict):
@@ -348,34 +341,26 @@ class OSWorldAsyncDataset(Dataset):
     def _get_item_with_wait(self, item_index: int) -> list[dict]:
         
         # 只在需要时设置数据库连接
-        if not self.db_manager_trainable_group.is_connected():
-            self.db_manager_trainable_group.setup_database()
+        if not self.db_manager.is_connected():
+            self.db_manager.setup_database()
         
         try:
-            self.task_ids = self.db_manager_trainable_group.get_all_task_id_by_run_id(self.run_id)
-            row_dicts = []
-            for task_id in self.task_ids:
-                if not self.db_manager_trainable_group.is_connected():
-                    self.db_manager_trainable_group.setup_database()
-                row_dict = self.db_manager_trainable_group.get_datasets_by_task_id(
-                    run_id=self.run_id,
-                    task_id=task_id
-                )
-                print(f"type of row_dict: {type(row_dict)}")
-                row_dicts += row_dict
+            row_dicts = self.db_manager.get_datasets_by_task_id(
+                run_id=self.run_id,
+                task_id=self.task_ids[item_index]
+            )
             
-                print(f"run-id: {self.run_id}, fetched data, step: {item_index}, len(row_dicts): {len(row_dict)}")
+            print(f"run-id: {self.run_id}, fetched data, offset: {item_index}, len(row_dicts): {len(row_dicts)}")
             if len(row_dicts) > 0:
                 # 成功获取数据后关闭数据库连接
-                self.db_manager_trainable_group.close_database()
-                print("fetch tasks len: ", len(self.task_ids), ", trajs len(row_dicts): ", len(row_dicts))
+                self.db_manager.close_database()
                 return row_dicts
             else:
                 # 即使没有数据也关闭连接
-                self.db_manager_trainable_group.close_database()
+                self.db_manager.close_database()
                 return []
         except Exception as e:
-            print(f"run-id: {self.run_id}, step: {item_index}, error: {e}")
+            print(f"run-id: {self.run_id}, offset: {item_index}, error: {e}")
             # 发生异常时也要关闭连接
             try:
                 self.db_manager.close_database()
@@ -392,19 +377,9 @@ class OSWorldAsyncDataset(Dataset):
         # assert len(row_dicts) == 1
         # row_dict = row_dicts[0]
         output_row_dicts = []
-
         for row_dict in row_dicts:
             output_row_dict = dict()
-            # trajectory_id = row_dict["trajectory_id"]
-
             trajectory_id = row_dict["trajectory_id"]
-
-            ##
-            if not self.db_manager_rollout_run.is_connected():
-                self.db_manager_rollout_run.setup_database()
-            self.db_manager_rollout_run.update_used(trajectory_id=trajectory_id)
-            ##
-
             data_dir = os.path.join(self.config.root_data_dir, trajectory_id)
             with open(os.path.join(data_dir, "task_config.json")) as f:
                 task_data = json.load(f)
@@ -437,9 +412,6 @@ class OSWorldAsyncDataset(Dataset):
             output_row_dict["dataset_ids"] = trajectory_id
             output_row_dict["reward_tensors"] = reward_tensor
             output_row_dicts.append(output_row_dict)
-
-        if len(output_row_dicts) == 0:
-            print(f"run-id: {self.run_id}, fetched no data, offset: {item}, len(output_row_dicts): {len(output_row_dicts)}")
 
         # print(f"run-id: {self.run_id}, fetched data, offset: {item}, len(output_row_dicts): {len(output_row_dicts)}")
         # return output_row_dict
