@@ -35,8 +35,8 @@ export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
-export ROOT_DATA_DIR=tmp_async_0802_n16_ori_dis
-export RUN_ID=sim_rollout_test
+export ROOT_DATA_DIR=test_for_train_pass8_gpu8_env77_20250817_1345
+export RUN_ID=results/test_for_train_pass8_gpu8_env77_20250817_1345
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_16_9et14w
 export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0813_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
@@ -133,10 +133,10 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=2 \
+    trainer.save_freq=1 \
     trainer.test_freq=5 \
     trainer.val_before_train=False \
-    trainer.total_epochs=1 \
+    trainer.total_epochs=5 \
     trainer.max_actor_ckpt_to_keep=20 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=sliding_window \

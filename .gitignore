@@ -146,3 +146,5 @@ sleep.sh
 *.webp
 data/chenrui
 *results*/
+
+debug_datasets/
