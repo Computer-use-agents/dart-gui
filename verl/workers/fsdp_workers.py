@@ -731,7 +731,7 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
 
     @register(dispatch_mode=Dispatch.DP_COMPUTE_PROTO)
     @DistProfiler.annotate(color="olive")
-    def compute_ref_log_prob(self, data: DataProto):
+    def compute_ref_log_prob(self, data: DataProto,offline=False):
         if self._is_lora:
             # if _is_lora, actor without lora applied is the ref
             data.meta_info["is_lora"] = True
@@ -753,7 +753,10 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
         with self.ulysses_sharding_manager:
             data = self.ulysses_sharding_manager.preprocess_data(data)
             output, _ = self.ref_policy.compute_log_prob(data=data, calculate_entropy=False)
-            output = DataProto.from_dict(tensors={"ref_log_prob": output})
+            if offline:
+                output = DataProto.from_dict(tensors={"old_log_probs": output})
+            else:
+                output = DataProto.from_dict(tensors={"ref_log_prob": output})
             output = self.ulysses_sharding_manager.postprocess_data(output)
 
         output = output.to("cpu")

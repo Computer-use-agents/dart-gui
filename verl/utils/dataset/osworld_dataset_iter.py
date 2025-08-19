@@ -31,10 +31,10 @@ from torch.utils.data import Dataset, IterableDataset, get_worker_info
 from transformers import PreTrainedTokenizer, ProcessorMixin
 
 # === NEW: unified DB manager and trainable filter ===
-WORKSPACE_ROOT = "/workspace/computer-use/verl"
-if WORKSPACE_ROOT not in sys.path:
-    sys.path.insert(0, WORKSPACE_ROOT)
-os.chdir(WORKSPACE_ROOT)
+# WORKSPACE_ROOT = "/workspace/computer-use/verl"
+# if WORKSPACE_ROOT not in sys.path:
+#     sys.path.insert(0, WORKSPACE_ROOT)
+# os.chdir(WORKSPACE_ROOT)
 from verl.utils.database.mysql import create_database_manager
 from verl.utils.dataset.trainable_filter import filter_fn
 

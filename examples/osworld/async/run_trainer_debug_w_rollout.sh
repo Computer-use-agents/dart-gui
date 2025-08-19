@@ -3,7 +3,7 @@ pip install cryptography
 
 set -x
 ENGINE=${1:-vllm_osworld}
-cd /workspace/computer-use/verl
+cd /root/verl
 
 # Initialize Ray cluster for multi-node training
 # Make sure Ray is running on all nodes before executing this script
@@ -29,14 +29,14 @@ MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-
 
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export SWANLAB_API_KEY=rI0ezs9zkbORI8oUMsgHT #4wEX4aVA4guJHGZ553g4K
+export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K
 export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-defau-bddf300d21.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
-export ROOT_DATA_DIR=test_for_train_pass8_gpu8_env77_20250817_1345
-export RUN_ID=results/test_for_train_pass8_gpu8_env77_20250817_1345
+export ROOT_DATA_DIR=tmp_async_0802_n16_ori_dis
+export RUN_ID=sim_rollout_test
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_16_9et14w
 export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0813_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
@@ -153,6 +153,7 @@ python3 -m verl.trainer.main_ppo_async \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
     +actor_rollout_ref.rollout.server_url=$ROLLOUT_SERVER_URL \
+    +actor_rollout_ref.actor.offline=false \
     #  +trainer.splitter=sliding_window \
     # 
     #     trainer.experiment_name="osworld_all_feasible_reward_script_grpo_k8s_0802_16_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 6 | head -n 1)" \

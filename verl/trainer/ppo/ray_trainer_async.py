@@ -174,8 +174,15 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     # compute global_valid tokens
                     batch.meta_info["global_token_num"] = torch.sum(batch.batch["attention_mask"], dim=-1).tolist()
                     # recompute old_log_probs
+                    
                     with marked_timer("old_log_prob", timing_raw):
-                        old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)
+                        if self.config.actor_rollout_ref.actor.offline:
+                            print(f"Computing old log prob in offline mode, using actor_rollout_ref")
+                            old_log_prob = self.actor_rollout_wg.compute_ref_log_prob(batch, self.config.actor_rollout_ref.actor.offline)
+
+                        else:
+                            old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)
+
                         entropys = old_log_prob.batch["entropys"]
                         response_masks = batch.batch["response_mask"]
                         loss_agg_mode = self.config.actor_rollout_ref.actor.loss_agg_mode
@@ -233,7 +240,6 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         if self.config.reward_model.launch_reward_fn_async:
                             reward_tensor, reward_extra_infos_dict = ray.get(future_reward)
                             batch.batch["token_level_scores"] = reward_tensor
-#pengxiang debug
                             if reward_extra_infos_dict:
                                 batch.non_tensor_batch.update({k: np.array(v) for k, v in reward_extra_infos_dict.items()})
 

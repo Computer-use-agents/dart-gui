@@ -1,6 +1,6 @@
 from tqdm import tqdm
 import time
-from verl.utils.database.mysql import create_database_manager, demo_datasets_orm_operations
+from verl.utils.database.mysql_rollout_run import create_database_manager, demo_datasets_orm_operations
 import os
 from pathlib import Path
 from typing import List
@@ -33,10 +33,9 @@ def load_data_from_json(json_path, run_id, model_version="ui-tars-1.5-7b"):
 
 
 def main():
-    # json_path = "data/train/filtered_train_proportional_origin_distribution.json"
-    # run_id = "pengxiang_test_0802_origin_distribution"
-    run_id = "pengxiang_test_0802_max_variance"
-    json_path = "data/train/filtered_train_proportional_max_variance.json"
+
+    run_id = "your run id"
+    json_path = "the path to your json file"
     model_version = "ui-tars-1.5-7b"
     load_data_from_json(json_path, run_id, model_version)
 

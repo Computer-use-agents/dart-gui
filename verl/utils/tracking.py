@@ -126,7 +126,7 @@ class Tracking:
                     config={"FRAMEWORK": "verl", **config},
                     logdir=SWANLAB_LOG_DIR,
                     mode=SWANLAB_MODE,
-                    callbacks=[swanlab_callbacks]
+                    callbacks=swanlab_callbacks
                 )
             else:
                  swanlab.init(
