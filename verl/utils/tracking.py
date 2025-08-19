@@ -89,44 +89,16 @@ class Tracking:
                 config = {}  # make sure config is not None, otherwise **config will raise error
             
             SWAN_WX_GROUP_HOOK = os.environ.get("SWAN_WX_GROUP_HOOK", None)
-            SWAN_FS_GROUP_HOOK = os.environ.get("SWAN_FS_GROUP_HOOK", None)
-            swanlab_callbacks = []
-
-
             if SWAN_WX_GROUP_HOOK:
                 from swanlab.plugin.notification import WXWorkCallback
-                swanlab_callbacks.append(WXWorkCallback(webhook_url=SWAN_WX_GROUP_HOOK))
 
-                # swanlab.init(
-                #     project=project_name,
-                #     experiment_name=experiment_name,
-                #     config={"FRAMEWORK": "verl", **config},
-                #     logdir=SWANLAB_LOG_DIR,
-                #     mode=SWANLAB_MODE,
-                #     callbacks=[WXWorkCallback(webhook_url=SWAN_WX_GROUP_HOOK)]
-                # )
-            if SWAN_FS_GROUP_HOOK:
-                from swanlab.plugin.notification import LarkCallback
-                swanlab_callbacks.append(LarkCallback(webhook_url=SWAN_FS_GROUP_HOOK))
-                # from swanlab.plugin.notification import LarkCallback
-                # swanlab.init(
-                #     project=project_name,
-                #     experiment_name=experiment_name,
-                #     config={"FRAMEWORK": "verl", **config},
-                #     logdir=SWANLAB_LOG_DIR,
-                #     mode=SWANLAB_MODE,
-                #     callbacks=[WXWorkCallback(webhook_url=SWAN_WX_GROUP_HOOK)]
-                # )
-
-
-            if len(swanlab_callbacks) > 0:
                 swanlab.init(
                     project=project_name,
                     experiment_name=experiment_name,
                     config={"FRAMEWORK": "verl", **config},
                     logdir=SWANLAB_LOG_DIR,
                     mode=SWANLAB_MODE,
-                    callbacks=swanlab_callbacks
+                    callbacks=[WXWorkCallback(webhook_url=SWAN_WX_GROUP_HOOK)]
                 )
             else:
                  swanlab.init(

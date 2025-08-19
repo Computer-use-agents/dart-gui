@@ -213,10 +213,11 @@ class OSWorldAsyncDataset(IterableDataset):
         Expected row_dict to contain: "trajectory_id"
         """
         trajectory_id = row_dict["trajectory_id"]
+        run_id = row_dict["run_id"]
 
         # 先占位（claim），避免多 worker 重复
         try:
-            self.db_manager.update_rollout_used(trajectory_id=trajectory_id)
+            self.db_manager.update_rollout_used(run_id=run_id, trajectory_id=trajectory_id)
         except Exception as e:
             logger.warning(f"update_rollout_used failed for {trajectory_id}: {e}")
 
@@ -281,7 +282,6 @@ class OSWorldAsyncDataset(IterableDataset):
                 top_mvs=top_mvs,
                 random_state=self.config.get("random_state", None),
             )
-            print("len data after filtered: ", len(datasets))
 
             # 若数量不足，继续轮询等待
             min_needed = self.batch_size_min * self.rollout_n
@@ -290,11 +290,54 @@ class OSWorldAsyncDataset(IterableDataset):
                             f"sleep {self.poll_interval_sec}s and retry.")
                 time.sleep(self.poll_interval_sec)
                 continue
+                        
+            # 按照task id最早出现时间排序，优先选先出现的task id
+            _min_create_at = {}
+            for row in datasets:
+                tid = str(row["task_id"])
+                ts = row["create_at"]
+                if tid not in _min_create_at or ts < _min_create_at[tid]:
+                    _min_create_at[tid] = ts
+            # 先按task_id组的 min(create_at) 升序排列；再按 task_id排序
+            datasets.sort(key=lambda r: (_min_create_at[str(r["task_id"])], str(r["task_id"]), r["create_at"]))
+            print("len data after filtered: ", len(datasets))
 
             # 限制最大数量
             max_allowed = self.batch_size_max * self.rollout_n
             if len(datasets) > max_allowed:
                 datasets = datasets[:max_allowed]
+                
+            # # 保存采样数据，用于检查
+            # try:
+            #     dump_dir = "debug_datasets"
+            #     os.makedirs(dump_dir, exist_ok=True)
+            #     ts = time.strftime("%Y%m%d-%H%M%S")
+            #     dump_base = f"datasets_step{self.produced_batches}_w{worker_id}_{ts}"
+
+            #     # 保存完整样本列表
+            #     with open(os.path.join(dump_dir, dump_base + ".json"), "w", encoding="utf-8") as f:
+            #         json.dump(datasets, f, ensure_ascii=False, indent=2, default=str)
+
+            #     # 简要统计：按 task_id 分布
+            #     from collections import Counter
+            #     def _task_id_of(row: dict) -> str:
+            #         tid = row.get("task_id")
+            #         if tid is not None:
+            #             return str(tid)
+            #         traj = str(row.get("trajectory_id", ""))
+            #         return traj.split("/", 1)[0] if "/" in traj else traj
+
+            #     counts = Counter(_task_id_of(r) for r in datasets)
+            #     summary = {
+            #         "total": len(datasets),
+            #         "counts_by_task_id": {k: int(v) for k, v in counts.items()},
+            #     }
+            #     with open(os.path.join(dump_dir, dump_base + ".summary.json"), "w", encoding="utf-8") as f:
+            #         json.dump(summary, f, ensure_ascii=False, indent=2)
+
+            #     logger.info(f"[worker {worker_id}] Dumped datasets to {os.path.join(dump_dir, dump_base)}.*")
+            # except Exception as e:
+            #     logger.warning(f"[worker {worker_id}] Failed to dump datasets for inspection: {e}")
 
             # 构造样本
             batch_samples: List[Dict[str, Any]] = []

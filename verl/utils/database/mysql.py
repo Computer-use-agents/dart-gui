@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 
 from sqlalchemy import (
-    create_engine, Column, String, Integer, BigInteger, Text, func, select, update
+    create_engine, Column, String, Integer, BigInteger, Text, func, select, update, text
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.dialects import mysql
@@ -34,6 +34,7 @@ DB_CONFIG = {
     'charset': 'utf8mb4'
 }
 
+
 def _serialize(value):
     if isinstance(value, datetime):
         return value.isoformat(sep=' ', timespec='seconds')
@@ -43,11 +44,11 @@ class Checkpoint(Base):
     __tablename__ = "checkpoint"
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    name = Column(String(50), nullable=True)
+    name = Column(String(50), nullable=False, server_default=text("''"))
     version = Column(String(50), nullable=False, index=True)            # v1, v2, ...
     status = Column(String(20), nullable=False, index=True)             # PENDING, ...
     path = Column(String(255), nullable=False)
-    source = Column(String(50), nullable=False, index=True)             # train, ...
+    source = Column(String(50), nullable=True, index=True)             # train, ...
     operator = Column(String(50), nullable=True)
     remark = Column(String(1024), nullable=True)
     config_yaml = Column(Text, nullable=True)
@@ -65,9 +66,6 @@ class Checkpoint(Base):
     started_at = Column(mysql.TIMESTAMP, nullable=True)
     finished_at = Column(mysql.TIMESTAMP, nullable=True)
 
-    replicas = Column(Integer, nullable=True)
-    gpu_per_replica = Column(Integer, nullable=True)
-
     def to_dict(self) -> Dict[str, Any]:
         return {c.name: _serialize(getattr(self, c.name)) for c in self.__table__.columns}
 
@@ -75,9 +73,9 @@ class Checkpoint(Base):
 class RolloutRun(Base):
     __tablename__ = "rollout_run"
 
-    id = Column(BigInteger, nullable=True)
+    id = Column(BigInteger, nullable=True, primary_key=True)
     run_id = Column(String(191, collation='utf8mb4_unicode_ci'), index=True)
-    trajectory_id = Column(String(191, collation='utf8mb4_unicode_ci'), primary_key=True)
+    trajectory_id = Column(String(191, collation='utf8mb4_unicode_ci'))
     task_id = Column(String(191, collation='utf8mb4_unicode_ci'))
     trace_id = Column(String(191, collation='utf8mb4_unicode_ci'))
     split_dir = Column(String(512, collation='utf8mb4_unicode_ci'))
@@ -143,11 +141,12 @@ class MySQLRolloutORM:
             rows = s.execute(select(RolloutRun).where(RolloutRun.run_id == run_id)).scalars().all()
             return [r.to_dict() for r in rows]
 
-    # ---- 2) 根据 trajectory_id 将 used 在当前值基础上 +1 --------------------------------------
-    def update_rollout_used(self, trajectory_id: str) -> int:
+    # ---- 2) 根据 run_id和trajectory_id 将 used 在当前值基础上 +1 --------------------------------------
+    def update_rollout_used(self, run_id: str, trajectory_id: str) -> int:
         with self.session_scope() as s:
             stmt = update(RolloutRun).where(
-                RolloutRun.trajectory_id == trajectory_id
+                RolloutRun.run_id == run_id,
+                RolloutRun.trajectory_id == trajectory_id,    
             ).values(
                 used=func.coalesce(RolloutRun.used, 0) + 1
             )
@@ -184,8 +183,8 @@ class MySQLRolloutORM:
             ).limit(n).all()
             result = [r[0] for r in rows]
             
-            # 若列表为空，返回默认路径
-            if not result:
+            # 若列表长度不足，添加默认路径
+            if len(result) < n:
                 result.append("/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5")
             return result
         
@@ -247,6 +246,6 @@ if __name__ == "__main__":
 
     orm = MySQLRolloutORM(DB_CONFIG, create_tables_if_missing=True)
     # print(orm.get_rollouts_by_run_id("results/test_for_train_pass8_gpu8_env77_20250817_1345")[0])
-    print(orm.update_rollout_used("9439a27b-18ae-42d8-9778-5f68f891805e_trace_e635d5e3af17_1755501336"))
+    print(orm.update_rollout_used("results/test_for_train_pass8_gpu8_env77_20250817_1345", "9439a27b-18ae-42d8-9778-5f68f891805e_trace_e635d5e3af17_1755501336"))
     # print(orm.insert_checkpoint("/mnt/checkpoints/model-abc/weights.bin"))
     # print(orm.get_latest_n_checkpoint_paths())

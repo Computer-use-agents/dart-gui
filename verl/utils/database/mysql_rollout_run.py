@@ -20,15 +20,23 @@ logger = logging.getLogger(__name__)
 Base = declarative_base()
 
 # Database configuration
+# DB_CONFIG = {
+#     'host': '112.125.88.107',
+#     'user': 'teamx',
+#     'password': '#C!D123^-c12',
+#     'database': 'TeamX_BIGAI',
+#     'port': 5906,
+#     'charset': 'utf8mb4'
+# }
+
 DB_CONFIG = {
     'host': '112.125.88.107',
-    'user': 'teamx',
-    'password': '#C!D123^-c12',
-    'database': 'TeamX_BIGAI',
+    'user': 'agentictrl',
+    'password': '`1qaz~!QAZ',
+    'database': 'BIGAI',
     'port': 5906,
     'charset': 'utf8mb4'
 }
-
 
 
 class Dataset(Base):
@@ -743,4 +751,6 @@ def demo_single_record_query():
 
 
 if __name__ == "__main__":
-    demo_datasets_orm_operations()
+    #demo_datasets_orm_operations()
+    manager = MySQLDatasetsORM(DB_CONFIG)
+    print(len(manager.get_all_task_id_by_run_id("liuyang_sft_0818")))
