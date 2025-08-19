@@ -135,7 +135,7 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.nnodes=$N_NODES \
     trainer.save_freq=2 \
     trainer.test_freq=5 \
-    trainer.val_before_train=False \
+    trainer.val_before_train=false \
     trainer.total_epochs=1 \
     trainer.max_actor_ckpt_to_keep=20 \
     +trainer.run_id=$RUN_ID \
