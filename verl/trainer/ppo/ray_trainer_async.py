@@ -56,6 +56,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         os.makedirs(self.config.data.root_data_dir, exist_ok=True)
         self.save_interval = config.get("save_interval", 780)
         self._last_ckpt_time = None
+        self.run_id = config.data.run_id
         
     def _validate(self):
         results = validate_osworld_parallel(
@@ -321,7 +322,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             # Insert checkpoint path into MySQL database
                             print("Inserting checkpoint path into MySQL database...")
                             db_manager = create_database_manager()
-                            db_manager.insert_checkpoint(abs_path_actor_hf)
+                            db_manager.insert_checkpoint(abs_path_actor_hf, run_id=self.run_id)
                             db_manager.close_database()
                             print("Checkpoint path inserted into MySQL database.")
 

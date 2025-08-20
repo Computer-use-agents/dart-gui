@@ -1,5 +1,6 @@
 from typing import Optional, List, Any, Dict
 import pandas as pd
+import numpy as np
 
 # ---- tool functions ----
 def sort_by_time(df_):
@@ -17,6 +18,16 @@ def to_records(x: pd.DataFrame, cols: List[str]) -> List[Dict[str, Any]]:
         return []
     return x[cols].to_dict(orient="records")
 
+def sample_df(x: pd.DataFrame, n: int, rng) -> pd.DataFrame:
+    if n <= 0:
+        return x.iloc[0:0]
+    if len(x) <= n:
+        return x
+    if rng is None:
+        return x.sample(n=n, replace=False)
+    seed = int(rng.randint(0, 2**32 - 1))
+    return x.sample(n=n, replace=False, random_state=seed)
+
 
 # ---- main filter function ----
 def filter_fn(
@@ -32,11 +43,11 @@ def filter_fn(
     - 对于 mean == 0 的 task：
         若全表该 task 存在 reward==1 的样本，则用“该 task 最新的正样本”替换组内最旧一条；
         否则丢弃该 task
-    - 每个 task 在最终裁剪为 per_task_limit 条时：随机抽取，但若该组存在正样本，保证至少保留 1 条正样本
+    - 每个 task 在最终裁剪为 per_task_limit 条时：随机抽取，且至少保留 1 条正样本(reward>0)和 1 条负样本
     """
     df = pd.DataFrame(data)
     if df.empty:
-        return df.copy()
+        return []
 
     out_cols = df.columns
     d = df.copy()
@@ -45,16 +56,16 @@ def filter_fn(
         raise KeyError("输入数据缺少 create_at 列")
     d["create_at"] = pd.to_datetime(d["create_at"], errors="coerce")
 
-    # 1) 最新两个 model_version → 改为从参数传入 top_mvs
-    # 若未传或为空，直接返回空表（保持与原逻辑“无可用 mv 即空”的语义一致）
+    # 1) 最新两个 model_version → 从参数传入 top_mvs
+    # 若未传或为空，直接返回空表
     if not top_mvs:
-        return d.iloc[0:0].copy()
+        return []
 
     # 2) 仅两版(由参数决定) + used==0
     base = d[d["model_version"].isin(top_mvs) & (d["used"] == 0)].copy()
     #print("len base: ", len(base))
     if base.empty:
-        return base
+        return []
 
     # 3) 分组 size>=limit & mean(reward)∈[0,1)
     base["reward"] = pd.to_numeric(base["reward"], errors="coerce")
@@ -64,16 +75,15 @@ def filter_fn(
     )
     eligible = grp[(grp["cnt"] >= per_task_limit) & (grp["mean_reward"].ge(0) & grp["mean_reward"].lt(1))]
     if eligible.empty:
-        return base.iloc[0:0].copy()
+        return []
 
     sel = base[base["task_id"].isin(eligible.index)].copy()
 
-    # 4) mean==0 的组：若全表该 task 有 reward==1，则“替最旧为最新正样本”；否则丢弃该 task
+    # 4) mean==0 的组：若全表该 task 有 reward>0，则“替最旧为最新正样本”；否则丢弃该 task
     eps = 1e-12
     zero_mean_tasks = eligible.index[(eligible["mean_reward"].abs() <= eps)].tolist()
     for tid in zero_mean_tasks:
-        # 统一以数值比较判断正样本，避免 '1'/'1.0' 与 1 的类型差异
-        cand_all_mask = (d["task_id"] == tid) & (pd.to_numeric(d["reward"], errors="coerce") == 1)
+        cand_all_mask = (d["task_id"] == tid) & (pd.to_numeric(d["reward"], errors="coerce") > 0)
         cand_all = d[cand_all_mask]
         if cand_all.empty:
             sel = sel[sel["task_id"] != tid]
@@ -91,42 +101,54 @@ def filter_fn(
         sel = pd.concat([sel, cand[out_cols]], ignore_index=True)
 
     if sel.empty:
-        return sel
+        return []
 
     # 5) 每组裁剪为 per_task_limit：随机取，且若存在 reward==1 至少保留 1 条
+    rng = np.random.RandomState(random_state) if random_state is not None else None
+
     kept = []
     for tid, g in sel.groupby("task_id", group_keys=False):
-        if len(g) < per_task_limit:
-            continue
-        elif len(g) == per_task_limit:
+        rnum = pd.to_numeric(g["reward"], errors="coerce")
+        pos_rows = g.loc[rnum > 0]
+        neg_rows = g.loc[rnum == 0]
+
+        # 若无需裁剪，直接保留（已满足上游条件；无法强制补齐不存在的类别）
+        if len(g) <= per_task_limit:
             kept.append(g)
             continue
 
-        # 用数值比较来确定正样本
-        g_reward_num = pd.to_numeric(g["reward"], errors="coerce")
-        pos_idx = g.index[g_reward_num == 1]
-        has_pos = len(pos_idx) > 0
+        chosen_parts = []
 
-        if not has_pos:
-            # 没有正样本，直接随机采样 per_task_limit 条
-            sampled = g.sample(n=per_task_limit, random_state=random_state, replace=False)
-            kept.append(sampled)
-        else:
-            # 至少保留 1 条正样本：先在正样本中随机抽取 1 条
-            pos_choice = g.loc[pos_idx].sample(n=1, random_state=random_state, replace=False)
-            remaining_needed = per_task_limit - 1
-            # 从其余样本中随机补足
-            rest_pool = g.drop(index=pos_choice.index)
-            if remaining_needed > 0:
-                rest_sample = rest_pool.sample(
-                    n=remaining_needed,
-                    random_state=random_state,
-                    replace=False
-                )
-                sampled = pd.concat([pos_choice, rest_sample], ignore_index=False)
+        # 若两类都存在，尽量各取 1
+        if not pos_rows.empty and not neg_rows.empty:
+            pos_one = sample_df(pos_rows, 1, rng)
+            chosen_parts.append(pos_one)
+            # 避免与 pos_one 同一行重复
+            neg_pool = neg_rows.drop(index=pos_one.index, errors="ignore")
+            if not neg_pool.empty:
+                neg_one = sample_df(neg_pool, 1, rng)
+                chosen_parts.append(neg_one)
             else:
-                sampled = pos_choice
-            kept.append(sampled)
+                # 极端：neg_rows 只有一行且与 pos_one 同索引（理论几乎不可能，防御性处理）
+                pass
+            
+        else:
+            # 只有一类存在时，优先保证正样本；若无正样本则保证负样本
+            if not pos_rows.empty:
+                chosen_parts.append(sample_df(pos_rows, 1, rng))
+            elif not neg_rows.empty:
+                chosen_parts.append(sample_df(neg_rows, 1, rng))
+
+        chosen = pd.concat(chosen_parts, ignore_index=False) if chosen_parts else g.iloc[0:0]
+        remaining_needed = max(per_task_limit - len(chosen), 0)
+
+        # 从剩余池随机补齐
+        rest_pool = g.drop(index=chosen.index, errors="ignore")
+        rest_sample = sample_df(rest_pool, remaining_needed, rng) if remaining_needed > 0 else rest_pool.iloc[0:0]
+        final = pd.concat([chosen, rest_sample], ignore_index=False)
+
+        kept.append(final)
+
 
     res = pd.concat(kept, ignore_index=True)
     return to_records(res, out_cols)

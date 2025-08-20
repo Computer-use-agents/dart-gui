@@ -3,7 +3,7 @@ pip install cryptography
 
 set -x
 ENGINE=${1:-vllm_osworld}
-cd /root/verl
+cd /workspace/computer-use/verl
 
 # Initialize Ray cluster for multi-node training
 # Make sure Ray is running on all nodes before executing this script
@@ -14,7 +14,7 @@ N_NODES=1
 N_GPUS=$(nvidia-smi --list-gpus | wc -l) 
 N_GPUS_PER_NODE=$N_GPUS
 
-# 生成带时间戳的唯一文件ID，后台运行
+# # 生成带时间戳的唯一文件ID，后台运行
 # MONITOR_ID="gpu_monitor_$(date +%Y%m%d_%H%M%S)_$$"
 # nohup nvidia-smi --query-gpu=index,timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 1 > "${MONITOR_ID}.csv" 2>&1 &
 
@@ -29,14 +29,14 @@ MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-
 
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K
+export SWANLAB_API_KEY=rI0ezs9zkbORI8oUMsgHT #4wEX4aVA4guJHGZ553g4K
 export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-defau-bddf300d21.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
-export ROOT_DATA_DIR=tmp_async_0802_n16_ori_dis
-export RUN_ID=sim_rollout_test 
+export ROOT_DATA_DIR=pass@32_trainset90
+export RUN_ID=results/pass@32_trainset90
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_16_9et14w
 export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0813_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
@@ -132,11 +132,11 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=3 \
+    trainer.save_freq=5 \
     trainer.test_freq=10 \
-    trainer.val_before_train=false \
+    trainer.val_before_train=False \
     trainer.total_epochs=1 \
-    trainer.max_actor_ckpt_to_keep=4 \
+    trainer.max_actor_ckpt_to_keep=10 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=sliding_window \
     +trainer.splitter_parallel=False\
