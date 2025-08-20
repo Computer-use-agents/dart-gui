@@ -35,10 +35,10 @@ export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
-export ROOT_DATA_DIR=tmp_async_0802_n16_ori_dis
+export ROOT_DATA_DIR=data/traj/pass@32_trainset90
 export RUN_ID=sim_rollout_test 
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_16_9et14w
-export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0813_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0820_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
@@ -78,6 +78,12 @@ gen_tp=4
 fsdp_size=32
 
 
+## message splitter
+limit_messages=35
+splitter=stepwise
+window_size=5
+stride_size=5
+max_steps=100
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
@@ -94,9 +100,9 @@ python3 -m verl.trainer.main_ppo_async \
     data.custom_cls.name=OSWorldAsyncDataset \
     data.shuffle=false \
     +data.root_data_dir=$ROOT_DATA_DIR \
-    +data.window_size=5 \
-    +data.stride_size=5 \
-    +data.max_steps=100 \
+    +data.window_size=${window_size} \
+    +data.stride_size=${stride_size} \
+    +data.max_steps=${max_steps} \
     +data.num_workers=0 \
     +data.run_id=$RUN_ID \
     +data.steps_per_epoch=100 \
@@ -113,7 +119,7 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.clip_ratio_c=10.0 \
     actor_rollout_ref.model.path=$MODEL_PATH \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
-    actor_rollout_ref.actor.optim.lr=1e-6 \
+    actor_rollout_ref.actor.optim.lr=1e-7 \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=${train_prompt_mini_bsz} \
@@ -138,7 +144,8 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.total_epochs=1 \
     trainer.max_actor_ckpt_to_keep=4 \
     +trainer.run_id=$RUN_ID \
-    +trainer.splitter=sliding_window \
+    +trainer.splitter=${splitter} \
+    +trainer.limit_messages=${limit_messages} \
     +trainer.splitter_parallel=False\
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \

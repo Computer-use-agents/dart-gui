@@ -156,9 +156,9 @@ def simulate_rollout(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simulated rollout producer for trainer unit tests.")
-    parser.add_argument("--json", default="data/train/filtered_train_proportional_max_variance.json", help="Path to the static JSON data.")
+    parser.add_argument("--json", default="data/train/pass@32_90_trainingser.json", help="Path to the static JSON data.")
     parser.add_argument("--run-id", default="sim_rollout_test", help="Run ID to write into DB rows.")
-    parser.add_argument("--rate", type=int, default=5, help="Insert rate per minute (default: 16).")
+    parser.add_argument("--rate", type=int, default=8, help="Insert rate per minute (default: 16).")
     parser.add_argument("--start-index", type=int, default=0, help="Start from this index in the JSON list.")
     parser.add_argument("--limit", type=int, default=None, help="Only process this many items.")
     parser.add_argument("--dry-run", action="store_true", help="Don't write to DB; just print what would happen.")
@@ -169,6 +169,27 @@ def main() -> None:
         help="Delete existing DB rows for this run_id before starting.",
     )
     args = parser.parse_args()
+    from sqlalchemy.engine import URL
+    from sqlalchemy import create_engine, text, MetaData, Table
+
+    db_url = URL.create(
+        drivername="mysql+pymysql",
+        username="agentictrl",
+        password="`1qaz~!QAZ",
+        host="112.125.88.107",
+        port=5906,
+        database="BIGAI",
+        query={"charset": "utf8mb4"},
+    )
+
+    engine = create_engine(db_url, pool_pre_ping=True)
+
+
+    with engine.begin() as conn:
+        conn.exec_driver_sql("SET FOREIGN_KEY_CHECKS=0")
+        conn.exec_driver_sql("TRUNCATE TABLE `checkpoint`")
+        conn.exec_driver_sql("SET FOREIGN_KEY_CHECKS=1")
+        print("✅ 已清空表checkpoint（TRUNCATE，已重置自增）")
 
     simulate_rollout(
         json_path=args.json,

@@ -37,6 +37,8 @@ def get_result(target_dir):
                 result = open(os.path.join(example_path, "reward.txt"), "r").read()
                 if float(result) < 0:
                     print(f"Warning: Negative reward {result} for example {example_id} in domain {domain}.")
+                    continue
+                
                 if infeasible_flag:
                     try:
                         infeasible_result.append(float(result))
@@ -107,5 +109,10 @@ if __name__ == '__main__':
     # get_result("/capacity/userdata/vcfenxd75jiv/workshops/workshop-4caef9d8-9aba-46e5-aed0-46dcd955e590/uitars_training_sample16/34/")
     # get_result("results/pass@1_all_32env_6model_tmp07_max-texts-35")
     # get_result("results/pass@1_async_all_66env_6model_max-texts-15_add-sample-args")
-    # get_result("validation/results/pass32_20250812_1010_all_pass32_gpu8_env70")
-    get_result("validation/results/uitars_1.5_7b_90_train")
+    print("Start to get results... STEP 0 (uitars_1.5_7b_90_train)")
+    get_result("validation/results/uitars_1.5_7b_90_train_pure")
+    print("Start to get results... bz8 STEP 10")
+    get_result("validation/results/pass32_20250812_1010_all_pass32_gpu8_env70")
+    print("Start to get results... bz4 STEP 24")
+    get_result("validation/results/step24")
+    

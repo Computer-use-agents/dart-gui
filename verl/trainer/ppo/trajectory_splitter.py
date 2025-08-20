@@ -487,6 +487,8 @@ class StepwiseTrajectorySplitter:
             max_response_length: int = 32000,
             truncation: str = "error",
             limit_images: int = 5,
+            limit_messages: int = 35,
+            
         ) -> None:
         self.processor = processor
         self.root_dir = root_dir
@@ -496,6 +498,7 @@ class StepwiseTrajectorySplitter:
         self.truncation = truncation
         self.max_response_length = max_response_length
         self.limit_images = limit_images
+        self.limit_messages = limit_messages
 
     def split(
             self, 
@@ -575,9 +578,10 @@ class StepwiseTrajectorySplitter:
 
         batch_data = []
         for end in range(3, n_msg, 2):
+            pre_start = max(0, end - self.limit_messages * 2 - 1)
             item = self._process_item(
                 dataset, 
-                0, 
+                pre_start, 
                 end
             )
             batch_data.append((item, copy.deepcopy(task_config)))
@@ -585,6 +589,7 @@ class StepwiseTrajectorySplitter:
         return batch_data
 
     def _process_item(self, dataset, start, end) -> list:
+
         return limit_images_in_messages(dataset[start:end], limit_images=self.limit_images)
     
     def tokenize(self, batch_data: list, dataset_id: str, reward: float) -> list[list[dict]]:
@@ -639,7 +644,10 @@ class StepwiseTrajectorySplitter:
             if isinstance(msg["content"], list):
                 for c in msg["content"]:
                     if c["type"] == "image":
-                        image_paths.append(os.path.join(self.root_dir, dataset_id, f"{c['image']}.png"))
+                        if '.png' in c['image']:
+                            image_paths.append(os.path.join(self.root_dir, dataset_id, c['image']))
+                        else:
+                            image_paths.append(os.path.join(self.root_dir, dataset_id, f"{c['image']}.png"))
         images = [process_image(Image.open(image)) for image in image_paths]
         multi_modal_data["image"] = images
         model_inputs = self.processor(text=[raw_prompt], images=images, return_tensors="pt")
