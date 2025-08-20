@@ -55,13 +55,13 @@ def read_static_data(json_path: str) -> List[Dict[str, Any]]:
     return data
 
 
-def latest_model_version(db_manager) -> str:
+def latest_model_version(db_manager, run_id) -> str:
     """Fetch the most recent model version via get_latest_n_checkpoint_paths(1)."""
     paths: List[str] = []
     # Prefer module-level function if available
     if _get_latest_n_checkpoint_paths_fn is not None:
         try:
-            paths = _get_latest_n_checkpoint_paths_fn(1) or []
+            paths = _get_latest_n_checkpoint_paths_fn(run_id, 1) or []
         except Exception as e:
             print(f"[warn] module-level get_latest_n_checkpoint_paths failed: {e}")
 
@@ -82,18 +82,22 @@ def simulate_rollout(
     start_index: int = 0,
     limit: Optional[int] = None,
     dry_run: bool = False,
-    init_model_version = "",
+    max_loops = 10,
     delete_existing: bool = False,
 ) -> None:
     """Simulate rollout by inserting rows at a controlled, steady rate."""
     # Step 1: Read static data only (no DB writes)
-    data = read_static_data(json_path)
+    base_data = read_static_data(json_path)
 
     # Apply slicing if requested
     if start_index:
-        data = data[start_index:]
+        base_data = base_data[start_index:]
     if limit is not None:
-        data = data[:limit]
+        base_data = base_data[:limit]
+        
+    if not base_data:
+        print("[error] No data to process after applying start/limit. Exiting.")
+        return
 
     # Initialize DB manager
     db_manager = create_database_manager()
@@ -102,67 +106,82 @@ def simulate_rollout(
     if delete_existing:
         try:
             db_manager.delete_datasets_by_run_id(run_id)
-            print(f"[info] Deleted existing rows for run_id={run_id}")
+            db_manager.delete_checkpoint_by_run_id(run_id)
+            print(f"[info] Deleted existing rows for run_id={run_id} in rollout_run and checkpoint")
         except Exception as e:
             print(f"[warn] Failed to delete existing rows for run_id={run_id}: {e}")
 
     # Step 2: Insert at rate_per_min (default 16/min => 3.75s/insert)
     interval = 60.0 / float(rate_per_min)
-    next_ts = time.perf_counter()
 
-    total = len(data)
-    print(f"[info] Starting simulated rollout: {total} items, rate={rate_per_min}/min, interval={interval:.3f}s")
+    total_per_loop = len(base_data)
+    grand_total = total_per_loop * max_loops if max_loops > 0 else float("inf")
+    print(
+        f"[info] Starting simulated rollout: {total_per_loop} items/loop, "
+        f"loops={max_loops}, rate={rate_per_min}/min, interval={interval:.3f}s"
+    )
 
+    row_counter = 0
     try:
-        for i, item in enumerate(data, start=1):
-            # Pace the inserts precisely (steady clock)
-            now = time.perf_counter()
-            sleep_s = next_ts - now
-            if sleep_s > 0:
-                time.sleep(sleep_s)
-            next_ts += interval
+        for loop_idx in range(1, max_loops + 1):
+            print(f"[info] Loop {loop_idx}/{max_loops} started.")
+            data = list(base_data)  # fresh iteration order each loop
+            next_ts = time.perf_counter()
+            
+            for i, item in enumerate(data, start=1):
+                # Pace the inserts precisely (steady clock)
+                now = time.perf_counter()
+                sleep_s = next_ts - now
+                if sleep_s > 0:
+                    time.sleep(sleep_s)
+                next_ts += interval
 
-            # Step 3: fetch latest model version before insert
-            model_version = latest_model_version(db_manager)
-            if not model_version:
-                model_version = init_model_version
+                # Step 3: fetch latest model version before insert
+                model_version = latest_model_version(db_manager, run_id)
 
-            payload = dict(
-                trajectory_id=item["trajectory_id"],
-                run_id=run_id,
-                task_id=item["task_id"],
-                trace_id=item["trajectory_id"].split("_")[-1],
-                used=0,
-                model_version=model_version,
-                reward=item["reward"],
-            )
-
-            if dry_run:
-                print(f"[dry-run] Would insert: {payload}")
-            else:
-                try:
-                    db_manager.create_dataset(**payload)
-                    print(
-                        f"[ok] ({i}/{total}) "
-                        f"trajectory_id={item['trajectory_id']} "
-                        f"model_version={model_version}"
-                    )
-                except Exception as e:
-                    print(f"[error] Insert failed for trajectory_id={item['trajectory_id']}: {e}")
+                payload = dict(
+                    trajectory_id=item["trajectory_id"],
+                    run_id=run_id,
+                    task_id=item["task_id"],
+                    trace_id=item["trajectory_id"].split("_")[-1],
+                    used=0,
+                    model_version=model_version,
+                    reward=item["reward"],
+                )
+                
+                row_counter += 1
+                
+                if dry_run:
+                    print(f"[dry-run] ({i}/{total_per_loop} loop {loop_idx}) Would insert or update: {payload}")
+                else:
+                    try:
+                        db_manager.create_or_update_dataset_with_event(**payload)
+                        print(
+                            f"[ok] ({i}/{total_per_loop} loop {loop_idx}) "
+                            f"trajectory_id={item['trajectory_id']} "
+                            f"model_version={model_version} "
+                            f"[total={row_counter}/{grand_total if grand_total != float('inf') else '∞'}]"
+                        )
+                    except Exception as e:
+                        print(f"[error] Insert failed for trajectory_id={item['trajectory_id']}: {e}")
+                        
+            print(f"[info] Loop {loop_idx}/{max_loops} completed. Inserted {total_per_loop} rows this loop.")
+        
+        print(f"[done] Completed {max_loops} loop(s). Total rows processed: {row_counter}.")
 
     except KeyboardInterrupt:
-        print("\n[info] Interrupted by user; stopping gracefully.")
+        print(f"\n[info] Interrupted. Rows processed so far: {row_counter}. Stopping gracefully.")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simulated rollout producer for trainer unit tests.")
     parser.add_argument("--json", default="data/train/pass@32_90_trainingser.json", help="Path to the static JSON data.")
     parser.add_argument("--run-id", default="sim_rollout_test", help="Run ID to write into DB rows.")
-    parser.add_argument("--rate", type=int, default=8, help="Insert rate per minute (default: 16).")
+    parser.add_argument("--rate", type=int, default=30, help="Insert rate per minute (default: 16).")
     parser.add_argument("--start-index", type=int, default=0, help="Start from this index in the JSON list.")
     parser.add_argument("--limit", type=int, default=None, help="Only process this many items.")
     parser.add_argument("--dry-run", action="store_true", help="Don't write to DB; just print what would happen.")
-    parser.add_argument("--init_model_version", default="/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5")
+    parser.add_argument("--loops", type=int, default=10, help="Maximum number of full loops over the JSON (default: 10).")
     parser.add_argument(
         "--delete-existing",
         action="store_true",
@@ -170,26 +189,26 @@ def main() -> None:
     )
     args = parser.parse_args()
     from sqlalchemy.engine import URL
-    from sqlalchemy import create_engine, text, MetaData, Table
+    # from sqlalchemy import create_engine, text, MetaData, Table
 
-    db_url = URL.create(
-        drivername="mysql+pymysql",
-        username="agentictrl",
-        password="`1qaz~!QAZ",
-        host="112.125.88.107",
-        port=5906,
-        database="BIGAI",
-        query={"charset": "utf8mb4"},
-    )
+    # db_url = URL.create(
+    #     drivername="mysql+pymysql",
+    #     username="agentictrl",
+    #     password="`1qaz~!QAZ",
+    #     host="112.125.88.107",
+    #     port=5906,
+    #     database="BIGAI",
+    #     query={"charset": "utf8mb4"},
+    # )
 
-    engine = create_engine(db_url, pool_pre_ping=True)
+    # engine = create_engine(db_url, pool_pre_ping=True)
 
 
-    with engine.begin() as conn:
-        conn.exec_driver_sql("SET FOREIGN_KEY_CHECKS=0")
-        conn.exec_driver_sql("TRUNCATE TABLE `checkpoint`")
-        conn.exec_driver_sql("SET FOREIGN_KEY_CHECKS=1")
-        print("✅ 已清空表checkpoint（TRUNCATE，已重置自增）")
+    # with engine.begin() as conn:
+    #     conn.exec_driver_sql("SET FOREIGN_KEY_CHECKS=0")
+    #     conn.exec_driver_sql("TRUNCATE TABLE `checkpoint`")
+    #     conn.exec_driver_sql("SET FOREIGN_KEY_CHECKS=1")
+    #     print("✅ 已清空表checkpoint（TRUNCATE，已重置自增）")
 
     simulate_rollout(
         json_path=args.json,
@@ -198,7 +217,7 @@ def main() -> None:
         start_index=args.start_index,
         limit=args.limit,
         dry_run=args.dry_run,
-        init_model_version=args.init_model_version,
+        max_loops=args.loops,
         delete_existing=args.delete_existing,
     )
 

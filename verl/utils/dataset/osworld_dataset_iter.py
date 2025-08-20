@@ -216,6 +216,7 @@ class OSWorldAsyncDataset(IterableDataset):
         """
         trajectory_id = row_dict["trajectory_id"]
         run_id = row_dict["run_id"]
+        #instruction = row_dict["instruction"]
         reward = row_dict["reward"]
 
         try:
@@ -223,10 +224,32 @@ class OSWorldAsyncDataset(IterableDataset):
         except Exception as e:
             logger.warning(f"update_rollout_used failed for {trajectory_id}: {e}")
 
+        # data_dir = os.path.join(self.root_data_dir, trajectory_id)
+        # with open(os.path.join(data_dir, "task_config.json")) as f:
+        #     task_data = json.load(f)
+        # with open(os.path.join(data_dir, "reward.txt")) as f:
+        #     reward_tensor = float(f.read().strip())
+        #     reward_tensor = torch.tensor([reward_tensor], dtype=torch.float32)
         reward_tensor = torch.tensor([reward], dtype=torch.float32)
 
+        # instruction = task_data["instruction"]
+        # system_prompt = COMPUTER_USE_DOUBAO if not self.use_call_user else COMPUTER_USE_DOUBAO_WITH_CALL_USER
+
+        # messages = [
+        #     {"role": "system", "content": "You are a helpful assistant."},
+        #     {
+        #         "role": "user",
+        #         "content": [
+        #             {"type": "text",
+        #              "text": system_prompt.format(instruction=instruction, language="English")}
+        #         ],
+        #     },
+        # ]
 
         sample = {
+            # "messages": messages,
+            # "instruction": instruction,
+            # "task_config": task_data,
             "dataset_ids": trajectory_id,
             "reward_tensors": reward_tensor,
         }
@@ -254,7 +277,7 @@ class OSWorldAsyncDataset(IterableDataset):
 
             # 2) 获取最近的若干 checkpoint 对应的 model_versions（top_mvs）
             top_n = int(self.config.get("top_mvs_n", 2))
-            top_mvs = self.db_manager.get_latest_n_checkpoint_paths(n=top_n)
+            top_mvs = self.db_manager.get_latest_n_checkpoint_paths(run_id=self.run_id, n=top_n)
 
             # 3) 通过 filter_fn 选择本次要训练的 datasets（限制每 task 的数量）
             datasets: List[Dict[str, Any]] = filter_fn(
@@ -291,37 +314,37 @@ class OSWorldAsyncDataset(IterableDataset):
             if len(datasets) > max_allowed:
                 datasets = datasets[:max_allowed]
                 
-            # # 保存采样数据，用于检查
-            # try:
-            #     dump_dir = "debug_datasets"
-            #     os.makedirs(dump_dir, exist_ok=True)
-            #     ts = time.strftime("%Y%m%d-%H%M%S")
-            #     dump_base = f"datasets_step{self.produced_batches}_w{worker_id}_{ts}"
+            # 保存采样数据，用于检查
+            try:
+                dump_dir = "debug_datasets"
+                os.makedirs(dump_dir, exist_ok=True)
+                ts = time.strftime("%Y%m%d-%H%M%S")
+                dump_base = f"datasets_step{self.produced_batches}_w{worker_id}_{ts}"
 
-            #     # 保存完整样本列表
-            #     with open(os.path.join(dump_dir, dump_base + ".json"), "w", encoding="utf-8") as f:
-            #         json.dump(datasets, f, ensure_ascii=False, indent=2, default=str)
+                # 保存完整样本列表
+                with open(os.path.join(dump_dir, dump_base + ".json"), "w", encoding="utf-8") as f:
+                    json.dump(datasets, f, ensure_ascii=False, indent=2, default=str)
 
-            #     # 简要统计：按 task_id 分布
-            #     from collections import Counter
-            #     def _task_id_of(row: dict) -> str:
-            #         tid = row.get("task_id")
-            #         if tid is not None:
-            #             return str(tid)
-            #         traj = str(row.get("trajectory_id", ""))
-            #         return traj.split("/", 1)[0] if "/" in traj else traj
+                # 简要统计：按 task_id 分布
+                from collections import Counter
+                def _task_id_of(row: dict) -> str:
+                    tid = row.get("task_id")
+                    if tid is not None:
+                        return str(tid)
+                    traj = str(row.get("trajectory_id", ""))
+                    return traj.split("/", 1)[0] if "/" in traj else traj
 
-            #     counts = Counter(_task_id_of(r) for r in datasets)
-            #     summary = {
-            #         "total": len(datasets),
-            #         "counts_by_task_id": {k: int(v) for k, v in counts.items()},
-            #     }
-            #     with open(os.path.join(dump_dir, dump_base + ".summary.json"), "w", encoding="utf-8") as f:
-            #         json.dump(summary, f, ensure_ascii=False, indent=2)
+                counts = Counter(_task_id_of(r) for r in datasets)
+                summary = {
+                    "total": len(datasets),
+                    "counts_by_task_id": {k: int(v) for k, v in counts.items()},
+                }
+                with open(os.path.join(dump_dir, dump_base + ".summary.json"), "w", encoding="utf-8") as f:
+                    json.dump(summary, f, ensure_ascii=False, indent=2)
 
-            #     logger.info(f"[worker {worker_id}] Dumped datasets to {os.path.join(dump_dir, dump_base)}.*")
-            # except Exception as e:
-            #     logger.warning(f"[worker {worker_id}] Failed to dump datasets for inspection: {e}")
+                logger.info(f"[worker {worker_id}] Dumped datasets to {os.path.join(dump_dir, dump_base)}.*")
+            except Exception as e:
+                logger.warning(f"[worker {worker_id}] Failed to dump datasets for inspection: {e}")
 
             # 构造样本
             batch_samples: List[Dict[str, Any]] = []

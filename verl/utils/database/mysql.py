@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 
 from sqlalchemy import (
-    create_engine, Column, String, Integer, BigInteger, Text, func, select, update, text
+    create_engine, Column, String, Integer, BigInteger, Text, func, select, update, text, Enum, TIMESTAMP
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.dialects import mysql
@@ -27,9 +27,9 @@ Base = declarative_base()
 # Database configuration
 DB_CONFIG = {
     'host': '112.125.88.107',
-    'user': 'agentictrl',
-    'password': '`1qaz~!QAZ',
-    'database': 'BIGAI',
+    'user': 'teamx',
+    'password': '#C!D123^-c12',
+    'database': 'TeamX_BIGAI',
     'port': 5906,
     'charset': 'utf8mb4'
 }
@@ -46,6 +46,7 @@ class Checkpoint(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False, server_default=text("''"))
     version = Column(String(50), nullable=False, index=True)            # v1, v2, ...
+    run_id = Column(String(191), nullable=False, server_default=text("''"), index=True)  # 新增
     status = Column(String(20), nullable=False, index=True)             # PENDING, ...
     path = Column(String(255), nullable=False)
     source = Column(String(50), nullable=True, index=True)             # train, ...
@@ -83,10 +84,22 @@ class RolloutRun(Base):
     num_chunks = Column(Integer)
     used = Column(Integer, nullable=False, server_default="0", index=True)
     model_version = Column(String(191, collation='utf8mb4_unicode_ci'))
+    instruction = Column(String(1024, collation='utf8mb4_unicode_ci'))
     create_at = Column(mysql.TIMESTAMP, server_default=func.current_timestamp())
 
     def to_dict(self) -> Dict[str, Any]:
         return {c.name: _serialize(getattr(self, c.name)) for c in self.__table__.columns}
+    
+class DatasetUsageEvent(Base):
+    __tablename__ = "dataset_usage_events"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    trajectory_id = Column(String(64), nullable=False)
+    run_id        = Column(String(128), nullable=False)
+    model_version = Column(String(512))
+    used_delta    = Column(Integer, nullable=False, server_default=text("0"))
+    event_type    = Column(Enum("INSERT", "UPDATE", "USE", name="dataset_usage_event_type"), nullable=False)
+    created_at    = Column(TIMESTAMP, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
 
 
 class MySQLRolloutORM:
@@ -154,13 +167,18 @@ class MySQLRolloutORM:
             return result.rowcount or 0
 
     # ---- 3) 插入 checkpoint：source=train, status=PENDING, version 自增 v1,v2...
-    def insert_checkpoint(self, path: str) -> Dict[str, Any]:
+    def insert_checkpoint(self, path: str, run_id: str) -> Dict[str, Any]:
         source = "train"
         status = "PENDING"
         with self.session_scope() as s:
+            # 仅在同一 run_id 下计算 version
             existing_versions = s.execute(
-                select(Checkpoint.version).where(Checkpoint.source == source)
+                select(Checkpoint.version).where(
+                    Checkpoint.source == source,
+                    Checkpoint.run_id == run_id,
+                )
             ).all()
+
             max_n = 0
             for (ver,) in existing_versions:
                 if not ver:
@@ -170,30 +188,50 @@ class MySQLRolloutORM:
                     max_n = max(max_n, int(m.group(1)))
             next_version = f"v{max_n + 1}"
 
-            cp = Checkpoint(source=source, status=status, version=next_version, path=path)
+            cp = Checkpoint(
+                source=source,
+                status=status,
+                version=next_version,
+                run_id=run_id,
+                path=path,
+            )
             s.add(cp)
             s.flush()  # 获取数据库生成字段（如 id / timestamps）
             return cp.to_dict()
 
     # ---- 4) 取出 checkpoint 最新n条 path ------------------------------------
-    def get_latest_n_checkpoint_paths(self, n=2) -> List[str]:
+    def get_latest_n_checkpoint_paths(self, run_id: str, n: int = 2) -> List[str]:
         with self.session_scope() as s:
-            rows = s.query(Checkpoint.path).order_by(
-                Checkpoint.created_at.desc(), Checkpoint.id.desc()
-            ).limit(n).all()
+            rows = (
+                s.query(Checkpoint.path)
+                .filter(Checkpoint.run_id == run_id)
+                .order_by(Checkpoint.created_at.desc(), Checkpoint.id.desc())
+                .limit(n)
+                .all()
+            )
             result = [r[0] for r in rows]
-            
+
             # 若列表长度不足，添加默认路径
             if len(result) < n:
                 result.append("/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5")
             return result
         
-        # 删除指定 run_id 的全部 rollout_run 记录，返回受影响行数
+    # 删除指定 run_id 的全部 rollout_run 记录，返回受影响行数
     def delete_datasets_by_run_id(self, run_id: str) -> int:
         with self.session_scope() as s:
             affected = s.query(RolloutRun)\
                 .filter(RolloutRun.run_id == run_id)\
                 .delete(synchronize_session=False)
+            return affected
+    
+    # 按 run_id 硬删除对应的 checkpoint 记录，返回受影响行数
+    def delete_checkpoint_by_run_id(self, run_id: str) -> int:
+        with self.session_scope() as s:
+            affected = (
+                s.query(Checkpoint)
+                .filter(Checkpoint.run_id == run_id)
+                .delete(synchronize_session=False)
+            )
             return affected
 
     # 创建一条 rollout_run 记录；used 默认为 0
@@ -226,6 +264,65 @@ class MySQLRolloutORM:
                 # 例如 trajectory_id 主键冲突
                 s.rollback()
                 raise
+            return row.to_dict()
+        
+    def create_or_update_dataset_with_event(
+        self,
+        trajectory_id: str,
+        run_id: str,
+        task_id: str,
+        trace_id: str,
+        model_version: str,
+        reward: float,
+        used: int = 0,
+    ) -> dict:
+        """
+        如果 (trajectory_id, run_id) 不存在：插入主表（used 默认 0 或传入值），事件表记 INSERT。
+        如果已存在：仅更新 model_version，且将 used 置 0，事件表记 UPDATE。
+        """
+        with self.session_scope() as s:
+            # 1) 查是否已存在
+            existing = (
+                s.query(RolloutRun)
+                 .filter_by(trajectory_id=trajectory_id, run_id=run_id)
+                 .one_or_none()
+            )
+
+            if existing is None:
+                # 2a) 插入
+                row = RolloutRun(
+                    trajectory_id=trajectory_id,
+                    run_id=run_id,
+                    task_id=task_id,
+                    trace_id=trace_id,
+                    model_version=model_version,
+                    reward=reward,
+                    used=used if used is not None else 0,
+                    split_dir="",
+                    num_chunks=0,
+                )
+                s.add(row)
+                s.flush()
+                event_type = "INSERT"
+            else:
+                # 2b) 更新（只更新你要求的字段）
+                existing.model_version = model_version
+                existing.used = 0
+                s.flush()
+                row = existing
+                event_type = "UPDATE"
+
+            # 3) 事件表写入（记录这次主表操作）
+            evt = DatasetUsageEvent(
+                trajectory_id=trajectory_id,
+                run_id=run_id,
+                model_version=model_version,
+                used_delta=0,         # 本次不改变 used，仅记录结构变更
+                event_type=event_type # INSERT 或 UPDATE
+            )
+            s.add(evt)
+            # 注意：session_scope 应负责 commit；此处无需再 commit
+
             return row.to_dict()
          
         
