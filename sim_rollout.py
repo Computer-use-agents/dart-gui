@@ -158,7 +158,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Simulated rollout producer for trainer unit tests.")
     parser.add_argument("--json", default="data/train/filtered_train_proportional_max_variance.json", help="Path to the static JSON data.")
     parser.add_argument("--run-id", default="sim_rollout_test", help="Run ID to write into DB rows.")
-    parser.add_argument("--rate", type=int, default=16, help="Insert rate per minute (default: 16).")
+    parser.add_argument("--rate", type=int, default=5, help="Insert rate per minute (default: 16).")
     parser.add_argument("--start-index", type=int, default=0, help="Start from this index in the JSON list.")
     parser.add_argument("--limit", type=int, default=None, help="Only process this many items.")
     parser.add_argument("--dry-run", action="store_true", help="Don't write to DB; just print what would happen.")

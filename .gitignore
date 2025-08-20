@@ -148,3 +148,6 @@ data/chenrui
 *results*/
 
 debug_datasets/
+swanlog/
+.venv/
+.vscode/

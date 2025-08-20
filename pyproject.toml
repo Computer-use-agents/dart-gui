@@ -85,3 +85,8 @@ verl = [
   "version/*",
   "trainer/config/*.yaml"
 ]
+
+[tool.uv.workspace]
+members = [
+    "validation",
+]

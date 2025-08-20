@@ -169,6 +169,8 @@ class OSWorldAsyncDataset(IterableDataset):
         # root_data_dir for files
         self.root_data_dir = getattr(self.config, "root_data_dir", ".")
         self.produced_batches = 0
+        self.wait_num = 0 
+        self.max_wait_num = config.get("max_wait_num", 40)
 
     # 你原来的 messages 组装逻辑（若仍需要）
     def _build_messages(self, example: dict):
@@ -214,43 +216,22 @@ class OSWorldAsyncDataset(IterableDataset):
         """
         trajectory_id = row_dict["trajectory_id"]
         run_id = row_dict["run_id"]
+        reward = row_dict["reward"]
 
-        # 先占位（claim），避免多 worker 重复
         try:
             self.db_manager.update_rollout_used(run_id=run_id, trajectory_id=trajectory_id)
         except Exception as e:
             logger.warning(f"update_rollout_used failed for {trajectory_id}: {e}")
 
-        data_dir = os.path.join(self.root_data_dir, trajectory_id)
-        with open(os.path.join(data_dir, "task_config.json")) as f:
-            task_data = json.load(f)
-        with open(os.path.join(data_dir, "reward.txt")) as f:
-            reward_tensor = float(f.read().strip())
-            reward_tensor = torch.tensor([reward_tensor], dtype=torch.float32)
+        reward_tensor = torch.tensor([reward], dtype=torch.float32)
 
-        instruction = task_data["instruction"]
-        system_prompt = COMPUTER_USE_DOUBAO if not self.use_call_user else COMPUTER_USE_DOUBAO_WITH_CALL_USER
-
-        messages = [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text",
-                     "text": system_prompt.format(instruction=instruction, language="English")}
-                ],
-            },
-        ]
 
         sample = {
-            "messages": messages,
-            "instruction": instruction,
-            "task_config": task_data,
             "dataset_ids": trajectory_id,
             "reward_tensors": reward_tensor,
         }
         return sample
-
+    
     def __iter__(self):
         """
         每次迭代（Trainer 的一个 epoch）产出若干个“批次”（list[dict]）。
@@ -269,7 +250,7 @@ class OSWorldAsyncDataset(IterableDataset):
             #try:
             # 1) 获取全部候选 rollouts（原始数据）
             data = self.db_manager.get_rollouts_by_run_id(run_id=self.run_id)
-            print("len data:", len(data))
+            print("len all data in SQL:", len(data))
 
             # 2) 获取最近的若干 checkpoint 对应的 model_versions（top_mvs）
             top_n = int(self.config.get("top_mvs_n", 2))
@@ -282,15 +263,18 @@ class OSWorldAsyncDataset(IterableDataset):
                 top_mvs=top_mvs,
                 random_state=self.config.get("random_state", None),
             )
-
+            print("len datasets filtered for this step:", len(datasets))
             # 若数量不足，继续轮询等待
             min_needed = self.batch_size_min * self.rollout_n
             if len(datasets) < min_needed:
                 logger.info(f"[worker {worker_id}] datasets={len(datasets)} < min_needed={min_needed}; "
                             f"sleep {self.poll_interval_sec}s and retry.")
                 time.sleep(self.poll_interval_sec)
+                self.wait_num += 1
                 continue
-                        
+            if self.wait_num >= self.max_wait_num:
+                raise RuntimeError(f"[worker {worker_id}] Waited {self.max_wait_num} times but still not enough data (datasets={len(datasets)} < min_needed={min_needed}). Giving up.")
+            self.wait_num =0          
             # 按照task id最早出现时间排序，优先选先出现的task id
             _min_create_at = {}
             for row in datasets:
