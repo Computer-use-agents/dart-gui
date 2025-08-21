@@ -48,6 +48,8 @@ from verl.utils.eval import validate_osworld, validate_osworld_parallel
 from verl.utils.database.mysql import create_database_manager
 from verl.utils.database.rollouter_reload_model import reload_model
 
+from verl.trainer.ppo.sample_visualizer import SampleVisualizer, save_batch_for_viz
+
 
 class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
     def __init__(self, config, tokenizer, role_worker_mapping: dict[Role, WorkerType], resource_pool_manager: ResourcePoolManager, ray_worker_group_cls: RayWorkerGroup = RayWorkerGroup, processor=None, reward_fn=None, val_reward_fn=None, train_dataset: Optional[Dataset] = None, val_dataset: Optional[Dataset] = None, collate_fn=None, train_sampler: Optional[Sampler] = None, device_name="cuda"):
@@ -157,6 +159,15 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         batch = splitter.split_parallel(dataset_ids, reward_tensor)
                     else:
                         batch = splitter.split(dataset_ids, reward_tensor)
+                                         
+                    if self.global_steps == 11:               
+                        save_path = save_batch_for_viz(
+                            batch, json_path="viz/batch_step11.json",
+                            max_samples=4
+                        )
+                        print(f"[viz] saved debug batch -> {save_path}")
+                
+                
                     batch = DataProto.from_single_dict(batch)
                     config = self.actor_rollout_wg.get_config()
                     if isinstance(config, list):
