@@ -68,7 +68,7 @@ def latest_model_version(db_manager, run_id) -> str:
     # Fallback: check if db_manager exposes the method
     if not paths and hasattr(db_manager, "get_latest_n_checkpoint_paths"):
         try:
-            paths = db_manager.get_latest_n_checkpoint_paths(1) or []
+            paths = db_manager.get_latest_n_checkpoint_paths(run_id, 1) or []
         except Exception as e:
             print(f"[warn] db_manager.get_latest_n_checkpoint_paths failed: {e}")
 
