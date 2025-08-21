@@ -343,6 +343,6 @@ if __name__ == "__main__":
 
     orm = MySQLRolloutORM(DB_CONFIG, create_tables_if_missing=True)
     # print(orm.get_rollouts_by_run_id("results/test_for_train_pass8_gpu8_env77_20250817_1345")[0])
-    print(orm.update_rollout_used("results/test_for_train_pass8_gpu8_env77_20250817_1345", "9439a27b-18ae-42d8-9778-5f68f891805e_trace_e635d5e3af17_1755501336"))
+    # print(orm.update_rollout_used("results/test_for_train_pass8_gpu8_env77_20250817_1345", "9439a27b-18ae-42d8-9778-5f68f891805e_trace_e635d5e3af17_1755501336"))
     # print(orm.insert_checkpoint("/mnt/checkpoints/model-abc/weights.bin"))
-    # print(orm.get_latest_n_checkpoint_paths())
+    print(orm.get_latest_n_checkpoint_paths("results/pass@32_trainset90", 1))

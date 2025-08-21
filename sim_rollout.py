@@ -68,7 +68,7 @@ def latest_model_version(db_manager, run_id) -> str:
     # Fallback: check if db_manager exposes the method
     if not paths and hasattr(db_manager, "get_latest_n_checkpoint_paths"):
         try:
-            paths = db_manager.get_latest_n_checkpoint_paths(1) or []
+            paths = db_manager.get_latest_n_checkpoint_paths(run_id, 1) or []
         except Exception as e:
             print(f"[warn] db_manager.get_latest_n_checkpoint_paths failed: {e}")
 
@@ -175,9 +175,9 @@ def simulate_rollout(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simulated rollout producer for trainer unit tests.")
-    parser.add_argument("--json", default="data/train/pass@32_90_trainingser.json", help="Path to the static JSON data.")
-    parser.add_argument("--run-id", default="sim_rollout_test", help="Run ID to write into DB rows.")
-    parser.add_argument("--rate", type=int, default=30, help="Insert rate per minute (default: 16).")
+    parser.add_argument("--json", default="data/train/data_pass@32_trainset90.json", help="Path to the static JSON data.")
+    parser.add_argument("--run-id", default="results/pass@32_trainset90", help="Run ID to write into DB rows.")
+    parser.add_argument("--rate", type=int, default=16, help="Insert rate per minute.")
     parser.add_argument("--start-index", type=int, default=0, help="Start from this index in the JSON list.")
     parser.add_argument("--limit", type=int, default=None, help="Only process this many items.")
     parser.add_argument("--dry-run", action="store_true", help="Don't write to DB; just print what would happen.")
@@ -224,3 +224,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+    # print(latest_model_version(create_database_manager(), "results/pass@32_trainset90"))
+
