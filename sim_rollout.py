@@ -82,7 +82,8 @@ def simulate_rollout(
     start_index: int = 0,
     limit: Optional[int] = None,
     dry_run: bool = False,
-    max_loops = 10,
+    loops = 10,
+    bootstrap_count = 256,
     delete_existing: bool = False,
 ) -> None:
     """Simulate rollout by inserting rows at a controlled, steady rate."""
@@ -93,11 +94,18 @@ def simulate_rollout(
     if start_index:
         base_data = base_data[start_index:]
     if limit is not None:
-        base_data = base_data[:limit]
-        
+        base_data = base_data[:limit]   
     if not base_data:
         print("[error] No data to process after applying start/limit. Exiting.")
         return
+    
+    total_per_loop = len(base_data)
+    total_needed = loops * total_per_loop           # 总条数（含bootstrap覆盖的那部分）
+    B = max(0, int(bootstrap_count))                # 启动阶段希望不等待的条数
+    B_effective = min(B, total_needed)              # 实际能用于bootstrap的不等待条数
+
+    def item_at(global_idx: int) -> Dict[str, Any]:
+        return base_data[global_idx % total_per_loop]
 
     # Initialize DB manager
     db_manager = create_database_manager()
@@ -111,63 +119,81 @@ def simulate_rollout(
         except Exception as e:
             print(f"[warn] Failed to delete existing rows for run_id={run_id}: {e}")
 
-    # Step 2: Insert at rate_per_min (default 16/min => 3.75s/insert)
     interval = 60.0 / float(rate_per_min)
+    next_ts: Optional[float] = None  # 节拍阶段的基准时间
+    row_counter = 0                  # 成功写入计数（bootstrap + steady）
+    steady_needed = total_needed - B_effective  # 需要按节拍写入的剩余条数
 
-    total_per_loop = len(base_data)
-    grand_total = total_per_loop * max_loops if max_loops > 0 else float("inf")
     print(
-        f"[info] Starting simulated rollout: {total_per_loop} items/loop, "
-        f"loops={max_loops}, rate={rate_per_min}/min, interval={interval:.3f}s"
+        f"[info] Single-loop | total_needed={total_needed} "
+        f"(loops={loops} * {total_per_loop}/loop), "
+        f"bootstrap={B} (effective={B_effective}), steady_needed={steady_needed}, "
+        f"rate={rate_per_min}/min, interval={interval:.3f}s"
     )
 
-    row_counter = 0
     try:
-        for loop_idx in range(1, max_loops + 1):
-            print(f"[info] Loop {loop_idx}/{max_loops} started.")
-            data = list(base_data)  # fresh iteration order each loop
-            next_ts = time.perf_counter()
+
+        for t in range(total_needed):
+            item = item_at(t)
             
-            for i, item in enumerate(data, start=1):
-                # Pace the inserts precisely (steady clock)
+            # —— 节拍控制 —— 
+            if row_counter < B_effective:
+                # bootstrap阶段：不等待，不推进next_ts
+                pass
+            else:
+                # 刚跨过bootstrap阈值：初始化节拍
+                if row_counter == B_effective: 
+                    next_ts = time.perf_counter() + interval
+
+                # 正常steady节拍
                 now = time.perf_counter()
-                sleep_s = next_ts - now
+                sleep_s = (next_ts - now) if next_ts is not None else 0.0
                 if sleep_s > 0:
                     time.sleep(sleep_s)
-                next_ts += interval
+                next_ts = (next_ts or time.perf_counter()) + interval            
 
-                # Step 3: fetch latest model version before insert
-                model_version = latest_model_version(db_manager, run_id)
 
-                payload = dict(
-                    trajectory_id=item["trajectory_id"],
-                    run_id=run_id,
-                    task_id=item["task_id"],
-                    trace_id=item["trajectory_id"].split("_")[-1],
-                    used=0,
-                    model_version=model_version,
-                    reward=item["reward"],
-                )
-                
-                row_counter += 1
-                
-                if dry_run:
-                    print(f"[dry-run] ({i}/{total_per_loop} loop {loop_idx}) Would insert or update: {payload}")
+            # 插入数据
+            model_version = latest_model_version(db_manager, run_id)
+            payload = dict(
+                trajectory_id=item["trajectory_id"],
+                run_id=run_id,
+                task_id=item["task_id"],
+                trace_id=item["trajectory_id"].split("_")[-1],
+                used=0,
+                model_version=model_version,
+                reward=item["reward"],
+            )
+            
+            if dry_run:
+                phase = "bootstrap" if row_counter < B_effective else "steady"
+                # 为了好看，分别计算相对计数
+                if phase == "bootstrap":
+                    phase_idx = row_counter + 1
+                    phase_total = B_effective
                 else:
-                    try:
-                        db_manager.create_or_update_dataset_with_event(**payload)
-                        print(
-                            f"[ok] ({i}/{total_per_loop} loop {loop_idx}) "
-                            f"trajectory_id={item['trajectory_id']} "
-                            f"model_version={model_version} "
-                            f"[total={row_counter}/{grand_total if grand_total != float('inf') else '∞'}]"
-                        )
-                    except Exception as e:
-                        print(f"[error] Insert failed for trajectory_id={item['trajectory_id']}: {e}")
-                        
-            print(f"[info] Loop {loop_idx}/{max_loops} completed. Inserted {total_per_loop} rows this loop.")
-        
-        print(f"[done] Completed {max_loops} loop(s). Total rows processed: {row_counter}.")
+                    phase_idx = row_counter - B_effective + 1
+                    phase_total = steady_needed
+                print(f"[dry-run/{phase}] ({phase_idx}/{phase_total}) "
+                      f"traj={item['trajectory_id']} mv={model_version}")
+                row_counter += 1
+                continue
+            
+            try:
+                db_manager.create_or_update_dataset_with_event(**payload)
+                row_counter += 1
+                if row_counter <= B_effective:
+                    print(f"[ok/bootstrap] ({row_counter}/{B_effective}) "
+                          f"traj={item['trajectory_id']} mv={model_version}")
+                else:
+                    steady_idx = row_counter - B_effective
+                    print(f"[ok/steady] ({steady_idx}/{steady_needed}) "
+                          f"traj={item['trajectory_id']} mv={model_version}")
+            except Exception as e:
+                print(f"[error] traj={item['trajectory_id']}: {e}")
+                    
+        print(f"[done] Completed. Total rows processed: {row_counter} "
+              f"(bootstrap_effective {B_effective} + steady {steady_needed}).")
 
     except KeyboardInterrupt:
         print(f"\n[info] Interrupted. Rows processed so far: {row_counter}. Stopping gracefully.")
@@ -175,13 +201,14 @@ def simulate_rollout(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simulated rollout producer for trainer unit tests.")
-    parser.add_argument("--json", default="data/train/pass@32_90_trainingser.json", help="Path to the static JSON data.")
-    parser.add_argument("--run-id", default="sim_rollout_test", help="Run ID to write into DB rows.")
-    parser.add_argument("--rate", type=int, default=30, help="Insert rate per minute (default: 16).")
+    parser.add_argument("--json", default="data/train/data_pass@32_trainset90.json", help="Path to the static JSON data.")
+    parser.add_argument("--run-id", default="results/pass@32_trainset90", help="Run ID to write into DB rows.")
+    parser.add_argument("--rate", type=int, default=16, help="Insert rate per minute.")
     parser.add_argument("--start-index", type=int, default=0, help="Start from this index in the JSON list.")
     parser.add_argument("--limit", type=int, default=None, help="Only process this many items.")
     parser.add_argument("--dry-run", action="store_true", help="Don't write to DB; just print what would happen.")
     parser.add_argument("--loops", type=int, default=10, help="Maximum number of full loops over the JSON (default: 10).")
+    parser.add_argument("--bootstrap", type=int, default=256, help="Number of items to insert immediately at startup (default: 256).")
     parser.add_argument(
         "--delete-existing",
         action="store_true",
@@ -217,10 +244,13 @@ def main() -> None:
         start_index=args.start_index,
         limit=args.limit,
         dry_run=args.dry_run,
-        max_loops=args.loops,
+        loops=args.loops,
+        bootstrap_count=args.bootstrap,
         delete_existing=args.delete_existing,
     )
 
 
 if __name__ == "__main__":
     main()
+    # print(latest_model_version(create_database_manager(), "results/pass@32_trainset90"))
+

@@ -23,6 +23,7 @@ from collections import defaultdict
 from typing import Any, Dict, List, Optional, Union
 import time
 import hashlib
+from itertools import groupby
 
 import numpy as np
 import torch
@@ -171,6 +172,9 @@ class OSWorldAsyncDataset(IterableDataset):
         self.produced_batches = 0
         self.wait_num = 0 
         self.max_wait_num = config.get("max_wait_num", 40)
+        
+        # 使用静态数据时，按上一批的最后一个task定锚轮换
+        self._last_used_task_id = None
 
     # 你原来的 messages 组装逻辑（若仍需要）
     def _build_messages(self, example: dict):
@@ -287,17 +291,19 @@ class OSWorldAsyncDataset(IterableDataset):
                 random_state=self.config.get("random_state", None),
             )
             print("len datasets filtered for this step:", len(datasets))
+            
             # 若数量不足，继续轮询等待
             min_needed = self.batch_size_min * self.rollout_n
             if len(datasets) < min_needed:
-                logger.info(f"[worker {worker_id}] datasets={len(datasets)} < min_needed={min_needed}; "
+                print(f"[worker {worker_id}] datasets={len(datasets)} < min_needed={min_needed}; "
                             f"sleep {self.poll_interval_sec}s and retry.")
                 time.sleep(self.poll_interval_sec)
                 self.wait_num += 1
                 continue
             if self.wait_num >= self.max_wait_num:
                 raise RuntimeError(f"[worker {worker_id}] Waited {self.max_wait_num} times but still not enough data (datasets={len(datasets)} < min_needed={min_needed}). Giving up.")
-            self.wait_num =0          
+            self.wait_num =0
+            
             # 按照task id最早出现时间排序，优先选先出现的task id
             _min_create_at = {}
             for row in datasets:
@@ -307,19 +313,45 @@ class OSWorldAsyncDataset(IterableDataset):
                     _min_create_at[tid] = ts
             # 先按task_id组的 min(create_at) 升序排列；再按 task_id排序
             datasets.sort(key=lambda r: (_min_create_at[str(r["task_id"])], str(r["task_id"]), r["create_at"]))
-            print("len data after filtered: ", len(datasets))
 
+            # 使用静态数据时，按照task_id轮换使用，记录偏移量         
+            rotate_static = self.config.get("rotate_task_groups", False)
+            print("rotate_static: ",rotate_static)
+            
+            if rotate_static:
+                # 按task_id分组
+                groups = [(tid, list(items)) for tid, items in groupby(datasets, key=lambda r: str(r["task_id"]))]
+                offset = 0
+                last_tid = self._last_used_task_id
+                print("last_tid: ", last_tid)
+                if last_tid:
+                    idx_map = {tid: i for i, (tid, _) in enumerate(groups)}
+                    if last_tid in idx_map:
+                        offset = (idx_map[last_tid] + 1) % len(groups)
+
+                rotated = groups[offset:] + groups[:offset] if offset else groups
+                datasets = [row for _, items in rotated for row in items]
+            
             # 限制最大数量
             max_allowed = self.batch_size_max * self.rollout_n
             if len(datasets) > max_allowed:
                 datasets = datasets[:max_allowed]
+            print("len data after filtered: ", len(datasets))
+            
+            # 记录“本批最后一个 task_id”，供下一批计算偏移
+            if rotate_static and datasets:
+                try:
+                    self._last_used_task_id = str(datasets[-1]["task_id"])
+                except Exception:
+                    self._last_used_task_id = None
                 
             # 保存采样数据，用于检查
             try:
-                dump_dir = "debug_datasets"
-                os.makedirs(dump_dir, exist_ok=True)
+                dt = time.strftime("%Y%m%d")
                 ts = time.strftime("%Y%m%d-%H%M%S")
-                dump_base = f"datasets_step{self.produced_batches}_w{worker_id}_{ts}"
+                dump_dir = f"debug_datasets/{self.run_id.split('/')[-1]}_{dt}"
+                os.makedirs(dump_dir, exist_ok=True)
+                dump_base = f"datasets_step{self.produced_batches}_{ts}"
 
                 # 保存完整样本列表
                 with open(os.path.join(dump_dir, dump_base + ".json"), "w", encoding="utf-8") as f:
@@ -416,12 +448,13 @@ def main(run_id, root_data_dir):
     cfg = OmegaConf.create({
         "run_id": run_id,
         "steps_per_epoch": 3,
-        "train_batch_size_min": 4,
-        "train_batch_size_max": 8,
+        "train_batch_size_min": 1,
+        "train_batch_size_max": 2,
         "rollout_n": 8,
         "top_mvs_n": 2,
         "poll_interval_sec": 30,
         "root_data_dir": root_data_dir,
+        "rotate_task_groups": True,
         # 你也可以按需加：cache_dir / use_call_user / prompt_key / image_key / video_key 等
     })
 
@@ -477,6 +510,6 @@ def main(run_id, root_data_dir):
 
 if __name__ == "__main__":
     
-    run_id = "results/test_for_train_pass8_gpu8_env77_20250817_1345"
+    run_id = "results/pass@32_trainset90"
     root_data_dir = "/workspace/computer-use/computer-use-rollout/results/test_for_train_pass8_gpu8_env77_20250817_1345"
     main(run_id, root_data_dir)
