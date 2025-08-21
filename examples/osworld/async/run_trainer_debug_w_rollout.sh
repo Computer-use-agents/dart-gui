@@ -81,7 +81,7 @@ fsdp_size=32
 ## message splitter
 limit_messages=35
 splitter=sliding_window
-window_size=5
+window_size=5 
 stride_size=5
 max_steps=100
 
