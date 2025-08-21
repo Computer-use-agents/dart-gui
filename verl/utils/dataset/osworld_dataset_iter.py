@@ -335,7 +335,9 @@ class OSWorldAsyncDataset(IterableDataset):
             # 限制最大数量
             max_allowed = self.batch_size_max * self.rollout_n
             if len(datasets) > max_allowed:
-                datasets = datasets[:max_allowed]
+                # datasets = datasets[:max_allowed]
+                # pengxiang debug
+                datasets = datasets[:8]
             print("len data after filtered: ", len(datasets))
             
             # 记录“本批最后一个 task_id”，供下一批计算偏移

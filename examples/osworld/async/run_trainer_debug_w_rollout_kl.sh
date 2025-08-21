@@ -36,10 +36,10 @@ export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
 export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-export RUN_ID=pengxiang_test_0821
-export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-
+export RUN_ID=pengxiang_test_0821_kl
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0813_h8zdohoq
+export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
@@ -50,10 +50,10 @@ adv_estimator=grpo
 
 use_kl_in_reward=False
 kl_coef=0.0
-use_kl_loss=False
-kl_loss_coef=0.0
+use_kl_loss=True
+kl_loss_coef=0.01
 
-clip_ratio_low=0.1
+clip_ratio_low=0.2
 clip_ratio_high=0.28
 
 
@@ -116,6 +116,7 @@ python3 -m verl.trainer.main_ppo_async \
     reward_model.reward_manager=osworld \
     actor_rollout_ref.actor.use_kl_loss=${use_kl_loss} \
     actor_rollout_ref.actor.kl_loss_coef=${kl_loss_coef} \
+    actor_rollout_ref.actor.kl_loss_type=low_var_kl \
     actor_rollout_ref.actor.clip_ratio_low=${clip_ratio_low} \
     actor_rollout_ref.actor.clip_ratio_high=${clip_ratio_high} \
     actor_rollout_ref.actor.clip_ratio_c=10.0 \
@@ -134,7 +135,6 @@ python3 -m verl.trainer.main_ppo_async \
     "actor_rollout_ref.actor.checkpoint.save_contents=['model', 'optimizer', 'extra', 'hf_model']" \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.ref.fsdp_config.param_offload=${offload} \
-    actor_rollout_ref.ref.ulysses_sequence_parallel_size=${sp_size} \
     "trainer.logger=['console','swanlab']" \
     trainer.project_name='verl_osworld_grpo' \
     trainer.experiment_name=$EXPERIMENT_NAME \
@@ -149,7 +149,7 @@ python3 -m verl.trainer.main_ppo_async \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \
     +trainer.splitter_parallel=False\
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=$ENGINE \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
@@ -161,7 +161,7 @@ python3 -m verl.trainer.main_ppo_async \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
     +actor_rollout_ref.rollout.server_url=$ROLLOUT_SERVER_URL \
-    +actor_rollout_ref.actor.offline=false \
+    +actor_rollout_ref.actor.offline=True \
     #  +trainer.splitter=sliding_window \
     # 
     #     trainer.experiment_name="osworld_all_feasible_reward_script_grpo_k8s_0802_16_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 6 | head -n 1)" \

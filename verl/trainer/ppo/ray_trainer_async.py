@@ -174,16 +174,13 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
 
                     # compute global_valid tokens
                     batch.meta_info["global_token_num"] = torch.sum(batch.batch["attention_mask"], dim=-1).tolist()
+
+
+
+
                     # recompute old_log_probs
-                    
                     with marked_timer("old_log_prob", timing_raw):
-                        if self.config.actor_rollout_ref.actor.offline:
-                            print(f"Computing old log prob in offline mode, using actor_rollout_ref")
-                            old_log_prob = self.actor_rollout_wg.compute_ref_log_prob(batch, self.config.actor_rollout_ref.actor.offline)
-
-                        else:
-                            old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)
-
+                        old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)
                         entropys = old_log_prob.batch["entropys"]
                         response_masks = batch.batch["response_mask"]
                         loss_agg_mode = self.config.actor_rollout_ref.actor.loss_agg_mode
@@ -217,16 +214,48 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                                     "training/rollout_probs_diff_std": rollout_probs_diff_std.detach().item(),
                                 }
                             )
+                    # # compute reference log_prob
+                    # if self.use_reference_policy:
+                    #     with marked_timer("ref", timing_raw):
+                    #         print("Computing ref log prob")
+                    #         if not self.ref_in_actor:
+                    #             print("Computing ref log prob in ref_policy_wg")
+                    #             ref_log_prob = self.ref_policy_wg.compute_ref_log_prob(batch)
+                    #         else:
+                    #             print("Computing ref log prob in actor_rollout_wg")
+                    #             ref_log_prob = self.actor_rollout_wg.compute_ref_log_prob(batch)
+                    #         batch = batch.union(ref_log_prob)
+                    #     if self.config.actor_rollout_ref.actor.offline:
+                    #         print(f"Computing old log prob in offline mode, using actor_rollout_ref")
+                    #         # old_log_prob = self.actor_rollout_wg.compute_ref_log_prob(batch, self.config.actor_rollout_ref.actor.offline)
+                    #         old_log_prob = DataProto.from_dict(tensors={"old_log_probs": ref_log_prob.batch["ref_log_prob"]})
+                    #         batch = batch.union(old_log_prob)
 
+                    # compute reference log_prob
                     if self.use_reference_policy:
-                        # compute reference log_prob
                         with marked_timer("ref", timing_raw):
+                            print("Computing ref log prob")
                             if not self.ref_in_actor:
+                                print("Computing ref log prob in ref_policy_wg")
                                 ref_log_prob = self.ref_policy_wg.compute_ref_log_prob(batch)
                             else:
+                                print("Computing ref log prob in actor_rollout_wg")
                                 ref_log_prob = self.actor_rollout_wg.compute_ref_log_prob(batch)
                             batch = batch.union(ref_log_prob)
-
+                        if self.config.actor_rollout_ref.actor.offline:
+                            print(f"Computing old log prob in offline mode, using ref_log_prob to replace old_log_prob")
+                            # old_log_prob = self.actor_rollout_wg.compute_ref_log_prob(batch, self.config.actor_rollout_ref.actor.offline)
+                            # Directly update the old_log_probs in batch instead of union to avoid key conflict
+                            print(f"Type of old_log_probs: {type(batch.batch['old_log_probs'])}")
+                            print(f"Type of ref_log_prob: {type(ref_log_prob.batch['ref_log_prob'])}")
+                            try:
+                                # print the shape of old_log_probs and ref_log_prob
+                                print(f"Shape of old_log_probs: {batch.batch['old_log_probs'].shape}")
+                                print(f"Shape of ref_log_prob: {ref_log_prob.batch['ref_log_prob'].shape}")
+                            except Exception as e:
+                                print(f"Error in printing shapes: {e}")
+                            # batch.batch["old_log_probs"] = ref_log_prob.batch["ref_log_prob"]
+                            batch.batch["old_log_probs"] = ref_log_prob.batch["ref_log_prob"]
                     # compute values
                     if self.use_critic:
                         with marked_timer("values", timing_raw):

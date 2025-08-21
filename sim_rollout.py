@@ -202,7 +202,7 @@ def simulate_rollout(
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simulated rollout producer for trainer unit tests.")
     parser.add_argument("--json", default="data/train/data_pass@32_trainset90.json", help="Path to the static JSON data.")
-    parser.add_argument("--run-id", default="results/pass@32_trainset90", help="Run ID to write into DB rows.")
+    parser.add_argument("--run-id", default="pengxiang_test_0821_kl", help="Run ID to write into DB rows.")
     parser.add_argument("--rate", type=int, default=16, help="Insert rate per minute.")
     parser.add_argument("--start-index", type=int, default=0, help="Start from this index in the JSON list.")
     parser.add_argument("--limit", type=int, default=None, help="Only process this many items.")

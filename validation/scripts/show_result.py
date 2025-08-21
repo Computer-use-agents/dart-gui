@@ -12,7 +12,7 @@ def get_result(target_dir):
     infeasible_result = []
     infeasible_steps = []
     all_result_for_analysis = {}
-
+    print("Processing example:", len(os.listdir(target_dir)))
     for example_id in os.listdir(target_dir):
         
         example_path = os.path.join(target_dir, example_id)
@@ -112,7 +112,11 @@ if __name__ == '__main__':
     print("Start to get results... STEP 0 (uitars_1.5_7b_90_train)")
     get_result("validation/results/uitars_1.5_7b_90_train_pure")
     print("Start to get results... bz8 STEP 10")
-    get_result("validation/results/pass32_20250812_1010_all_pass32_gpu8_env70")
-    print("Start to get results... bz4 STEP 24")
-    get_result("validation/results/step24")
+    # get_result("validation/results/pass32_20250812_1010_all_pass32_gpu8_env70")
+    # print("Start to get results... bz4 STEP 24")
+    # get_result("validation/results/step24")
+    get_result("validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco/global_step_10")
+    
+    print("Start to get results... bz8 STEP 10 RUN2")
+    get_result("validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco/global_step_10_run2")
     
