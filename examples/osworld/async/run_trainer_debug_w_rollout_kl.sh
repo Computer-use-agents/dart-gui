@@ -3,7 +3,7 @@ pip install cryptography
 
 set -x
 ENGINE=${1:-vllm_osworld}
-cd /workspace/computer-use/verl
+cd /root/verl
 
 # Initialize Ray cluster for multi-node training
 # Make sure Ray is running on all nodes before executing this script
@@ -51,9 +51,9 @@ adv_estimator=grpo
 use_kl_in_reward=False
 kl_coef=0.0
 use_kl_loss=True
-kl_loss_coef=0.01
+kl_loss_coef=0.0001
 
-clip_ratio_low=0.2
+clip_ratio_low=0.1
 clip_ratio_high=0.28
 
 
@@ -107,7 +107,7 @@ python3 -m verl.trainer.main_ppo_async \
     +data.max_steps=${max_steps} \
     +data.num_workers=0 \
     +data.run_id=$RUN_ID \
-    +data.steps_per_epoch=100 \
+    +data.steps_per_epoch=50 \
     +data.train_batch_size_min=${train_bz_min} \
     +data.train_batch_size_max=${train_bz_max} \
     algorithm.adv_estimator=${adv_estimator} \
