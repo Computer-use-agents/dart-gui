@@ -396,6 +396,7 @@ class DataParallelPPOActor(BasePPOActor):
                 data.batch.batch_size[0], 
                 self.config.ppo_mini_batch_size
             )
+            print(f"data.batch.batch_size[0] = {data.batch.batch_size}, mini bz = {self.config.ppo_mini_batch_size}, chunks = {num_mini_batches}")
             dataloader = data.select(select_keys, non_tensor_select_keys).chunk(num_mini_batches)
         else:
             dataloader = batch.split(self.config.ppo_mini_batch_size)

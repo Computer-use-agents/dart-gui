@@ -365,6 +365,7 @@ class DataProto:
         # get and check batch size
         batch_size = None
         pivot_key = None
+        
         for key, tensor in tensors.items():
             if batch_size is None:
                 batch_size = tensor.shape[:num_batch_dims]
@@ -380,6 +381,8 @@ class DataProto:
         tensor_dict = TensorDict(source=tensors, batch_size=batch_size) if tensors else None
         if auto_padding:
             meta_info[DataProtoConfig.auto_padding_key] = True
+            
+        print(f"batch_size {batch_size} check with num_batch_dims={num_batch_dims}")
         return cls(batch=tensor_dict, non_tensor_batch=non_tensors, meta_info=meta_info)
 
     def to(self, device) -> "DataProto":

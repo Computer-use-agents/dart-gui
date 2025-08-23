@@ -36,7 +36,7 @@ export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
 export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-export RUN_ID=pengxiang_test_0823_slidingwindow
+export RUN_ID=pengxiang_test_0823_stepwise
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
 export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 
@@ -58,7 +58,7 @@ clip_ratio_high=0.28
 
 
 max_prompt_length=32000
-max_response_length=32000
+max_response_length=2000
 
 loss_agg_mode="token-mean"
 
@@ -81,7 +81,7 @@ fsdp_size=32
 
 ## message splitter
 limit_messages=35
-splitter=sliding_window
+splitter=stepwise
 window_size=5 
 stride_size=5
 max_steps=100
@@ -92,8 +92,8 @@ python3 -m verl.trainer.main_ppo_async \
     data.val_files=evaluation_examples/filtered_test_all.json \
     data.train_batch_size=${train_prompt_bsz} \
     data.val_batch_size=4 \
-    data.max_prompt_length=32000 \
-    data.max_response_length=32000 \
+    data.max_prompt_length=${max_prompt_length} \
+    data.max_response_length=${max_response_length} \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
     data.image_key=images \
@@ -125,14 +125,14 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=${train_prompt_mini_bsz} \
-    actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
+    actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.actor.fsdp_config.param_offload=${offload} \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=${offload} \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.grad_clip=10.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     "actor_rollout_ref.actor.checkpoint.save_contents=['model', 'optimizer', 'extra', 'hf_model']" \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.ref.fsdp_config.param_offload=${offload} \
     actor_rollout_ref.ref.ulysses_sequence_parallel_size=${sp_size} \
     "trainer.logger=['console','swanlab']" \
@@ -149,7 +149,7 @@ python3 -m verl.trainer.main_ppo_async \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \
     +trainer.splitter_parallel=False\
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=$ENGINE \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \

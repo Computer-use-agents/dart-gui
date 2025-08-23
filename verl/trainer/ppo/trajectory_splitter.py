@@ -103,6 +103,8 @@ class TrajectorySplitter:
                 reward=reward_tensor[idx].item()
             )
             batch_output += batch_tokenized_messages
+        # pengxiang debug
+        batch_output = batch_output[:128]
         batch_output = collate_fn(batch_output)
         return batch_output
 
@@ -330,7 +332,7 @@ class TrajectorySplitter:
                     attention_mask=attention_mask,
                     max_length=self.max_prompt_length,
                     pad_token_id=self.processor.tokenizer.pad_token_id,
-                    left_pad=True,
+                    left_pad=False,
                     truncation=self.truncation,
                 )
         except Exception as e:
