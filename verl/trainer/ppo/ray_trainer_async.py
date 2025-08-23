@@ -160,9 +160,9 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     else:
                         batch = splitter.split(dataset_ids, reward_tensor)
                                          
-                    if self.global_steps == 11:               
+                    if self.global_steps == 1:               
                         save_path = save_batch_for_viz(
-                            batch, json_path="viz/batch_step11.json",
+                            batch, json_path="viz/batch_step1.json",
                             max_samples=4
                         )
                         print(f"[viz] saved debug batch -> {save_path}")
@@ -363,6 +363,17 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             print("Inserting checkpoint path into MySQL database...")
                             db_manager = create_database_manager()
                             db_manager.insert_checkpoint(abs_path_actor_hf, run_id=self.run_id)
+                            
+                            #统计第step-2个版本模型的平均成功率
+                            avg_nonneg, count_all, distinct_task_cnt = db_manager.get_nth_newest_model_success(run_id=self.run_id, n=3)
+                            # rollout metrics
+                            metrics.update(
+                                {
+                                    "rollout/succ_rate": avg_nonneg,
+                                    "rollout/traj_count": count_all,
+                                    "rollout/task_count": distinct_task_cnt
+                                }
+                            )
                             db_manager.close_database()
                             print("Checkpoint path inserted into MySQL database.")
 
@@ -412,7 +423,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
             import random
             dataset_ids = batch.non_tensor_batch["dataset_ids"]
             target_size = (len(batch) // n_mod + 1) * n_mod
-            up_sample_size = target_size - len(batch)
+            up_sample_size = target_size - len(batch) 
             print("Need upsample", up_sample_size)
             idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
             upsampel_batch = batch.select_idxs(idx)
