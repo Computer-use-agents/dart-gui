@@ -66,7 +66,7 @@ loss_agg_mode="seq-mean-token-mean"
 
 
 train_bz_min=4
-train_bz_max=8
+train_bz_max=6
 train_prompt_bsz=8
 rollout_n=8
 train_prompt_mini_bsz=64
@@ -76,7 +76,7 @@ sp_size=4
 use_dynamic_bsz=False
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
-offload=False
+offload=True
 gen_tp=4
 fsdp_size=32
 
@@ -127,14 +127,14 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=${train_prompt_mini_bsz} \
-    actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.actor.fsdp_config.param_offload=${offload} \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=${offload} \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.grad_clip=10.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     "actor_rollout_ref.actor.checkpoint.save_contents=['model', 'optimizer', 'extra', 'hf_model']" \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.ref.fsdp_config.param_offload=${offload} \
     actor_rollout_ref.ref.ulysses_sequence_parallel_size=${sp_size} \
     "trainer.logger=['console','swanlab']" \
