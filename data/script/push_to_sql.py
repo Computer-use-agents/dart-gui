@@ -15,12 +15,6 @@ def load_data_from_json(json_path, run_id, model_version="ui-tars-1.5-7b"):
     print(f"加载数据长度: {len(data)}") 
     for item in tqdm(data):
         print(item)
-        # try:
-        #     db_manager.delete_dataset(item["trajectory_id"])
-        #     print(f"Deleted dataset: {item['trajectory_id']}")
-        # except Exception as e:
-        #     print(f"Already deleted dataset: {e}")
-        #     continue
         db_manager.create_dataset(
             trajectory_id=item["trajectory_id"],
             run_id=run_id,

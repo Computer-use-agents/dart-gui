@@ -375,120 +375,88 @@ class DataParallelPPOActor(BasePPOActor):
         self.actor_module.train()
 
         temperature = data.meta_info["temperature"]  # temperature must be in the data.meta_info to avoid silent error
-        multi_turn = data.meta_info.get("multi_turn", False)
 
-        select_keys = ["responses", "input_ids", "attention_mask", "position_ids", "old_log_probs", "advantages"]
-        if multi_turn:
-            select_keys.append("loss_mask")
+        select_keys = [
+            "responses",
+            "response_mask",
+            "input_ids",
+            "attention_mask",
+            "position_ids",
+            "old_log_probs",
+            "advantages",
+        ]
         if self.config.use_kl_loss:
             select_keys.append("ref_log_prob")
-        batch = data.select(batch_keys=select_keys).batch
+
         has_multi_modal_inputs = "multi_modal_inputs" in data.non_tensor_batch.keys()
+        non_tensor_select_keys = ["multi_modal_inputs"] if has_multi_modal_inputs else []
+        print(f"data len before selection: {len(data)}")
+        print(f"data batch size before selection: {data.batch.batch_size}")
+        data = data.select(batch_keys=select_keys, non_tensor_batch_keys=non_tensor_select_keys)
 
         # Split to make minibatch iterator for updating the actor
         # See PPO paper for details. https://arxiv.org/abs/1707.06347
-        if has_multi_modal_inputs:
-            num_mini_batches = data.batch.batch_size[0] // self.config.ppo_mini_batch_size
-            non_tensor_select_keys = ["multi_modal_inputs"]
-            print(
-                "Split batch size", 
-                num_mini_batches,  
-                data.batch.batch_size[0], 
-                self.config.ppo_mini_batch_size
-            )
-            print(f"data.batch.batch_size[0] = {data.batch.batch_size}, mini bz = {self.config.ppo_mini_batch_size}, chunks = {num_mini_batches}")
-            dataloader = data.select(select_keys, non_tensor_select_keys).chunk(num_mini_batches)
-        else:
-            dataloader = batch.split(self.config.ppo_mini_batch_size)
+        mini_batches = data.split(self.config.ppo_mini_batch_size)
+        print(f"Update policy, total data {len(data)}, num mini batches: {len(mini_batches)}, mini_batch_size: {self.config.ppo_mini_batch_size}")
+
+        on_policy = len(mini_batches) == 1 and self.config.ppo_epochs == 1
 
         metrics = {}
-        for epoch in range(self.config.ppo_epochs):
-            for batch_idx, data in enumerate(dataloader):
-                # split batch into micro_batches
-                mini_batch = data
-                if has_multi_modal_inputs:
-                    micro_batches = []
-                    if self.config.use_dynamic_bsz:
-                        all_multi_modal_inputs_list = data.non_tensor_batch["multi_modal_inputs"]
-                        batch_tensordict_for_rearrange = data.batch
-
-                        max_token_len = self.config.ppo_max_token_len_per_gpu * self.ulysses_sequence_parallel_size
-                        rearranged_text_micro_batches_tds, textual_indices = rearrange_micro_batches(batch=batch_tensordict_for_rearrange, max_token_len=max_token_len)
-
-                        for current_original_indices, text_mb_td in zip(textual_indices, rearranged_text_micro_batches_tds):
-                            current_mm_inputs_list = [all_multi_modal_inputs_list[idx] for idx in current_original_indices]
-                            mb_dict = {k: v for k, v in text_mb_td.items()}
-                            mb_dict["multi_modal_inputs"] = current_mm_inputs_list
-                            micro_batches.append(mb_dict)
-                    else:
-                        self.gradient_accumulation = self.config.ppo_mini_batch_size // self.config.ppo_micro_batch_size_per_gpu
-                        num_micro_batches = mini_batch.batch.batch_size[0] // self.config.ppo_micro_batch_size_per_gpu
-                        micro_batches = data.select(select_keys, non_tensor_select_keys).chunk(num_micro_batches)
-                elif self.config.use_dynamic_bsz:
+        for _ in range(self.config.ppo_epochs):
+            for batch_idx, mini_batch in enumerate(mini_batches):
+                print(f"Update policy, mini batch idx {batch_idx}, mini_batch size: {len(mini_batch)}")
+                if self.config.use_dynamic_bsz:
                     max_token_len = self.config.ppo_max_token_len_per_gpu * self.ulysses_sequence_parallel_size
-                    micro_batches, _ = rearrange_micro_batches(batch=mini_batch, max_token_len=max_token_len)
+                    micro_batches, _ = prepare_dynamic_batch(mini_batch, max_token_len=max_token_len)
                 else:
-                    self.gradient_accumulation = self.config.ppo_mini_batch_size // self.config.ppo_micro_batch_size_per_gpu
-                    # split batch into micro_batches
+                    self.gradient_accumulation = (
+                        self.config.ppo_mini_batch_size // self.config.ppo_micro_batch_size_per_gpu
+                    )
                     micro_batches = mini_batch.split(self.config.ppo_micro_batch_size_per_gpu)
 
                 self.actor_optimizer.zero_grad()
 
-                for data in micro_batches:
-                    # Support all hardwares
-                    if isinstance(data, DataProto):
-                        data = {**data.batch.to(get_device_id()), **data.non_tensor_batch}
-                    elif isinstance(data, dict):
-                        for k, v in data.items():
-                            if isinstance(v, torch.Tensor):
-                                data[k] = v.to(get_device_id())
-                            elif k == "multi_modal_inputs" and v is not None:
-                                data[k] = [{kk: vv.to(get_device_id()) for kk, vv in item_dict.items()} for item_dict in v]
-                            else:
-                                data[k] = v
-                    else:
-                        data = data.to(get_device_id())  # actor device is cpu when using offload
-                    responses = data["responses"]
-                    response_length = responses.size(1)
-                    attention_mask = data["attention_mask"]
-                    if multi_turn:
-                        response_mask = data["loss_mask"][:, -response_length:]
-                    else:
-                        response_mask = attention_mask[:, -response_length:]
+                for micro_batch in micro_batches:
+                    micro_batch = micro_batch.to(get_device_id())
+                    micro_batch_metrics = {}
+                    model_inputs = {**micro_batch.batch, **micro_batch.non_tensor_batch}
+                    response_mask = model_inputs["response_mask"]
+                    advantages = model_inputs["advantages"]
 
-                    old_log_prob = data["old_log_probs"]
-                    advantages = data["advantages"]
-
-                    clip_ratio = self.config.clip_ratio
-                    clip_ratio_low = self.config.clip_ratio_low if self.config.clip_ratio_low is not None else clip_ratio
-                    clip_ratio_high = self.config.clip_ratio_high if self.config.clip_ratio_high is not None else clip_ratio
-                    clip_ratio_c = self.config.get("clip_ratio_c", 3.0)
                     entropy_coeff = self.config.entropy_coeff
                     loss_agg_mode = self.config.loss_agg_mode
+
+                    if self.config.use_dynamic_bsz:
+                        loss_scale_factor = response_mask.shape[0] / self.config.ppo_mini_batch_size
+                    else:
+                        loss_scale_factor = 1 / self.gradient_accumulation
 
                     # all return: (bsz, response_length)
                     calculate_entropy = False
                     if entropy_coeff != 0:
                         calculate_entropy = True
-                    entropy, log_prob = self._forward_micro_batch(micro_batch=data, temperature=temperature, calculate_entropy=calculate_entropy)
+                    entropy, log_prob = self._forward_micro_batch(
+                        model_inputs, temperature=temperature, calculate_entropy=calculate_entropy
+                    )
+
+                    if on_policy:
+                        old_log_prob = log_prob.detach()
+                    else:
+                        old_log_prob = model_inputs["old_log_probs"]
 
                     loss_mode = self.config.policy_loss.get("loss_mode", "vanilla")
-
-                    if self.config.policy_loss.loss_mode == "vanilla":
-                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower,pg_loss_no_old = compute_policy_loss(
-                            old_log_prob=old_log_prob,
-                            log_prob=log_prob,
-                            advantages=advantages,
-                            response_mask=response_mask,
-                            cliprange=clip_ratio,
-                            cliprange_low=clip_ratio_low,
-                            cliprange_high=clip_ratio_high,
-                            clip_ratio_c=clip_ratio_c,
-                            loss_agg_mode=loss_agg_mode,
-                        )
-                    else:
-                        policy_loss_fn = get_policy_loss_fn(loss_mode)
-                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower,pg_loss_no_old = policy_loss_fn(old_log_prob, log_prob, advantages, response_mask, loss_agg_mode, self.config)
+                    # vanilla -> verl.trainer.ppo.core_algos.compute_policy_loss_vanilla
+                    # gpg -> verl.trainer.ppo.core_algos.compute_policy_loss_gpg
+                    # clip_cov -> verl.trainer.ppo.core_algos.compute_policy_loss_clip_cov
+                    policy_loss_fn = get_policy_loss_fn(loss_mode)
+                    pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower = policy_loss_fn(
+                        old_log_prob=old_log_prob,
+                        log_prob=log_prob,
+                        advantages=advantages,
+                        response_mask=response_mask,
+                        loss_agg_mode=loss_agg_mode,
+                        config=self.config,
+                    )
 
                     if entropy_coeff != 0:
                         entropy_loss = agg_loss(loss_mat=entropy, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
@@ -499,20 +467,22 @@ class DataParallelPPOActor(BasePPOActor):
                         policy_loss = pg_loss
 
                     if self.config.use_kl_loss:
-                        ref_log_prob = data["ref_log_prob"]
+                        ref_log_prob = model_inputs["ref_log_prob"]
                         # compute kl loss
-                        kld = kl_penalty(logprob=log_prob, ref_logprob=ref_log_prob, kl_penalty=self.config.kl_loss_type)
+                        kld = kl_penalty(
+                            logprob=log_prob, ref_logprob=ref_log_prob, kl_penalty=self.config.kl_loss_type
+                        )
                         kl_loss = agg_loss(loss_mat=kld, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
 
                         policy_loss = policy_loss + kl_loss * self.config.kl_loss_coef
-                        metrics["actor/kl_loss"] = kl_loss.detach().item()
-                        metrics["actor/kl_coef"] = self.config.kl_loss_coef
+                        micro_batch_metrics["actor/kl_loss"] = kl_loss.detach().item() * loss_scale_factor
+                        micro_batch_metrics["actor/kl_coef"] = self.config.kl_loss_coef
 
                     if self.config.use_dynamic_bsz:
                         # relative to the dynamic bsz
-                        loss = policy_loss * (len(data) / self.config.ppo_mini_batch_size)
+                        loss = policy_loss * loss_scale_factor
                     else:
-                        loss = policy_loss / self.gradient_accumulation
+                        loss = policy_loss * loss_scale_factor
                     loss.backward()
 
                     data = {
@@ -521,8 +491,6 @@ class DataParallelPPOActor(BasePPOActor):
                         "actor/log_prob_mean": log_prob.mean().detach().item(),
                         "actor/old_log_prob_mean": old_log_prob.mean().detach().item(),
                         "actor/pg_loss": pg_loss.detach().item(),
-                        "actor/pg_loss_no_old": pg_loss_no_old.detach().item(),
-                        "actor/loss": loss.detach().item(),
                         "actor/pg_clipfrac": pg_clipfrac.detach().item(),
                         "actor/ppo_kl": ppo_kl.detach().item(),
                         "actor/pg_clipfrac_lower": pg_clipfrac_lower.detach().item(),
@@ -530,9 +498,7 @@ class DataParallelPPOActor(BasePPOActor):
                     append_to_dict(metrics, data)
 
                 grad_norm = self._optimizer_step()
-                print("call optimizer step, update actor")
                 data = {"actor/grad_norm": grad_norm.detach().item()}
                 append_to_dict(metrics, data)
         self.actor_optimizer.zero_grad()
-
         return metrics

@@ -67,7 +67,7 @@ train_bz_min=4
 train_bz_max=8
 train_prompt_bsz=8
 rollout_n=8
-train_prompt_mini_bsz=8
+train_prompt_mini_bsz=64
 
 # Performance Related Parameter
 sp_size=4

@@ -600,12 +600,22 @@ def compute_policy_loss(
     assert clip_ratio_c > 1.0, "The lower bound of the clip_ratio_c for dual-clip PPO should be greater than 1.0," + f" but get the value: {clip_ratio_c}."
 
     negative_approx_kl = log_prob - old_log_prob
+    # negative_approx_kl = log_prob 
     # Clamp negative_approx_kl for stability
     negative_approx_kl = torch.clamp(negative_approx_kl, min=-20.0, max=20.0)
     ratio = torch.exp(negative_approx_kl)
     ppo_kl = verl_F.masked_mean(-negative_approx_kl, response_mask)
 
     pg_losses1 = -advantages * ratio
+    # pengxiang debug
+    # pg_loss = agg_loss(loss_mat=pg_losses1, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
+    # pg_clipfrac = torch.tensor(0.0, device=pg_loss.device)
+    # pg_clipfrac_lower = torch.tensor(0.0, device=pg_loss.device)
+    # return pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower
+
+    pg_loss_no_old =  -advantages * torch.exp(log_prob)
+    pg_loss_no_old = agg_loss(loss_mat=pg_loss_no_old, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
+
     if cliprange_low is None:
         cliprange_low = cliprange
     if cliprange_high is None:
@@ -621,7 +631,7 @@ def compute_policy_loss(
     pg_losses = torch.where(advantages < 0, clip_pg_losses2, clip_pg_losses1)
     pg_loss = agg_loss(loss_mat=pg_losses, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
 
-    return pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower
+    return pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower, pg_loss_no_old
 
 
 @register_policy_loss("clip_cov")

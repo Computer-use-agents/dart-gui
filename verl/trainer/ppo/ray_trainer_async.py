@@ -181,10 +181,18 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         self.actor_rollout_wg.world_size, 
                         config.actor.ppo_mini_batch_size
                     )
+
                     if "reward_tensor" in batch.batch.keys():
                         reward_tensor = batch.batch.pop("reward_tensor")
                         print("Reward tensor is refreshed!", reward_tensor.shape)
-
+                    with marked_timer("reward", timing_raw):
+                        # compute reward model score
+                        trajectory_metrics = {
+                            "critic/trajectory_score/mean": torch.mean(reward_tensor).detach().item(),
+                            "critic/trajectory_score/max": torch.max(reward_tensor).detach().item(),
+                            "critic/trajectory_score/min": torch.min(reward_tensor).detach().item(),
+                        }    
+                        metrics.update(trajectory_metrics)
                     # compute global_valid tokens
                     batch.meta_info["global_token_num"] = torch.sum(batch.batch["attention_mask"], dim=-1).tolist()
 
@@ -270,6 +278,8 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                                 print(f"Error in printing shapes: {e}")
                             # batch.batch["old_log_probs"] = ref_log_prob.batch["ref_log_prob"]
                             batch.batch["old_log_probs"] = ref_log_prob.batch["ref_log_prob"]
+                            metrics.update(
+                                    { "actor/ref_log_prob_mean": ref_log_prob.batch["ref_log_prob"].mean().detach().item(),})
                     # compute values
                     if self.use_critic:
                         print("Using critic, computing values!")
@@ -410,50 +420,52 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     progress_bar.close()
                     return
     
-    def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
-        n_mod = ppo_mini_batch_size
-        if len(batch) % n_mod == 0:
-            return batch
-        print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
-        try:
-            import random
-            dataset_ids = batch.non_tensor_batch["dataset_ids"]
-            target_size = (len(batch) // n_mod + 1) * n_mod
-            up_sample_size = target_size - len(batch)
-            print("Need upsample", up_sample_size)
-            idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
-            upsampel_batch = batch.select_idxs(idx)
-            batch = DataProto.concat([batch, upsampel_batch])
-            print("After upsample", len(batch))
-        except Exception as e:
-            print("_up_sample failed due to", e)
-
-        return batch
-
     # def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
-    #     n_mod = world_size * ppo_mini_batch_size
+    #     n_mod = ppo_mini_batch_size
     #     if len(batch) % n_mod == 0:
     #         return batch
-       
+    #     print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
     #     try:
     #         import random
     #         dataset_ids = batch.non_tensor_batch["dataset_ids"]
-
-    #         if len(batch) > n_mod:
-    #             print("[Warning] batch size larger than world size, need downsample! current batch size:", len(batch), n_mod)
-    #             idx = random.choices(list(range(len(dataset_ids))), k=n_mod)
-    #             downsampled_batch = batch.select_idxs(idx)
-    #             return downsampled_batch
-    #         else:
-    #             print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
-    #             target_size = (len(batch) // n_mod + 1) * n_mod
-    #             up_sample_size = target_size - len(batch)
-    #             print("Need upsample", up_sample_size)
-    #             idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
-    #             upsampel_batch = batch.select_idxs(idx)
-    #             batch = DataProto.concat([batch, upsampel_batch])
-    #             print("After upsample", len(batch))
+    #         target_size = (len(batch) // n_mod + 1) * n_mod
+    #         up_sample_size = target_size - len(batch)
+    #         print("Need upsample", up_sample_size)
+    #         # idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
+    #         idx = list(range(up_sample_size))
+    #         upsampel_batch = batch.select_idxs(idx)
+    #         batch = DataProto.concat([batch, upsampel_batch])
+    #         print("After upsample", len(batch))
     #     except Exception as e:
     #         print("_up_sample failed due to", e)
 
-    #     return batch    
+    #     return batch
+
+    def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
+        n_mod = world_size * ppo_mini_batch_size
+        if len(batch) % n_mod == 0:
+            return batch
+       
+        try:
+            import random
+            dataset_ids = batch.non_tensor_batch["dataset_ids"]
+
+            if len(batch) > n_mod:
+                print("[Warning] batch size larger than world size, need downsample! current batch size:", len(batch), n_mod)
+                idx = random.choices(list(range(len(dataset_ids))), k=n_mod)
+                downsampled_batch = batch.select_idxs(idx)
+                return downsampled_batch
+            else:
+                print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
+                target_size = (len(batch) // n_mod + 1) * n_mod
+                up_sample_size = target_size - len(batch)
+                print("Need upsample", up_sample_size)
+                idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
+                upsampel_batch = batch.select_idxs(idx)
+                batch = DataProto.concat([batch, upsampel_batch])
+                print("After upsample", len(batch))
+        except Exception as e:
+            print("_up_sample failed due to", e)
+
+        return batch    
+# # 
