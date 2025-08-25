@@ -201,13 +201,14 @@ def simulate_rollout(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simulated rollout producer for trainer unit tests.")
-    parser.add_argument("--json", default="data/train/data_pass@32_trainset90.json", help="Path to the static JSON data.")
-    parser.add_argument("--run-id", default="pengxiang_test_0823_slidingwindow", help="Run ID to write into DB rows.")
-    parser.add_argument("--rate", type=int, default=16, help="Insert rate per minute.")
+    parser.add_argument("--json", default="data/train/data_pass@8_train90.json", help="Path to the static JSON data.")
+    # parser.add_argument("--run-id", default="pengxiang_test_0824_fixed_4_task", help="Run ID to write into DB rows.")
+    parser.add_argument("--run-id", default="pengxiang_test_0824_stepwise_pass8", help="Run ID to write into DB rows.")
+    parser.add_argument("--rate", type=int, default=26, help="Insert rate per minute.")
     parser.add_argument("--start-index", type=int, default=0, help="Start from this index in the JSON list.")
     parser.add_argument("--limit", type=int, default=None, help="Only process this many items.")
     parser.add_argument("--dry-run", action="store_true", help="Don't write to DB; just print what would happen.")
-    parser.add_argument("--loops", type=int, default=10, help="Maximum number of full loops over the JSON (default: 10).")
+    parser.add_argument("--loops", type=int, default=10000, help="Maximum number of full loops over the JSON (default: 10).")
     parser.add_argument("--bootstrap", type=int, default=256, help="Number of items to insert immediately at startup (default: 256).")
     parser.add_argument(
         "--delete-existing",

@@ -151,3 +151,4 @@ debug_datasets/
 swanlog/
 .venv/
 .vscode/
+trainingdata_sample

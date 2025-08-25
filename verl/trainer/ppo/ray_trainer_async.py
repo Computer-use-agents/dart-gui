@@ -167,8 +167,10 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         )
                         print(f"[viz] saved debug batch -> {save_path}")
                 
-                
+                    # make batch cannot be devidec by world_size_gpu
+                    
                     batch = DataProto.from_single_dict(batch)
+
                     config = self.actor_rollout_wg.get_config()
                     if isinstance(config, list):
                         print("Warning: config is a list?", config)
@@ -179,10 +181,18 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         self.actor_rollout_wg.world_size, 
                         config.actor.ppo_mini_batch_size
                     )
+
                     if "reward_tensor" in batch.batch.keys():
                         reward_tensor = batch.batch.pop("reward_tensor")
                         print("Reward tensor is refreshed!", reward_tensor.shape)
-
+                    with marked_timer("reward", timing_raw):
+                        # compute reward model score
+                        trajectory_metrics = {
+                            "critic/trajectory_score/mean": torch.mean(reward_tensor).detach().item(),
+                            "critic/trajectory_score/max": torch.max(reward_tensor).detach().item(),
+                            "critic/trajectory_score/min": torch.min(reward_tensor).detach().item(),
+                        }    
+                        metrics.update(trajectory_metrics)
                     # compute global_valid tokens
                     batch.meta_info["global_token_num"] = torch.sum(batch.batch["attention_mask"], dim=-1).tolist()
 
@@ -200,6 +210,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         old_log_prob_metrics = {"actor/entropy": entropy_agg.detach().item()}
                         metrics.update(old_log_prob_metrics)
                         old_log_prob.batch.pop("entropys")
+                        print(f"size of old_log_probs: {old_log_prob.batch.batch_size}, {old_log_prob.batch['old_log_probs'].shape}")
                         batch = batch.union(old_log_prob)
 
                         if "rollout_log_probs" in batch.batch.keys():
@@ -267,8 +278,11 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                                 print(f"Error in printing shapes: {e}")
                             # batch.batch["old_log_probs"] = ref_log_prob.batch["ref_log_prob"]
                             batch.batch["old_log_probs"] = ref_log_prob.batch["ref_log_prob"]
+                            metrics.update(
+                                    { "actor/ref_log_prob_mean": ref_log_prob.batch["ref_log_prob"].mean().detach().item(),})
                     # compute values
                     if self.use_critic:
+                        print("Using critic, computing values!")
                         with marked_timer("values", timing_raw):
                             values = self.critic_wg.compute_values(batch)
                             batch = batch.union(values)
@@ -305,6 +319,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             multi_turn=self.config.actor_rollout_ref.rollout.multi_turn.enable,
                             config=self.config.algorithm,
                         )
+                    
 
                     # update critic
                     if self.use_critic:
@@ -318,6 +333,8 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         # update actor
                         with marked_timer("update_actor", timing_raw):
                             batch.meta_info["multi_turn"] = self.config.actor_rollout_ref.rollout.multi_turn.enable
+                            print("Updating actor!")
+                            print(f"Size of batch used for actor update: {batch.batch.batch_size}")
                             actor_output = self.actor_rollout_wg.update_actor(batch)
                         actor_output_metrics = reduce_metrics(actor_output.meta_info["metrics"])
                         metrics.update(actor_output_metrics)
@@ -414,22 +431,52 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     progress_bar.close()
                     return
     
+    # def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
+    #     n_mod = ppo_mini_batch_size
+    #     if len(batch) % n_mod == 0:
+    #         return batch
+    #     print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
+    #     try:
+    #         import random
+    #         dataset_ids = batch.non_tensor_batch["dataset_ids"]
+    #         target_size = (len(batch) // n_mod + 1) * n_mod
+    #         up_sample_size = target_size - len(batch)
+    #         print("Need upsample", up_sample_size)
+    #         # idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
+    #         idx = list(range(up_sample_size))
+    #         upsampel_batch = batch.select_idxs(idx)
+    #         batch = DataProto.concat([batch, upsampel_batch])
+    #         print("After upsample", len(batch))
+    #     except Exception as e:
+    #         print("_up_sample failed due to", e)
+
+    #     return batch
+
     def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
         n_mod = world_size * ppo_mini_batch_size
         if len(batch) % n_mod == 0:
             return batch
-        print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
+       
         try:
             import random
             dataset_ids = batch.non_tensor_batch["dataset_ids"]
-            target_size = (len(batch) // n_mod + 1) * n_mod
-            up_sample_size = target_size - len(batch) 
-            print("Need upsample", up_sample_size)
-            idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
-            upsampel_batch = batch.select_idxs(idx)
-            batch = DataProto.concat([batch, upsampel_batch])
-            print("After upsample", len(batch))
+
+            if len(batch) > n_mod:
+                print("[Warning] batch size larger than world size, need downsample! current batch size:", len(batch), n_mod)
+                idx = random.choices(list(range(len(dataset_ids))), k=n_mod)
+                downsampled_batch = batch.select_idxs(idx)
+                return downsampled_batch
+            else:
+                print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
+                target_size = (len(batch) // n_mod + 1) * n_mod
+                up_sample_size = target_size - len(batch)
+                print("Need upsample", up_sample_size)
+                idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
+                upsampel_batch = batch.select_idxs(idx)
+                batch = DataProto.concat([batch, upsampel_batch])
+                print("After upsample", len(batch))
         except Exception as e:
             print("_up_sample failed due to", e)
 
-        return batch
+        return batch    
+# # 

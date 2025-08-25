@@ -35,10 +35,11 @@ export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
-export ROOT_DATA_DIR=test_for_train_pass8_gpu7_env69_20250821_2333
-export RUN_ID=results/test_for_train_pass8_gpu7_env69_20250821_2333
-export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0813_mfel74uq
-# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0813_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export ROOT_DATA_DIR=data/traj/pass@32_trainset90
+export RUN_ID=pengxiang_test_0823_slidingwindow
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
+export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
@@ -66,7 +67,7 @@ train_bz_min=4
 train_bz_max=8
 train_prompt_bsz=8
 rollout_n=8
-train_prompt_mini_bsz=8
+train_prompt_mini_bsz=64
 
 # Performance Related Parameter
 sp_size=4
@@ -106,7 +107,7 @@ python3 -m verl.trainer.main_ppo_async \
     +data.max_steps=${max_steps} \
     +data.num_workers=0 \
     +data.run_id=$RUN_ID \
-    +data.steps_per_epoch=50 \
+    +data.steps_per_epoch=30 \
     +data.train_batch_size_min=${train_bz_min} \
     +data.train_batch_size_max=${train_bz_max} \
     algorithm.adv_estimator=${adv_estimator} \
@@ -120,7 +121,7 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.clip_ratio_c=10.0 \
     actor_rollout_ref.model.path=$MODEL_PATH \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
-    actor_rollout_ref.actor.optim.lr=1e-7 \
+    actor_rollout_ref.actor.optim.lr=1e-5 \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=${train_prompt_mini_bsz} \
@@ -128,7 +129,7 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.fsdp_config.param_offload=${offload} \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=${offload} \
     actor_rollout_ref.actor.entropy_coeff=0 \
-    actor_rollout_ref.actor.grad_clip=2.0 \
+    actor_rollout_ref.actor.grad_clip=10.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     "actor_rollout_ref.actor.checkpoint.save_contents=['model', 'optimizer', 'extra', 'hf_model']" \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
@@ -148,7 +149,7 @@ python3 -m verl.trainer.main_ppo_async \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \
     +trainer.splitter_parallel=False\
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=$ENGINE \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \

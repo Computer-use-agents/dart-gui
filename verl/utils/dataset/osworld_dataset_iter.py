@@ -208,7 +208,7 @@ class OSWorldAsyncDataset(IterableDataset):
 
     def _close_dbs(self):
         try:
-            self.db_manager.close_database()
+            self.dwob_manager.close_database()
         except Exception:
             pass
 
@@ -292,6 +292,7 @@ class OSWorldAsyncDataset(IterableDataset):
                 top_mvs=top_mvs,
                 random_state=self.config.get("random_state", None),
             )
+            datasets = data
             print("len datasets filtered for this step:", len(datasets))
             
             # 若数量不足，继续轮询等待

@@ -225,11 +225,12 @@ def main():
     """主函数示例"""
     # 示例用法
     baseline_dir = "validation/results/uitars_1.5_7b_90_train_pure"
-    # current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco/global_step_20"
-    current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250822_8vat2940/global_step_25"
-    
+    # current_dir = "/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_trainset90_px_08220031_step30"
+    current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250822_8vat2940/global_step_30"
+    # current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco/global_step_30"
+    # 
     # 对比两个实验
-    compare_results(baseline_dir, current_dir, "Baseline", "Step 20")
+    compare_results(baseline_dir, current_dir, "Baseline", "Step 30")
     
     # 也可以对比多个实验
     # step10_run2_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco/global_step_10_run2"
