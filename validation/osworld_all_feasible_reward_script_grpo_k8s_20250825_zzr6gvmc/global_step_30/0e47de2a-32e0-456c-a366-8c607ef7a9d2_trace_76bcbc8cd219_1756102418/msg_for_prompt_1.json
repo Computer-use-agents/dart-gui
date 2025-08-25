@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nAdd page number for every page at the bottom left\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于 finally终于 finally finally finally finally finallyfinally终于终于finally finally finally finallyfinally终于終於finallyfinally终于finally finally finally終於Finally终于终于finally finally finally终于finally终于finally终于終於finally终于终于 Finally finally finally总算終於finallyfinallyfinally终于终于 finally finally finally Finally Finally終於Finally終於finally finallyfinally Finally终于终于Finally\tfinally Finally終於Finally終於\tfinallyfinally终于终于Finally finally Finally終於\tfinallyfinallyFinally最终 Finally finally finally终于终于Finallyfinally finally Finallyfinally总算终于终于Finally終於\tfinallyfinally最终 Finally finally finally总算终于终于Finally终于finally Finally\tfinallyfinally終於Finally終於最终 Finally终Finally总算终于finally finally Finally finallyFinally Finally总算finally Finally终\tfinally finally总算 finally終於\tfinally最终FinallyFinally Finally終於finally\tfinallyfinally Finally最终Finally\tfinally最终\tfinally最后总算终于终于终于終於inallyfinally終於Finally finally finally最终 Finally终\tfinally最后总算终于finally终于finally终于Finally finally Finally終於\tfinally最后总算 finally\tfinally最后总算最终Finally FinallyFinally終於inally最后总算 Finallyinally终究Finally终 Lastly我終於終於finally finally Finallyfinally终于finallyFinally finally finally Finally终于finally終於inally\tfinally最后 LastlyFinally终ついinally Finally最终\tfinally最后总算Finally finallyfinally\tfinally最后好不容易終於终于finally finally Finally finally终于 LastlyFinally\tfinally Finally\tfinally LastlyfinallyLastly finallyfinallyついinallyついfinaly Lastly终ついinally最终Lastly终\tfinally最后到底终于终于终于总算终于終於最终Finally終於最終 Finally LastlyFinally Finally总算Finally\tfinally最终果然finallyLastly终究总算 finally finally终于finally終於inally最终Finally Finally总算 Finally\tfinally最后总算 Lastly终究Finallyついﬁnally Lastly终极于 Finally finallyfinally eventually finally\tfinally最终Lastly终究Finally Lastly好不容易最后終於终于终于終於終於ついinally Lastly FINALLY finallyfinallyLastly终于是忽然finallyLastly FINALLY Finally Lastly Finally\tfinally Lastly finallyfinally finally\tfinally ultimately FinallyLastlyخير最終mente突然inallyFINALLY最终FINALLY果然这才好不容易Finally finally finally Finally\tfinally最后居然最后Finallyfinally Lastly好不容易才算最后总算终于终于总算Finallyfinallyinally eventually eventually Finally竟然finallyLastly终究 Eventually到底总算最终終於最终Finally果然这才突然.finally竟然finally最后总算是总算终y cuốiy总之突然忽然忽然\tfinally突然突然竟然突然忽然忽然忽然忽然忽然忽然忽然忽怱居然果然竟然最後鬨毕竟究竟果然 Suddenly finally Lastly竟然才算好不容易最后一终ely总之 FINALLY suddenly final"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

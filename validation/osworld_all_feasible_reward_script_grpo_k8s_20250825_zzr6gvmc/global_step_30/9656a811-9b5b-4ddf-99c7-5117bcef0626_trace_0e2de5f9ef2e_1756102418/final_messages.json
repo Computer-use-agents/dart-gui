@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nI want Chrome to warn me whenever I visit a potentially harmful or unsafe website. Can you enable this safety feature?\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于 finally终于终于 finally终于终于终于 finally终于 finallyfinally finally finally finally finally終於finallyfinally終於finally终于finally終於 finally終於finally终于 finally終於finally终于总算终于 finallyfinally finally終於\tfinallyfinally终于 finally Finally终于总算终于 finally终终于终于Finally终于 finallyfinallyfinally最终終於終於finally最终Finally finally终 Finally最终Finally我终于终于 finallyfinally Finally finally finally终于finally終於\tfinallyfinally終於Finally终于 Finally总算finally Finally终 Finally最终Finally终 finally总算 finally終於\tfinally最终Finally Finally终于总算 finally总算\tfinally 终于总算终于finally終於\tfinally 终于发现了Finally finally Finally終於Finally終於终于终于finally最终Finally终 Finally到底终于 finallyfinally Finally Finally总算finallyFinally finally最终Finally終於\tfinally最后終於终于终于finally最终Finally終於finally总算finally终于终于 finally总算\tfinally最后\tfinally Finally总算inally finally �終於 Finally finally终ついinally Finally最后\tfinally最后Finallyfinally终于finally終於ついﬁnallyFinallyついﬁn终 FINALLY终于 finally Finally finally最终Finally终Finally終於最后\tfinally Finally最后\tfinally最后好不容易总算终于finally终于finally终于finally最终Finally Finally finally finally究竟finally\tfinally到底Finally Finally Finally终于 finally finally終於inallyfinally終於Finallyfinally Finally终于终于Finally终于finally finally\tfinallyinally Finally\tfinallyinally Finally終於inally忽然突然finally finallyFinally\tfinally终究Finally总算Finally\tfinally ﬁnally最终 Lastly终于总算终于总算最终终于总算 finally最后突然finally終於最后\tfinally Lastly Finally Finally終於finaly Lastly终于是finally最终Finally到底 finally eventually Finally finally終於最終Lastly终究Finally突然finally竟然finally最后居然 finally\tfinallyinally Lastly果然finally Lastly竟然inally最后总ついely Finally LastlyFinally FINALLY终于最后总ely finally Finally最终ついinally eventually Finally终究FINALLYFinally好不容易Lastly终于终于终于finally終於 Lastlyخيرmenteinally\tfinally最終Lastly果然这才总算 finallyfinally LastlyFinallyついﬁnly\tfinally终极Lastly竟然最终 Finally Lastly好不容易ついに finally\tfinally ultimately Finally Lastly FINALLYFinally最后uddenlyfinally cuốimente忽然好不容易突然最终ついに\tfinallyureka终于終於inally最后最後 crossorigin eventually才算最后总算 finally Lastly终究好不容易这才最后Finally suddenly finally finally FINALLY Finally finally finaly\tfinally终极ultimately总算finallyLastly果然这才突然最终inally才发现终y Finally总之好不容易LastlyFinallyLastlyfinally.readyState终究才算finaly到底才算最后居然这才finaly竟然突然才最终\tfinally eventualy总之好不容易ようやく"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

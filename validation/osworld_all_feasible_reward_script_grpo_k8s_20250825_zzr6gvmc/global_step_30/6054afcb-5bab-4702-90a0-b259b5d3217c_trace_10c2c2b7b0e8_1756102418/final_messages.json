@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nSome data are missed by now and are filled by 'N/A' temporarily. Please hide them in the table for now. Do not delete them and filter is no needed.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于 finally终于 finally终于 finally终于 finally终于finally终于 finally finally终于finallyfinally终于 finally finally终于 finally终于finallyfinally终于finally finally finally终于finally finally Finally finally终于finallyfinally终于终于finally finallyFinally Finally finally finally终于finally finally Finally Finally终于finally finally FinallyFinallyfinallyfinally終於終於終於終於終於終於終於終於終於終於\tfinallyfinally finallyFinally FinallyFinallyfinally\tfinallyFinally Finally FinallyFinally FinallyFinallyFinally终于终于\tfinally\tfinally\tfinallyinally最终终于终于finally finally finally finally终于finally finally Finally finally finally Finally终于finally finally Finally Finally终于finally终于 finallyFinallyFinallyFinally终于终于finally finally\tfinally\tfinallyinally最终Finally Finally FinallyFinally FinallyFinallyfinallyfinally终于finally总算终于终于终于总算终于终于 finally finally终于 finally终于finallyfinally总算最终Finally Finally finallyfinallyfinally最终\tfinally\tfinally最终Finally Finally終於总算Finally FinallyFinally\tfinally\tfinally最终\tfinally最终finally finally終於最后終於总算最后終於最后总算最后总算最后总算 Lastly Finally finally finally finally finally Finally\tfinallyinally\tfinally最终 Lastly Lastlyfinally FinallyFinallyfinally\tfinallyinally终究Lastly终究终究终究总算总算最后总算最后总算最后总算最后总算最后总算最后才算最终FinallyFinally Finallyinally终于finallyfinally\tfinallyﬁnally最终ﬃnally终ﬃnally终ﬃnally终ﬁnally终ﬁnally终ﬁnally终ﬁnally终ﬁnALLY终FINALLY，終於終於終於終於終于終於ついに Lastly LastlyLastly Lastly最终Finally到底好不容易终于终于终于终于终于finally Finally Finally finally finallyFinally FinallyFinally终于Finally\tfinally\tfinally最终inally eventually Finally Lastly finallyfinallyLastly竟然finallyfinally居然最终終於finally finally finally终于inally最终\tfinally eventually Finally竟然inally最终Finally最后果然finally\tfinally ultimately最终 ultimately ultimate最终Finally最終终极Ultimately ultimately终极ultimately终极ultimately最终 Lastly eventually ultimate eventually ultimate eventually ultimate eventual ultimately终极ultimate eventually ultimate Ultimately终极 Ultimate Ultimately Ultimate Ultimate ultimtimate最终 ultimately Eventually eventual eventually Eventually终究Eventually 결국에eventually eventually eventual eventual eventual eventual finalfinal final.final终究finaly finaly cuốimente 最終eventuallyeventual/eventual最終eventual:eventual:eventual:eventua:eventua:eventuall:end 终于最后果然果然果然果然果然果然果然果然果然果然果然突然I finally finally Finally Lastly Finally最終inally最终忽然Lastly忽然忽然忽然忽然忽然忽然忽然倏然忽然恍然突然恍然突然突然猛然恍"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

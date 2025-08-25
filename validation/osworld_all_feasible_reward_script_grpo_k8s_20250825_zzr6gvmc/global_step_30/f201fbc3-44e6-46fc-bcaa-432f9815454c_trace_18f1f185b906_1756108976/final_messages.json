@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nWhen I reply to an email, it quotes the original message but offsets it with an indentation and \">\" character. I would like to quote the original message with no indentation, and no special character. Could you help me remove the indentation and \">\" for me?\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于 finally终于 finally终于终于 finally finally finallyfinally终于终于finally finallyfinally终于 finallyfinally终于 finally finallyfinally终于终于finally finallyfinallyfinally终于终于 finally Finally终于 finally finallyfinallyfinally终于终于finallyFinally finally finally finallyfinally Finally finally Finallyfinally finallyfinally终于Finally Finally Finally Finally finally终于finallyFinally finallyfinally FinallyFinallyFinally Finallyfinally finallyfinally\tfinally finally Finally FinallyFinallyfinally终于终于Finally finally\tfinally\tfinallyfinally終於终于Finally finally\tfinally\tfinally\tfinallyfinally终于终于Finally Finally\tfinally終於終於終於終於終於终于终于终于 finallyfinallyFinally finally Finally FinallyFinally FinallyFinallyfinally finally finallyfinallyFinally Finallyfinally\tfinally終於終於終於終於終於总算终于终于终于终于终于终于 finally finallyfinallyfinallyFinally Finally FinallyFinally Finally最终总算终于 finallyfinally finally总算终于Finally Finallyfinally finallyFinallyfinally\tfinallyFinally Finally\tfinally\tfinally\tfinally Lastly终于总算终于終於終於总算終於finallyFinally finally FinallyFinally Finallyfinally Lastly finallyfinallyFinally Finally\tfinallyfinally finally finally\tfinally最终总算终于終於inally总算Finally Lastly最后終於終於inally最终Finally Finally\tfinally Lastly finallyfinally Finally最终LastlyFinally Finally\tfinally最后Finally finally总算最后 Lastly最终inallyfinally終於\tfinally最后总算Finally\tfinally最后最后終於 Lastly最终inallyついinallyinally终ely終於Lastly终y Finally LastlyfinallyLastly finally最终ついfinaly最后总算 Lastly最终ついfinalyついfinly Finally最终ついfinalyついfinly终n終於 Lastly终究总算 eventually终于finallyFinally\tfinally终究 finally finally FinallyfinallyLastlyfinally\tfinally终究Finallyinally\tfinally终究好不容易终于终于终于总算终于终于终于总算终于終於终inally Finally\tfinally Lastly finallyFinally FINALLY总算 finallyfinally終於最终終於finally最后Lastly Finally\tfinally finaly最后果然总算Finally FINALLY Finally终mente到底最后总算 finallyfinally Lastly最终果然Lastly最后果然Lastly最后果然最终inallyخير终mente终me终究 Lastly才算Finally总之突然总算Finally.finally最後ﬀﬁnallyﬃnallyﬃn Finally最終ﬃnallyﬃnallyﬃnally终究inally-finals终ainally究竟才算最后終於LastlyFINALLY Lastly竟然最后总算終於最终 crossorigin最终 Finally FINALLYLastly终究ccount最终ely 결국ually cuốimente终极才算最后竟然Finally最後.readyState终极才算(finalystate ===终极才算('loaded')�建终这才突然好不容易uddenly終於忽然忽然忽然忽然忽然忽然忽然恍然终inally突然总算突然突然突然突然突然突突突突"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

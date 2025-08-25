@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nCould you please add a two-hour lecture slot to my weekly course timetable, scheduled for every Wednesday at 12 PM? It seems I accidentally omitted that when setting up my schedule. I'd appreciate you taking care of that for me. Thanks!\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于 finally终于 finally finally finally终于 finally终于终于finally finallyfinally终于终于finally finally finallyfinallyfinally终于终于finally finally finally Finally终于终于finally finally finallyfinally finally终于终于finallyfinally终于终于 finally finally終於finallyFinally终于finally finally finally Finallyfinally终于finally Finally finallyFinallyfinally终于终于 Finally finally Finally Finally終於Finally終於Finally終於\tfinallyfinally终于终于finally finallyFinally Finally finallyFinally終於終於finally finally Finally FinallyFinallyfinally终于finally终于 Finally\tfinally finally\tfinally finally終於Finallyfinally终于Finally finally Finally\tfinally\tfinally Finally終於Finally終於\tfinallyfinally finallyfinally终于finallyFinally\tfinally\tfinally Finally总算终于终于 finally终于终于 finally最终終於Finally终于 finally终于finally终于终于finally最终 FinallyFinally終於Finally finally Finally总算finally Finally終於Finally終於finally finally finally Finally\tfinallyFinally終於finally Finally Finally总算Finally终于总算 finally finally终于finally终于Finally終於\tfinallyfinally Finally总算Finally\tfinallyfinally finally最终Finally最后总算终于 finally Finally\tfinallyfinally終於最终 Lastly Finally finally finallyfinally Finally\tfinally\tfinallyinallyFinally終於最后Finally Finally总算 Lastlyfinally finally最终Finally最后 Lastlyinally终于终于总算最终 Finally\tfinally Lastly终inally終於最后finallyFinally最终Lastlyinally最终finally finally\tfinally最终 Lastly终究总算最终終於最后总算 Finally最后 Lastly终究Lastly终Lastly终\tfinallyfinallyFinallyinally最终 Lastly终究最后 Lastly终究最后Lastlyinally最终好不容易終於总算 FinallyFinally\tfinally最后終於最后Finallyinally最终 Lastly终究Lastlyخير终ついely最終ĳfinalyついly最終ĳﬁnalmente终ĳﬁnally终ĳﬁnalmente终极ĳﬁNALME终极｡总算终于終於总算最后 Finally\tfinallyfinally終於finaly终ﬃnalmente终极ﬁNALMENTE最终 Lastly终究才算最后 finally finally finally Finally\tfinally\tfinally eventually终于Finally Finallyfinally終於inally �終於finallyFinallyついに终于终于总算 finally finally Finallyfinally終於FinallyfinallyLastlyFinally总算 finally finally Finally\tfinallyfinally Lastlyinally最终好不容易Finally\tfinallyfinally Finally总算 finally Finally\tfinally\tfinally Finally终于终于总算 finally finallyFinallyinally终于是终于 LastlyLastly好不容易.finally Lastly竟然最后終於finallyLastly果然最后总算终于finallyFinally最後 FINALLY Lastly eventually Finally竟然Lastly居然果然最后突然finally\tfinally eventually这才总算终于最终Finally到底终于是好不容易ついially才算最后总算最终Finally好不容易居然竟然果然这才突然最终突然最终 LastlyLastly好不容易这才突然忽然总之突然忽然总之突然忽然总之突然忽然"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

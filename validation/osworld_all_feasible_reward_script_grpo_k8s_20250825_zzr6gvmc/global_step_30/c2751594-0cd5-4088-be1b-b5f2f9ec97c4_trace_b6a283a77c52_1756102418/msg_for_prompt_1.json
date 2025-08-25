@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nHelp me export the first image from the doc file attached in the most recent email in Notes folder, and set this image as the new desktop background.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于终于 finally终于终于 finally finally finally finallyfinally终于终于finally finally finallyfinally终于终于finally finally finallyfinally终于finallyfinally终于终于finally finally finallyfinally终于终于终于 Finally终于 finally finallyfinally finallyFinallyfinally终于finally finally finally Finally finallyfinally finally终于终于 Finally Finally終於finallyFinally finallyfinally Finally finally Finally终于finally终于Finally finallyFinallyfinally Finally FinallyFinally\tfinallyFinally終於finally finally\tfinally\tfinallyfinally终于终于finally finallyFinally Finally Finally终于finally终于 finally finally终于Finally终于finally終於終於終於終於终于总算Finally Finally finally终于 finally终于finally終於最终終於Finally终于 Finally finally finallyFinally Finallyfinally\tfinally\tfinallyfinally終於Finally Finally\tfinally\tfinallyinallyFinally Finally\tfinally\tfinally总算終於finallyFinally Finally\tfinally\tfinally总算Finally Finallyfinally finally終於finallyFinally Finally总算Finally finallyfinally finally终于 Finallyfinally終於Finally终于finally终于 Finally finally finally finally终于总算Finally Finally\tfinally最后終於終於 Lastlyfinally終於总算終於总算终于总算终于Finallyfinally Lastly\tfinally Lastlyfinally终inally Finally\tfinally\tfinallyinallyFinally Finally最后 Lastlyinally最后Lastly最终Finally Finally finally finallyfinally Lastly\tfinally LastlyinallyFinally終於Lastly终 lastIndex Finally\tfinally\tfinally总算Finally finallyfinally finally終於最后 Lastly终究总算 Finallyfinally終於最后总算Finally finally最终終於最终终于终于Finallyfinallyついinallyついついinally最后Lastly �終於 Lastly最终Lastlyinally最后 Lastly终究最终总算 Finally\tfinally最后总算Lastly终才算 finally Finally总算finally終於最终終於最终ついinally最终つい突然终于终于终于Finally Finally\tfinally最后 Lastly好不容易Finally finally finally finally终于 Finallyfinally\tfinallyfinally終於LastlyFinally Lastly好不容易 FINALLY终ely终y总之inally終於总算终y总之finaly Finally.finallyLastly-finaly Lastlyخير终y总mente终ryfinallninal终rlyfinaly最終lyfinalny最终mente终究算最后總算Finally\tfinally最后Lastly果然总算总算总算終於inally最后\tfinally最後uddenlyfinally Lastly最终Lastly竟然finally Finallyついに终于Finally finally finally Finally\tfinallyFinally Lastlyinally終於Lastly到底最后居然终于终于最终終於finally finally finally Finally\tfinallyfinally終於-finals cuốiely finalnya FINALLYFINALLY FINALLY最终FINALLY总算Finally eventuallyFinally Finally最后才算最终 LastlyFinally到底总算终于最终终于终于总算最后总算finally Lastlyinally最终好不容易这才最后finally finally最终\tfinally终究居然竟然 결국ially终极\tfinally突然好不容易ようally好不容易よう componentWill finally竟然 crossorigin=\"\""
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

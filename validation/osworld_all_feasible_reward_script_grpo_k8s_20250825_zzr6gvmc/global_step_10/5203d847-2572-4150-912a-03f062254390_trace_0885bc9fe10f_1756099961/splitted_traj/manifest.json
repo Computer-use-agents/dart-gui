@@ -1,0 +1,8 @@
+{
+  "stride_size": 5,
+  "window_size": 5,
+  "num_chunks": 1,
+  "output_filenames": [
+    "5203d847-2572-4150-912a-03f062254390_trace_0885bc9fe10f_1756099961_chunk_0.json"
+  ]
+}

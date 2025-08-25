@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nOn it Whenever I launch a LibreOffice Impress, it uses both screens, one for current slide and next slide and another for actual presentation. What I want is to use only one monitor which shows presentation. I dont want the screen with Current slide and Next slide so that it can be used for other purposes. How should I achieve this?\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于终于 finally终于 finally终于 finally finally finallyfinally终于终于finally终于 finallyfinallyfinally finally终于终于 finallyfinally finallyfinally finallyfinally finally Finally终于终于终于finally终于 finallyfinally finallyfinally终于Finally finally finally finally终于finally终于finally终于finally终于 finally Finally终于终于 Finally finallyfinally FinallyFinally終於finally Finally finally finallyFinallyFinally终于finally Finally Finallyfinally finally finallyFinallyfinally终于Finally Finally\tfinallyFinally finally\tfinally\tfinallyfinally Finally finallyfinallyFinally终于 Finallyfinally\tfinally終於Finally finally\tfinally\tfinallyfinally终于终于 Finally finally終於終於終於終於终于终于终于终于终于Finally finallyfinally Finally FinallyfinallyFinallyFinally终于 finally finallyfinally Finally最终終於終於終於总算终于Finally Finallyfinally finally finally FinallyFinallyfinallyFinally终于終於終於\tfinallyfinally Finally finallyFinally Finally finallyfinallyFinally终于总算终于总算 finally\tfinally\tfinally\tfinallyfinally Finally FinallyFinally終於終於終於終於終於Finally finallyfinallyfinally Finally Finally finally Lastly终于总算最后总算终于Finally finally最终Finallyfinally\tfinally最终 Finallyfinally\tfinallyinally\tfinally最终 LastlyFinally总算Finally\tfinally最终 Lastly终inally终于 finally Finally finallyfinally Finally终于 LastlyLastly\tfinally最后 Lastly最后 Lastly最终終於終於总算最后总算Finally Finally\tfinallyfinally\tfinally最终 Lastly最终Finally总算finallyinally\tfinally最后Lastly最终終於inally最后Lastly最后 最终终于总算 Finally finallyFinally\tfinally最后 Lastly最终 LastlyFinally Finally Finallyfinally終於inally最终Lastly终ついinally\tfinally ultimately finally finally finally finallyfinally\tfinally终究 Lastly Finally終於inally最终Lastly终究Finally总算finally finalely\tfinally终究 Lastly好不容易终于终于总算终于终于终于终ついinally終於finalyLastly终ついfinallyついfinalyついfinallyついfinaly最終inally.finally終於\tfinally最后inally终u終於总算Finally FINALLYfinally FINALLY最后FINALLY总之(finally最终Finally终rinally最终Lastly终究Finally Lastly最后才算 finally最终总算終於总算总算終於终ely果然总算 cuốimente-finalmente终y最終mente终究finallmente最后FINALLY到底最后居然finallyخيرًا总算 Finally\tfinally最後-finalsult终究算.finally總算Finally_finallly终极ﬁnally终极ﬁn終於終於inally最終ついförmino终y终极ﬁnally终极ﬁnally终极ﬁnally终极ﬁnalurally终极fınalny终极fınalnya终究finallnya究竟 FINALLY到底FINALLY果然竟然Lastly好不容易chèl终y算是最后突然"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

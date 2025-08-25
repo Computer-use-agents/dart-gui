@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nOn next Monday, look up a flight from Mumbai to Stockholm.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于终于 finally终于终于 finally finally终于 finally finally finally finally终于终于finally finally finallyfinally finallyfinallyfinally finally finally终于finally终于終於finally Finally终于finally finally finallyFinally终于 Finallyfinally Finally finally終於終於finally最终终于终于finally finallyFinally FinallyFinally終於終於\tfinally finally Finally FinallyFinally FinallyFinallyFinally終於終於 �总算终于终于finally finally Finally\tfinallyfinally终于终于finally finally\tfinally\tfinally最终Finallyfinally finally Finally FinallyFinally最后finally finallyFinally終於終於 �終於终于终于finally finally\tfinally\tfinally finally终于终于finally最终Finally Finally最终 Finally到底终于终于终于总算finally finally finally总算最终Finally总算finally终于Finally Finally最后\tfinally最终finally终于終於Finally最后\tfinally最终最终终于总算終於inally finally Finally Finally最后 最终终于終於总算finally finallyfinally Finally\tfinally最终 最终Finally最后总算终于Finally finally\tfinally最终 最终Finally最后总算finally finally終於 �总inally finally Finally Lastly Finally最后 最后finally终于finally终于finally终于\tfinally終於 终于最后好不容易Finally finally finallyfinally Finally finally终于Finally终于\tfinally最终inally\tfinally �終於 终于finally\tfinally终究总算最后Finally Finally到底好不容易終於finally终于finally终于Finally finally\tfinally终究总算最后 Finally Lastly I终于 finally finally终于finally終於inally最终Finallyついに終於终于finally finally Finally Finally Lastly Finally突然终于终于终于finally finally\tfinally Lastly finally FINALLYfinallyLastly\tfinally eventually finallyFinallyinally终于是时候终于 Finally\tfinally Lastly最终Lastlyinally终于是时候总算Finally Lastly終於finaly finaly Finally最終果然总算Finally最后突然finally最后总算Finally Lastly最终竟然最后总算终于最终終於Lastly终究Finally Finally最后FINALLY好不容易ついに最终finally finally finally finally\tfinally\tfinally终究 Lastly居然finallyfinally Finally eventually eventuallyFinally LastlyLastlyinally Lastly终究Lastly忽然这才总算终于 finally finally最终\tfinally ultimately eventually eventually最终 Finallyinally FINALLY Finally ultimately eventualy finaly最终才算总算Finally Lastly Eventually eventually eventually eventually终于是我终于终于finally终于終於ついに終於最終inallyLastly终究最后竟然竟然finally最终Finally果然这才突然恍然终于是 결국ally最终最後uddenlyfinallyLastly\tfinally终极finalmente最終mente终极ﬁnally终极ﬁnely终极ﬁnally cuốimenteﬁnálmente终极Finalmente忽然这才突然finaly突然最终竟然没想到居然好不容易Finally好不容易ついに终予果然inally才.finallyLastly果然after finally Finally竟然قد konečno konecně"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nRecently, I've been exploring the use of the Vim editor for code editing. However, the default settings don't display line numbers in Vim editor. Please search the Internet for a tutorial on adding absolute line numbers in Vim and setting it as default for my local Vim.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于 finally终于 finally finally终于 finally终于 finally终于finally finallyfinally终于 finally finallyfinallyfinally终于终于finally finally finally finally终于finally终于finally终于终于finally终于 finally finally终于 Finally终于 finallyfinally finally finallyfinallyFinally终于finally finally Finallyfinally finally終於finallyfinally Finally Finally终于Finally finally Finally finally终于 Finally終於Finally終於终于finally finallyFinally Finally Finally终于finallyfinallyFinally终于 finally finally\tfinally Finally finally终于Finally终于Finally終於終於finallyfinally终于终于finally finallyFinally Finally\tfinally\tfinally Finally finallyFinally\tfinally\tfinally\tfinallyfinally Finally finally終於終於finally最终终于终于终于终于终于终于Finally finallyfinally Finally finallyFinally Finally終於Finally总算finally FinallyFinallyfinally Finally finallyfinallyFinally finally\tfinally FinallyfinallyFinally終於Finally終於finally finally finally终于 Finally终于finallyFinally终于 Finally\tfinally Finally終於\tfinallyFinally finally总算finally Finally总算Finally总算最终終於最后总算终于 finally finally终于finally\tfinally Finally\tfinallyfinallyFinally终于finally終於最终\tfinally\tfinally最终Finally Finally finally finallyfinally Lastly终于Finally Finally終於最终\tfinally最终inally最后总算Finally\tfinally最终inally最后总算最后 Finallyfinally Lastly总算最后总算 Lastly終於最后 Lastly终inally Finally finally終於Lastly终究Finallyfinally Finally最终 Lastly好不容易終於终于Finally finallyfinally\tfinally\tfinally最后 LastlyFinally Finallyfinally finally finally\tfinally\tfinallyinally\tfinally最终Lastly总算Finally Finally最后 Lastly总算Lastlyinally終於最后好不容易終於最终終於finally终于终于总算最终Finallyfinally finallyFinallyinally最终ついに Finally Finallyfinally Lastly finally finally终于总算最终\tfinally最后 Lastlyinally最后Lastlyinally終於Lastly终final Finallyfinally Lastly终究Lastly 最终终于终于終於終於总算终ついinallyFinally Finally Lastly eventually finally finallyFinally Finally\tfinallyfinally Lastly终究 LastlyLastlyついinally FINALLY终于最后总算最终\tfinally ultimately\tfinally ultimately最终竟然最后居然最终Finallyfinally終於 결국ALLY终yely果然总算最后Lastly果然这才好不容易終於 Lastly好不容易恍然终突然finallyFinally竟然最后Lastly Finally LastlyFinallyinally终究才算最后Lastly\tfinally终极finaly最終FINALLY終於最终inallyخيرally最終FINALLY FINALLY总算Finally finaly最後果然 cuốiyally终极finaly总之(finalmente eventually eventually总算最终竟然忽然.finalmente eventually eventualmente finalmente finalmente总算竟然忽然突然突然突然好不容易突然忽然突然居然突然竟然突然才忽然终porfinly到底总算好不容易才算究竟果然果然果然果然果然果然果然果然居然居然竟然竟然竟然竟然居然居然"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

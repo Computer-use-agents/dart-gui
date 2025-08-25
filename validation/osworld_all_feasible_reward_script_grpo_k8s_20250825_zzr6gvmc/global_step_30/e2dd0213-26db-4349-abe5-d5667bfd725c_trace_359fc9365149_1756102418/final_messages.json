@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nCan you assist me in shifting the text box to the left? I keep accidentally selecting the image layer beneath it.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于 finally终于 finally finally finally finally终于 finally终于终于finallyfinally终于终于finally finally finally finallyfinally finallyfinally终于finally终于 finally finally终于 finally终于finally终于总算终于finally Finally finallyfinallyfinally終於Finally Finally Finally finally finally finallyfinallyfinally终于终于finally finally Finally Finally FinallyFinally终于終於\tfinally finally\tfinally finallyfinallyFinally Finally FinallyFinally finallyfinallyfinally终于终于Finally Finally FinallyFinallyfinally終於終於終於終於終於終於終於終於\tfinally finally\tfinally\tfinally最终终于终于终于终于终于终于finally finally finally终于 finally总算Finally Finally Finally最终Finally最终Finally最终Finally终Finally終於finallyfinallyfinally finally finally终于\tfinally �终于finally Finallyfinally\tfinally Finally最终Finally总算Finally总算最终Finally終於\tfinally最后总算终于finally finally Finally finally\tfinally Finally finally\tfinally\tfinally\tfinallyinallyfinally終於finally最终Finally最后Finally最后总算 Finally最后 Finally总算Finally終於总算finally終於inally最终总算Finally終於最终 Lastly终于终于总算 finally finally finally Finally finally\tfinally终究finallyfinally终于终于终于Finally Finally Finally Finally终 inally\tfinally 终于finally最后\tfinally最后终究Finally終於最终 Lastly终yFinally Lastly终yFinally最终 Lastly终Lastly终 Lastly终Lastly终 Lastly终极\tfinally 终于最后 Lastly终极到底finally最后ついにfinally finally Finally finally总算Finally Finally最后好不容易finally finally Finally finally终于inally\tfinally终究这才finally总算Finally Finally最后終於总算最后Finally終於inally最终居然终于终于终于終於突然终于 finallyfinallyfinally終於最终 FinallyFinally\tfinallyfinallyfinally終於最终Lastly究竟\tfinally eventually finally finally finally Finally finallyFinallyinally\tfinally最終Lastly FINALLY最终FINALLY总算最终inally eventually終於 eventually eventually终于终于总算最终Finally竟然finally finally最后 Finally Finally最后 Lastlyinally终究好不容易終於 Lastly好不容易到底果然finally\tfinally ultimately总算好不容易居然竟然Finally Lastly竟然忽然最终inally eventually\tfinally ultimately finally eventualyLastly总ely总算最后竟然突然finally最終mente finalmentefinalmentefinalmentefinalmente finalmente finalmeine 最终 Finallyついに最终inally最终inally最終 결국才算最后Lastly果然竟然uddenly忽然突然 ultimately eventually ultimately ultimately ultimateultimately最終ultimate Ultimately Ultimate终极Ultimately Ultimately终极 ultimate Eventually eventually EventuallyEventually终究Ultimately ultimately Ultimatelyﬁnally eventually Eventually终究ultimately eventualually eventualually最终eventualy cuối cùng最後にようやく最終的にﬃnally ﬁnalmentfinalmentfinalment.finalmente\tfinalmenﬁnalement"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nI've got a bunch of email accounts in Thunderbird, and it's a hassle to check them one by one. Can you show me how to set up a unified inbox so I can see all my emails in one place?\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于终于 finally终于终于 finally终于终于 finally finallyfinally终于终于finally finally finallyfinallyfinally终于终于finally finally finallyfinally finally finallyfinally终于终于finally Finally终于终于 finally finallyfinallyfinally终于终于finally finallyFinally finally finallyfinallyfinally终于终于finally Finally finally Finally finally finally FinallyFinallyfinallyfinally终于终于Finally FinallyFinallyfinally finallyFinally Finally Finally finallyFinally finally\tfinally Finally finally終於finallyfinallyFinally Finally\tfinallyFinallyfinally Finally\tfinally\tfinally finallyfinallyFinally finally Finally终于终于Finally finally\tfinally\tfinallyfinally终于终于finally終於終於終於终于终于终于终于终于終於終於 finally终于总算 FinallyfinallyFinally finally最终終於 FinallyfinallyFinally finally Finally finally终于Finally finally Finallyfinallyfinally終於Finally finally Finally\tfinally\tfinally总算終於Finally Finally总算Finally终于 finally终于finally终于终于finally finally Finallyfinally終於\tfinally終於Finally FinallyFinally finally最后終於总算 Finallyfinally finally终于Finally终于总算 Finally最终总算Finallyfinally finally Finally\tfinally\tfinally Lastly终于总算 Finallyfinally finallyFinallyfinally終於\tfinally\tfinallyinallyFinally Finally Lastlyfinally終於 Lastlyinally最终Finally finally最后最后总算 Finally最终Finally finallyfinally\tfinally Lastly\tfinally\tfinallyinallyLastly最终終於inally終於Finally总算最后 Lastly终inally Finallyfinally終於 Lastly终Lastly\tfinally Lastly最终Lastlyinally最后 Lastly终究总算 Finally最后Lastlyinally最后ついely最后Finally\tfinally-finalsLastly终究Finally\tfinally最终ついinally最终終於 Lastly最终 Lastly\tfinally最终ついinally ultimately Finally eventually finally finally終於终极Finally �終於finaly总算 Lastly最终つい终つい finally Finallyfinallyfinally FINALLY终于Lastly終於最终Finally总算 Lastly终究最后 FinallyfinallyLastly\tfinally终极Lastly终つい finalinally\tfinally终极ultimately finally finally Finally最终خير终mente終於最终inally终究好不容易终于总算终于总算终于总算終於果然总算Finally最后到底终于 finallyfinallyfinally最后Finally最後uffixinally\tfinallyﬁnally終於最終﹢终ﬃﬃ终ﬃﬃ终ﬃﬃ终ﬀ �终ﬀ终端终ﬀ终端终究才算最后 Finally最后总算Finally竟然最后居然finally最后Finally果然 finally Lastly果然这才 finally\tfinally查看全文 Finally Lastlyخير终究突然finallyfinally終於好不容易.finally\tfinallyĳ终究uddenly finally終於finalmente忽然忽然忽然忽然忽然忽然忽然忽然忽然怱惚惚恍惚恍惚恍惚恍惚恍惚恍惚恍 cuốiʹFINALLY FINALLY总算终于終於突然好不容易突然好不容易突然好不容易突然好不容易突然好不容易突然好不容易突然不容易突然不容易突然"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

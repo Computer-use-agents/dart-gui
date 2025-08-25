@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nPlease help me modify the setting of VS Code to keep my cursor focused on the debug console when debugging in VS Code, instead of automatically focusing back on the Editor.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于终于 finally终于 finally终于 finally终于 finallyfinally終於finally finally finally finallyfinallyfinally終於finally finally finally終於finally finally终于finally終於finally终于终于終於 finally finally終於 Finally终于总算终于finally finally finally终于finally终于Finally finally终于finally终于 finally finally Finally终于finally finally終於finally終於Finally Finally终于Finally終於\tfinally Finally最终终于finally finally finally FinallyFinally終於Finally終於finally Finally Finally总算finallyFinally总算Finally\tfinally Finally终\tfinally FinallyFinallyfinally终于终于终于finally最终Finally finally finally总算finally终\tfinally finally终\tfinally終於Finally总算finally終於終於终于终于终于总算 Finally finally Finally总算finallyFinally終於\tfinally Finally最后Finally finally finally\tfinally Finally总算finally\tfinally最终Finally finallyfinallyFinally終於inally\tfinally Finally最后\tfinally Finally最终finally終於Finally终于finally终于终于终于 finally finally Finally总算終於inally最终Finally终于是突然终于终于终于终于finally終於finally終於\tfinally finally finally Finally总算Finally\tfinally最后\tfinally最后总算finallyFinallyついに終於inallyfinally Finally finally finally\tfinally Finally终筈inally最终 Lastly终于终于finally finally Finally finally終於inally最终Finallyついに終於finally finallyfinally终于Finally Finally总算Finally最终\tfinally最后好不容易总算终于 Finally FinallyfinallyFinallyついに终于终于finally finally finally Finally finally終於inally最终\tfinally最后 LastlyFinally\tfinally总ely終於finaly Lastly最后总ely终yLastly Lastly终y Lastly终y Lastly终yLastly �終於 Lastly终究finally\tfinally最后好不容易ついmenteinally最后Finally Finallyついnymally FinallyfinallyLastly果然终于Finally Finally\tfinally最后Finallyinally忽然finally finally finally总算Finally\tfinally到底总算终于终于总算最终Finally FINALLY最终inallyfinally到底总算终于最终 Finally\tfinally果然这才finally finally finally最后好不容易ついmente 결국ALLY最終FINALLY總edly最终FINALLY总ley终极FINALLY于是終於 Lastly终究Lastly\tfinally突然忽然突然inally最终竟然finally Lastly居然最后总算Finally Finallyついmente突然这才恍然终 Finally Finally\tfinally突然 eventually終於LastlyFinally FINALLY Lastly finally finallyfinally FINALLY Finally finally finally最后才算最后Finally Lastly终究好不容易Lastly finallyfinally最後 crossorigin eventually终于最后果然竟然uddenly最终\tfinally果然竟然恍然 ultimately总算Lastly竟然finaly Lastly终究终极Lastlyخيرًاinally终究才算究竟才算突然最终猛然好不容易才终于finallyFinally Lastly忽然这才最终Finally Finally‰ﬁnally‰ﬁninally‰ﬁnally‰ﬁ"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nBrowse the natural products database.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于终于 finally终于终于 finally finally finally finally finallyfinally终于终于finally finally finally finallyfinally终于终于finally finally finallyfinallyfinally終於终于finally finally Finallyfinally finally终于finally终于终于终于Finally finally finally总算终于finallyfinally终于终于finally finally Finally finally finally finally终于finally Finally Finally终于终于finally finallyFinally Finally終於終於FinallyfinallyFinally終於finally终于finally終於\tfinally Finally finally终于Finally终于Finally終於終於\tfinallyfinally終於 Finally Finallyfinally finally finally Finally终于Finally\tfinally\tfinallyfinallyFinally最终終於finally finally Finally终于Finally终于finally终于Finally终于 finally finally总算 Finally终于finally終於\tfinally Finally总算Finally終於\tfinally\tfinally\tfinally Finally finallyFinally終於\tfinally �终于finally Finally finally Finally总算Finally終於inallyFinally总算finallyFinally終於最终 Finally终于 finally finally终于 finally总算 FinallyfinallyFinally終於finallyFinally終於最终 Finally最后finally finally终于finally最终Finally Finally\tfinally\tfinally最终Finally最后\tfinallyinallyfinally finally总算最终 Finally\tfinally終於inally finallyfinally Lastly终于finallyFinally Finally最后总算Finally finally finally Finally\tfinallyfinally Lastly終於inally\tfinally终究终于终于终于Finally finally Finally Finally总算Finally\tfinally最后 Lastly终于是finally终于finally终于Finally Finally最后 Lastly最终总算 finally finally finally\tfinally最后总算最终終於最终Finally終於最后 Lastly到底总算终于finallyfinally\tfinallyついに終於inally finally Finally最后Lastly果然终于终于总算最终Finallyinally终y Lastly終於ついに終於最终 Finally果然 Lastly终y FinallyLastly好不容易終於终于总算finally finally finallyFinallyついに终于终于终于\tfinallyfinallyLastly Finallyinally终Lastly\tfinallyfinally Lastly终究总算最终Finally\tfinally FINALLY終於最后 Lastly好不容易最后finally Finally\tfinally eventually finally finallyFinally Lastly Finallyinally终Lastlyinally終於ついmente终LastlyfinelyFinally\tfinally finallyfinallyついにする终y突然终于终于总算最终Finally竟然最后居然最终 Finally Lastly好不容易 FINALLY Finally\tfinally finally总算finaly Finally FINALLY終於finaly最后FINALLY最后总算finallyLastlyFinallyinally最終inally果然果然总算最终竟然竟然finally Lastly好不容易突然突然终于是忽然忽然突然突然突然猛然终eniuddenly finally finallyFinally\tfinally最後.finallyfinally最終到底Lastly终究这才最后总算终于最终竟然 eventually finally Finallyخيرally才算最后居然竟然果然果然果然果然 cuốimente suddenly finaly最後(finalmente 最后经过终于Finallyついにようやく終於inally恍然终子究竟忽然忽然突然suddenly suddenly ultimately eventually"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

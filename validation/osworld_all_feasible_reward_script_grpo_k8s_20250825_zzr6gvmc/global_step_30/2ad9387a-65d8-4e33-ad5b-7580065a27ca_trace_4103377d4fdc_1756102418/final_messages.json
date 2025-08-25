@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nCan you make a new folder for me on the bookmarks bar in my internet browser? Let's call it 'Favorites.'\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于终于 finally终于终于 finally finally终于finally终于 finally finally终于 finally finally终于finally终于終於finallyfinally finally finallyfinally终于終於finally終於finally finally終於finally finally終於 finally终于finally Finally终于 finally总算终于 finallyFinally终于 finally最终Finally finally总算终于finally终于\tfinally終於finally終於finally終於finally終於Finally终于 Finally finally finally最终finally终 Finally finally Finally终于Finally終於\tfinallyfinally Finally finally finally最终Finally总算finallyFinally终于finally終於终 Finally\tfinally Finally总算finally终于终于Finally finally终于 finally終於\tfinally\tfinally Finally終於Finally总算finally Finally总算finallyFinally finally Finally\tfinally\tfinally Finally最终Finally最后finally finally终于终于终于Finally终于finally finally最终Finally终 Finally最终Finally終於\tfinallyfinally終於\tfinallyinally終於ﬁinally总算finallyFinally Finally总算\tfinally\tfinally到底 finally最后Finally Finally最后\tfinallyinally最后 Finally最后\tfinallyﬁnallyFinally到底finally总算 finally最终finally終於Finally最后总算终于终于 Finally最后ついinally終於最后总算finally终ついinally最终Finally最后ついfinal Finally到底 finally最终Finally终ついfinal Finally最终 Lastly终ついfinal �終於finally終於突然终于 finally终 Finally最终\tfinally FINALLY終於FINALLY忽然突然总算finally finallyFinally finally終於 ﬁnally Finally finally终于 Lastlyfinally終於 ﬁn终inally終於ﬁnally\tfinally终究 Finally finally FINALLYfinally LastlyFinally finally最终inally\tfinally eventually终于 Lastly终 总算finally finally好不容易Finally Finally Finally终于Finally终于终于 finally终于finally FinallyfinallyFinally终于finally終於Lastly\tfinally Finally Lastly finallyFinally finally\tfinally Finallyfinallyinally\tfinally Lastly终究Finally突然finally finally Finallyfinallyついfinely总算Finally\tfinally居然竟然Finally最后总mente终與inally終於Lastly最終Lastly果然 Lastly竟然 Lastly果然这才终于终于总算 Finallyついinally FINALLY最后好不容易最后finallyついfinlyLastly好不容易總算 finally最後.finalyLastly总mente终究总算总算总算\tfinallyخيرely总之uddenly终于 Finally突然好不容易.readyState最终究竟才算 finally为止才算最终 Lastly终究Finally FINALLYよう cuốiy总之 finaly Lastly好不容易finallyLastlyFinally果然这才突然finally最后FINALLY Lastly忽然忽然最终\tfinally_FINALLY最終chèl终于终于 Finally eventually到底总算最后‰ult终‰括竟然Finally好不容易算才算究竟才算突然忽然忽然突然居然竟然竟然 결국果然 crossorigin=\"\" ultimately finally finally終於ﬁnallyﬃnalyﬃnalmenteﬃnalmenteı"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

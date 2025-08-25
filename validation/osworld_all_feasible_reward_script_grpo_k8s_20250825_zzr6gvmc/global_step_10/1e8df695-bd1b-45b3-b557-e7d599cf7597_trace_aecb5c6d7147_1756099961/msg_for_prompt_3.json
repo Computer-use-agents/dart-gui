@@ -1,0 +1,73 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nAdd a new column named \"Profit\" and calculate the profit for each week by subtracting \"COGS\" from \"Sales\" in that column.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "Thought: I noticed that the WeeklySales.xlsx file is currently loading, and I'm patiently waiting for the spreadsheet interface to fully appear. Once it's ready, I'll be able to start calculating profits - I need to add a new column called \"Profit\" and compute the difference between Sales and COGS for each week. The system just needs a moment to load all the data completely.\nAction: wait()"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "Thought: The data has finally loaded completely! I took a close look at the structure of the table and found that I need to add a Profit column. I see that cell C1 is perfect for this - I will click on it and enter \"Profit\" as the header. This way, I can calculate the weekly profit by simply subtracting COGS from Sales in each row afterwards.\nAction: click(start_box='<|box_start|>(347,290)<|box_end|>')"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0002.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "Thought: After analyzing the data distribution, I finally figured out the correct position. I identified that I should add a Profit column in cell C2, which is directly to the right of COGS. I'm going to click on this cell now and enter \"Profit\" as the title. Once that's done, I can easily calculate weekly profits by entering \"=B2-C2\" in each row - this formula subtracts the cost of goods sold from sales revenue to determine profit.\nAction: click(start_box='<|box_start|>(347,316)<|box_end|>')"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0003.png"
+      }
+    ]
+  }
+]

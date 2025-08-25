@@ -1,0 +1,604 @@
+task:
+  task_file: evaluation_examples/test_all.json
+  osworld_root: ./evaluation_examples/examples_processed
+storage:
+  root: results/pass@1_all_38env_6model_tmp07_max-texts-35
+model:
+  checkpoint_dir: ''
+  ckpt_path: /capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+  replicas: 8
+  base_port: 8000
+env:
+  server_url: http://112.125.88.107:4999
+  user_token: user4
+coordinator:
+  max_concurrent_envs: 3
+  max_task_queue_size: 1
+runner:
+  max_steps: 100
+  max_images: 4
+  max_texts: 35
+  env:
+    server_url: http://112.125.88.107:4999
+    user_token: user4
+    max_retries: 3
+    action_space: pyautogui
+    screen_size: (1920, 1080)
+    headless: true
+    os_type: Ubuntu
+    require_a11y_tree: false
+  prelaunched_model:
+    base_url: https://sv-98272fdc-4f22-4a25-ba0e-7d51a37448d3-8000-x-defau-51acffd7d9.sproxy.hd-01.alayanew.com:22443/v1
+    model: ui_tars_1.5
+    frequency_penalty: 1
+    max_tokens: 500
+    temperature: 0
+    top_p: 0.9
+    seed: 1
+  model_pool:
+    timeout: 10
+    retries: 3
+    backoff: 2
+    frequency_penalty: 1
+    temperature: 0.7
+    top_p: 0.9
+    max_tokens: 500
+    seed: 1
+
+[2025-08-04 18:44:29,328][agent_coordinator][INFO] - AgentCoordinator初始化 - 最大并发环境数: 3, 最多填充任务: 1 次, rollout_n: 1
+[2025-08-04 18:44:29,329][agent_coordinator][INFO] - 环境清理配置 - 清理间隔: 10秒, 清理超时: 300秒
+[2025-08-04 18:44:29,386][__main__][INFO] - 等待模型服务池准备就绪...
+[36m(ModelServicePool pid=595739)[0m Initializing ModelServicePool...
+[36m(ModelServicePool pid=595739)[0m [32mUsing nvidia-smi[0m
+[36m(ModelServicePool pid=595739)[0m Warning: Requested replicas (8) is greater than available GPU count (2). Setting replicas to 2.
+[36m(ModelServicePool pid=595739)[0m Initializing GPU instances...
+[36m(ModelServicePool pid=595739)[0m [32mUsing nvidia-smi[0m
+[2025-08-04 18:44:29,758][__main__][INFO] - 模型服务池已准备就绪，已启动 2 个服务实例
+[{'server_id': 'dcee7613-eb65-40a5-ab4c-2bdf321657c2', 'vnc_port': 5900, 'status': 'occupied', 'created_at': '2025-08-04T18:43:25', 'updated_at': '2025-08-04T18:44:29'}, {'server_id': '3c06d28b-bd6a-422d-802d-2e6a7ff089fb', 'vnc_port': 5900, 'status': 'occupied', 'created_at': '2025-08-04T18:43:25', 'updated_at': '2025-08-04T18:43:53'}, {'server_id': 'ab1289a5-6bd8-4023-aa13-a4aa10fd2088', 'vnc_port': 5900, 'status': 'occupied', 'created_at': '2025-08-04T18:43:25', 'updated_at': '2025-08-04T18:43:52'}]
+Total: 3
+[36m(ModelServicePool pid=595739)[0m Initialized 2 GPU instances.
+[36m(ModelServicePool pid=595739)[0m Checking existing service health...
+[36m(ModelServicePool pid=595739)[0m Service on port 8000 is healthy. Adding to service_instances.
+[36m(ModelServicePool pid=595739)[0m Service on port 8001 is healthy. Adding to service_instances.
+[36m(ModelServicePool pid=595739)[0m Model pool is ready with 2 instances.
+release dcee7613-eb65-40a5-ab4c-2bdf321657c2 {'meta': {'trace_id': '65e100df0c7f4d55b1f68d2f720fd4aa'}, 'data': {'message': 'success'}}
+release 3c06d28b-bd6a-422d-802d-2e6a7ff089fb {'meta': {'trace_id': 'ad7bd8b22a2c43818c2ae3746faff6c1'}, 'data': {'message': 'success'}}
+release ab1289a5-6bd8-4023-aa13-a4aa10fd2088 {'meta': {'trace_id': 'db1998899e6846bcaea926e5ab160c62'}, 'data': {'message': 'success'}}
+[2025-08-04 18:44:30,075][agent_coordinator][INFO] - 开始任务处理循环
+Current tasks file:  evaluation_examples/test_all.json
+Total number of tasks: 369, Remained:355
+[2025-08-04 18:44:30,300][agent_coordinator][INFO] - 获取到新任务批次，大小: 355
+[2025-08-04 18:44:30,300][agent_coordinator][INFO] - [trace_4fd0ddf99d33_1754304270] 添加任务到队列 - task_id: 99146c54-4f37-4ab8-9327-5f3291665e1e, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_8344b611a566_1754304270] 添加任务到队列 - task_id: 6766f2b8-8a72-417f-a9e5-56fcaa735837, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_cb485529a218_1754304270] 添加任务到队列 - task_id: ae78f875-5b98-4907-bbb5-9c737fc68c03, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_33ed42d52114_1754304270] 添加任务到队列 - task_id: 3299584d-8f11-4457-bf4c-ce98f7600250, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_0dc3d5132bee_1754304270] 添加任务到队列 - task_id: 030eeff7-b492-4218-b312-701ec99ee0cc, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_5523cc37946f_1754304270] 添加任务到队列 - task_id: 9656a811-9b5b-4ddf-99c7-5117bcef0626, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_7ebe8ef59976_1754304270] 添加任务到队列 - task_id: fc6d8143-9452-4171-9459-7f515143419a, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_88ffc4a364db_1754304270] 添加任务到队列 - task_id: a96b564e-dbe9-42c3-9ccf-b4498073438a, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_28d64a9722ed_1754304270] 添加任务到队列 - task_id: 1704f00f-79e6-43a7-961b-cedd3724d5fd, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_79f9a307a18b_1754304270] 添加任务到队列 - task_id: f3b19d1e-2d48-44e9-b4e1-defcae1a0197, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_869a4093b390_1754304270] 添加任务到队列 - task_id: 82bc8d6a-36eb-4d2d-8801-ef714fb1e55a, rollout_idx: 1/1
+[2025-08-04 18:44:30,301][agent_coordinator][INFO] - [trace_2030e0609fcf_1754304270] 添加任务到队列 - task_id: 47543840-672a-467d-80df-8f7c3b9788c9, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_83ba2ca2edca_1754304270] 添加任务到队列 - task_id: c1fa57f3-c3db-4596-8f09-020701085416, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_a94901c2ac9d_1754304270] 添加任务到队列 - task_id: da46d875-6b82-4681-9284-653b0c7ae241, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_3bceede9274b_1754304270] 添加任务到队列 - task_id: 6c4c23a1-42a4-43cc-9db1-2f86ff3738cc, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_74702aa5224a_1754304270] 添加任务到队列 - task_id: f79439ad-3ee8-4f99-a518-0eb60e5652b0, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_91b4c30f4a63_1754304270] 添加任务到队列 - task_id: b7895e80-f4d1-4648-bee0-4eb45a6f1fa8, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_35097116ac87_1754304270] 添加任务到队列 - task_id: 9f3f70fc-5afc-4958-a7b7-3bb4fcb01805, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_a4647ba06526_1754304270] 添加任务到队列 - task_id: 7f52cab9-535c-4835-ac8c-391ee64dc930, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_5ce750ad8236_1754304270] 添加任务到队列 - task_id: 82279c77-8fc6-46f6-9622-3ba96f61b477, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_424fd6c43631_1754304270] 添加任务到队列 - task_id: 2888b4e6-5b47-4b57-8bf5-c73827890774, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_a803e7f67616_1754304270] 添加任务到队列 - task_id: b4f95342-463e-4179-8c3f-193cd7241fb2, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_3c01b596358c_1754304270] 添加任务到队列 - task_id: f5d96daf-83a8-4c86-9686-bada31fc66ab, rollout_idx: 1/1
+[2025-08-04 18:44:30,302][agent_coordinator][INFO] - [trace_f25663355159_1754304270] 添加任务到队列 - task_id: 121ba48f-9e17-48ce-9bc6-a4fb17a7ebba, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_165990788b65_1754304270] 添加任务到队列 - task_id: 368d9ba4-203c-40c1-9fa3-da2f1430ce63, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_a89eb3387afd_1754304270] 添加任务到队列 - task_id: 59155008-fe71-45ec-8a8f-dc35497b6aa8, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_77788bdad0e5_1754304270] 添加任务到队列 - task_id: a728a36e-8bf1-4bb6-9a03-ef039a5233f0, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_e13ea7ca2108_1754304270] 添加任务到队列 - task_id: b070486d-e161-459b-aa2b-ef442d973b92, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_bf610b3abd7d_1754304270] 添加任务到队列 - task_id: 0d8b7de3-e8de-4d86-b9fd-dd2dce58a217, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_ffadf08e5c15_1754304270] 添加任务到队列 - task_id: 9f935cce-0a9f-435f-8007-817732bfc0a5, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_c4b28146c178_1754304270] 添加任务到队列 - task_id: f0b971a1-6831-4b9b-a50e-22a6e47f45ba, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_4ecdefe6d180_1754304270] 添加任务到队列 - task_id: cabb3bae-cccb-41bd-9f5d-0f3a9fecd825, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_dbade739cc45_1754304270] 添加任务到队列 - task_id: 7a4deb26-d57d-4ea9-9a73-630f66a7b568, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_b912fd9fb5b5_1754304270] 添加任务到队列 - task_id: 554785e9-4523-4e7a-b8e1-8016f565f56a, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_108ebccc346a_1754304270] 添加任务到队列 - task_id: 77b8ab4d-994f-43ac-8930-8ca087d7c4b4, rollout_idx: 1/1
+[2025-08-04 18:44:30,303][agent_coordinator][INFO] - [trace_789450a2814d_1754304270] 添加任务到队列 - task_id: f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_d84e078f3ddb_1754304270] 添加任务到队列 - task_id: d52d6308-ec58-42b7-a2c9-de80e4837b2b, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_32b6591144d3_1754304270] 添加任务到队列 - task_id: 2a729ded-3296-423d-aec4-7dd55ed5fbb3, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_ca785b415034_1754304270] 添加任务到队列 - task_id: b148e375-fe0b-4bec-90e7-38632b0d73c2, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_c285ca795584_1754304270] 添加任务到队列 - task_id: a746add2-cab0-4740-ac36-c3769d9bfb46, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_32a4a73736ee_1754304270] 添加任务到队列 - task_id: 7b7617bd-57cc-468e-9c91-40c4ec2bcb3d, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_27d143b76f94_1754304270] 添加任务到队列 - task_id: d16c99dc-2a1e-46f2-b350-d97c86c85c15, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_7080b3c246f2_1754304270] 添加任务到队列 - task_id: 06ca5602-62ca-47f6-ad4f-da151cde54cc, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_902c8bab1051_1754304270] 添加任务到队列 - task_id: e2dd0213-26db-4349-abe5-d5667bfd725c, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_1e64bdb5fd58_1754304270] 添加任务到队列 - task_id: f723c744-e62c-4ae6-98d1-750d3cd7d79d, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_f1cfa8d4f5c0_1754304270] 添加任务到队列 - task_id: 72f83cdc-bf76-4531-9a1b-eb893a13f8aa, rollout_idx: 1/1
+[2025-08-04 18:44:30,304][agent_coordinator][INFO] - [trace_093bce71dba0_1754304270] 添加任务到队列 - task_id: 7767eef2-56a3-4cea-8c9f-48c070c7d65b, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_276ff2089258_1754304270] 添加任务到队列 - task_id: 734d6579-c07d-47a8-9ae2-13339795476b, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_702c8ee787f7_1754304270] 添加任务到队列 - task_id: e19bd559-633b-4b02-940f-d946248f088e, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_41e92ff59b42_1754304270] 添加任务到队列 - task_id: 38f48d40-764e-4e77-a7cf-51dfce880291, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_5c41995cc71d_1754304270] 添加任务到队列 - task_id: fbb548ca-c2a6-4601-9204-e39a2efc507b, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_600cf24ef858_1754304270] 添加任务到队列 - task_id: 5ca86c6f-f317-49d8-b6a7-b527541caae8, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_762b4ae65e1f_1754304270] 添加任务到队列 - task_id: 62f7fd55-0687-4a43-b6e1-3eda16fc6252, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_8bb4761155b9_1754304270] 添加任务到队列 - task_id: 8ea73f6f-9689-42ad-8c60-195bbf06a7ba, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_31407a25e650_1754304270] 添加任务到队列 - task_id: 58d3eeeb-e9d0-499f-962e-fd0db2a744d8, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_8b65082fb3e8_1754304270] 添加任务到队列 - task_id: 2e6f678f-472d-4c55-99cc-8e7c5c402a71, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_37954a2658d5_1754304270] 添加任务到队列 - task_id: 045bf3ff-9077-4b86-b483-a1040a949cff, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_d3492fddb56a_1754304270] 添加任务到队列 - task_id: dbbf4b99-2253-4b10-9274-45f246af2466, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_83d15a4ed305_1754304270] 添加任务到队列 - task_id: 357ef137-7eeb-4c80-a3bb-0951f26a8aff, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_99c77c9b7175_1754304270] 添加任务到队列 - task_id: 42e0a640-4f19-4b28-973d-729602b5a4a7, rollout_idx: 1/1
+[2025-08-04 18:44:30,305][agent_coordinator][INFO] - [trace_c6d0eeb6700b_1754304270] 添加任务到队列 - task_id: 51719eea-10bc-4246-a428-ac7c433dd4b3, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_3e87ffefc1ee_1754304270] 添加任务到队列 - task_id: 1954cced-e748-45c4-9c26-9855b97fbc5e, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_f223d8423743_1754304270] 添加任务到队列 - task_id: 2bd59342-0664-4ccb-ba87-79379096cc08, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_3899a8f97324_1754304270] 添加任务到队列 - task_id: 3aaa4e37-dc91-482e-99af-132a612d40f3, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_95c3ba3433a8_1754304270] 添加任务到队列 - task_id: 1273e544-688f-496b-8d89-3e0f40aa0606, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_cc5583fc86f7_1754304270] 添加任务到队列 - task_id: 12382c62-0cd1-4bf2-bdc8-1d20bf9b2371, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_701ee6fae4da_1754304270] 添加任务到队列 - task_id: f9584479-3d0d-4c79-affa-9ad7afdd8850, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_bcb25eb8cee0_1754304270] 添加任务到队列 - task_id: 535364ea-05bd-46ea-9937-9f55c68507e8, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_3c1938c41cc3_1754304270] 添加任务到队列 - task_id: 7e429b8d-a3f0-4ed0-9b58-08957d00b127, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_d47aa654ab64_1754304270] 添加任务到队列 - task_id: 4f07fbe9-70de-4927-a4d5-bb28bc12c52c, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_260133911f93_1754304270] 添加任务到队列 - task_id: 04d9aeaf-7bed-4024-bedb-e10e6f00eb7f, rollout_idx: 1/1
+[2025-08-04 18:44:30,306][agent_coordinator][INFO] - [trace_ea21b439d6ec_1754304270] 添加任务到队列 - task_id: 0bf05a7d-b28b-44d2-955a-50b41e24012a, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_55ae950863f5_1754304270] 添加任务到队列 - task_id: 6054afcb-5bab-4702-90a0-b259b5d3217c, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_5f1e169e0c80_1754304270] 添加任务到队列 - task_id: abed40dc-063f-4598-8ba5-9fe749c0615d, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_70b96d16130b_1754304270] 添加任务到队列 - task_id: 37608790-6147-45d0-9f20-1137bb35703d, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_30e96cb27a8f_1754304270] 添加任务到队列 - task_id: 26a8440e-c166-4c50-aef4-bfb77314b46b, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_4e01f65faa6d_1754304270] 添加任务到队列 - task_id: d681960f-7bc3-4286-9913-a8812ba3261a, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_187a330b65a0_1754304270] 添加任务到队列 - task_id: 035f41ba-6653-43ab-aa63-c86d449d62e5, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_cc2720afd17b_1754304270] 添加任务到队列 - task_id: 7efeb4b1-3d19-4762-b163-63328d66303b, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_8c34438603fd_1754304270] 添加任务到队列 - task_id: 1de60575-bb6e-4c3d-9e6a-2fa699f9f197, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_6b9366044720_1754304270] 添加任务到队列 - task_id: aa3a8974-2e85-438b-b29e-a64df44deb4b, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_063501e09784_1754304270] 添加任务到队列 - task_id: 51b11269-2ca8-4b2a-9163-f21758420e78, rollout_idx: 1/1
+[2025-08-04 18:44:30,307][agent_coordinator][INFO] - [trace_310cc49d60c1_1754304270] 添加任务到队列 - task_id: 1e8df695-bd1b-45b3-b557-e7d599cf7597, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_932e8cc27eef_1754304270] 添加任务到队列 - task_id: ecb0df7a-4e8d-4a03-b162-053391d3afaf, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_78ca4573ac50_1754304270] 添加任务到队列 - task_id: 8b1ce5f2-59d2-4dcc-b0b0-666a714b9a14, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_67117e49d36a_1754304270] 添加任务到队列 - task_id: a01fbce3-2793-461f-ab86-43680ccbae25, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_31c6d7af1402_1754304270] 添加任务到队列 - task_id: 0326d92d-d218-48a8-9ca1-981cd6d064c7, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_a07293406006_1754304270] 添加任务到队列 - task_id: 0a2e43bf-b26c-4631-a966-af9dfa12c9e5, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_546146bf6491_1754304270] 添加任务到队列 - task_id: 4188d3a4-077d-46b7-9c86-23e1a036f6c1, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_d3b2266695bf_1754304270] 添加任务到队列 - task_id: 347ef137-7eeb-4c80-a3bb-0951f26a8aff, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_e4e9ba552ddf_1754304270] 添加任务到队列 - task_id: eb03d19a-b88d-4de4-8a64-ca0ac66f426b, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_4c0c986d158c_1754304270] 添加任务到队列 - task_id: 0cecd4f3-74de-457b-ba94-29ad6b5dafb6, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_5bfee95b065d_1754304270] 添加任务到队列 - task_id: 1d17d234-e39d-4ed7-b46f-4417922a4e7c, rollout_idx: 1/1
+[2025-08-04 18:44:30,308][agent_coordinator][INFO] - [trace_31942cb77237_1754304270] 添加任务到队列 - task_id: 4e6fcf72-daf3-439f-a232-c434ce416af6, rollout_idx: 1/1
+[2025-08-04 18:44:30,309][agent_coordinator][INFO] - [trace_38f3a138b533_1754304270] 添加任务到队列 - task_id: 01b269ae-2111-4a07-81fd-3fcd711993b0, rollout_idx: 1/1
+[2025-08-04 18:44:30,309][agent_coordinator][INFO] - [trace_0d66e9983d42_1754304270] 添加任务到队列 - task_id: 21df9241-f8d7-4509-b7f1-37e501a823f7, rollout_idx: 1/1
+[2025-08-04 18:44:30,309][agent_coordinator][INFO] - [trace_251e6ef634a5_1754304270] 添加任务到队列 - task_id: a9f325aa-8c05-4e4f-8341-9e4358565f4f, rollout_idx: 1/1
+[2025-08-04 18:44:30,309][agent_coordinator][INFO] - [trace_33ae3e34bcfd_1754304270] 添加任务到队列 - task_id: 6e99a1ad-07d2-4b66-a1ce-ece6d99c20a5, rollout_idx: 1/1
+[2025-08-04 18:44:30,309][agent_coordinator][INFO] - [trace_afcd14d01e6e_1754304270] 添加任务到队列 - task_id: 7a4e4bc8-922c-4c84-865c-25ba34136be1, rollout_idx: 1/1
+[2025-08-04 18:44:30,309][agent_coordinator][INFO] - [trace_a7e3eae8391c_1754304270] 添加任务到队列 - task_id: 4de54231-e4b5-49e3-b2ba-61a0bec721c0, rollout_idx: 1/1
+[2025-08-04 18:44:30,309][agent_coordinator][INFO] - [trace_9d1baf8d351b_1754304270] 添加任务到队列 - task_id: 30e3e107-1cfb-46ee-a755-2cd080d7ba6a, rollout_idx: 1/1
+[2025-08-04 18:44:30,309][agent_coordinator][INFO] - [trace_06dc88fae70b_1754304270] 添加任务到队列 - task_id: 4172ea6e-6b77-4edb-a9cc-c0014bd1603b, rollout_idx: 1/1
+[2025-08-04 18:44:30,309][agent_coordinator][INFO] - [trace_47fd22eb0eb2_1754304270] 添加任务到队列 - task_id: 1334ca3e-f9e3-4db8-9ca7-b4c653be7d17, rollout_idx: 1/1
+[2025-08-04 18:44:30,309][agent_coordinator][INFO] - [trace_5f33bd3a8fe2_1754304270] 添加任务到队列 - task_id: 3a7c8185-25c1-4941-bd7b-96e823c9f21f, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_f307c302407c_1754304270] 添加任务到队列 - task_id: 21ab7b40-77c2-4ae6-8321-e00d3a086c73, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_1964cfb74007_1754304270] 添加任务到队列 - task_id: 5d901039-a89c-4bfb-967b-bf66f4df075e, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_100bb574b221_1754304270] 添加任务到队列 - task_id: 550ce7e7-747b-495f-b122-acdc4d0b8e54, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_3fd415d1edf7_1754304270] 添加任务到队列 - task_id: 455d3c66-7dc6-4537-a39a-36d3e9119df7, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_64a5fd8e1d1a_1754304270] 添加任务到队列 - task_id: af23762e-2bfd-4a1d-aada-20fa8de9ce07, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_95f88da37243_1754304270] 添加任务到队列 - task_id: c59742c0-4323-4b9d-8a02-723c251deaa0, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_5fa7f5afe0e9_1754304270] 添加任务到队列 - task_id: ef9d12bd-bcee-4ba0-a40e-918400f43ddf, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_88c28a74a1ee_1754304270] 添加任务到队列 - task_id: 9ec204e4-f0a3-42f8-8458-b772a6797cab, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_ef60a9cd238b_1754304270] 添加任务到队列 - task_id: 0f84bef9-9790-432e-92b7-eece357603fb, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_e0119ed5d1f3_1754304270] 添加任务到队列 - task_id: ce88f674-ab7a-43da-9201-468d38539e4a, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_81898cd3e0ce_1754304270] 添加任务到队列 - task_id: 3b27600c-3668-4abd-8f84-7bcdebbccbdb, rollout_idx: 1/1
+[2025-08-04 18:44:30,310][agent_coordinator][INFO] - [trace_d472dea24958_1754304270] 添加任务到队列 - task_id: a097acff-6266-4291-9fbd-137af7ecd439, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_a230b3b693e3_1754304270] 添加任务到队列 - task_id: bf4e9888-f10f-47af-8dba-76413038b73c, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_b79184cf6707_1754304270] 添加任务到队列 - task_id: 21760ecb-8f62-40d2-8d85-0cee5725cb72, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_182c508a0c26_1754304270] 添加任务到队列 - task_id: ac9bb6cb-1888-43ab-81e4-a98a547918cd, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_e587edde5534_1754304270] 添加任务到队列 - task_id: 2cd43775-7085-45d8-89fa-9e35c0a915cf, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_302c999f49c6_1754304270] 添加任务到队列 - task_id: 358aa0a7-6677-453f-ae35-e440f004c31e, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_7ef0efe1b7c6_1754304270] 添加任务到队列 - task_id: a669ef01-ded5-4099-9ea9-25e99b569840, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_57268b61d831_1754304270] 添加任务到队列 - task_id: 73c99fb9-f828-43ce-b87a-01dc07faa224, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_12f28cf191cd_1754304270] 添加任务到队列 - task_id: 15aece23-a215-4579-91b4-69eec72e18da, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_2bcd9ac28b32_1754304270] 添加任务到队列 - task_id: 986fc832-6af2-417c-8845-9272b3a1528b, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_ae3365e9f481_1754304270] 添加任务到队列 - task_id: a434992a-89df-4577-925c-0c58b747f0f4, rollout_idx: 1/1
+[2025-08-04 18:44:30,311][agent_coordinator][INFO] - [trace_8cd553c225b6_1754304270] 添加任务到队列 - task_id: 7dbc52a6-11e0-4c9a-a2cb-1e36cfda80d8, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_e358a6bc22a9_1754304270] 添加任务到队列 - task_id: 841b50aa-df53-47bd-a73a-22d3a9f73160, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_bb74e24ae0b3_1754304270] 添加任务到队列 - task_id: 8979838c-54a5-4454-a2b8-3d135a1a5c8f, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_b1d8842f6423_1754304270] 添加任务到队列 - task_id: b8adbc24-cef2-4b15-99d5-ecbe7ff445eb, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_9a088aaafea7_1754304270] 添加任务到队列 - task_id: 2b94c692-6abb-48ae-ab0b-b3e8a19cb340, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_16e971deab61_1754304270] 添加任务到队列 - task_id: 9cf05d24-6bd9-4dae-8967-f67d88f5d38a, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_51b62098297f_1754304270] 添加任务到队列 - task_id: 08aced46-45a2-48d7-993b-ed3fb5b32302, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_36f97e7d7856_1754304270] 添加任务到队列 - task_id: edb61b14-a854-4bf5-a075-c8075c11293a, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_9dfaa1bddb5b_1754304270] 添加任务到队列 - task_id: c82632a4-56b6-4db4-9dd1-3820ee3388e4, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_e290553fdda1_1754304270] 添加任务到队列 - task_id: 39be0d19-634d-4475-8768-09c130f5425d, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_ee193c8228c0_1754304270] 添加任务到队列 - task_id: ac1b39ff-ee4d-4483-abce-c117e98942f0, rollout_idx: 1/1
+[2025-08-04 18:44:30,312][agent_coordinator][INFO] - [trace_7ab4ad06834c_1754304270] 添加任务到队列 - task_id: f23acfd2-c485-4b7c-a1e7-d4303ddfe864, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_706772b8f981_1754304270] 添加任务到队列 - task_id: 70bca0cc-c117-427e-b0be-4df7299ebeb6, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_849f328ab2cf_1754304270] 添加任务到队列 - task_id: af2d657a-e6b3-4c6a-9f67-9e3ed015974c, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_8e7bcb6cc1d9_1754304270] 添加任务到队列 - task_id: 57667013-ea97-417c-9dce-2713091e6e2a, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_13f0b9428a6a_1754304270] 添加任务到队列 - task_id: 0a211154-fda0-48d0-9274-eaac4ce5486d, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_ec28e1a4bdeb_1754304270] 添加任务到队列 - task_id: a53f80cd-4a90-4490-8310-097b011433f6, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_8bbeb49da653_1754304270] 添加任务到队列 - task_id: 7ae48c60-f143-4119-b659-15b8f485eb9a, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_43c49852b074_1754304270] 添加任务到队列 - task_id: 5cfb9197-e72b-454b-900e-c06b0c802b40, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_8722822c4fcf_1754304270] 添加任务到队列 - task_id: 05dd4c1d-c489-4c85-8389-a7836c4f0567, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_c302f688db6f_1754304270] 添加任务到队列 - task_id: 5c1a6c3d-c1b3-47cb-9b01-8d1b7544ffa1, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_c1b1f1ecb4b5_1754304270] 添加任务到队列 - task_id: 4ed5abd0-8b5d-47bd-839f-cacfa15ca37a, rollout_idx: 1/1
+[2025-08-04 18:44:30,313][agent_coordinator][INFO] - [trace_882f6e1788e8_1754304270] 添加任务到队列 - task_id: e4ef0baf-4b52-4590-a47e-d4d464cca2d7, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_caa7db4a085e_1754304270] 添加任务到队列 - task_id: ed43c15f-00cb-4054-9c95-62c880865d68, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_2ed9270787dc_1754304270] 添加任务到队列 - task_id: 3161d64e-3120-47b4-aaad-6a764a92493b, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_1fa3bc8b039c_1754304270] 添加任务到队列 - task_id: 04578141-1d42-4146-b9cf-6fab4ce5fd74, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_9cc3de0846ad_1754304270] 添加任务到队列 - task_id: 0810415c-bde4-4443-9047-d5f70165a697, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_91c5c38eb15f_1754304270] 添加任务到队列 - task_id: 0a0faba3-5580-44df-965d-f562a99b291c, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_3e53f64b396d_1754304270] 添加任务到队列 - task_id: 0b17a146-2934-46c7-8727-73ff6b6483e8, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_12d6819abbbd_1754304270] 添加任务到队列 - task_id: 0e47de2a-32e0-456c-a366-8c607ef7a9d2, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_a4cead719516_1754304270] 添加任务到队列 - task_id: 0e763496-b6bb-4508-a427-fad0b6c3e195, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_e3db68593402_1754304270] 添加任务到队列 - task_id: 3ef2b351-8a84-4ff2-8724-d86eae9b842e, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_d984eaef6dcf_1754304270] 添加任务到队列 - task_id: 4bcb1253-a636-4df4-8cb0-a35c04dfef31, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_796fad9dab77_1754304270] 添加任务到队列 - task_id: 66399b0d-8fda-4618-95c4-bfc6191617e9, rollout_idx: 1/1
+[2025-08-04 18:44:30,314][agent_coordinator][INFO] - [trace_580845d5c3c7_1754304270] 添加任务到队列 - task_id: 6a33f9b9-0a56-4844-9c3f-96ec3ffb3ba2, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_1f82c633a92b_1754304270] 添加任务到队列 - task_id: 6ada715d-3aae-4a32-a6a7-429b2e43fb93, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_b8751923a535_1754304270] 添加任务到队列 - task_id: 6f81754e-285d-4ce0-b59e-af7edb02d108, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_a91cb5d2417c_1754304270] 添加任务到队列 - task_id: 72b810ef-4156-4d09-8f08-a0cf57e7cefe, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_d032e2ac405a_1754304270] 添加任务到队列 - task_id: 8472fece-c7dd-4241-8d65-9b3cd1a0b568, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_51067de77563_1754304270] 添加任务到队列 - task_id: 88fe4b2d-3040-4c70-9a70-546a47764b48, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_0bfca1787913_1754304270] 添加任务到队列 - task_id: 936321ce-5236-426a-9a20-e0e3c5dc536f, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_cf8cd3faa197_1754304270] 添加任务到队列 - task_id: adf5e2c3-64c7-4644-b7b6-d2f0167927e7, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_7db726a301a7_1754304270] 添加任务到队列 - task_id: b21acd93-60fd-4127-8a43-2f5178f4a830, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_81c6ddab6e66_1754304270] 添加任务到队列 - task_id: d53ff5ee-3b1a-431e-b2be-30ed2673079b, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_235266d2c0b0_1754304270] 添加任务到队列 - task_id: e246f6d8-78d7-44ac-b668-fcf47946cb50, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_bf48b5651524_1754304270] 添加任务到队列 - task_id: e528b65e-1107-4b8c-8988-490e4fece599, rollout_idx: 1/1
+[2025-08-04 18:44:30,315][agent_coordinator][INFO] - [trace_4cce100cf56e_1754304270] 添加任务到队列 - task_id: ecc2413d-8a48-416e-a3a2-d30106ca36cb, rollout_idx: 1/1
+[2025-08-04 18:44:30,316][agent_coordinator][INFO] - [trace_f9872759fa8e_1754304270] 添加任务到队列 - task_id: f178a4a9-d090-4b56-bc4c-4b72a61a035d, rollout_idx: 1/1
+[2025-08-04 18:44:30,316][agent_coordinator][INFO] - [trace_c497346d1cf0_1754304270] 添加任务到队列 - task_id: bb8ccc78-479f-4a2f-a71e-d565e439436b, rollout_idx: 1/1
+[2025-08-04 18:44:30,316][agent_coordinator][INFO] - [trace_4400d5557281_1754304270] 添加任务到队列 - task_id: 2b9493d7-49b8-493a-a71b-56cd1f4d6908, rollout_idx: 1/1
+[2025-08-04 18:44:30,316][agent_coordinator][INFO] - [trace_27f742e2a083_1754304270] 添加任务到队列 - task_id: 2c9fc0de-3ee7-45e1-a5df-c86206ad78b5, rollout_idx: 1/1
+[2025-08-04 18:44:30,317][agent_coordinator][INFO] - [trace_51f7c2e8ee36_1754304270] 添加任务到队列 - task_id: 2fe4b718-3bd7-46ec-bdce-b184f5653624, rollout_idx: 1/1
+[2025-08-04 18:44:30,317][agent_coordinator][INFO] - [trace_389502c9d545_1754304270] 添加任务到队列 - task_id: 3680a5ee-6870-426a-a997-eba929a0d25c, rollout_idx: 1/1
+[2025-08-04 18:44:30,317][agent_coordinator][INFO] - [trace_928057762cd5_1754304270] 添加任务到队列 - task_id: 46407397-a7d5-4c6b-92c6-dbe038b1457b, rollout_idx: 1/1
+[2025-08-04 18:44:30,317][agent_coordinator][INFO] - [trace_2d13358ee5ab_1754304270] 添加任务到队列 - task_id: 4e9f0faf-2ecc-4ae8-a804-28c9a75d1ddc, rollout_idx: 1/1
+[2025-08-04 18:44:30,317][agent_coordinator][INFO] - [trace_7f9ac9263ab3_1754304270] 添加任务到队列 - task_id: 510f64c8-9bcc-4be1-8d30-638705850618, rollout_idx: 1/1
+[2025-08-04 18:44:30,317][agent_coordinator][INFO] - [trace_1c6b7d4735b2_1754304270] 添加任务到队列 - task_id: 51f5801c-18b3-4f25-b0c3-02f85507a078, rollout_idx: 1/1
+[2025-08-04 18:44:30,317][agent_coordinator][INFO] - [trace_ecb0914a2069_1754304270] 添加任务到队列 - task_id: 58565672-7bfe-48ab-b828-db349231de6b, rollout_idx: 1/1
+[2025-08-04 18:44:30,317][agent_coordinator][INFO] - [trace_8bb436c9c80e_1754304270] 添加任务到队列 - task_id: 78aed49a-a710-4321-a793-b611a7c5b56b, rollout_idx: 1/1
+[2025-08-04 18:44:30,317][agent_coordinator][INFO] - [trace_aa0db9566e07_1754304270] 添加任务到队列 - task_id: 897e3b53-5d4d-444b-85cb-2cdc8a97d903, rollout_idx: 1/1
+[2025-08-04 18:44:30,317][agent_coordinator][INFO] - [trace_97a1dc478672_1754304270] 添加任务到队列 - task_id: 937087b6-f668-4ba6-9110-60682ee33441, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_71ee624df3a5_1754304270] 添加任务到队列 - task_id: a0b9dc9c-fc07-4a88-8c5d-5e3ecad91bcb, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_1b6fdfd5bdf1_1754304270] 添加任务到队列 - task_id: b52b40a5-ad70-4c53-b5b0-5650a8387052, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_cdd7e414312b_1754304270] 添加任务到队列 - task_id: c867c42d-a52d-4a24-8ae3-f75d256b5618, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_48518ffe8cf2_1754304270] 添加任务到队列 - task_id: d9b7c649-c975-4f53-88f5-940b29c47247, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_c1ae9338810d_1754304270] 添加任务到队列 - task_id: e135df7c-7687-4ac0-a5f0-76b74438b53e, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_fd63210db313_1754304270] 添加任务到队列 - task_id: ee9a3c83-f437-4879-8918-be5efbb9fac7, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_90005b397d06_1754304270] 添加任务到队列 - task_id: f7dfbef3-7697-431c-883a-db8583a4e4f9, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_848524d51d5a_1754304270] 添加任务到队列 - task_id: f8cfa149-d1c1-4215-8dac-4a0932bad3c2, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_11a2df7d543b_1754304270] 添加任务到队列 - task_id: 6d72aad6-187a-4392-a4c4-ed87269c51cf, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_d4642541c6b6_1754304270] 添加任务到队列 - task_id: f918266a-b3e0-4914-865d-4faa564f1aef, rollout_idx: 1/1
+[2025-08-04 18:44:30,318][agent_coordinator][INFO] - [trace_d336ce9bbc27_1754304270] 添加任务到队列 - task_id: da52d699-e8d2-4dc5-9191-a2199e0b6a9b, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_a8d898bd765f_1754304270] 添加任务到队列 - task_id: bc2b57f3-686d-4ec9-87ce-edf850b7e442, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_381196159b46_1754304270] 添加任务到队列 - task_id: 74d5859f-ed66-4d3e-aa0e-93d7a592ce41, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_01533135af41_1754304270] 添加任务到队列 - task_id: b5062e3e-641c-4e3a-907b-ac864d2e7652, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_1cff6a3e9065_1754304270] 添加任务到队列 - task_id: 00fa164e-2612-4439-992e-157d019a8436, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_f05d82a5b238_1754304270] 添加任务到队列 - task_id: acb0f96b-e27c-44d8-b55f-7cb76609dfcd, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_158464d5f89b_1754304270] 添加任务到队列 - task_id: 69acbb55-d945-4927-a87b-8480e1a5bb7e, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_87cf3e01088d_1754304270] 添加任务到队列 - task_id: 48d05431-6cd5-4e76-82eb-12b60d823f7d, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_7fbf0b60c528_1754304270] 添加任务到队列 - task_id: 68a25bd4-59c7-4f4d-975e-da0c8509c848, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_c2b10c26ab2b_1754304270] 添加任务到队列 - task_id: eb303e01-261e-4972-8c07-c9b4e7a4922a, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_bc2d01dbad30_1754304270] 添加任务到队列 - task_id: 0c825995-5b70-4526-b663-113f4c999dd2, rollout_idx: 1/1
+[2025-08-04 18:44:30,319][agent_coordinator][INFO] - [trace_519725b5f453_1754304270] 添加任务到队列 - task_id: c7c1e4c3-9e92-4eba-a4b8-689953975ea4, rollout_idx: 1/1
+[2025-08-04 18:44:30,320][agent_coordinator][INFO] - [trace_49c95b9b71e9_1754304270] 添加任务到队列 - task_id: d1acdb87-bb67-4f30-84aa-990e56a09c92, rollout_idx: 1/1
+[2025-08-04 18:44:30,320][agent_coordinator][INFO] - [trace_3cb90d489ea9_1754304270] 添加任务到队列 - task_id: deec51c9-3b1e-4b9e-993c-4776f20e8bb2, rollout_idx: 1/1
+[2025-08-04 18:44:30,320][agent_coordinator][INFO] - [trace_3c85f007f3a0_1754304270] 添加任务到队列 - task_id: 8e116af7-7db7-4e35-a68b-b0939c066c78, rollout_idx: 1/1
+[2025-08-04 18:44:30,320][agent_coordinator][INFO] - [trace_bf717971d10f_1754304270] 添加任务到队列 - task_id: 337d318b-aa07-4f4f-b763-89d9a2dd013f, rollout_idx: 1/1
+[2025-08-04 18:44:30,320][agent_coordinator][INFO] - [trace_043320361ec5_1754304270] 添加任务到队列 - task_id: 82e3c869-49f6-4305-a7ce-f3e64a0618e7, rollout_idx: 1/1
+[2025-08-04 18:44:30,320][agent_coordinator][INFO] - [trace_308a10e482b3_1754304270] 添加任务到队列 - task_id: 185f29bd-5da0-40a6-b69c-ba7f4e0324ef, rollout_idx: 1/1
+[2025-08-04 18:44:30,320][agent_coordinator][INFO] - [trace_109eae4ae801_1754304270] 添加任务到队列 - task_id: 869de13e-bef9-4b91-ba51-f6708c40b096, rollout_idx: 1/1
+[2025-08-04 18:44:30,320][agent_coordinator][INFO] - [trace_fef691ad95a9_1754304270] 添加任务到队列 - task_id: 2c1ebcd7-9c6d-4c9a-afad-900e381ecd5e, rollout_idx: 1/1
+[2025-08-04 18:44:30,320][agent_coordinator][INFO] - [trace_7113f188bb6c_1754304270] 添加任务到队列 - task_id: 3a93cae4-ad3e-403e-8c12-65303b271818, rollout_idx: 1/1
+[2025-08-04 18:44:30,321][agent_coordinator][INFO] - [trace_4800cf9961f3_1754304270] 添加任务到队列 - task_id: 1f18aa87-af6f-41ef-9853-cdb8f32ebdea, rollout_idx: 1/1
+[2025-08-04 18:44:30,321][agent_coordinator][INFO] - [trace_4784c2593349_1754304270] 添加任务到队列 - task_id: 26150609-0da3-4a7d-8868-0faf9c5f01bb, rollout_idx: 1/1
+[2025-08-04 18:44:30,321][agent_coordinator][INFO] - [trace_00d6d1f9c7d5_1754304270] 添加任务到队列 - task_id: 9219480b-3aed-47fc-8bac-d2cffc5849f7, rollout_idx: 1/1
+[2025-08-04 18:44:30,321][agent_coordinator][INFO] - [trace_937d2869ce68_1754304270] 添加任务到队列 - task_id: 881deb30-9549-4583-a841-8270c65f2a17, rollout_idx: 1/1
+[2025-08-04 18:44:30,321][agent_coordinator][INFO] - [trace_a8dd0839aa4c_1754304270] 添加任务到队列 - task_id: 7e287123-70ca-47b9-8521-47db09b69b14, rollout_idx: 1/1
+[2025-08-04 18:44:30,321][agent_coordinator][INFO] - [trace_f2412181639b_1754304270] 添加任务到队列 - task_id: e2392362-125e-4f76-a2ee-524b183a3412, rollout_idx: 1/1
+[2025-08-04 18:44:30,321][agent_coordinator][INFO] - [trace_ce4cecde1f6a_1754304270] 添加任务到队列 - task_id: 5bc63fb9-276a-4439-a7c1-9dc76401737f, rollout_idx: 1/1
+[2025-08-04 18:44:30,321][agent_coordinator][INFO] - [trace_69df25991f7c_1754304270] 添加任务到队列 - task_id: 26660ad1-6ebb-4f59-8cba-a8432dfe8d38, rollout_idx: 1/1
+[2025-08-04 18:44:30,321][agent_coordinator][INFO] - [trace_f6a6fd93339e_1754304270] 添加任务到队列 - task_id: a82b78bb-7fde-4cb3-94a4-035baf10bcf0, rollout_idx: 1/1
+[2025-08-04 18:44:30,321][agent_coordinator][INFO] - [trace_23f82367c9af_1754304270] 添加任务到队列 - task_id: 36037439-2044-4b50-b9d1-875b5a332143, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_68d05b97191e_1754304270] 添加任务到队列 - task_id: 716a6079-22da-47f1-ba73-c9d58f986a38, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_58e03608153e_1754304270] 添加任务到队列 - task_id: 873cafdd-a581-47f6-8b33-b9696ddb7b05, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_c7394ec0c3a2_1754304270] 添加任务到队列 - task_id: a74b607e-6bb5-4ea8-8a7c-5d97c7bbcd2a, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_350bb0a2b6e4_1754304270] 添加任务到队列 - task_id: 6f4073b8-d8ea-4ade-8a18-c5d1d5d5aa9a, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_d8d26894476b_1754304270] 添加任务到队列 - task_id: da922383-bfa4-4cd3-bbad-6bebab3d7742, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_0a2959f63fd1_1754304270] 添加任务到队列 - task_id: 2373b66a-092d-44cb-bfd7-82e86e7a3b4d, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_6972bccef3e1_1754304270] 添加任务到队列 - task_id: 81c425f5-78f3-4771-afd6-3d2973825947, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_1d80978d3439_1754304270] 添加任务到队列 - task_id: bb83cab4-e5c7-42c7-a67b-e46068032b86, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_a7d1c35a0034_1754304270] 添加任务到队列 - task_id: 227d2f97-562b-4ccb-ae47-a5ec9e142fbb, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_3499db96e2de_1754304270] 添加任务到队列 - task_id: b337d106-053f-4d37-8da0-7f9c4043a66b, rollout_idx: 1/1
+[2025-08-04 18:44:30,322][agent_coordinator][INFO] - [trace_10980eb63cfb_1754304270] 添加任务到队列 - task_id: 20236825-b5df-46e7-89bf-62e1d640a897, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_e5aa58790b3a_1754304270] 添加任务到队列 - task_id: 8df7e444-8e06-4f93-8a1a-c5c974269d82, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_c419a19ad96d_1754304270] 添加任务到队列 - task_id: aad10cd7-9337-4b62-b704-a857848cedf2, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_4bacd978b525_1754304270] 添加任务到队列 - task_id: 02ce9a50-7af2-47ed-8596-af0c230501f8, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_68996c033586_1754304270] 添加任务到队列 - task_id: 4c26e3f3-3a14-4d86-b44a-d3cedebbb487, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_2a43ffd5fb1e_1754304270] 添加任务到队列 - task_id: a503b07f-9119-456b-b75d-f5146737d24f, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_a5640b738f6f_1754304270] 添加任务到队列 - task_id: 09a37c51-e625-49f4-a514-20a773797a8a, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_88d5fa3782da_1754304270] 添加任务到队列 - task_id: 3e3fc409-bff3-4905-bf16-c968eee3f807, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_9121da3a0e3c_1754304270] 添加任务到队列 - task_id: f5c13cdd-205c-4719-a562-348ae5cd1d91, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_3e1f87e87334_1754304270] 添加任务到队列 - task_id: 5990457f-2adb-467b-a4af-5c857c92d762, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_9bc37cc9ba4d_1754304270] 添加任务到队列 - task_id: 415ef462-bed3-493a-ac36-ca8c6d23bf1b, rollout_idx: 1/1
+[2025-08-04 18:44:30,323][agent_coordinator][INFO] - [trace_851214282e82_1754304270] 添加任务到队列 - task_id: 7ff48d5b-2df2-49da-b500-a5150ffc7f18, rollout_idx: 1/1
+[2025-08-04 18:44:30,324][agent_coordinator][INFO] - [trace_a5cb610d7435_1754304270] 添加任务到队列 - task_id: 9f3bb592-209d-43bc-bb47-d77d9df56504, rollout_idx: 1/1
+[2025-08-04 18:44:30,324][agent_coordinator][INFO] - [trace_4ab511a33a46_1754304270] 添加任务到队列 - task_id: dd60633f-2c72-42ba-8547-6f2c8cb0fdb0, rollout_idx: 1/1
+[2025-08-04 18:44:30,324][agent_coordinator][INFO] - [trace_30ddb5ed953e_1754304270] 添加任务到队列 - task_id: ce2b64a2-ddc1-4f91-8c7d-a88be7121aac, rollout_idx: 1/1
+[2025-08-04 18:44:30,324][agent_coordinator][INFO] - [trace_72a12207802e_1754304270] 添加任务到队列 - task_id: 3f05f3b9-29ba-4b6b-95aa-2204697ffc06, rollout_idx: 1/1
+[2025-08-04 18:44:30,324][agent_coordinator][INFO] - [trace_d8e8a22d31d8_1754304270] 添加任务到队列 - task_id: e1fc0df3-c8b9-4ee7-864c-d0b590d3aa56, rollout_idx: 1/1
+[2025-08-04 18:44:30,324][agent_coordinator][INFO] - [trace_c0fdce288952_1754304270] 添加任务到队列 - task_id: f8369178-fafe-40c2-adc4-b9b08a125456, rollout_idx: 1/1
+[2025-08-04 18:44:30,324][agent_coordinator][INFO] - [trace_2e0cf13700f0_1754304270] 添加任务到队列 - task_id: 778efd0a-153f-4842-9214-f05fc176b877, rollout_idx: 1/1
+[2025-08-04 18:44:30,324][agent_coordinator][INFO] - [trace_34944935b4fb_1754304270] 添加任务到队列 - task_id: 47f7c0ce-a5fb-4100-a5e6-65cd0e7429e5, rollout_idx: 1/1
+[2025-08-04 18:44:30,324][agent_coordinator][INFO] - [trace_0858270cb9dd_1754304270] 添加任务到队列 - task_id: c2751594-0cd5-4088-be1b-b5f2f9ec97c4, rollout_idx: 1/1
+[2025-08-04 18:44:30,324][agent_coordinator][INFO] - [trace_eef87c83eda5_1754304270] 添加任务到队列 - task_id: 788b3701-3ec9-4b67-b679-418bfa726c22, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_541c2837e016_1754304270] 添加任务到队列 - task_id: 48c46dc7-fe04-4505-ade7-723cba1aa6f6, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_baa15cc225ba_1754304270] 添加任务到队列 - task_id: 42d25c08-fb87-4927-8b65-93631280a26f, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_53db4cc38524_1754304270] 添加任务到队列 - task_id: e8172110-ec08-421b-a6f5-842e6451911f, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_31004262329e_1754304270] 添加任务到队列 - task_id: 42f4d1c7-4521-4161-b646-0a8934e36081, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_2fc4f61d95fb_1754304270] 添加任务到队列 - task_id: 3c8f201a-009d-4bbe-8b65-a6f8b35bb57f, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_50c0767b8f6c_1754304270] 添加任务到队列 - task_id: d68204bf-11c1-4b13-b48b-d303c73d4bf6, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_b02df62918c7_1754304270] 添加任务到队列 - task_id: 91190194-f406-4cd6-b3f9-c43fac942b22, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_a1f04e08b444_1754304270] 添加任务到队列 - task_id: 7f35355e-02a6-45b5-b140-f0be698bcf85, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_38258717b994_1754304270] 添加任务到队列 - task_id: 98e8e339-5f91-4ed2-b2b2-12647cb134f4, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_ab80a24a8d70_1754304270] 添加任务到队列 - task_id: 0e5303d4-8820-42f6-b18d-daf7e633de21, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_f53df1a688ef_1754304270] 添加任务到队列 - task_id: df67aebb-fb3a-44fd-b75b-51b6012df509, rollout_idx: 1/1
+[2025-08-04 18:44:30,325][agent_coordinator][INFO] - [trace_130d3d19124e_1754304270] 添加任务到队列 - task_id: 5df7b33a-9f77-4101-823e-02f863e1c1ae, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_a26aad6ae8f7_1754304270] 添加任务到队列 - task_id: aceb0368-56b8-4073-b70e-3dc9aee184e0, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_762e3a378e00_1754304270] 添加任务到队列 - task_id: 22a4636f-8179-4357-8e87-d1743ece1f81, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_483995c328e6_1754304270] 添加任务到队列 - task_id: 236833a3-5704-47fc-888c-4f298f09f799, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_40e2cea3a84e_1754304270] 添加任务到队列 - task_id: 67890eb6-6ce5-4c00-9e3d-fb4972699b06, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_dc0530ca2f8c_1754304270] 添加任务到队列 - task_id: 94d95f96-9699-4208-98ba-3c3119edf9c2, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_5efb1b0d90f9_1754304270] 添加任务到队列 - task_id: bedcedc4-4d72-425e-ad62-21960b11fe0d, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_f81869fb411c_1754304270] 添加任务到队列 - task_id: ec4e3f68-9ea4-4c18-a5c9-69f89d1178b3, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_596f42f22def_1754304270] 添加任务到队列 - task_id: a462a795-fdc7-4b23-b689-e8b6df786b78, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_792a227d8eae_1754304270] 添加任务到队列 - task_id: f9be0997-4b7c-45c5-b05c-4612b44a6118, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_9253c661a5c6_1754304270] 添加任务到队列 - task_id: 28cc3b7e-b194-4bc9-8353-d04c0f4d56d2, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_9afe20d5c992_1754304270] 添加任务到队列 - task_id: 5ea617a3-0e86-4ba6-aab2-dac9aa2e8d57, rollout_idx: 1/1
+[2025-08-04 18:44:30,326][agent_coordinator][INFO] - [trace_17b23f5ebaf0_1754304270] 添加任务到队列 - task_id: e0df059f-28a6-4169-924f-b9623e7184cc, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_e97022cb87a5_1754304270] 添加任务到队列 - task_id: b6781586-6346-41cd-935a-a6b1487918fc, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_afefeddcf7a7_1754304270] 添加任务到队列 - task_id: b3d4a89c-53f2-4d6b-8b6a-541fb5d205fa, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_f4e42ed100e6_1754304270] 添加任务到队列 - task_id: 3ce045a0-877b-42aa-8d2c-b4a863336ab8, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_6de50671ab22_1754304270] 添加任务到队列 - task_id: fe41f596-a71b-4c2f-9b2f-9dcd40b568c3, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_6b04fd07619a_1754304270] 添加任务到队列 - task_id: a4d98375-215b-4a4d-aee9-3d4370fccc41, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_846bcdde48d9_1754304270] 添加任务到队列 - task_id: 13584542-872b-42d8-b299-866967b5c3ef, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_c7fa1cfb3d19_1754304270] 添加任务到队列 - task_id: 23393935-50c7-4a86-aeea-2b78fd089c5c, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_935d26659bb7_1754304270] 添加任务到队列 - task_id: 5812b315-e7bd-4265-b51f-863c02174c28, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_72ccb96c3bf6_1754304270] 添加任务到队列 - task_id: c288e301-e626-4b98-a1ab-159dcb162af5, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_ecbd234328f3_1754304270] 添加任务到队列 - task_id: 4783cc41-c03c-4e1b-89b4-50658f642bd5, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_edd04a359f82_1754304270] 添加任务到队列 - task_id: 5c1075ca-bb34-46a3-a7a0-029bd7463e79, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_6aa04eba1aab_1754304270] 添加任务到队列 - task_id: 5ced85fc-fa1a-4217-95fd-0fb530545ce2, rollout_idx: 1/1
+[2025-08-04 18:44:30,327][agent_coordinator][INFO] - [trace_fe9b43f07252_1754304270] 添加任务到队列 - task_id: 37887e8c-da15-4192-923c-08fa390a176d, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_df1ea32139e2_1754304270] 添加任务到队列 - task_id: 4127319a-8b79-4410-b58a-7a151e15f3d7, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_a23878bb9b1b_1754304270] 添加任务到队列 - task_id: 4d117223-a354-47fb-8b45-62ab1390a95f, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_c0b84bc835ec_1754304270] 添加任务到队列 - task_id: 6f56bf42-85b8-4fbb-8e06-6c44960184ba, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_7f74143f9641_1754304270] 添加任务到队列 - task_id: bb5e4c0d-f964-439c-97b6-bdb9747de3f4, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_b64125a1718d_1754304270] 添加任务到队列 - task_id: 7b6c7e24-c58a-49fc-a5bb-d57b80e5b4c3, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_c579520529d7_1754304270] 添加任务到队列 - task_id: 12086550-11c0-466b-b367-1d9e75b3910e, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_3bf0dd3d19fb_1754304270] 添加任务到队列 - task_id: 06fe7178-4491-4589-810f-2e2bc9502122, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_bc128a1af011_1754304270] 添加任务到队列 - task_id: 6766f2b8-8a72-417f-a9e5-56fcaa735837, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_f01313a983ce_1754304270] 添加任务到队列 - task_id: e1e75309-3ddb-4d09-92ec-de869c928143, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_464254f97a72_1754304270] 添加任务到队列 - task_id: 3d1682a7-0fb0-49ae-a4dc-a73afd2d06d5, rollout_idx: 1/1
+[2025-08-04 18:44:30,328][agent_coordinator][INFO] - [trace_f94bf065b57f_1754304270] 添加任务到队列 - task_id: 35253b65-1c19-4304-8aa4-6884b8218fc0, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_57cc8b1467f7_1754304270] 添加任务到队列 - task_id: d088f539-cab4-4f9a-ac92-9999fc3a656e, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_e0bd90d54aba_1754304270] 添加任务到队列 - task_id: 2ad9387a-65d8-4e33-ad5b-7580065a27ca, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_f171d0d5daed_1754304270] 添加任务到队列 - task_id: 480bcfea-d68f-4aaa-a0a9-2589ef319381, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_8e00515ac7c3_1754304270] 添加任务到队列 - task_id: 030eeff7-b492-4218-b312-701ec99ee0cc, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_668f87e5c67d_1754304270] 添加任务到队列 - task_id: 94760984-3ff5-41ee-8347-cf1af709fea0, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_165e381e6022_1754304270] 添加任务到队列 - task_id: 99146c54-4f37-4ab8-9327-5f3291665e1e, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_8b20d5efb5c5_1754304270] 添加任务到队列 - task_id: c9e7eaf2-b1a1-4efc-a982-721972fa9f02, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_3539995e0c07_1754304270] 添加任务到队列 - task_id: 59f21cfb-0120-4326-b255-a5b827b38967, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_e5b259eca200_1754304270] 添加任务到队列 - task_id: 8ba5ae7a-5ae5-4eab-9fcc-5dd4fe3abf89, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_1bd7d9cbbab5_1754304270] 添加任务到队列 - task_id: 8f080098-ddb1-424c-b438-4e96e5e4786e, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_a23ac16578f9_1754304270] 添加任务到队列 - task_id: bba3381f-b5eb-4439-bd9e-80c22218d5a7, rollout_idx: 1/1
+[2025-08-04 18:44:30,329][agent_coordinator][INFO] - [trace_978366c6f347_1754304270] 添加任务到队列 - task_id: fba2c100-79e8-42df-ae74-b592418d54f4, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_351215dc0ad5_1754304270] 添加任务到队列 - task_id: efcf0d81-0835-4880-b2fd-d866e8bc2294, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_2f1ea1231119_1754304270] 添加任务到队列 - task_id: 8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_2600bdb39db0_1754304270] 添加任务到队列 - task_id: aa4b5023-aef6-4ed9-bdc9-705f59ab9ad6, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_6f64290195c2_1754304270] 添加任务到队列 - task_id: 386dbd0e-0241-4a0a-b6a2-6704fba26b1c, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_6a649db1390f_1754304270] 添加任务到队列 - task_id: 9195653c-f4aa-453d-aa95-787f6ccfaae9, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_c19b512cc14c_1754304270] 添加任务到队列 - task_id: d06f0d4d-2cd5-4ede-8de9-598629438c6e, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_dd05a4838b2a_1754304270] 添加任务到队列 - task_id: a5bbbcd5-b398-4c91-83d4-55e1e31bbb81, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_b2eec424d6d3_1754304270] 添加任务到队列 - task_id: 5ac2891a-eacd-4954-b339-98abba077adb, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_5539019d7a95_1754304270] 添加任务到队列 - task_id: f3977615-2b45-4ac5-8bba-80c17dbe2a37, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_b8f8fcc87c77_1754304270] 添加任务到队列 - task_id: 215dfd39-f493-4bc3-a027-8a97d72c61bf, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_3b7e8322e867_1754304270] 添加任务到队列 - task_id: cb130f0d-d36f-4302-9838-b3baf46139b6, rollout_idx: 1/1
+[2025-08-04 18:44:30,330][agent_coordinator][INFO] - [trace_50f4062118c7_1754304270] 添加任务到队列 - task_id: 7882ed6e-bece-4bf0-bada-c32dc1ddae72, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_2af8d27a11a6_1754304270] 添加任务到队列 - task_id: 0ed39f63-6049-43d4-ba4d-5fa2fe04a951, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_cfd30428e608_1754304270] 添加任务到队列 - task_id: 53ad5833-3455-407b-bbc6-45b4c79ab8fb, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_1b16eb719f29_1754304270] 添加任务到队列 - task_id: eabc805a-bfcf-4460-b250-ac92135819f6, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_51019aba28d6_1754304270] 添加任务到队列 - task_id: 982d12a5-beab-424f-8d38-d2a48429e511, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_737468792880_1754304270] 添加任务到队列 - task_id: 4e60007a-f5be-4bfc-9723-c39affa0a6d3, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_e6e0551a6948_1754304270] 添加任务到队列 - task_id: e2b5e914-ffe1-44d2-8e92-58f8c5d92bb2, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_76b8143cf19f_1754304270] 添加任务到队列 - task_id: 9439a27b-18ae-42d8-9778-5f68f891805e, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_fbd9a4c4c1ef_1754304270] 添加任务到队列 - task_id: ea98c5d7-3cf9-4f9b-8ad3-366b58e0fcae, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_22203c99ee23_1754304270] 添加任务到队列 - task_id: 930fdb3b-11a8-46fe-9bac-577332e2640e, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_27f8ab9f6d18_1754304270] 添加任务到队列 - task_id: 276cc624-87ea-4f08-ab93-f770e3790175, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_47d26760127b_1754304270] 添加任务到队列 - task_id: 9d425400-e9b2-4424-9a4b-d4c7abac4140, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_f22278189135_1754304270] 添加任务到队列 - task_id: 5e2d93d8-8ad0-4435-b150-1692aacaa994, rollout_idx: 1/1
+[2025-08-04 18:44:30,331][agent_coordinator][INFO] - [trace_88986e1c796c_1754304270] 添加任务到队列 - task_id: 6ed0a554-cbee-4b44-84ea-fd6c042f4fe1, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_81d6afaecee5_1754304270] 添加任务到队列 - task_id: ec71221e-ac43-46f9-89b8-ee7d80f7e1c5, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_5557fce4f151_1754304270] 添加任务到队列 - task_id: 70745df8-f2f5-42bd-8074-fbc10334fcc5, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_d6db78a460de_1754304270] 添加任务到队列 - task_id: 57242fad-77ca-454f-b71b-f187181a9f23, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_e5fd6227fb47_1754304270] 添加任务到队列 - task_id: c6bf789c-ba3a-4209-971d-b63abf0ab733, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_5d38b1aabf21_1754304270] 添加任务到队列 - task_id: 0512bb38-d531-4acf-9e7e-0add90816068, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_abeb18b560cd_1754304270] 添加任务到队列 - task_id: 847a96b6-df94-4927-97e6-8cc9ea66ced7, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_922bea422414_1754304270] 添加任务到队列 - task_id: 7aeae0e2-70ee-4705-821d-1bba5d5b2ddd, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_cd571af95fae_1754304270] 添加任务到队列 - task_id: dcbe20e8-647f-4f1d-8696-f1c5bbb570e3, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_b6470fe1afcc_1754304270] 添加任务到队列 - task_id: 7c4cc09e-7a92-40dd-8338-b2286535c4ed, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_fdc351d8622b_1754304270] 添加任务到队列 - task_id: 971cbb5b-3cbf-4ff7-9e24-b5c84fcebfa6, rollout_idx: 1/1
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - 第 1 次填充任务完成，添加了 355 个任务，当前队列大小: 355
+!!!!!!!!!!!!active_tasks: set()
+!!!!!!!!!max_concurrent_envs: 3
+[2025-08-04 18:44:30,332][agent_coordinator][INFO] - [trace_4fd0ddf99d33_1754304270] 开始启动任务 - task_id: 99146c54-4f37-4ab8-9327-5f3291665e1e, rollout_idx: 1/1
+[2025-08-04 18:44:30,348][agent_coordinator][INFO] - [trace_4fd0ddf99d33_1754304270] 任务启动成功 - task_id: 99146c54-4f37-4ab8-9327-5f3291665e1e, rollout_idx: 1/1, 当前活跃任务数: 1
+!!!!!!!!!!!!active_tasks: {ObjectRef(f4402ec78d3a260771bc8f8c75be31bb8f2fbbc60100000001000000)}
+!!!!!!!!!max_concurrent_envs: 3
+[2025-08-04 18:44:30,348][agent_coordinator][INFO] - [trace_8344b611a566_1754304270] 开始启动任务 - task_id: 6766f2b8-8a72-417f-a9e5-56fcaa735837, rollout_idx: 1/1
+[2025-08-04 18:44:30,349][agent_coordinator][INFO] - [trace_8344b611a566_1754304270] 任务启动成功 - task_id: 6766f2b8-8a72-417f-a9e5-56fcaa735837, rollout_idx: 1/1, 当前活跃任务数: 2
+!!!!!!!!!!!!active_tasks: {ObjectRef(f4402ec78d3a260771bc8f8c75be31bb8f2fbbc60100000001000000), ObjectRef(82891771158d68c1bdb986f42225edde89fc80d80100000001000000)}
+!!!!!!!!!max_concurrent_envs: 3
+[2025-08-04 18:44:30,349][agent_coordinator][INFO] - [trace_cb485529a218_1754304270] 开始启动任务 - task_id: ae78f875-5b98-4907-bbb5-9c737fc68c03, rollout_idx: 1/1
+[2025-08-04 18:44:30,350][agent_coordinator][INFO] - [trace_cb485529a218_1754304270] 任务启动成功 - task_id: ae78f875-5b98-4907-bbb5-9c737fc68c03, rollout_idx: 1/1, 当前活跃任务数: 3
+[2025-08-04 18:44:30,350][agent_coordinator][INFO] - 本轮启动了 3 个任务
+[2025-08-04 18:44:30,853][stderr][ERROR] - STDERR: [36m(pid=595738)[0m [2025-08-04 18:44:30][root][INFO] - 日志系统初始化完成 - 日志文件: /root/code/computer-use-rollout/logs/computer_use_rollout.log
+[36m(TrajectoryRunnerActor pid=595740)[0m k8s: _create_remote_env called {'id': '6766f2b8-8a72-417f-a9e5-56fcaa735837', 'snapshot': 'chrome', 'instruction': 'Could you help me install the unpacked extension at /home/user/Desktop/ in Chrome?', 'source': 'https://support.google.com/chrome/thread/205881926/it-s-possible-to-load-unpacked-extension-automatically-in-chrome?hl=en', 'config': [{'type': 'download', 'parameters': {'files': [{'url': 'https://drive.google.com/uc?id=1t-6Qrpgox0UvqQ0EAhkCnSV8Rqsp4cMF&export=download', 'path': '/home/user/Desktop/helloExtension.zip'}]}}, {'type': 'execute', 'parameters': {'command': 'echo password | sudo -S apt-get update -y && echo password | sudo -S apt-get install unzip -y && unzip /home/user/Desktop/helloExtension.zip -d /home/user/Desktop/ && rm /home/user/Desktop/helloExtension.zip', 'shell': True}}, {'type': 'launch', 'parameters': {'command': ['google-chrome', '--remote-debugging-port=1337']}}, {'type': 'launch', 'parameters': {'command': ['socat', 'tcp-listen:9222,fork', 'tcp:localhost:1337']}}], 'trajectory': 'trajectories/', 'related_apps': ['chrome'], 'evaluator': {'func': 'is_in_list', 'result': {'type': 'find_unpacked_extension_path'}, 'expected': {'type': 'rule', 'rules': {'expected': '/home/user/Desktop/helloExtension'}}}, 'task_id': '6766f2b8-8a72-417f-a9e5-56fcaa735837', 'os': 'ubuntu', 'raw': {'task_type': 'chrome', 'task_id': '6766f2b8-8a72-417f-a9e5-56fcaa735837'}}
+[36m(TrajectoryRunnerActor pid=595740)[0m k8s: init_env request {'task_id': '6766f2b8-8a72-417f-a9e5-56fcaa735837', 'os': 'ubuntu', 'config': [{'type': 'download', 'parameters': {'files': [{'url': 'https://drive.google.com/uc?id=1t-6Qrpgox0UvqQ0EAhkCnSV8Rqsp4cMF&export=download', 'path': '/home/user/Desktop/helloExtension.zip'}]}}, {'type': 'execute', 'parameters': {'command': 'echo password | sudo -S apt-get update -y && echo password | sudo -S apt-get install unzip -y && unzip /home/user/Desktop/helloExtension.zip -d /home/user/Desktop/ && rm /home/user/Desktop/helloExtension.zip', 'shell': True}}, {'type': 'launch', 'parameters': {'command': ['google-chrome', '--remote-debugging-port=1337']}}, {'type': 'launch', 'parameters': {'command': ['socat', 'tcp-listen:9222,fork', 'tcp:localhost:1337']}}]}
+[36m(TrajectoryRunnerActor pid=595742)[0m k8s: _create_remote_env called {'id': 'ae78f875-5b98-4907-bbb5-9c737fc68c03', 'snapshot': 'chrome', 'instruction': 'Could you please change the number of search results displayed on one page to 50? I find that having more results visible at once significantly enhances my research efficiency, as it reduces the need to constantly click through multiple pages. ', 'source': 'https://support.google.com/chrome/thread/219988391/increase-search-results-per-page?hl=en', 'config': [], 'trajectory': 'trajectories/', 'related_apps': ['chrome'], 'evaluator': {'func': 'infeasible'}, 'task_id': 'ae78f875-5b98-4907-bbb5-9c737fc68c03', 'os': 'ubuntu', 'raw': {'task_type': 'chrome', 'task_id': 'ae78f875-5b98-4907-bbb5-9c737fc68c03'}}
+[36m(TrajectoryRunnerActor pid=595742)[0m k8s: init_env request {'task_id': 'ae78f875-5b98-4907-bbb5-9c737fc68c03', 'os': 'ubuntu', 'config': []}
+[36m(TrajectoryRunnerActor pid=595738)[0m k8s: _create_remote_env called {'id': '99146c54-4f37-4ab8-9327-5f3291665e1e', 'snapshot': 'chrome', 'instruction': 'Please help me set Chrome to delete my browsing data automatically every time I close the browser.', 'source': 'https://www.youtube.com/watch?v=v0kxqB7Xa6I', 'config': [{'type': 'launch', 'parameters': {'command': ['google-chrome', '--remote-debugging-port=1337']}}, {'type': 'launch', 'parameters': {'command': ['socat', 'tcp-listen:9222,fork', 'tcp:localhost:1337']}}], 'trajectory': 'trajectories/', 'related_apps': ['chrome'], 'evaluator': {'postconfig': [{'type': 'execute', 'parameters': {'command': 'pkill chrome', 'shell': 'true'}}], 'func': 'exact_match', 'result': {'type': 'data_delete_automacally'}, 'expected': {'type': 'rule', 'rules': {'expected': 'true'}}}, 'task_id': '99146c54-4f37-4ab8-9327-5f3291665e1e', 'os': 'ubuntu', 'raw': {'task_type': 'chrome', 'task_id': '99146c54-4f37-4ab8-9327-5f3291665e1e'}}
+[36m(TrajectoryRunnerActor pid=595738)[0m k8s: init_env request {'task_id': '99146c54-4f37-4ab8-9327-5f3291665e1e', 'os': 'ubuntu', 'config': [{'type': 'launch', 'parameters': {'command': ['google-chrome', '--remote-debugging-port=1337']}}, {'type': 'launch', 'parameters': {'command': ['socat', 'tcp-listen:9222,fork', 'tcp:localhost:1337']}}]}
+[36m(TrajectoryRunnerActor pid=595742)[0m task_id ae78f875-5b98-4907-bbb5-9c737fc68c03 init_env elapsed 25.18
+[36m(TrajectoryRunnerActor pid=595742)[0m k8s: k8s init_env resp {'server_id': '68e7aa97-2d7a-4209-b5a4-2ed453a63f38', 'vnc_port': 0}
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595742)[0m step-------------0
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8001 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595738)[0m task_id 99146c54-4f37-4ab8-9327-5f3291665e1e init_env elapsed 29.34
+[36m(TrajectoryRunnerActor pid=595738)[0m k8s: k8s init_env resp {'server_id': 'c92b45cd-7f25-43cb-b92d-bf0bd47de920', 'vnc_port': 0}
+[36m(TrajectoryRunnerActor pid=595738)[0m step-------------0
+[36m(TrajectoryRunnerActor pid=595742)[0m Response from agent:  Thought: To adjust the display settings for search results, I first need to open the system's Activities overview. There's an "Activities" button located in the top left corner of the screen; clicking on it will take me into this interface. This is where I can start looking for options related to search engines.
+[36m(TrajectoryRunnerActor pid=595742)[0m Action: click(start_box='(30,15)')
+[36m(TrajectoryRunnerActor pid=595742)[0m Call_vLLM time consumption: 4.02s
+[36m(TrajectoryRunnerActor pid=595742)[0m [!!!!] in step
+[36m(TrajectoryRunnerActor pid=595738)[0m Response from agent:  Thought: Let me see... To set up automatic clearing of browsing data, the first step is to access the settings menu in Chrome. I noticed that there’s a three-dot icon in the upper right corner of the browser window; clicking on it will open all the available options. This is where we begin our journey into configuring privacy settings.
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595738)[0m Action: click(start_box='(1259,244)')
+[36m(TrajectoryRunnerActor pid=595738)[0m Call_vLLM time consumption: 3.87s
+[36m(TrajectoryRunnerActor pid=595738)[0m [!!!!] in step
+[36m(TrajectoryRunnerActor pid=595742)[0m step-------------1
+[36m(TrajectoryRunnerActor pid=595742)[0m Response from agent:  Thought: The Activities interface has now opened up before me, and I notice there’s a search box at the top. To locate the settings for adjusting the number of search results per page, I need to type "settings" into this search box. This should help me quickly find the relevant configuration options.
+[36m(TrajectoryRunnerActor pid=595742)[0m Action: type(content='settings')
+[36m(TrajectoryRunnerActor pid=595742)[0m Call_vLLM time consumption: 1.20s
+[36m(TrajectoryRunnerActor pid=595742)[0m [!!!!] in step
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595738)[0m step-------------1
+[36m(TrajectoryRunnerActor pid=595738)[0m Response from agent:  Thought: I just opened the main menu of Chrome, and now I need to locate the "Settings" option. It should be positioned near the bottom of this dropdown menu. Once I find it, clicking on it will take me to the detailed settings page for Chrome, where we can start configuring how to automatically clear browsing data.
+[36m(TrajectoryRunnerActor pid=595738)[0m Action: click(start_box='(987,1016)')
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595738)[0m Call_vLLM time consumption: 1.76s
+[36m(TrajectoryRunnerActor pid=595738)[0m [!!!!] in step
+[36m(TrajectoryRunnerActor pid=595742)[0m step-------------2
+[36m(TrajectoryRunnerActor pid=595742)[0m Response from agent:  Thought: It seems that searching for "settings" isn't the best approach. I noticed there's a Chrome browser icon on the left side of the screen, which is actually what we need. After all, if we want to change how search results are displayed, it makes sense to start from within the browser itself. Let me click on that Chrome icon and see if I can find any relevant settings options directly in the browser.
+[36m(TrajectoryRunnerActor pid=595742)[0m Call_vLLM time consumption: 1.52s
+[36m(TrajectoryRunnerActor pid=595742)[0m [!!!!] in step
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595742)[0m Action: click(start_box='(34,67)')
+[36m(TrajectoryRunnerActor pid=595738)[0m step-------------2
+[36m(TrajectoryRunnerActor pid=595738)[0m Response from agent:  Thought: I've accessed the main settings interface of Chrome, but it seems like there are quite a few options here. The option to automatically clear browsing data should be located under the privacy-related settings. Let me click on the menu button in the top left corner to expand all the categories and see if I can find anything related to privacy or security.
+[36m(TrajectoryRunnerActor pid=595738)[0m Action: click(start_box='(409,297)')
+[36m(TrajectoryRunnerActor pid=595738)[0m Call_vLLM time consumption: 1.41s
+[36m(TrajectoryRunnerActor pid=595738)[0m [!!!!] in step
+[36m(TrajectoryRunnerActor pid=595742)[0m step-------------3
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(ModelServicePool pid=595739)[0m Checking existing service health...
+[36m(TrajectoryRunnerActor pid=595742)[0m Response from agent:  Thought: I just took a wrong turn by opening the Chrome browser, but that's alright. Now that I'm back on the Activities interface, let me rethink my approach. Since we're looking to adjust the search results settings, it would be more appropriate to start from the system settings. I need to type "settings" into this search box so that I can find and access the correct configuration entry.
+[36m(TrajectoryRunnerActor pid=595742)[0m Call_vLLM time consumption: 1.57s
+[36m(TrajectoryRunnerActor pid=595742)[0m [!!!!] in step
+[36m(TrajectoryRunnerActor pid=595740)[0m task_id 6766f2b8-8a72-417f-a9e5-56fcaa735837 init_env elapsed 61.68
+[36m(TrajectoryRunnerActor pid=595740)[0m k8s: k8s init_env resp {'server_id': '2bcb639f-c540-4b68-bd65-3c4a80227c92', 'vnc_port': 0}
+[36m(TrajectoryRunnerActor pid=595742)[0m Action: click(start_box='(867,75)')
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595738)[0m step-------------3
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8001 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595740)[0m step-------------0
+[36m(TrajectoryRunnerActor pid=595738)[0m Response from agent:  Thought: I took a quick glance at the left sidebar of the settings page and spotted an option labeled "Privacy and security." This is exactly what I was looking for! The feature to automatically clear browsing data must be hidden within this section. So, let me click on it to explore further.
+[36m(TrajectoryRunnerActor pid=595738)[0m Action: click(start_box='(498,437)')
+[36m(TrajectoryRunnerActor pid=595738)[0m Call_vLLM time consumption: 1.43s
+[36m(TrajectoryRunnerActor pid=595738)[0m [!!!!] in step
+[36m(TrajectoryRunnerActor pid=595740)[0m Response from agent:  Thought: To install an extension, I first need to open the settings menu in Chrome. Let me see... Ah, there’s a three-dot icon in the upper right corner of the browser window; that should be what I’m looking for. Clicking on it will reveal more options.
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595742)[0m step-------------4
+[36m(TrajectoryRunnerActor pid=595742)[0m Response from agent:  Thought: I just clicked on a blank area of the desktop, but nothing happened. It seems like I need to change my approach. To adjust the search results settings, I should start from within Chrome itself. Do you see those three dots in the upper right corner? That's where you can access the browser's settings menu. Clicking on it should lead us to the option for configuring how many search results are displayed per page.
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8001 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595742)[0m Action: click(start_box='(1263,245)')[32m [repeated 2x across cluster][0m
+[36m(TrajectoryRunnerActor pid=595742)[0m Call_vLLM time consumption: 1.77s[32m [repeated 2x across cluster][0m
+[36m(TrajectoryRunnerActor pid=595742)[0m [!!!!] in step[32m [repeated 2x across cluster][0m
+[36m(TrajectoryRunnerActor pid=595740)[0m step-------------1
+[36m(TrajectoryRunnerActor pid=595738)[0m step-------------4
+[36m(TrajectoryRunnerActor pid=595740)[0m Response from agent:  Thought: The menu has been expanded, and I've noticed the "Extensions" option. This is exactly where we need to go next—by clicking on it, we can access the extensions management page. From there, we'll be able to locate the entry point for installing local extensions.
+[36m(TrajectoryRunnerActor pid=595738)[0m Response from agent:  Thought: I found the option labeled "Delete browsing data," which is exactly what I was looking for. It seems that by clicking on it, I can access more specific settings regarding automatic clearing. Let me go ahead and click on this option to proceed with the next steps.
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595742)[0m step-------------5
+[36m(TrajectoryRunnerActor pid=595742)[0m Response from agent:  Thought: I've found the Settings option in the menu list, which is exactly what I was looking for. By clicking on it, I can access the detailed settings interface of Chrome, where I should be able to find the configuration options related to search results. Let me go ahead and click on this option to proceed with our task.
+[36m(TrajectoryRunnerActor pid=595742)[0m Action: click(start_box='(987,1015)')[32m [repeated 3x across cluster][0m
+[36m(TrajectoryRunnerActor pid=595742)[0m Call_vLLM time consumption: 2.26s[32m [repeated 3x across cluster][0m
+[36m(TrajectoryRunnerActor pid=595742)[0m [!!!!] in step[32m [repeated 3x across cluster][0m
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595740)[0m step-------------2
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8001 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595738)[0m step-------------5
+[36m(TrajectoryRunnerActor pid=595740)[0m Response from agent:  Thought: I noticed that the menu has already expanded to show the "Manage Extensions" option. This is exactly what we need—through this entry, we can manage all our installed extensions and also add new ones. Let me click on it so I can proceed with installing the extension files from my desktop.
+[36m(TrajectoryRunnerActor pid=595740)[0m Action: click(start_box='(1392,648)')
+[36m(TrajectoryRunnerActor pid=595740)[0m Call_vLLM time consumption: 2.25s
+[36m(TrajectoryRunnerActor pid=595740)[0m [!!!!] in step
+[36m(TrajectoryRunnerActor pid=595738)[0m Response from agent:  Thought: I have now reached the crucial step of setting up automatic clearing. In front of me is a dialog box for deleting browsing data, and I need to switch to the "Advanced" tab in order to configure the automatic clearing feature. This advanced settings panel should include options related to browser shutdown events, so let me click over there and take a look.
+[36m(TrajectoryRunnerActor pid=595738)[0m Action: click(start_box='(950,417)')
+[36m(TrajectoryRunnerActor pid=595738)[0m Call_vLLM time consumption: 2.99s
+[36m(TrajectoryRunnerActor pid=595738)[0m [!!!!] in step
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595742)[0m step-------------6
+[36m(TrajectoryRunnerActor pid=595742)[0m Response from agent:  Thought: I've accessed the main settings interface of Chrome, but it seems that the options for adjusting search results aren't immediately visible. However, that's not a problem because there's a handy search feature in the upper right corner. Instead of sifting through all these settings one by one, it would be much quicker to simply type "search" into the search box to locate the specific setting we need.
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595742)[0m Action: click(start_box='(1246,295)')
+[36m(TrajectoryRunnerActor pid=595742)[0m Call_vLLM time consumption: 2.41s
+[36m(TrajectoryRunnerActor pid=595742)[0m [!!!!] in step
+[36m(TrajectoryRunnerActor pid=595740)[0m step-------------3
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8001 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595738)[0m step-------------6
+[36m(TrajectoryRunnerActor pid=595740)[0m Response from agent:  Thought: I have successfully accessed the extension management interface, and now I'm ready to proceed with the installation of the extension. In order to install an extension from a local file, I need to enable developer mode first. There's a switch button labeled "Developer mode" located in the upper right corner of the screen; by clicking it, I can activate this feature.
+[36m(TrajectoryRunnerActor pid=595740)[0m Action: click(start_box='(1263,297)')
+[36m(TrajectoryRunnerActor pid=595740)[0m Call_vLLM time consumption: 1.54s
+[36m(TrajectoryRunnerActor pid=595740)[0m [!!!!] in step
+[36m(TrajectoryRunnerActor pid=595738)[0m Response from agent:  Thought: I'm currently on the advanced settings page, and it seems that the option to automatically clear data upon shutdown isn't visible in the current view. However, that's alright; I know these types of settings usually require scrolling down a bit. Let me press Page Down to see if there are any additional options below.
+[36m(TrajectoryRunnerActor pid=595738)[0m Action: hotkey(key='pagedown')
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595742)[0m step-------------7
+[36m(TrajectoryRunnerActor pid=595742)[0m Response from agent:  Thought: I've finally reached the settings page in Chrome, and now it's time to look for the search-related configurations. The search box is right in front of me, so I'll type "search" here to quickly pinpoint the options we need. This way, we can avoid aimlessly browsing through all these settings and save some time.
+[36m(TrajectoryRunnerActor pid=595742)[0m Action: type(content='search')
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595742)[0m Call_vLLM time consumption: 2.21s[32m [repeated 2x across cluster][0m
+[36m(TrajectoryRunnerActor pid=595742)[0m [!!!!] in step[32m [repeated 2x across cluster][0m
+[36m(TrajectoryRunnerActor pid=595740)[0m step-------------4
+[36m(TrajectoryRunnerActor pid=595740)[0m Response from agent:  Thought: Great! Developer mode is now enabled. I took a quick look at the interface and found the "Load unpacked" button on the left side, which is exactly what we need. By clicking this button, I can browse to the directory where my extension files are located on my desktop. Let me go ahead and click it to start loading those extension files.
+[36m(TrajectoryRunnerActor pid=595740)[0m Action: click(start_box='(457,350)')
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595740)[0m Call_vLLM time consumption: 1.66s
+[36m(TrajectoryRunnerActor pid=595740)[0m [!!!!] in step
+[36m(TrajectoryRunnerActor pid=595742)[0m step-------------8
+[36m(TrajectoryRunnerActor pid=595742)[0m Response from agent:  Thought: I typed "search" into the search box, but it seems that the results haven't fully loaded yet. The page is still loading, and I can see that spinning icon at the top. Instead of rushing to click around and potentially making mistakes, it would be better to wait until everything is fully displayed before proceeding.
+[36m(TrajectoryRunnerActor pid=595742)[0m Action: wait()
+[36m(TrajectoryRunnerActor pid=595742)[0m Call_vLLM time consumption: 2.14s
+[36m(TrajectoryRunnerActor pid=595742)[0m [!!!!] in step
+[36m(ModelServicePool pid=595739)[0m Routing request to http://localhost:8000 (in-flight: 1)
+[36m(TrajectoryRunnerActor pid=595740)[0m step-------------5
+[36m(TrajectoryRunnerActor pid=595740)[0m Response from agent:  Thought: I am currently browsing through the file system to find the location of my extension files. On the left side of the navigation bar, there's a Desktop option, which is exactly where I need to go. The path seems straightforward; by simply clicking on this Desktop folder, I can access it and locate those extension files.
+[36m(TrajectoryRunnerActor pid=595740)[0m Action: click(start_box='(285,278)')
+[2025-08-04 18:46:29,236][stderr][ERROR] - STDERR: Traceback (most recent call last):
+[2025-08-04 18:46:29,236][stderr][ERROR] - STDERR: File "/root/code/computer-use-rollout/run.py", line 106, in <module>
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: main()
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/site-packages/hydra/main.py", line 94, in decorated_main
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: _run_hydra(
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/site-packages/hydra/_internal/utils.py", line 394, in _run_hydra
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: _run_app(
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/site-packages/hydra/_internal/utils.py", line 457, in _run_app
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: run_and_report(
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/site-packages/hydra/_internal/utils.py", line 220, in run_and_report
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: return func()
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/site-packages/hydra/_internal/utils.py", line 458, in <lambda>
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: lambda: hydra.run(
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/site-packages/hydra/_internal/hydra.py", line 119, in run
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: ret = run_job(
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/site-packages/hydra/core/utils.py", line 186, in run_job
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: ret.return_value = task_function(task_cfg)
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: File "/root/code/computer-use-rollout/run.py", line 33, in main
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: asyncio.run(async_main(config))
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/asyncio/runners.py", line 44, in run
+[2025-08-04 18:46:29,237][stderr][ERROR] - STDERR: return loop.run_until_complete(main)
+[2025-08-04 18:46:29,238][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/asyncio/base_events.py", line 636, in run_until_complete
+[2025-08-04 18:46:29,238][stderr][ERROR] - STDERR: self.run_forever()
+[2025-08-04 18:46:29,238][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/asyncio/base_events.py", line 603, in run_forever
+[2025-08-04 18:46:29,238][stderr][ERROR] - STDERR: self._run_once()
+[2025-08-04 18:46:29,238][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/asyncio/base_events.py", line 1871, in _run_once
+[2025-08-04 18:46:29,238][stderr][ERROR] - STDERR: event_list = self._selector.select(timeout)
+[2025-08-04 18:46:29,238][stderr][ERROR] - STDERR: File "/root/miniconda3/envs/cua310/lib/python3.10/selectors.py", line 469, in select
+[2025-08-04 18:46:29,238][stderr][ERROR] - STDERR: fd_event_list = self._selector.poll(timeout, max_ev)
+[2025-08-04 18:46:29,238][stderr][ERROR] - STDERR: KeyboardInterrupt
+[36m(TrajectoryRunnerActor pid=595740)[0m Call_vLLM time consumption: 2.20s
+[36m(TrajectoryRunnerActor pid=595740)[0m [!!!!] in step

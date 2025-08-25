@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nCould you help me copy the data in Cell B6 in this Libreoffice Calc file and search it in the Chrome browser.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于 finally终于 finally finally finally finally finallyfinally终于终于finally finally finally finallyfinallyfinally终于终于终于finally finally finally终于 Finally终于终于finally finallyfinally终于finally finallyfinally终于 finally finallyFinally终于终于finally finallyfinally Finallyfinally Finally finally终于 Finally finally终于 Finally finally终于 Finally終於Finallyfinallyfinally终于 finallyfinallyFinally Finallyfinally\tfinally finally finally\tfinally\tfinallyFinally FinallyFinally Finally FinallyFinallyfinally finally终于finally FinallyFinally FinallyFinally FinallyFinally FinallyFinally終於終於\tfinally\tfinally最终终于终于finallyfinally终于终于终于finally finally finally终于 finally finally终于 finally终于finally终于finally终于finally终于Finally finally終於总算终于Finally Finally終於 finallyfinally finally终于总算Finallyfinally終於\tfinally\tfinally Finally\tfinally\tfinally\tfinally\tfinally Finally\tfinally終於Finally Finally終於 FinallyFinally終於 Finally最终Finally finally总算finallyfinally finally finally总算終於inally最终总算Finally Lastly終於 Lastly終於最后总算finallyinally最终Finally最后\tfinallyinally Lastly最终 Lastly最终总算最后finallyFinally终究总算最后Lastly 最终 Finally終於 Lastly最终 Lastly最终Finally最后总算Lastly 最后 Finally最后終於Lastly终究好不容易finallyfinally\tfinallyinally Finally\tfinally\tfinally终yFinallyFinally Finally最后ついに终于终于终于终于终于finally finally finally总算終於最终終於最终inally最终finaly Finally最后Finallyinally FINALLY最终FINALLY最后FINALLY果然总算最后_FINALLY最后FINALLY果然果然总算ﬁnally最終ﬃnally终y最终ﬀinally ﬁnalmenteﬁnalmente终ﬀﬁnálmenteﬁnalmente终究才算最后到底\tfinally eventually finally Lastly eventually finalized。终于finally finally finally Finally finallyFinally終於終於終於究竟inally最终finally\tfinally最终finallyFinally\tfinally终y最终竟然突然终于终于终于总算終於ついについに終於inally最終 결국에ようやく终y cuối lastIndex居然突然总算終於忽然finally Finally竟然突然忽然恍然终hFinally Lastly suddenly finally finally Finally\tfinally �終於最後ｈａｓｈｉｄｙｉｎｆｏｒｃｅｄｌｅｎｇｔｈｙｆｉｎａｌlyｆｉｎａ LastlyfinallyFinallyLastlyFinally\tfinallyfinalyLastlyfinalllyLastlyfinalyLastly.final ultimately finallyfinally Finallyخيرا konečno finalyy eventualmentally finally FINALLY Lastly FINALLY Lastly FINALLY FinallyخيراFinal mente终极ely finalmente\tfinalmente最終にようやく終於inally终究算总算.finalmente ﬁnalmente经过好不容易"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

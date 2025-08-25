@@ -1,0 +1,73 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nOn next Monday, look up a flight from Mumbai to Stockholm.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "Thought: I realized I took the wrong path - I was looking for flights on Qatar Airways' website, which isn't quite right. To find a flight from Mumbai to Stockholm next Monday, I should actually be using Skyscanner. I noticed that I need to click on the address bar and enter \"skyscanner.com,\" so let's start searching for the right flight.\nAction: click(start_box='<|box_start|>(649,250)<|box_end|>')"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "Thought: I finally found the right website! I saw that I needed to visit Skyscanner, which is a professional flight search platform. I entered \"skyscanner.com\" into the address bar, and now I'm ready to help users find a suitable flight from Mumbai to Stockholm. The interface is designed to be very user-friendly; I can easily select my departure city as Mumbai and my destination as Stockholm, then set the travel date for next Monday.\nAction: click(start_box='<|box_start|>(647,251)<|box_end|>')\n\ntype(content='skyscanner.com')"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0002.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "Thought: I finally located the right flight search tool! I successfully accessed the Skyscanner website, and I'm now ready to assist users in finding ideal flights. The process is straightforward - I need to enter Mumbai as my departure point and Stockholm as my destination, making sure to set the travel date for next Monday.I saw that the screen displayed a clean booking interface, prompting me to click on \"One way\" for one-way tickets. This way, travelers can find non-stop flights that meet their needs perfectly.\nAction: click(start_box='<|box_start|>(788,290)<|box_end|>')\n\nclick(start_box='<|box_start|>(513,590)<|box_end|>')"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0003.png"
+      }
+    ]
+  }
+]

@@ -1,0 +1,73 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nMake the line spacing of first two paragraph into double line spacing\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "Thought: I'm currently looking at a document that discusses the characteristics of novels, and I need to adjust the line spacing for the first two paragraphs. The text begins with \"Compared to a short story,\" and I have to move my mouse over this section - I'll start from \"Compared\" and drag all the way to \"peaks.\" Once selected, I can find the line spacing button in the toolbar above, which will allow me to change both paragraphs to double spacing.\nAction: drag(start_box='<|box_start|>(628,214)<|box_end|>', end_box='<|box_start|>(709,350)<|box_end|>')"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "Thought: I finally figured out where to adjust the line spacing. I found the key - I needed to select the entire content of the first two paragraphs. Starting from \"Compared to a short story,\" I had to carefully drag my mouse all the way to \"highest peaks at the end.\" This way, I was able to locate the double-line spacing button on the toolbar and easily changed both sections of text to double spacing.\nAction: click(start_box='<|box_start|>(287,81)<|box_end|>')"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0002.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "Thought: I finally managed to adjust the line spacing correctly! I identified the crucial text range - I started from \"Compared to a short story\" and extended it all the way to \"at the end.\" Now, I've located the \"Spacing\" option in the Format menu, and by selecting Double from its dropdown list, I successfully set both paragraphs to double line spacing. With this adjustment, the entire layout looks much clearer.\nAction: finished(content='我已经将前两段的行距设置为双倍行距。')"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0003.png"
+      }
+    ]
+  }
+]

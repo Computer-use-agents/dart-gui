@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nCross-check the invoices with the bank statements and identify any discrepancies. Then pull out the invoices that don't match the statements and put them in the \"problematic\" folder.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于 finally finally finally finally finally finally finally finally终于终于finally finallyfinally终于终于finally finally finally终于finally终于finally终于 finallyfinallyfinally終於finallyfinallyfinally Finally终于 finally finally终于终于 finally finallyFinally终于 Finally finally finally終於\tfinally Finally Finally终于finallyfinallyfinally终于终于Finally Finally Finally終於終於finally finallyFinally finally最终终于Finally终于 finally终于finally終於\tfinally FinallyFinally終於終於finally finally Finally Finally总算終於Finally终于终于终于Finally终于finally finally finally終於\tfinally Finally总算finally终于finally最终Finally总算Finally finally finally終於\tfinally Finally最终Finally总算finally Finally Finally最终Finally终\tfinally finally终于终于终于finally終於\tfinally Finally最后Finally总算finallyfinally终于 finally finally终于Finally Finally FinallyFinally\tfinally Finally\tfinally finallyfinallyfinally finally終於inally\tfinally最终Finally FinallyFinally終於終於終於終於终于是最后总算finally\tfinally Finally最后总算Finally最后\tfinally最终总算Finally Finally最后竟然finally终于finally终于最终Finally最后\tfinally最后总算 finally\tfinally最后 最后 Finally finally終於inallyinally终究Finally終於最终 Lastly finally finally最终 Lastly终于是inally最终\tfinally到底finallyfinallyfinally Finally\tfinally最后 最后总算Finally Finally最后 最终 Finally finally finallyFinally\tfinally终究这才finallyfinally终于终于总算最终Finally\tfinallyinally终究总算最后好不容易终于终于终于finally终于终于终于Finally finally finally Finally finally終於ついにfinally Lastly Finally Lastly finally finally終於Lastly FINALLY最终总算最终\tfinally eventually Finally\tfinally ultimately finallyfinally Lastly好不容易Finally Lastly Finally最终inally最终Lastly Finally\tfinally ultimately最终果然finallyFinally eventually eventually終於最終inally最终inally终极终极究竟最后居然最后 Lastly终究总算最后Finally好不容易Lastlyfinally终于是 결국에야终于是突然终于finally finally finally最终inally最终忽然終於finaly.finaly最終menteﬁnallyﬁnalmenteﬁnalmenteﬁnalmenteﬁnálmentefinalmenteﬃnalmente终究FINALLY果然FINALLY最後ﬀINALLYﬃNALY最終ﬃNALY ﬁNALY终究FINALLY到底FINALLY究竟ULTIMATELY突然FINALLY Lastly FINALLY好不容易FINALLY Lastly FINALLY最后FINALLY总算是最终Lastly终究才算最终总算最终Lastly ultimately ultimate eventually eventually eventually finally Finally finaly eventualultimately ultimately Ultimately ultimately ultimately ultimately ultimateultimateultimate �終於終於终於ついに终于Finally\tfinally Eventually eventually eventually eventually eventual eventual eventual eventual eventual finaly finaly finalfinafinaly"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]

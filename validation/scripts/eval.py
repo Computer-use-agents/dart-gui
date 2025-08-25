@@ -226,8 +226,7 @@ def main():
     # 示例用法
     baseline_dir = "validation/results/uitars_1.5_7b_90_train_pure"
     # current_dir = "/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_trainset90_px_08220031_step30"
-    current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250822_8vat2940/global_step_30"
-    # current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco/global_step_30"
+    current_dir = "validation/osworld_all_feasible_reward_script_grpo_k8s_20250825_zzr6gvmc/global_step_10"
     # 
     # 对比两个实验
     compare_results(baseline_dir, current_dir, "Baseline", "Step 30")

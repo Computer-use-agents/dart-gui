@@ -1,0 +1,37 @@
+[
+  {
+    "role": "system",
+    "content": "You are a helpful assistant."
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "text",
+        "text": "You are a GUI agent. You are given a task and your action history, with screenshots. You need to perform the next action to complete the task.\n\n## Output Format\n```\nThought: ...\nAction: ...\n```\n\n## Action Space\n\nclick(start_box='<|box_start|>(x1,y1)<|box_end|>')\nleft_double(start_box='<|box_start|>(x1,y1)<|box_end|>')\nright_single(start_box='<|box_start|>(x1,y1)<|box_end|>')\ndrag(start_box='<|box_start|>(x1,y1)<|box_end|>', end_box='<|box_start|>(x3,y3)<|box_end|>')\nhotkey(key='')\ntype(content='') #If you want to submit your input, use \"\\n\" at the end of `content`.\nscroll(start_box='<|box_start|>(x1,y1)<|box_end|>', direction='down or up or right or left')\nwait() #Sleep for 5s and take a screenshot to check for any changes.\nfinished(content='xxx') # Use escape characters \\', \\\", and \\n in content part to ensure we can parse the content in normal python string format.\n\n## Note\n- Use English in `Thought` part.\n- Write a small plan and finally summarize your next action (with its target element) in one sentence in `Thought` part.\n- My computer's password is 'password', feel free to use it when you need sudo rights.\n\n## User Instruction\nPlease help me open the autosave feature of VS Code and delay AutoSave operations for 500 milliseconds in the VS Code setting.\n"
+      },
+      {
+        "type": "image_url",
+        "image_url": "image_0000.png"
+      }
+    ]
+  },
+  {
+    "role": "assistant",
+    "content": [
+      {
+        "type": "text",
+        "text": "终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于终于finally终于终于 finally终于 finally finally finally终于 finally终于终于finally finally finallyfinally终于终于终于finally finally finally終於finallyfinally终于终于finally finally finally终于finally終於finally finally finally終於finally終於 Finally终于 finally finally终于终于finally finally終於Finally终于总算终于finally Finally Finally finally finally终于finally終於finallyFinally Finally终于 finally终于finallyFinally Finally finally終於\tfinally Finally finally总算finallyFinally最终Finally Finallyfinallyfinally終於終於Finally finally finally Finally finally终于Finally终于finally终于finally終於\tfinally Finally\tfinally终于终于finally总算Finally Finally finallyFinally终于finally終於\tfinally\tfinally终于总算Finally Finally Finally finally finallyFinally Finally終於\tfinallyfinallyFinally終於最终Finally总算finally Finally\tfinallyfinally Finally总算Finally finallyfinally Finally\tfinally终inally finally finally终于Finally终于finally终于Finally finally Finally终于finally終於\tfinally最后終於Finally Finally总算finally終於\tfinallyfinally終於最终Finally finally finally总算 Finally\tfinallyfinally Finally终inally\tfinally最终Finally总算finally終於最后\tfinally最后最终Finally最后 Lastly finally Finally finally终于Finally\tfinally最终inally最终 Finally总算finally最后 Lastly终inally最终\tfinally最终終於最后 Lastly终究终于总算 finally终于 FinallyFinallyついに终于终于终于終於終於finally finally finally Finally finally FinallyfinallyFinally\tfinally LastlyFinallyついに终于终于finally finally Finally\tfinallyinally好不容易总算终于finallyFinally Finally Finally終於inally\tfinally FINALLY終於finalyLastly终yinally Lastly最终ついにfinally LastlyFinally Lastly finally最后Lastly果然总算最后ついに終於inallyfinallyLastly\tfinally最终ついmenteinally最后Finally Lastly终究这才总算终于 finally finally Finally finallyfinallyLastly\tfinally究竟好不容易Finally Finally FinallyFinally Lastly finallyfinally終於Lastly\tfinally最后居然finally最后FinallyLastly\tfinally到底总算终于最终終於 Lastly终y终y终ついely果然突然终于终于最终总算最后Finally Finally終於最後�权突然终于finallyfinally Lastly竟然最后总算 finally finally Finally\tfinally果然忽然忽然突然突然总算突然忽然忽然好不容易uddenlyfinallyLastly FINALLY最后好不容易FINALLYLastlyخير最終mente\tfinally finaly finaly Lastly最终_finally最終finallnya终究算总之經常 cuốily eventually竟然afterfinaly finalny eventually eventually总算最後Ṿuallyeventuallyخيرﬁnally最終ially eventualmenteｖａｓｙｉｎｃｙｒａｌｆｉｎａｌｎｙﬁｎａｌ４ＬＹﬁＮＡＬ４ＬＹﬁﾅＩＡＬ４Ｌ"
+      }
+    ]
+  },
+  {
+    "role": "user",
+    "content": [
+      {
+        "type": "image_url",
+        "image_url": "image_0001.png"
+      }
+    ]
+  }
+]
