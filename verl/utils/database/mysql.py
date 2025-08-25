@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 
 from sqlalchemy import (
-    create_engine, Column, String, Integer, BigInteger, Text, func, select, update, text, Enum, TIMESTAMP
+    create_engine, Column, String, Integer, BigInteger, Text, func, select, update, text, Enum, TIMESTAMP, case, literal
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.dialects import mysql
@@ -324,6 +324,44 @@ class MySQLRolloutORM:
             # 注意：session_scope 应负责 commit；此处无需再 commit
 
             return row.to_dict()
+        
+    # 统计第 n 新的 model_version（= 第 n 新的 checkpoint.path）在指定 run_id 下的成功率
+    def get_nth_newest_model_success(self, run_id: str, n: int):
+        """
+        返回 (avg_nonneg, count_all)
+        - avg_nonneg = sum(max(reward, 0)) / count_all
+        - count_all  = 所有匹配条目的数量（包含 reward 为 NULL 的行）
+        """
+        paths = self.get_latest_n_checkpoint_paths(run_id=run_id, n=n)
+        if len(paths) < n:
+            return 0, 0, 0
+
+        nth_model_version = paths[-1]
+        print("nth_model_version: ",nth_model_version)
+
+        with self.session_scope() as s:
+            nonneg_sum, count_all, distinct_task_cnt = s.execute(
+                select(
+                    # 只累计 reward >= 0 的值，其他（包括 NULL、负数）按 0 处理
+                    func.sum(
+                        case((RolloutRun.reward >= 0, RolloutRun.reward), else_=0.0)
+                    ),
+                    # 计数为所有匹配行
+                    func.count(literal(1)),
+                    func.count(func.distinct(RolloutRun.task_id)),
+                ).where(
+                    RolloutRun.run_id == run_id,
+                    RolloutRun.model_version == nth_model_version,
+                )
+            ).one()
+
+            count_all = int(count_all or 0)
+            distinct_task_cnt = int(distinct_task_cnt or 0)
+            if count_all == 0:
+                return 0, 0, 0
+
+            avg_nonneg = float(nonneg_sum or 0.0) / count_all
+            return avg_nonneg, count_all, distinct_task_cnt
          
         
 def create_database_manager() -> MySQLRolloutORM:
@@ -345,4 +383,6 @@ if __name__ == "__main__":
     # print(orm.get_rollouts_by_run_id("results/test_for_train_pass8_gpu8_env77_20250817_1345")[0])
     # print(orm.update_rollout_used("results/test_for_train_pass8_gpu8_env77_20250817_1345", "9439a27b-18ae-42d8-9778-5f68f891805e_trace_e635d5e3af17_1755501336"))
     # print(orm.insert_checkpoint("/mnt/checkpoints/model-abc/weights.bin"))
-    print(orm.get_latest_n_checkpoint_paths("results/pass@32_trainset90", 1))
+    # print(orm.get_latest_n_checkpoint_paths("results/pass@32_trainset90", 1))
+    for i in range(10, 20):
+        print(orm.get_nth_newest_model_success("results/test_for_train_pass8_gpu7_env69_20250821_2333", i))

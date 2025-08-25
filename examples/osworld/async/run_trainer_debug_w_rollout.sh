@@ -43,7 +43,7 @@ export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
-export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
+export ROLLOUT_SERVER_URL=http://172.19.102.100:15959
 
 # training parameters
 adv_estimator=grpo
@@ -100,7 +100,7 @@ python3 -m verl.trainer.main_ppo_async \
     data.custom_cls.path=verl/utils/dataset/osworld_dataset_iter.py \
     data.custom_cls.name=OSWorldAsyncDataset \
     data.shuffle=false \
-    +data.rotate_task_groups=true \
+    +data.rotate_task_groups=false \
     +data.root_data_dir=$ROOT_DATA_DIR \
     +data.window_size=${window_size} \
     +data.stride_size=${stride_size} \
@@ -140,11 +140,11 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=5 \
+    trainer.save_freq=2 \
     trainer.test_freq=10 \
     trainer.val_before_train=False \
     trainer.total_epochs=1 \
-    trainer.max_actor_ckpt_to_keep=10 \
+    trainer.max_actor_ckpt_to_keep=40 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \

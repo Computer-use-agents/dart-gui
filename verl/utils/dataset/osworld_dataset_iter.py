@@ -282,6 +282,8 @@ class OSWorldAsyncDataset(IterableDataset):
             # 2) 获取最近的若干 checkpoint 对应的 model_versions（top_mvs）
             top_n = int(self.config.get("top_mvs_n", 2))
             top_mvs = self.db_manager.get_latest_n_checkpoint_paths(run_id=self.run_id, n=top_n)
+            # print(data[0])
+            # print(top_mvs)
 
             # 3) 通过 filter_fn 选择本次要训练的 datasets（限制每 task 的数量）
             datasets: List[Dict[str, Any]] = filter_fn(
@@ -449,9 +451,9 @@ def main(run_id, root_data_dir):
     # 组装最小配置（与数据集实现里的 config.get 字段对齐）
     cfg = OmegaConf.create({
         "run_id": run_id,
-        "steps_per_epoch": 3,
-        "train_batch_size_min": 1,
-        "train_batch_size_max": 2,
+        "steps_per_epoch": 1,
+        "train_batch_size_min": 4,
+        "train_batch_size_max": 8,
         "rollout_n": 8,
         "top_mvs_n": 2,
         "poll_interval_sec": 30,
@@ -512,6 +514,6 @@ def main(run_id, root_data_dir):
 
 if __name__ == "__main__":
     
-    run_id = "results/pass@32_trainset90"
-    root_data_dir = "/workspace/computer-use/computer-use-rollout/results/test_for_train_pass8_gpu8_env77_20250817_1345"
+    run_id = "results/test_for_train_pass8_gpu7_env69_20250821_2333"
+    root_data_dir = "test_for_train_pass8_gpu7_env69_20250821_2333"
     main(run_id, root_data_dir)
