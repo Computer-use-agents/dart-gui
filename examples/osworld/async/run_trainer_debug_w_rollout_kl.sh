@@ -35,9 +35,9 @@ export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
-export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-export RUN_ID=pengxiang_test_0821_kl
-# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0813_h8zdohoq
+export ROOT_DATA_DIR=data/traj/data_pass@8_train90
+export RUN_ID=pengxiang_test_0824_fixed_4_task
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
 export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
@@ -51,7 +51,7 @@ adv_estimator=grpo
 use_kl_in_reward=False
 kl_coef=0.0
 use_kl_loss=True
-kl_loss_coef=0.0001
+kl_loss_coef=0.1
 
 clip_ratio_low=0.1
 clip_ratio_high=0.28
@@ -161,7 +161,7 @@ python3 -m verl.trainer.main_ppo_async \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
     +actor_rollout_ref.rollout.server_url=$ROLLOUT_SERVER_URL \
-    +actor_rollout_ref.actor.offline=True \
+    +actor_rollout_ref.actor.offline=False \
     #  +trainer.splitter=sliding_window \
     # 
     #     trainer.experiment_name="osworld_all_feasible_reward_script_grpo_k8s_0802_16_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 6 | head -n 1)" \

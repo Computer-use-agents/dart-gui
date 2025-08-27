@@ -189,6 +189,8 @@ class DataParallelPPOActor(BasePPOActor):
                     inplace_backward = True
                     if calculate_entropy:
                         inplace_backward = False
+
+                    print("_forward_micro_batch Before logprobs_from_logits", logits_rmpad.shape, input_ids_rmpad_rolled.shape, inplace_backward)
                     log_probs = logprobs_from_logits(
                         logits=logits_rmpad,
                         labels=input_ids_rmpad_rolled,

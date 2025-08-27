@@ -36,8 +36,8 @@ export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
 # export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train90_pass16_gpu4_env60
-export RUN_ID=results/pass16_20250825_train90_pass16_gpu4_env60
+export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train90_pass16_gpu4_env36
+export RUN_ID=results/pass16_20250825_train90_pass16_gpu4_env36
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
 export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 
@@ -45,7 +45,7 @@ export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.6.105:15959
+export ROLLOUT_SERVER_URL=http://172.19.6.227:15959
 
 # training parameters
 adv_estimator=grpo

@@ -1,6 +1,6 @@
 # conda deactivate
 pip install cryptography
-export HYDRA_FULL_ERROR=1
+
 set -x
 ENGINE=${1:-vllm_osworld}
 cd /root/verl
@@ -35,15 +35,18 @@ export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
-export ROOT_DATA_DIR=data/traj/data_pass@8_train90
-export RUN_ID=pengxiang_test_0824_fixed_4_task
+# export ROOT_DATA_DIR=data/traj/pass@32_trainset90
+export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train90_pass16_gpu4_env36_kl
+export RUN_ID=results/pass16_20250825_train90_pass16_gpu4_env36_kl
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
 export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export osworld_all_feasible_reward_script_grpo_k8s_20250826_ypwbn244
 
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
-export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
+# export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
+export ROLLOUT_SERVER_URL=http://172.19.131.210:15959
 
 # training parameters
 adv_estimator=grpo
@@ -58,35 +61,34 @@ clip_ratio_high=0.28
 
 
 max_prompt_length=32000
-max_response_length=32000
+max_response_length=1000
 
-loss_agg_mode="seq-mean-token-sum"
 # loss_agg_mode="token-mean"
+loss_agg_mode="seq-mean-token-mean"
 
 
-train_bz_min=1
-train_bz_max=2
-train_prompt_bsz=4
+train_bz_min=4
+train_bz_max=8
+train_prompt_bsz=8
 rollout_n=8
-train_prompt_mini_bsz=4
+train_prompt_mini_bsz=64
 
 # Performance Related Parameter
 sp_size=4
 use_dynamic_bsz=False
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
-offload=False
+offload=True
 gen_tp=4
-fsdp_size=4
+fsdp_size=32
 
 
 ## message splitter
 limit_messages=35
-splitter=sliding_window
-# splitter=stepwise
+splitter=stepwise
 window_size=5 
 stride_size=5
-max_steps=100
+max_steps=15
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
@@ -94,12 +96,12 @@ python3 -m verl.trainer.main_ppo_async \
     data.val_files=evaluation_examples/filtered_test_all.json \
     data.train_batch_size=${train_prompt_bsz} \
     data.val_batch_size=4 \
-    data.max_prompt_length=32000 \
-    data.max_response_length=32000 \
+    data.max_prompt_length=${max_prompt_length} \
+    data.max_response_length=${max_response_length} \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
     data.image_key=images \
-    data.custom_cls.path=verl/utils/dataset/osworld_dataset_iter_fixed.py \
+    data.custom_cls.path=verl/utils/dataset/osworld_dataset_iter.py \
     data.custom_cls.name=OSWorldAsyncDataset \
     data.shuffle=false \
     +data.rotate_task_groups=true \
@@ -109,7 +111,7 @@ python3 -m verl.trainer.main_ppo_async \
     +data.max_steps=${max_steps} \
     +data.num_workers=0 \
     +data.run_id=$RUN_ID \
-    +data.steps_per_epoch=50 \
+    +data.steps_per_epoch=31 \
     +data.train_batch_size_min=${train_bz_min} \
     +data.train_batch_size_max=${train_bz_max} \
     algorithm.adv_estimator=${adv_estimator} \
@@ -118,10 +120,9 @@ python3 -m verl.trainer.main_ppo_async \
     reward_model.reward_manager=osworld \
     actor_rollout_ref.actor.use_kl_loss=${use_kl_loss} \
     actor_rollout_ref.actor.kl_loss_coef=${kl_loss_coef} \
-    actor_rollout_ref.actor.kl_loss_type=low_var_kl \
     actor_rollout_ref.actor.clip_ratio_low=${clip_ratio_low} \
     actor_rollout_ref.actor.clip_ratio_high=${clip_ratio_high} \
-    actor_rollout_ref.actor.clip_ratio_c=20.0 \
+    actor_rollout_ref.actor.clip_ratio_c=10.0 \
     actor_rollout_ref.model.path=$MODEL_PATH \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.actor.optim.lr=1e-6 \
@@ -132,7 +133,7 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.fsdp_config.param_offload=${offload} \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=${offload} \
     actor_rollout_ref.actor.entropy_coeff=0 \
-    actor_rollout_ref.actor.grad_clip=20.0 \
+    actor_rollout_ref.actor.grad_clip=2.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     "actor_rollout_ref.actor.checkpoint.save_contents=['model', 'optimizer', 'extra', 'hf_model']" \
     actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
@@ -142,8 +143,8 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=50 \
-    trainer.test_freq=50 \
+    trainer.save_freq=2 \
+    trainer.test_freq=10 \
     trainer.val_before_train=False \
     trainer.total_epochs=1 \
     trainer.max_actor_ckpt_to_keep=10 \
@@ -151,7 +152,7 @@ python3 -m verl.trainer.main_ppo_async \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \
     +trainer.splitter_parallel=False\
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=$ENGINE \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
@@ -163,7 +164,7 @@ python3 -m verl.trainer.main_ppo_async \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
     +actor_rollout_ref.rollout.server_url=$ROLLOUT_SERVER_URL \
-    +actor_rollout_ref.actor.offline=False \
+    +actor_rollout_ref.actor.offline=false \
     #  +trainer.splitter=sliding_window \
     # 
     #     trainer.experiment_name="osworld_all_feasible_reward_script_grpo_k8s_0802_16_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 6 | head -n 1)" \

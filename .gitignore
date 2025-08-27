@@ -152,3 +152,4 @@ swanlog/
 .venv/
 .vscode/
 trainingdata_sample
+*.zip

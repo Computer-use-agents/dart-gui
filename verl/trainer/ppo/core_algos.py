@@ -255,6 +255,66 @@ def compute_grpo_outcome_advantage(
     return scores, scores
 
 
+# # NOTE(sgm): this implementation only consider outcome supervision, where the reward is a scalar.
+# @register_adv_est(AdvantageEstimator.GRPO_TRAJ)  # or simply: @register_adv_est("grpo")
+# def compute_grpo_outcome_advantage(
+#     token_level_rewards: torch.Tensor,
+#     response_mask: torch.Tensor,
+#     index: np.ndarray,
+#     epsilon: float = 1e-6,
+#     norm_adv_by_std_in_grpo: str = True,
+# ):
+#     """
+#     Compute advantage for GRPO, operating only on Outcome reward
+#     (with only one scalar reward for each response).
+
+#     Args:
+#         token_level_rewards: `(torch.Tensor)`
+#             shape is (bs, response_length)
+#         response_mask: `(torch.Tensor)`
+#             shape is (bs, response_length)
+#         norm_adv_by_std_in_grpo: (bool)
+#             whether to scale the GRPO advantage.
+#             If True, the advantage is scaled by the std, as in the original GRPO.
+#             If False, the advantage is not scaled, as in Dr.GRPO (https://arxiv.org/abs/2503.20783).
+
+#     Returns:
+#         advantages: `(torch.Tensor)`
+#             shape is (bs, response_length)
+#         Returns: `(torch.Tensor)`
+#             shape is (bs, response_length)
+#     """
+#     scores = token_level_rewards.sum(dim=-1)
+#     print("compute_grpo_outcome_advantage token_level_rewards", scores)
+#     id2score = defaultdict(list)
+#     id2mean = {}
+#     id2std = {}
+
+#     with torch.no_grad():
+#         bsz = scores.shape[0]
+#         for i in range(bsz):
+#             id2score[index[i]].append(scores[i])
+#         for idx in id2score:
+#             print("compute_grpo_outcome_advantage idx", len(id2score[idx]))
+#             if len(id2score[idx]) == 1:
+#                 id2mean[idx] = torch.tensor(0.0)
+#                 id2std[idx] = torch.tensor(1.0)
+#             elif len(id2score[idx]) > 1:
+#                 id2mean[idx] = torch.mean(torch.tensor(id2score[idx]))
+#                 id2std[idx] = torch.std(torch.tensor([id2score[idx]]))
+#             else:
+#                 raise ValueError(f"no score in prompt index: {idx}")
+#         for i in range(bsz):
+#             if norm_adv_by_std_in_grpo:
+#                 scores[i] = (scores[i] - id2mean[index[i]]) / (id2std[index[i]] + epsilon)
+#             else:
+#                 scores[i] = scores[i] - id2mean[index[i]]
+#         scores = scores.unsqueeze(-1) * response_mask
+#     print("compute_grpo_outcome_advantage_traj_level", id2mean, id2std)
+#     return scores, scores
+
+
+
 @register_adv_est(AdvantageEstimator.GRPO_PASSK)  # or simply: @register_adv_est("grpo_passk")
 def compute_grpo_passk_outcome_advantage(
     token_level_rewards: torch.Tensor,
@@ -537,7 +597,7 @@ def agg_loss(loss_mat: torch.Tensor, loss_mask: torch.Tensor, loss_agg_mode: str
         loss: `a scalar torch.Tensor`
             aggregated loss
     """
-    if loss_agg_mode == "token-mean":
+    if loss_agg_mode == "token-mean": 
         loss = verl_F.masked_mean(loss_mat, loss_mask)
     elif loss_agg_mode == "seq-mean-token-sum":
         seq_losses = torch.sum(loss_mat * loss_mask, dim=-1)  # token-sum

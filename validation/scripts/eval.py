@@ -224,9 +224,15 @@ def compare_results(baseline_dir, current_dir, baseline_name="Baseline", current
 def main():
     """主函数示例"""
     # 示例用法
-    baseline_dir = "validation/results/uitars_1.5_7b_90_train_pure"
+
+    # get_result("validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_0")
+    # print("Start to get results... bz8 STEP 26")
+    # get_result("validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_26")
+
+
+    baseline_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_0"
     # current_dir = "/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_trainset90_px_08220031_step30"
-    current_dir = "validation/osworld_all_feasible_reward_script_grpo_k8s_20250825_zzr6gvmc/global_step_10"
+    current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_31"
     # 
     # 对比两个实验
     compare_results(baseline_dir, current_dir, "Baseline", "Step 30")
