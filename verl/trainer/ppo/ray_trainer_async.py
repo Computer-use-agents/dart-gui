@@ -413,13 +413,14 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         #统计第step-2个版本模型的平均成功率
                         avg_nonneg, count_all, distinct_task_cnt = db_manager.get_nth_newest_model_success(run_id=self.run_id, n=3)
                         # rollout metrics
-                        metrics.update(
-                            {
-                                "rollout/succ_rate": avg_nonneg,
-                                "rollout/traj_count": count_all,
-                                "rollout/task_count": distinct_task_cnt
-                            }
-                        )
+                        if avg_nonneg > 0:
+                            metrics.update(
+                                {
+                                    "rollout/succ_rate": avg_nonneg,
+                                    "rollout/traj_count": count_all,
+                                    "rollout/task_count": distinct_task_cnt
+                                }
+                            )
                         db_manager.close_database()
                         
                 # training metrics
