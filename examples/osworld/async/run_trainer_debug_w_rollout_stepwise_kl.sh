@@ -29,29 +29,31 @@ MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-
 
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export SWANLAB_API_KEY=rI0ezs9zkbORI8oUMsgHT #rI0ezs9zkbORI8oUMsgHT
+export SWANLAB_API_KEY=rI0ezs9zkbORI8oUMsgHT #4wEX4aVA4guJHGZ553g4K
 export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-defau-bddf300d21.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
-export ROOT_DATA_DIR=results/trainset15_pass16_gpu2_env20_maxstep15_20250827_1348
-export RUN_ID=results/trainset8_pass8_gpu4_env40_20250826_2218
-export EXPERIMENT_NAME=async_pass8_train8_lr1e-5_minibs32_paddingmask
+# export ROOT_DATA_DIR=data/traj/pass@32_trainset90
+export ROOT_DATA_DIR=results/trainset15_pass16_gpu2_env20_maxstep15_20250828_1422
+export RUN_ID=results/trainset15_pass16_gpu2_env20_maxstep15_20250828_1422
+export EXPERIMENT_NAME=async_pass8_train15_lr1e-6_bz8_minibs32_downsample_slidingwindow_kl_maxstep15
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export osworld_all_feasible_reward_script_grpo_k8s_20250826_ypwbn244
 
-# export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
+# export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
-export ROLLOUT_SERVER_URL=http://172.19.17.183:15959
+export ROLLOUT_SERVER_URL=http://172.19.17.62:15959
 
 # training parameters
 adv_estimator=grpo
 
 use_kl_in_reward=False
 kl_coef=0.0
-use_kl_loss=False
-kl_loss_coef=0.0
+use_kl_loss=True
+kl_loss_coef=0.1
 
 clip_ratio_low=0.1
 clip_ratio_high=0.28
@@ -60,10 +62,11 @@ clip_ratio_high=0.28
 max_prompt_length=32000
 max_response_length=32000
 
-loss_agg_mode="token-mean"
+# loss_agg_mode="token-mean"
+loss_agg_mode="seq-mean-token-mean"
 
 
-train_bz_min=8
+train_bz_min=4
 train_bz_max=8
 train_prompt_bsz=8
 rollout_n=8
@@ -84,7 +87,7 @@ limit_messages=35
 splitter=sliding_window
 window_size=5 
 stride_size=5
-max_steps=100
+max_steps=15
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
@@ -92,22 +95,22 @@ python3 -m verl.trainer.main_ppo_async \
     data.val_files=evaluation_examples/filtered_test_all.json \
     data.train_batch_size=${train_prompt_bsz} \
     data.val_batch_size=4 \
-    data.max_prompt_length=32000 \
-    data.max_response_length=32000 \
+    data.max_prompt_length=${max_prompt_length} \
+    data.max_response_length=${max_response_length} \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
     data.image_key=images \
     data.custom_cls.path=verl/utils/dataset/osworld_dataset_iter.py \
     data.custom_cls.name=OSWorldAsyncDataset \
     data.shuffle=false \
-    +data.rotate_task_groups=false \
+    +data.rotate_task_groups=true \
     +data.root_data_dir=$ROOT_DATA_DIR \
     +data.window_size=${window_size} \
     +data.stride_size=${stride_size} \
     +data.max_steps=${max_steps} \
     +data.num_workers=0 \
     +data.run_id=$RUN_ID \
-    +data.steps_per_epoch=30 \
+    +data.steps_per_epoch=50 \
     +data.train_batch_size_min=${train_bz_min} \
     +data.train_batch_size_max=${train_bz_max} \
     algorithm.adv_estimator=${adv_estimator} \
@@ -121,7 +124,7 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.clip_ratio_c=10.0 \
     actor_rollout_ref.model.path=$MODEL_PATH \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
-    actor_rollout_ref.actor.optim.lr=1e-5 \
+    actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=${train_prompt_mini_bsz} \
@@ -129,12 +132,11 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.fsdp_config.param_offload=${offload} \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=${offload} \
     actor_rollout_ref.actor.entropy_coeff=0 \
-    actor_rollout_ref.actor.grad_clip=10.0 \
+    actor_rollout_ref.actor.grad_clip=2.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     "actor_rollout_ref.actor.checkpoint.save_contents=['model', 'optimizer', 'extra', 'hf_model']" \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.ref.fsdp_config.param_offload=${offload} \
-    actor_rollout_ref.ref.ulysses_sequence_parallel_size=${sp_size} \
     "trainer.logger=['console','swanlab']" \
     trainer.project_name='verl_osworld_grpo' \
     trainer.experiment_name=$EXPERIMENT_NAME \

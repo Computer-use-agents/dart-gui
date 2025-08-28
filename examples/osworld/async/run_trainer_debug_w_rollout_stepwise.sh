@@ -29,22 +29,23 @@ MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-
 
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K #rI0ezs9zkbORI8oUMsgHT
+export SWANLAB_API_KEY=rI0ezs9zkbORI8oUMsgHT #4wEX4aVA4guJHGZ553g4K
 export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-defau-bddf300d21.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
 # export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-export ROOT_DATA_DIR=data/traj/data_pass@8_train90
-export RUN_ID=pengxiang_test_0824_stepwise_pass8
-# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export ROOT_DATA_DIR=results/trainset15_pass16_gpu2_env20_maxstep15_20250828_1342
+export RUN_ID=results/trainset15_pass16_gpu2_env20_maxstep15_20250828_1342
+export EXPERIMENT_NAME=async_pass8_train15_lr1e-6_bz8_minibs64_downsample_stepwise_maxstep15
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export osworld_all_feasible_reward_script_grpo_k8s_20250826_ypwbn244
 
-# export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
+# export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
-export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
+export ROLLOUT_SERVER_URL=http://172.19.6.62:15959
 
 # training parameters
 adv_estimator=grpo
@@ -59,14 +60,14 @@ clip_ratio_high=0.28
 
 
 max_prompt_length=32000
-max_response_length=2000
+max_response_length=1000
 
 # loss_agg_mode="token-mean"
 loss_agg_mode="seq-mean-token-mean"
 
 
 train_bz_min=4
-train_bz_max=6
+train_bz_max=8
 train_prompt_bsz=8
 rollout_n=8
 train_prompt_mini_bsz=64
@@ -109,7 +110,7 @@ python3 -m verl.trainer.main_ppo_async \
     +data.max_steps=${max_steps} \
     +data.num_workers=0 \
     +data.run_id=$RUN_ID \
-    +data.steps_per_epoch=31 \
+    +data.steps_per_epoch=50 \
     +data.train_batch_size_min=${train_bz_min} \
     +data.train_batch_size_max=${train_bz_max} \
     algorithm.adv_estimator=${adv_estimator} \
@@ -123,7 +124,7 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.clip_ratio_c=10.0 \
     actor_rollout_ref.model.path=$MODEL_PATH \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
-    actor_rollout_ref.actor.optim.lr=1e-5 \
+    actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.optim.weight_decay=0.1 \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.ppo_mini_batch_size=${train_prompt_mini_bsz} \
@@ -131,27 +132,26 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.fsdp_config.param_offload=${offload} \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=${offload} \
     actor_rollout_ref.actor.entropy_coeff=0 \
-    actor_rollout_ref.actor.grad_clip=10.0 \
+    actor_rollout_ref.actor.grad_clip=2.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     "actor_rollout_ref.actor.checkpoint.save_contents=['model', 'optimizer', 'extra', 'hf_model']" \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.ref.fsdp_config.param_offload=${offload} \
-    actor_rollout_ref.ref.ulysses_sequence_parallel_size=${sp_size} \
     "trainer.logger=['console','swanlab']" \
     trainer.project_name='verl_osworld_grpo' \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=10 \
+    trainer.save_freq=1 \
     trainer.test_freq=10 \
     trainer.val_before_train=False \
     trainer.total_epochs=1 \
-    trainer.max_actor_ckpt_to_keep=10 \
+    trainer.max_actor_ckpt_to_keep=5 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \
     +trainer.splitter_parallel=False\
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=$ENGINE \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \

@@ -1,0 +1,50 @@
+[
+  {
+    "trajectory_id": "82279c77-8fc6-46f6-9622-3ba96f61b477_trace-45f5095f4d88-1756177608",
+    "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+    "reward": 0.0,
+    "num_chunks": 3
+  },
+  {
+    "trajectory_id": "82279c77-8fc6-46f6-9622-3ba96f61b477_trace-5f1f5dd7f868-1756177608",
+    "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+    "reward": 0.0,
+    "num_chunks": 3
+  },
+  {
+    "trajectory_id": "82279c77-8fc6-46f6-9622-3ba96f61b477_trace-1260149cc6a2-1756177608",
+    "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+    "reward": 1.0,
+    "num_chunks": 4
+  },
+  {
+    "trajectory_id": "82279c77-8fc6-46f6-9622-3ba96f61b477_trace-8f7e699c462e-1756177608",
+    "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+    "reward": 1.0,
+    "num_chunks": 4
+  },
+  {
+    "trajectory_id": "82279c77-8fc6-46f6-9622-3ba96f61b477_trace-a934eb18dd70-1756177608",
+    "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+    "reward": 1.0,
+    "num_chunks": 4
+  },
+  {
+    "trajectory_id": "82279c77-8fc6-46f6-9622-3ba96f61b477_trace-7f894388186f-1756177608",
+    "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+    "reward": 0.0,
+    "num_chunks": 4
+  },
+  {
+    "trajectory_id": "82279c77-8fc6-46f6-9622-3ba96f61b477_trace-251923af6e56-1756177608",
+    "task_id": "82279c77-8fc6-46f6-9622-3ba96f61b477",
+    "reward": 0.0,
+    "num_chunks": 4
+  },
+    {
+        "trajectory_id":"82279c77-8fc6-46f6-9622-3ba96f61b477_trace-3698d60a7fa2-1756177608",
+        "task_id":"82279c77-8fc6-46f6-9622-3ba96f61b477",
+        "reward":1.0,
+        "num_chunks":5
+    }
+]

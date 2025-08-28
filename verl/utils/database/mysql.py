@@ -384,5 +384,5 @@ if __name__ == "__main__":
     # print(orm.update_rollout_used("results/test_for_train_pass8_gpu8_env77_20250817_1345", "9439a27b-18ae-42d8-9778-5f68f891805e_trace_e635d5e3af17_1755501336"))
     # print(orm.insert_checkpoint("/mnt/checkpoints/model-abc/weights.bin"))
     # print(orm.get_latest_n_checkpoint_paths("results/pass@32_trainset90", 1))
-    for i in range(10, 20):
-        print(orm.get_nth_newest_model_success("results/test_for_train_pass8_gpu7_env69_20250821_2333", i))
+    for i in range(1, 4):
+        print(orm.get_nth_newest_model_success("results/trainset8_pass8_gpu8_env64_20250826_1854", i))

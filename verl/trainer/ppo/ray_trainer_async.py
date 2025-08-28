@@ -27,6 +27,7 @@ import ray
 import torch
 from omegaconf import OmegaConf
 from torch.utils.data import Dataset, Sampler
+from tensordict import TensorDict
 from tqdm import tqdm
 import time
 
@@ -56,7 +57,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         config.actor_rollout_ref.rollout.root_data_dir = config.data.root_data_dir
         super().__init__(config, tokenizer, role_worker_mapping, resource_pool_manager, ray_worker_group_cls, processor, reward_fn, val_reward_fn, train_dataset, val_dataset, collate_fn, train_sampler, device_name)
         os.makedirs(self.config.data.root_data_dir, exist_ok=True)
-        self.save_interval = config.get("save_interval", 780)
+        self.save_interval = config.get("save_interval", 400)
         self._last_ckpt_time = None
         self.run_id = config.data.run_id
         
@@ -384,21 +385,23 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             #统计第step-2个版本模型的平均成功率
                             avg_nonneg, count_all, distinct_task_cnt = db_manager.get_nth_newest_model_success(run_id=self.run_id, n=3)
                             # rollout metrics
-                            metrics.update(
-                                {
-                                    "rollout/succ_rate": avg_nonneg,
-                                    "rollout/traj_count": count_all,
-                                    "rollout/task_count": distinct_task_cnt
-                                }
-                            )
-                            db_manager.close_database()
+                            if avg_nonneg > 0:
+                                metrics.update(
+                                    {
+                                        "rollout/succ_rate": avg_nonneg,
+                                        "rollout/traj_count": count_all,
+                                        "rollout/task_count": distinct_task_cnt
+                                    }
+                                )
+                                db_manager.close_database()
                             print("Checkpoint path inserted into MySQL database.")
 
                             print("Reloading model in rollouter...")
                             # Reload model in rollouter
                             reload_result = reload_model(
                                 service_url=self.config.actor_rollout_ref.rollout.server_url,
-                                new_ckpt_path=abs_path_actor_hf
+                                new_ckpt_path=abs_path_actor_hf,
+                                batch_size=1
                             )
                             
                         self._last_ckpt_time = time.monotonic()
@@ -478,5 +481,134 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         except Exception as e:
             print("_up_sample failed due to", e)
 
-        return batch    
+        return batch  
+    
+    # def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
+    #     n_mod = world_size * ppo_mini_batch_size
+    #     orig_size = len(batch)
+    #     if len(batch) % n_mod == 0:
+    #         return batch
+       
+    #     try:
+    #         import random
+    #         dataset_ids = batch.non_tensor_batch["dataset_ids"]
+
+    #         print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
+    #         target_size = (len(batch) // n_mod + 1) * n_mod
+    #         up_sample_size = target_size - len(batch)
+    #         print("Need upsample", up_sample_size)
+    #         idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
+    #         upsampel_batch = batch.select_idxs(idx)
+    #         batch = DataProto.concat([batch, upsampel_batch])
+    #         print("After upsample", len(batch))
+            
+    #         # 补充padding_mask
+    #         padding_mask = torch.ones(target_size, dtype=torch.float32, device=batch.batch["input_ids"].device)
+    #         # print("padding_mask: ", padding_mask)
+    #         if up_sample_size > 0:
+    #             padding_mask[orig_size:] = 0.0
+    #         batch.batch['padding_mask'] = padding_mask
+            
+    #     except Exception as e:
+    #         print("_up_sample failed due to", e)
+
+    #     return batch    
 # # 
+    def _pad_batch_for_training(
+        self,
+        batch: DataProto,
+        required_multiple: int,
+        pad_token_id: int = 0
+    ) -> DataProto:
+        """
+        Pads a DataProto object to a size that is a multiple of `required_multiple`.
+        This function handles padding for all tensors in `data.batch` and aligned lists/arrays
+        in `data.non_tensor_batch`. It adds a `padding_mask` to `data.batch`.
+
+        Args:
+            data: The DataProto object to be padded.
+            required_multiple: The target multiple for the batch size.
+            pad_token_id: The token ID used for padding sequence-like tensors.
+
+        Returns:
+            A new, padded DataProto object.
+        """
+        current_size = len(batch)
+
+        # 如果大小已经对齐，只需添加一个全为1的 padding_mask
+        if current_size % required_multiple == 0:
+            if 'padding_mask' not in batch.batch:
+                padding_mask = torch.ones(current_size, dtype=torch.float32, device=batch.batch["input_ids"].device)
+                batch.batch['padding_mask'] = padding_mask
+            return batch
+
+        # 计算目标大小和需要填充的数量
+        target_size = (current_size + required_multiple - 1) // required_multiple * required_multiple
+        pad_size = target_size - current_size
+
+        if pad_size <= 0:
+            return batch
+
+        print(f"[Info] Padding batch. Current: {current_size}, Target: {target_size}, Padding: {pad_size}")
+
+        # 1. 填充 `data.batch` 中的所有 tensors
+        padded_tensors = {}
+        device = batch.batch["input_ids"].device
+        for key, tensor in batch.batch.items():
+            if not isinstance(tensor, torch.Tensor) or tensor.shape[0] != current_size:
+                padded_tensors[key] = tensor
+                continue
+
+            pad_shape = list(tensor.shape)
+            pad_shape[0] = pad_size
+            
+            fill_value = pad_token_id if key in ['input_ids'] else 0
+            padding_tensor = torch.full(pad_shape, fill_value, dtype=tensor.dtype, device=device)
+            
+            padded_tensors[key] = torch.cat([tensor, padding_tensor], dim=0)
+
+        # 2. 创建并添加 sample-level 的 padding_mask
+        original_mask = torch.ones(current_size, dtype=torch.float32, device=device)
+        padding_mask_part = torch.zeros(pad_size, dtype=torch.float32, device=device)
+        padded_tensors['padding_mask'] = torch.cat([original_mask, padding_mask_part], dim=0)
+        
+        # 转换为tensorDict
+        padded_td = TensorDict(padded_tensors, batch_size=[target_size], device=device)
+
+        # 3. 填充 `data.non_tensor_batch` 中与批次对齐的数据
+        padded_non_tensors = {}
+        for key, value in batch.non_tensor_batch.items():
+            if isinstance(value, (list, np.ndarray)) and len(value) == current_size:     
+                # 为 multi_modal_data 创建特殊的占位符
+                if key == 'multi_modal_data' and current_size > 0:
+                    # 创建一个与真实数据结构相同但内容为空的字典作为填充值
+                    first_item = value[0]
+                    if isinstance(first_item, dict):
+                        # e.g., creates {'image': []}
+                        padding_item = {k: [] for k in first_item.keys()} 
+                        padding_value = [padding_item] * pad_size
+                    else:
+                        padding_value = [None] * pad_size
+                elif key == 'multi_modal_inputs' and current_size > 0:
+                    first_item = value[0]
+                    if isinstance(first_item, dict):
+                        # 创建一个结构相同，但值为零张量的字典作为填充
+                        padding_item = {k: torch.zeros_like(v) for k, v in first_item.items() if isinstance(v, torch.Tensor)}
+                        padding_value = [padding_item] * pad_size
+                    else:
+                        padding_value = [None] * pad_size
+                else:
+                    # 其他 non-tensor 数据使用 None 填充
+                    padding_value = [None] * pad_size
+                    
+                padded_list = list(value) + padding_value
+                padded_non_tensors[key] = np.array(padded_list, dtype=object)
+            else:
+                padded_non_tensors[key] = value
+
+        # 4. 创建并返回一个新的、填充好的 DataProto 对象
+        return DataProto(
+            batch=padded_td,
+            non_tensor_batch=padded_non_tensors,
+            meta_info=batch.meta_info  # meta_info 通常不需要改变
+        )

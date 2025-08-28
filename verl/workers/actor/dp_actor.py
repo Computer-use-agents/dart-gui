@@ -378,6 +378,10 @@ class DataParallelPPOActor(BasePPOActor):
         multi_turn = data.meta_info.get("multi_turn", False)
 
         select_keys = ["responses", "input_ids", "attention_mask", "position_ids", "old_log_probs", "advantages"]
+        if "loss_mask" in data.batch.keys():
+            select_keys.append("loss_mask")
+        if "padding_mask" in data.batch.keys():
+            select_keys.append("padding_mask")
         if multi_turn:
             select_keys.append("loss_mask")
         if self.config.use_kl_loss:
@@ -453,8 +457,11 @@ class DataParallelPPOActor(BasePPOActor):
                     attention_mask = data["attention_mask"]
                     if multi_turn:
                         response_mask = data["loss_mask"][:, -response_length:]
-                    else:
+                    else: # jingrong debug
                         response_mask = attention_mask[:, -response_length:]
+                        # response_mask = data["loss_mask"][:, -response_length:]
+                        # response_mask = data["loss_mask"][:, -response_length:] * data["padding_mask"].unsqueeze(1)
+                        # response_mask = attention_mask[:, -response_length:] * data["padding_mask"].unsqueeze(1)
 
                     old_log_prob = data["old_log_probs"]
                     advantages = data["advantages"]
