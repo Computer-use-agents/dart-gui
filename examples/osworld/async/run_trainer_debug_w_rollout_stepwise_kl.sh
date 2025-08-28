@@ -60,7 +60,7 @@ clip_ratio_high=0.28
 
 
 max_prompt_length=32000
-max_response_length=32000
+max_response_length=1000
 
 # loss_agg_mode="token-mean"
 loss_agg_mode="seq-mean-token-mean"
@@ -84,7 +84,7 @@ fsdp_size=32
 
 ## message splitter
 limit_messages=35
-splitter=sliding_window
+splitter=stepwise
 window_size=5 
 stride_size=5
 max_steps=15
