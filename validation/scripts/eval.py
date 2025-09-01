@@ -14,7 +14,7 @@ def colorize(delta):
     else:
         return Fore.YELLOW + f"{delta:.3f}" + Style.RESET_ALL
 
-def get_result(target_dir):
+def get_result(target_dir,filter_json = None):
     """获取单个实验的结果，返回详细的统计信息"""
     print(f"Processing: {target_dir}")
     if not os.path.exists(target_dir):
@@ -27,6 +27,17 @@ def get_result(target_dir):
     infeasible_steps = []
     all_result_for_analysis = {}
     
+    if filter_json is not None:
+        with open(filter_json, "r") as f:
+            filter_data = json.load(f)
+        filtered_ids=[]
+        for key,item in filter_data.items():
+            for id in item:
+                filtered_ids.append(id)
+        print(f"Filtering with {filter_json}, {len(filtered_ids)} examples.")
+        # print(f"Filtered IDs: {filtered_ids}")
+        
+            
     print("Processing examples:", len(os.listdir(target_dir)))
     
     for example_id in os.listdir(target_dir):
@@ -40,6 +51,11 @@ def get_result(target_dir):
                 with open(os.path.join(example_path, "task_config.json"), "r") as f:
                     task_config = json.load(f)
                 domain = task_config['raw']['task_type']
+                id = task_config['raw']['task_id']
+                if filter_json is not None:
+                    if id not in filtered_ids:
+                        # print(f"Skipping {id} as it's not in filter list.")
+                        continue
                 infeasible_flag = True if task_config['evaluator']['func'] == "infeasible" else False
                 if infeasible_flag:
                     infeasible_steps.append([example_id, len(os.listdir(example_path))//2-2])
@@ -148,13 +164,13 @@ def get_result(target_dir):
         print("-----------------------------------")
         return stats
 
-def compare_results(baseline_dir, current_dir, baseline_name="Baseline", current_name="Current"):
+def compare_results(baseline_dir, current_dir, baseline_name="Baseline", current_name="Current",filter_json = None):
     """对比两个实验的结果"""
     print("="*100)
     print(f"EXPERIMENT COMPARISON: {baseline_name} vs {current_name}")
     print("="*100)
     
-    baseline_stats = get_result(baseline_dir)
+    baseline_stats = get_result(baseline_dir,filter_json)
     if baseline_stats is None:
         print(f"Failed to get baseline results from {baseline_dir}")
         return
@@ -162,7 +178,7 @@ def compare_results(baseline_dir, current_dir, baseline_name="Baseline", current
     print("\n" + "="*50)
     print()
     
-    current_stats = get_result(current_dir)
+    current_stats = get_result(current_dir,filter_json)
     if current_stats is None:
         print(f"Failed to get current results from {current_dir}")
         return
@@ -230,12 +246,22 @@ def main():
     # get_result("validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_26")
 
 
-    baseline_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_0"
+    # baseline_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_0"
+    # baseline_dir = "/capacity/userdata/vcfenxd75jiv/workshops/workshop-3c968795-bb00-4072-bb11-ee466e4046b2/computer-use-rollout-dev-zzh/results/pass@1_UI-TARS-1.5-7B"
+    baseline_dir= "validation/results/ui_tars_1.5/trainset152"
+    # baseline_dir="/root/verl/validation/results/ui_tars_1.5/trainset62"
+
     # current_dir = "/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_trainset90_px_08220031_step30"
-    current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_31"
+    # current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_31"
+    # current_dir = "validation/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_22"
+    current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50_152"
+    # current_dir="validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50_62_max15"
+    # current_dir = "validation/results/wo_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_mpo87w96/global_step_36"
+    # current_dir = "validation/results/w_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_w4jryw5c/global_step_16"
     # 
     # 对比两个实验
-    compare_results(baseline_dir, current_dir, "Baseline", "Step 30")
+    filter_json="validation/evaluation_examples/test_trainset_62.json"
+    compare_results(baseline_dir, current_dir, "Baseline", "Ours",filter_json=filter_json)
     
     # 也可以对比多个实验
     # step10_run2_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco/global_step_10_run2"

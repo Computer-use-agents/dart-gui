@@ -8,7 +8,7 @@ from omegaconf import DictConfig
 from dataclasses import dataclass, asdict
 import copy
 import logging
-
+import random
 from prompts import COMPUTER_USE_PROMPT, COMPUTER_USE_PROMPT_WITH_CALL_USER
 from log_config import setup_logging
 
@@ -26,17 +26,28 @@ class TaskLoader:
         self.storage_root = storage_root
         self.resume = task_cfg.resume
 
+    # def poll_for_tasks(self) -> List[Dict]:
+    #     """find new tasks json file
+    #     return list of TaskInfo dict if there is new json
+    #     else return []
+    #     """
+    #     # updated_flag = self._maybe_refresh_dataset()
+    #     # if not updated_flag:
+    #     #     return []
+    #     self._maybe_refresh_dataset()
+
+    #     return [task.to_dict() for task in self._tasks]
     def poll_for_tasks(self) -> List[Dict]:
         """find new tasks json file
         return list of TaskInfo dict if there is new json
         else return []
         """
-        # updated_flag = self._maybe_refresh_dataset()
-        # if not updated_flag:
-        #     return []
         self._maybe_refresh_dataset()
+        
+        tasks_list = [task.to_dict() for task in self._tasks]
+        random.shuffle(tasks_list)
 
-        return [task.to_dict() for task in self._tasks]
+        return tasks_list 
     
     def _maybe_refresh_dataset_bak(self):
         

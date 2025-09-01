@@ -36,17 +36,18 @@ export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
 # export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train90_pass16_gpu4_env36_kl
-export RUN_ID=results/pass16_20250825_train90_pass16_gpu4_env36_kl
+export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36_kl
+export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36_kl
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
+# export EXPERIMENT_NAME=w_KL_trainset152_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export EXPERIMENT_NAME=w_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_w4jryw5c
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
 
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.131.210:15959
+export ROLLOUT_SERVER_URL=http://172.19.72.140:15959
 
 # training parameters
 adv_estimator=grpo
@@ -88,7 +89,7 @@ limit_messages=35
 splitter=stepwise
 window_size=5 
 stride_size=5
-max_steps=15
+max_steps=50
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \

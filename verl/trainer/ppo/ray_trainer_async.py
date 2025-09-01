@@ -470,6 +470,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
 
     def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
         n_mod = world_size * ppo_mini_batch_size
+        print("WORLD_SIZE and PPO mini batch size and N mod:", world_size, ppo_mini_batch_size, n_mod)
         if len(batch) % n_mod == 0:
             return batch
        

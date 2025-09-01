@@ -1,5 +1,5 @@
 working_dir: ./
-excludes: ["/.git/"]
+excludes: [ ".git/",".venv/","swanlog/", "debug_datasets/*","docker/","rollouter/", "validation/", "tmp_cache/", "docs/","*.csv", "checkpoints/","trainingdata_sample/","data/",".github/","outputs/"]
 env_vars:
   TORCH_NCCL_AVOID_RECORD_STREAMS: "1"
   # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:

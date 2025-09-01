@@ -23,4 +23,3 @@ sleep 2
 echo "Force killing any remaining Python processes..."
 pkill -9 -f python 2>/dev/null || true
 echo "All Python processes terminated"
-

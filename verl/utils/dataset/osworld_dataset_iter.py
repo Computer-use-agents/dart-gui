@@ -208,7 +208,7 @@ class OSWorldAsyncDataset(IterableDataset):
 
     def _close_dbs(self):
         try:
-            self.dwob_manager.close_database()
+            self.db_manager.close_database()
         except Exception:
             pass
 

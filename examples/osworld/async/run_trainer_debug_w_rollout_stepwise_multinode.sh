@@ -1,4 +1,5 @@
 # conda deactivate
+deactivate
 pip install cryptography
 
 set -x
@@ -10,7 +11,7 @@ cd /root/verl
 # On head node: ray start --head --port=6379
 # On worker nodes: ray start --address='head_node_ip:6379'
 # Detect number of GPUs on the current machine
-N_NODES=1
+N_NODES=2
 N_GPUS=$(nvidia-smi --list-gpus | wc -l) 
 N_GPUS_PER_NODE=$N_GPUS
 
@@ -36,17 +37,17 @@ export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
 # export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
-export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
+export ROOT_DATA_DIR=/capacity/userdata/vcfenxd75jiv/workshops/workshop-b923cef6-3b93-4f54-8d3b-9b6659443b9c/computer-use-rollout-dev-zzh/results/pass32_wo_plan_15s
+export RUN_ID=pengxiang_test_0829_stepwise_pass8_multinode
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-export EXPERIMENT_NAME=wo_KL_trainset152_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export EXPERIMENT_NAME=multinode_KL_trainset152_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
 
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
-# export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.140.227:15959
+export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
+# export ROLLOUT_SERVER_URL=http://172.19.140.227:15959
 
 # training parameters
 adv_estimator=grpo
@@ -67,11 +68,11 @@ max_response_length=1000
 loss_agg_mode="seq-mean-token-mean"
 
 
-train_bz_min=4
-train_bz_max=8
-train_prompt_bsz=8
+train_bz_min=8
+train_bz_max=16
+train_prompt_bsz=16
 rollout_n=8
-train_prompt_mini_bsz=64
+train_prompt_mini_bsz=8
 
 # Performance Related Parameter
 sp_size=4
@@ -90,7 +91,11 @@ window_size=5
 stride_size=5
 max_steps=50
 
-python3 -m verl.trainer.main_ppo_async \
+ray job submit --address='http://172.19.217.144:8265' \
+    --runtime-env=verl/trainer/runtime_env.yaml \
+    --no-wait \
+    -- \
+    python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
     data.train_files=evaluation_examples/filtered_test_all.json \
     data.val_files=evaluation_examples/filtered_test_all.json \
