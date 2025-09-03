@@ -207,7 +207,7 @@ class TrajectoryRunnerActor:
                 st = time.time()
                 obs, reward, done, info = await self._run_step_async(action)
                 obs_img = obs["screenshot"]
-                all_img.append(obs["image"])
+                # all_img.append(obs["image"])
 
                 env_duration = time.time() - st
                 logger.info(f"[{self.trace_id}] 环境步骤执行完成 - task_id: {self.task_id}, step: {step}, "
@@ -220,6 +220,7 @@ class TrajectoryRunnerActor:
                         self.task_root, step + 1, obs_img)
                     
                     self._add_image(obs_img, frame_path)
+                    all_img.append(obs["image"])
                 
                 # ---- save current trajectory
                 await storage.save_partial_traj.remote(self.task_root, step + 1, self._build_trajectory())
@@ -232,10 +233,7 @@ class TrajectoryRunnerActor:
                 
                 step += 1
 
-            # save img
-            if self.save_img_pt:
-                image_grid_thw, num_patches_list, pixel_values = await model_pool.process_images.remote(all_img)
-                await storage.save_img_pt.remote(self.task_root, all_img, image_grid_thw, num_patches_list, pixel_values)
+            
 
             # calculate and save reward
             reward = self.env.evaluate()
@@ -252,8 +250,15 @@ class TrajectoryRunnerActor:
                     last_msg["content"][0].get("type") == "image_url"
                 ):
                     full_messages.pop()
+                    all_img.pop()
+                    logger.info(f"[{self.trace_id}] 去除最后一条仅含图片的用户消息 - task_id: {self.task_id}")
             await storage.save_episode.remote(self.task_root, full_messages)
-            
+
+            # save img
+            if self.save_img_pt:
+                image_grid_thw, num_patches_list, pixel_values = await model_pool.process_images.remote(all_img)
+                await storage.save_img_pt.remote(self.task_root, all_img, image_grid_thw, num_patches_list, pixel_values)
+
             # -------- 拆轨迹逻辑，已停用 --------------chunk表结构已修改，复用时代码需要调整
             # split and save trajectory
             # storage_root, split_dir, split_meta = await storage.split_episode.remote(self.task_root,

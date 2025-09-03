@@ -147,3 +147,33 @@ Action: click(start_box='<|box_start|>(227,511)<|box_end|>')<|im_end|>"""
 
     result = processor(text=[prompt], images=None, return_tensors="pt")
     print(result)
+
+
+
+
+
+def test_splitter_pt():
+    from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter, StepwiseTrajectorySplitter, LastNTrajectorySplitter
+    processor = AutoProcessor.from_pretrained(
+        "/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5",
+        use_fast=True
+    )
+    root_dir = "rollouter/results/pass16_20250902_train90_pass16_gpu2_env20_vllm_logp_maxstep15_imgpt_test_new/"
+
+
+    splitter = StepwiseTrajectorySplitter(
+        processor=processor,
+        root_dir=root_dir,
+        max_prompt_length=32000,
+        max_response_length=500,
+        truncation="error",
+        use_vllm_logp=True
+    )  
+
+    dataset_ids = ['554785e9-4523-4e7a-b8e1-8016f565f56a_trace-b337476848e0-1756907169',
+    '554785e9-4523-4e7a-b8e1-8016f565f56a_trace-72bac16e8fe9-1756907169']
+
+    reward_tensor = torch.tensor([0.5, 0.8])
+
+    batch = splitter.split_parallel(dataset_ids, reward_tensor)
+test_splitter_pt()

@@ -8,15 +8,16 @@ import torch
 from PIL import Image
 from transformers import AutoProcessor
 import ray
+from pathlib import Path
+
 
 import verl.utils.torch_functional as verl_F
 from verl import DataProto
 from verl.models.transformers.qwen2_vl import get_rope_index
 from verl.utils.dataset.vision_utils import process_image
 from verl.utils.osworld import limit_images_in_messages
-
+from tqdm import tqdm
 import time
-
 def replace_image_url(obj):
     if isinstance(obj, dict):
         new_obj = {}
@@ -96,35 +97,20 @@ class TrajectorySplitter:
     def split(
             self, 
             dataset_ids: list[str], 
-            reward_tensor: torch.Tensor | None = None,
-            rollout_log_probs_list: list[list[torch.Tensor]] = None
+            reward_tensor: torch.Tensor | None = None
         ) -> DataProto:
         batch_output = []
 
-        if self.traj_filter:
-            positive_lengths = []
-            for idx, dataset_id in enumerate(dataset_ids):
-                if reward_tensor[idx].item() > 0:
-                    dataset_dir = os.path.join(self.root_dir, dataset_id)
-                    message_path = os.path.join(dataset_dir, "final_messages.json")
-                    with open(message_path) as f:
-                        dataset = json.load(f)
-                    assistant_count = sum(1 for msg in dataset if msg["role"] == "assistant")
-                    positive_lengths.append(assistant_count)
-
-            avg_len = int(sum(positive_lengths) / len(positive_lengths)) if positive_lengths else 0
-        else:
-            avg_len = 0
-
         for idx, dataset_id in enumerate(dataset_ids):
-            rollout_log_probs = rollout_log_probs_list[idx]
-            batch_messages = self.split_dataset_id(dataset_id, reward=reward_tensor[idx].item(), avg_len=avg_len, rollout_log_probs=rollout_log_probs)
+            batch_messages = self.split_dataset_id(dataset_id)
             batch_tokenized_messages = self.tokenize(
                 batch_messages, 
                 dataset_id,
                 reward=reward_tensor[idx].item()
             )
             batch_output += batch_tokenized_messages
+        # pengxiang debug
+        # batch_output = batch_output[:128]
         batch_output = collate_fn(batch_output)
         return batch_output
 
@@ -175,7 +161,7 @@ class TrajectorySplitter:
         batch_output = collate_fn(batch_output)
         return batch_output
     
-    def split_dataset_id(self, dataset_id: str, reward: float, avg_len: int, rollout_log_probs: list[torch.Tensor]) -> list[list[dict]]:
+    def split_dataset_id(self, dataset_id: str) -> list[list[dict]]:
         dataset_dir = os.path.join(self.root_dir, dataset_id)
         message_path = os.path.join(dataset_dir, "final_messages.json")
         with open(message_path) as f:
@@ -185,45 +171,27 @@ class TrajectorySplitter:
         with open(config_path) as f:
             task_config = json.load(f)
 
-        n_msg = len(dataset)
-        assistant_indices = [i for i, msg in enumerate(dataset) if msg["role"] == "assistant"]
-
-        if reward == 0 and avg_len > 0:
-            if len(assistant_indices) <= avg_len:
-                return []  # 整条轨迹太短，丢掉
-            start = assistant_indices[avg_len] + 1  # 从第 avg_len 个 assistant 后的下一条消息开始
-        else:
-            start = 1  # 正样本窗口从第一个 user 开始
-
+        start = 1
         end = start + 2 * self.window_size
+        n_msg = len(dataset)
         if end > n_msg:
             end = n_msg
         batch_data = []
         instruction = copy.deepcopy(dataset[1])
         is_first_turn = True
-
         while start < n_msg:
             if end > n_msg:
                 end = n_msg
             assert dataset[start]["role"] == "user"
             if len(dataset[start]["content"]) == 1:
+                # remove image from instruction
                 instruction["content"] = instruction["content"][:1]
             item = self._process_item(dataset, copy.deepcopy(instruction), start, end, is_first_turn)
             is_first_turn = False
-
-            assistant_in_window = [i for i in assistant_indices if start <= i < end]
-            if assistant_in_window:
-                last_assistant_idx = assistant_in_window[-1]
-                last_assistant_logp_idx = assistant_indices.index(last_assistant_idx)
-                rollout_log_prob = rollout_log_probs[last_assistant_logp_idx]
-            else:
-                rollout_log_prob = None
-                continue
-
-            batch_data.append((item, copy.deepcopy(task_config), rollout_log_prob))
+            
+            batch_data.append((item, copy.deepcopy(task_config)))
             start += 2 * self.stride_size
             end = start + 2 * self.window_size
-
         return batch_data
 
     def _process_item(self, dataset, instruction, start, end, is_first_turn: bool) -> list:
@@ -249,7 +217,7 @@ class TrajectorySplitter:
     def tokenize(self, batch_data: list[list[dict]], dataset_id: str, reward: float) -> list[list[dict]]:
         tokenized_batch_data = []
         # print("Tokenize with", dataset_id, "reward =", reward)
-        for (messages, task_config, rollout_log_prob) in batch_data:
+        for (messages, task_config) in batch_data:
             row_dict = dict()
             input_ids, attention_mask, position_ids, _, _ = self._get_inputs(messages, dataset_id)
             input_attention_mask = attention_mask
@@ -261,7 +229,6 @@ class TrajectorySplitter:
             valid_response_length = response_attention_mask.sum()
             # debuging valid response length
             reward_tensor[valid_response_length-1] = reward
-            rollout_log_prob = verl_F.pad_2d_list_to_length(rollout_log_prob.unsqueeze(0), self.processor.tokenizer.pad_token_id, max_length=self.max_response_length)
             row_dict["prompts"] = input_ids[0]
             row_dict["responses"] = response_ids[0]
             row_dict["attention_mask"] = attention_mask[0]
@@ -273,7 +240,6 @@ class TrajectorySplitter:
             row_dict["raw_messages"] = messages
             row_dict["dataset_ids"] = dataset_id
             row_dict["uid"] = task_config["id"]
-            row_dict["rollout_log_prob"] = rollout_log_prob[0]
             self.compute_mask(row_dict)
             tokenized_batch_data.append(row_dict)
         return tokenized_batch_data
@@ -530,8 +496,8 @@ class StepwiseTrajectorySplitter:
             truncation: str = "error",
             limit_images: int = 5,
             limit_messages: int = 35,
+            use_vllm_logp: bool = False,
             traj_filter: bool = False,
-            use_pt: bool = False
         ) -> None:
         self.processor = processor
         self.root_dir = root_dir
@@ -542,8 +508,8 @@ class StepwiseTrajectorySplitter:
         self.max_response_length = max_response_length
         self.limit_images = limit_images
         self.limit_messages = limit_messages
+        self.use_vllm_logp = use_vllm_logp
         self.traj_filter = traj_filter
-        self.use_pt = use_pt
         self.img_ids = {
             "<|vision_start|>": self.processor.tokenizer.convert_tokens_to_ids("<|vision_start|>"),
             "<|vision_end|>": self.processor.tokenizer.convert_tokens_to_ids("<|vision_end|>"),
@@ -561,7 +527,7 @@ class StepwiseTrajectorySplitter:
             dataset_ids: list[str], 
             reward_tensor: torch.Tensor | None = None
         ) -> DataProto:
-        batch_output = []
+        batch_output = [] 
 
         if self.traj_filter:
             positive_lengths = []
@@ -577,25 +543,23 @@ class StepwiseTrajectorySplitter:
             avg_len = int(sum(positive_lengths) / len(positive_lengths)) if positive_lengths else 0
         else:
             avg_len = 0
-
         for idx, dataset_id in enumerate(dataset_ids):
-            if not self.use_pt:
+            if self.use_vllm_logp:
+                batch_messages = self.split_dataset_id_from_pt(dataset_id,reward=reward_tensor[idx].item(), avg_len=avg_len)
+                
+                batch_tokenized_messages = self.tokenize_from_pt(
+                batch_messages, 
+                dataset_id,
+                reward=reward_tensor[idx].item()
+            )
+            else:
                 batch_messages = self.split_dataset_id(dataset_id)
                 batch_tokenized_messages = self.tokenize(
-                    batch_messages, 
-                    dataset_id,
-                    reward=reward_tensor[idx].item()
-                )
-            else:
-                batch_messages = self.split_dataset_id_from_pt(dataset_id, reward=reward_tensor[idx].item(), avg_len=avg_len)
-
-                batch_tokenized_messages = self.tokenize_from_pt(
-                    batch_messages, 
-                    dataset_id,
-                    reward=reward_tensor[idx].item()
-                )
+                batch_messages, 
+                dataset_id,
+                reward=reward_tensor[idx].item()
+            )
             batch_output += batch_tokenized_messages
-        
         batch_output = collate_fn(batch_output)
         return batch_output
 
@@ -603,7 +567,8 @@ class StepwiseTrajectorySplitter:
             self, 
             dataset_ids: list[str], 
             reward_tensor: torch.Tensor | None = None,
-            num_cpus: int = 4
+            num_cpus: int = 4,
+            parallel_size: int = 64,
         ) -> DataProto:
         """
         Parallel version of split using Ray for distributed processing.
@@ -621,29 +586,68 @@ class StepwiseTrajectorySplitter:
         
         # Create remote function for processing a single dataset
         @ray.remote
-        def process_single_dataset(splitter, dataset_id, reward):
-            batch_messages = splitter.split_dataset_id(dataset_id)
-            batch_tokenized_messages = splitter.tokenize(
+        def process_single_dataset(splitter, dataset_id, reward, use_vllm_logp, avg_len):
+            if self.use_vllm_logp:
+                batch_messages = self.split_dataset_id_from_pt(dataset_id,reward=reward_tensor[idx].item(), avg_len=avg_len)
+                
+                batch_tokenized_messages = self.tokenize_from_pt(
                 batch_messages, 
                 dataset_id,
-                reward=reward
+                reward=reward_tensor[idx].item()
+            )
+            else:
+                batch_messages = self.split_dataset_id(dataset_id)
+                batch_tokenized_messages = self.tokenize(
+                batch_messages, 
+                dataset_id,
+                reward=reward_tensor[idx].item()
             )
             return batch_tokenized_messages
         
+        # compute average length for positive reward trajectories
+        if self.traj_filter:
+            positive_lengths = []
+            for idx, dataset_id in enumerate(dataset_ids):
+                if reward_tensor[idx].item() > 0:
+                    dataset_dir = os.path.join(self.root_dir, dataset_id)
+                    message_path = os.path.join(dataset_dir, "final_messages.json")
+                    with open(message_path) as f:
+                        dataset = json.load(f)
+                    assistant_count = sum(1 for msg in dataset if msg["role"] == "assistant")
+                    positive_lengths.append(assistant_count)
+
+            avg_len = int(sum(positive_lengths) / len(positive_lengths)) if positive_lengths else 0
+        else:
+            avg_len = 0
+
+
         # Submit all tasks to Ray
         futures = []
         for idx, dataset_id in enumerate(dataset_ids):
             reward = reward_tensor[idx].item() if reward_tensor is not None else 0.0
-            future = process_single_dataset.remote(self, dataset_id, reward)
+            future = process_single_dataset.remote(self, dataset_id, reward, self.use_vllm_logp,avg_len)
             futures.append(future)
         
+        # # Collect results
+        # batch_output = []
+        # for i in range(0, len(futures), parallel_size):
+        #     batch_futures = futures[i:i + parallel_size]
+        #     results = ray.get(batch_futures)
+        #     for result in results:
+        #         batch_output += result
+        #     del results
+
         # Collect results
         batch_output = []
         results = ray.get(futures)
         for result in results:
             batch_output += result
-            
+        del results
         batch_output = collate_fn(batch_output)
+        # return batch_output
+        # return batch_output
+            # return batch_tokenized_messages
+        
         return batch_output
     
     def split_dataset_id(self, dataset_id: str) -> list[list[dict]]:
@@ -659,31 +663,21 @@ class StepwiseTrajectorySplitter:
         n_msg = len(dataset)
 
         batch_data = []
-        instruction = copy.deepcopy(dataset[1])
-        is_first_turn = True
         for end in range(3, n_msg, 2):
             pre_start = max(0, end - self.limit_messages * 2 - 1)
-            start = max(1, end - 5 * 2)
-            assert dataset[start]["role"] == "user"
-            if len(dataset[start]["content"]) == 1:
-                instruction["content"] = instruction["content"][:1]
-            item = self._process_item(dataset, copy.deepcopy(instruction), pre_start, start, end, is_first_turn)
-            is_first_turn = False
-
+            item = self._process_item(
+                dataset, 
+                pre_start, 
+                end
+            )
             batch_data.append((item, copy.deepcopy(task_config)))
+
         return batch_data
-    
-    def split_dataset_id_from_pt(self, dataset_id: str, reward: float, avg_len: int) -> list[list[dict]]:
+
+    def split_dataset_id_from_pt(self, dataset_id: str) -> list[list[dict]]:
         dataset_dir = os.path.join(self.root_dir, dataset_id)
         message_path = os.path.join(dataset_dir, "final_messages.json")
-        with open(message_path) as f:
-            dataset = json.load(f)
-        dataset = replace_image_url(dataset)
-        config_path = os.path.join(dataset_dir, "task_config.json")
-        with open(config_path) as f:
-            task_config = json.load(f)
-
-        from pathlib import Path
+        # load vllm logp from pt files
         pt_data_files = sorted(Path(dataset_dir).glob("data_for_step_*.pt"),key=lambda x: int(x.stem.split("_")[-1]))
         pt_data_list = [torch.load(f) for f in pt_data_files]
         rollout_log_probs = [d["logp"] for d in pt_data_list]
@@ -697,6 +691,18 @@ class StepwiseTrajectorySplitter:
         image_grid_thw_list = pt_data["image_grid_thw"] 
         num_patches_list = pt_data["num_patches_list"]
         pixel_values = pt_data["pixel_values"]
+
+        
+        # TODO: pre tokenize
+        # token_ids_list = [d["token_ids"] for d in pt_data_list]
+        # prompt_token_ids_list = [d["prompt_token_ids"] for d in pt_data_list]
+
+        with open(message_path) as f:
+            dataset = json.load(f)
+        dataset = replace_image_url(dataset)
+        config_path = os.path.join(dataset_dir, "task_config.json")
+        with open(config_path) as f:
+            task_config = json.load(f)
 
         n_msg = len(dataset)
         assistant_indices = [i for i, msg in enumerate(dataset) if msg["role"] == "assistant"]
@@ -712,16 +718,16 @@ class StepwiseTrajectorySplitter:
         instruction = copy.deepcopy(dataset[1])
         is_first_turn = True
         for end in range(3, n_msg, 2):
-            if end <= start+1:  
-                continue  # reward=0: 丢掉前面没达到 avg_len 的 step
             pre_start = max(0, end - self.limit_messages * 2 - 1)
-            start = max(1, end - 5 * 2)
+            start = max(1, end - self.limit_images * 2)
             assert dataset[start]["role"] == "user"
             if len(dataset[start]["content"]) == 1:
                 instruction["content"] = instruction["content"][:1]
-            item = self._process_item(dataset, copy.deepcopy(instruction), pre_start, start, end, is_first_turn)
+            # item = self._process_item(dataset, copy.deepcopy(instruction), pre_start, start, end, is_first_turn)
+            item = self._process_item(dataset, pre_start, end)
             is_first_turn = False
 
+            # fetch limited images and pixel values from pt file
             img_end = end // 2
             img_start = max(0, img_end - self.limit_images)
             image = images[img_start:img_end]
@@ -739,6 +745,7 @@ class StepwiseTrajectorySplitter:
                 last_assistant_logp_idx = assistant_indices.index(last_assistant_idx)
                 rollout_log_prob = rollout_log_probs[last_assistant_logp_idx]
 
+                # fetch token ids and prompt token ids
                 current_step_idx = last_assistant_logp_idx
                 core_tokens = prompt_token_ids[current_step_idx]
                 sp_tokens = self.img_ids["<|im_end|>"]
@@ -760,9 +767,16 @@ class StepwiseTrajectorySplitter:
             batch_data.append((item, copy.deepcopy(task_config), rollout_log_prob, input_ids, response_ids, image, image_grid_thw, num_patches, pixel_value))
         return batch_data
 
-    def _process_item(self, dataset, instruction, pre_start, start, end, is_first_turn: bool) -> list:
-
-        return limit_images_in_messages(dataset[pre_start:end], limit_images=self.limit_images)
+    def _process_item(self, dataset, start, end) -> list:
+        item = []
+        if start > 0:
+            system_prompt = dataset[0]
+            item.append(copy.deepcopy(system_prompt))
+            instruction = copy.deepcopy(dataset[1])
+            instruction["content"] = instruction["content"][:1]
+            item.append(instruction)
+        item += limit_images_in_messages(dataset[start:end], limit_images=self.limit_images)
+        return item
     
     def tokenize(self, batch_data: list, dataset_id: str, reward: float) -> list[list[dict]]:
         tokenized_batch_data = []
@@ -810,12 +824,7 @@ class StepwiseTrajectorySplitter:
             # print("messages", json.dumps(messages, indent=2, ensure_ascii=False))
             row_dict = dict()
 
-            start_time = time.time()
             input_ids, attention_mask, position_ids, multi_modal_data, model_inputs = self._get_inputs_from_pt(messages, dataset_id, input_ids, image, image_grid_thw, num_patches, pixel_value)
-            end_time = time.time()
-            duration = end_time - start_time
-            print(f"_get_inputs block runtime: {duration:.6f} sec\n")
-
             input_attention_mask = attention_mask
 
             try:
@@ -833,7 +842,13 @@ class StepwiseTrajectorySplitter:
             valid_response_length = response_attention_mask.sum()
             # debuging valid response length
             reward_tensor[valid_response_length-1] = reward
-            rollout_log_prob = verl_F.pad_2d_list_to_length(rollout_log_prob.unsqueeze(0), self.processor.tokenizer.pad_token_id, max_length=self.max_response_length)
+            if rollout_log_prob.shape[0] != valid_response_length:
+                print(f"[ERROR] rollout_log_prob length {rollout_log_prob.shape[0]} does not match valid_response_length {valid_response_length} for {dataset_id}, truncating or padding as needed.")
+                # Create a tensor with same shape as rollout_log_prob filled with -inf
+                rollout_log_prob = torch.zeros_like(torch.zeros(valid_response_length))
+                rollout_log_prob = verl_F.pad_2d_list_to_length(rollout_log_prob.unsqueeze(0), 0, max_length=self.max_response_length)
+            else:    
+                rollout_log_prob = verl_F.pad_2d_list_to_length(rollout_log_prob.unsqueeze(0), 0, max_length=self.max_response_length)
             row_dict["prompts"] = input_ids[0]
             row_dict["responses"] = response_ids[0]
             row_dict["attention_mask"] = attention_mask[0]
@@ -871,8 +886,10 @@ class StepwiseTrajectorySplitter:
         images = [process_image(Image.open(image)) for image in image_paths]
         multi_modal_data["image"] = images
         model_inputs = self.processor(text=[raw_prompt], images=images, return_tensors="pt")
+
         input_ids = model_inputs.pop("input_ids")
         attention_mask = model_inputs.pop("attention_mask")
+
         if "second_per_grid_ts" in model_inputs:
             model_inputs.pop("second_per_grid_ts")
 
@@ -1070,6 +1087,7 @@ class StepwiseTrajectorySplitter:
     def _get_responses_from_pt(self, messages: list[dict], dataset_id: str, model_inputs: dict, position_ids, response_ids, attention_mask):
         context_len = self._locate_context(messages)
         input_ids = response_ids.unsqueeze(0)
+        
 
         response = verl_F.pad_2d_list_to_length(input_ids, self.processor.tokenizer.pad_token_id, max_length=self.max_response_length)
         response_length = response.size(1)

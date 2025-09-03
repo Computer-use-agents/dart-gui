@@ -704,7 +704,7 @@ def compute_policy_loss(
         print(f"Zero rows found at batch indices: {zero_row_indices},Total zero rows: {len(zero_row_indices)}")
         
         vllm_log_prob = torch.where(zero_rows.unsqueeze(-1), old_log_prob, vllm_log_prob)
-        ratio_iv_mean =  torch.sum(vllm_log_prob * loss_mask, dim=-1) / torch.sum(loss_mask, dim=-1)  # (bs,)
+        ratio_iv_mean =  torch.sum(vllm_log_prob * response_mask, dim=-1) / torch.sum(response_mask, dim=-1)  # (bs,)
         w = torch.clamp(ratio_iv, max=1.0) # 0.2~0.28
         pg_losses = w *  pg_losses
     else:
