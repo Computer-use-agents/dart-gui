@@ -34,7 +34,7 @@ def main(config: DictConfig) -> None:
     asyncio.run(async_main(config))
 
 async def async_main(config=None):
-    ray.init(log_to_driver=True)
+    ray.init(log_to_driver=True,dashboard_host='0.0.0.0')
 
     
     task_loader = TaskLoader(config.task, config.storage.root)

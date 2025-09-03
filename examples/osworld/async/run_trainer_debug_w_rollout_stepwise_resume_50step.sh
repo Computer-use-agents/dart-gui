@@ -66,7 +66,7 @@ clip_ratio_high=0.28
 
 
 max_prompt_length=32000
-max_response_length=512
+max_response_length=500
 
 # loss_agg_mode="token-mean"
 loss_agg_mode="seq-mean-token-mean"
@@ -77,7 +77,7 @@ train_bz_max=8
 train_prompt_bsz=4
 rollout_n=8
 train_ppo_mini_bsz=64
-train_ppo_micro_bz_per_gpu=4
+train_ppo_micro_bz_per_gpu=2
 
 # Performance Related Parameter
 sp_size=4

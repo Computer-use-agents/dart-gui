@@ -66,7 +66,7 @@ clip_ratio_high=0.28
 
 
 max_prompt_length=32000
-max_response_length=512
+max_response_length=500
 
 # loss_agg_mode="token-mean"
 loss_agg_mode="seq-mean-token-mean"

@@ -107,7 +107,7 @@ class ServiceInstance:
     """
     使用一个数据类来统一管理每个服务实例的状态。
     """
-    def __init__(self, port: int, gpu_id: int, process: subprocess.Popen, ckpt_path: str):
+    def __init__(self, port: int, gpu_id: list[int], process: subprocess.Popen, ckpt_path: str):
         self.port = port
         self.gpu_id = gpu_id
         self.process = process
@@ -204,6 +204,7 @@ class ModelServicePool:
         self.replicas = model_cfg.replicas
         self.vllm_params = model_cfg.vllm_params
         self.gpu_memory_utilization = model_cfg.vllm_params.get("gpu_memory_utilization", 0.9)
+        self.tensor_parallel_size = model_cfg.vllm_params.get("tensor_parallel_size", 1)
         
         # 优化后的细粒度锁机制
         self.instances_lock = asyncio.Lock()  # 保护service_instances字典
@@ -227,7 +228,7 @@ class ModelServicePool:
             if gpu_count == 0:
                 raise RuntimeError("No available GPUs found. Cannot start ModelServicePool.")
             
-            self.replicas = min(self.model_cfg.replicas, gpu_count)
+            self.replicas = min(self.model_cfg.replicas, gpu_count//self.tensor_parallel_size)
             if self.replicas < self.model_cfg.replicas:
                 logger.warning(f"Warning: Requested replicas ({self.model_cfg.replicas}) > available GPU count ({gpu_count}). "
                       f"Setting replicas to {self.replicas}.")
@@ -1081,7 +1082,7 @@ def main(cfg: DictConfig):
         ckpt_path=cfg.model.ckpt_path,
         base_port=cfg.model.base_port,
         replicas=cfg.model.replicas,
-        vllm_params=OmegaConf.to_container(cfg.model.vllm_params)
+        vllm_params=OmegaConf.to_container(cfg.model.vllm_params),
     )
     app = create_app(model_cfg)
     uvicorn.run(app, host=cfg.model.host, port=cfg.model.service_port)

@@ -82,6 +82,10 @@ class Message(BaseModel):
 class GenerationRequest(BaseModel):
     messages: List[Dict[str, Any]]
     parameters: Optional[Dict[str, Any]] = None
+
+class TokenizeRequest(BaseModel):
+    prompt: str
+    parameters: Optional[Dict] = None
     
 # class GenerationRequest(BaseModel):
 #     """
@@ -794,6 +798,38 @@ class ModelServicePool:
         except Exception as e:
             logger.error(f"Error during generate call: {e}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        
+    async def tokenize(self, input_text: str, **kwargs) -> Dict[str, Any]:
+        """调用模型服务池的 /v1/tokenize 接口"""
+        try:
+            async with self._get_endpoint_for_request() as instance:
+                logger.info(f"Using Service Instance for tokenize ->>> {instance}")
+                if not instance:
+                    raise HTTPException(
+                        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                        detail="Model service pool is not ready or has no available endpoints."
+                    )
+
+                url = f"{instance.endpoint}/tokenize"
+                data = {"model": instance.ckpt_path, "prompt": input_text}
+
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(url, json=data) as response:
+                        if not response.ok:
+                            error_text = await response.text()
+                            raise HTTPException(status_code=response.status, detail=f"Tokenize API failed: {error_text}")
+                        
+                        response_data = await response.json()
+                        try:
+                            return response_data
+                        except (KeyError, IndexError, TypeError) as e:
+                            raise HTTPException(
+                                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail=f"Failed to parse tokenize response: {e}. Full response: {response_data}"
+                            )
+        except Exception as e:
+            logger.error(f"Error during tokenize call: {e}")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
     async def _find_available_ports(self, count: int, start_port: int = None, continuous: bool = False) -> List[int]:
         """
@@ -1023,6 +1059,10 @@ def main(cfg: DictConfig):
                 detail=f"An unexpected error occurred: {str(e)}"
             )
 
+    @app.post("/tokenize")
+    async def tokenize_text(request: TokenizeRequest, pool: ModelServicePool = Depends(get_model_pool)):
+        kwargs = request.parameters or {}
+        return await pool.tokenize(request.prompt, **kwargs)
     @app.post("/reload", summary="Reload model with rolling update")
     async def reload_model(request: ReloadRequest, pool: ModelServicePool = Depends(get_model_pool)):
         """通过滚动更新的方式重新加载模型。"""

@@ -52,6 +52,29 @@ class StorageActor:
 
         await asyncio.to_thread(torch.save, data_to_save, fn)
 
+    async def save_img_pt(self, task_root: str, images: list, image_grid_thw: torch.Tensor, num_patches_list: list[int], pixel_values):
+        """
+        保存图像 tensor 和 patch 信息为 .pt 文件
+
+        Args:
+            task_root: 保存根目录
+            images: 原始 PIL.Image.Image 列表
+            image_grid_thw: 模型处理后的 tensor
+            num_patches_list: 每张图的 patch 数量
+        """
+        save_dir = self.root / task_root
+        save_dir.mkdir(exist_ok=True, parents=True)
+        fn = save_dir / "images_data.pt"
+
+        data_to_save = {
+            "images": images,
+            "image_grid_thw": image_grid_thw.cpu(),
+            "num_patches_list": num_patches_list,
+            "pixel_values": pixel_values.cpu()
+        }
+
+        await asyncio.to_thread(torch.save, data_to_save, fn)
+
     # ---- save full trajectory json ----
     async def save_episode(self, task_root: str, episode_summary: list[dict]):
         save_dir = self.root / task_root

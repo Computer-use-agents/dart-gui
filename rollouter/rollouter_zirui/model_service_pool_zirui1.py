@@ -1,8 +1,69 @@
 import ray
 import aiohttp
+import asyncio
 from typing import List, Dict
 
+def set_pad_token_id(tokenizer):
+    """Set pad_token_id to eos_token_id if it is None.
 
+    Args:
+        tokenizer (transformers.PreTrainedTokenizer): The tokenizer to be set.
+
+    """
+    if tokenizer.pad_token_id is None:
+        tokenizer.pad_token_id = tokenizer.eos_token_id
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+def hf_tokenizer(name_or_path, correct_pad_token=True, correct_gemma2=True, **kwargs):
+    """Create a huggingface pretrained tokenizer which correctness handles eos and pad tokens.
+
+    Args:
+
+        name (str): The name of the tokenizer.
+        correct_pad_token (bool): Whether to correct the pad token id.
+        correct_gemma2 (bool): Whether to correct the gemma2 tokenizer.
+
+    Returns:
+
+        transformers.PreTrainedTokenizer: The pretrained tokenizer.
+
+    """
+    from transformers import AutoTokenizer
+
+    if correct_gemma2 and isinstance(name_or_path, str) and "gemma-2-2b-it" in name_or_path:
+        # the EOS token in gemma2 is ambiguious, which may worsen RL performance.
+        # https://huggingface.co/google/gemma-2-2b-it/commit/17a01657f5c87135bcdd0ec7abb4b2dece04408a
+        kwargs["eos_token"] = "<end_of_turn>"
+        kwargs["eos_token_id"] = 107
+    tokenizer = AutoTokenizer.from_pretrained(name_or_path, **kwargs)
+    if correct_pad_token:
+        set_pad_token_id(tokenizer)
+    return tokenizer
+
+
+def hf_processor(name_or_path, **kwargs):
+    """Create a huggingface processor to process multimodal data.
+
+    Args:
+        name_or_path (str): The name of the processor.
+
+    Returns:
+        transformers.ProcessorMixin: The pretrained processor.
+    """
+    from transformers import AutoProcessor
+
+    try:
+        processor = AutoProcessor.from_pretrained(name_or_path, **kwargs)
+    except Exception as e:
+        processor = None
+        # TODO(haibin.lin): try-catch should be removed after adding transformer version req to setup.py to avoid
+        # silent failure
+    # Avoid load tokenizer, see:
+    # https://github.com/huggingface/transformers/blob/v4.49.0/src/transformers/models/auto/processing_auto.py#L344
+    if processor is not None and "Processor" not in processor.__class__.__name__:
+        processor = None
+    return processor
 
 @ray.remote
 class ModelServicePool:
@@ -20,6 +81,11 @@ class ModelServicePool:
         print("Initializing ModelServicePool...")
         self.service_url = model_cfg.service_endpoint
         print(f"Model Service Endpoint:>>> {self.service_url}")
+
+        self.ckpt_path = model_cfg.ckpt_path
+
+        self.tokenizer = hf_tokenizer(self.ckpt_path, trust_remote_code=True)
+        self.processor = hf_processor(self.ckpt_path, trust_remote_code=True, use_fast=True)
 
 
     async def generate(self, messages: List[Dict[str, str]],  **kwargs) -> str:
@@ -142,5 +208,16 @@ class ModelServicePool:
         """
         checkpoint_info = await self.get_checkpoint_info()
         return checkpoint_info.get("last_ckpt_path", "")
+
+    def process_images_sync(self, images):
+        dummy_texts = [self.processor.image_token] * len(images)
+        model_inputs = self.processor(text=dummy_texts, images=images, return_tensors="pt")
+        image_grid_thw = model_inputs["image_grid_thw"]
+        num_patches_list = (image_grid_thw[:,0]*image_grid_thw[:,1]*image_grid_thw[:,2]).tolist()
+        pixel_values = model_inputs["pixel_values"]
+        return image_grid_thw, num_patches_list, pixel_values
+
+    async def process_images(self, images):
+        return await asyncio.to_thread(self.process_images_sync, images)
 
 

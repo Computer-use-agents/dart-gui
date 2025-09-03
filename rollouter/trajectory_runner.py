@@ -37,6 +37,7 @@ class TrajectoryRunnerActor:
         self.max_images = self.runner_cfg.max_images
         self.max_tests = self.runner_cfg.max_texts
         self.max_steps = self.runner_cfg.max_steps
+        self.save_img_pt = self.runner_cfg.save_img_pt
         # self.rollout_n = self.runner_cfg.rollout_n
 
         # --- process task info for running ---
@@ -114,10 +115,12 @@ class TrajectoryRunnerActor:
             # 如果初始化失败，抛出异常
             if not self.env_init_success:
                 raise RuntimeError(f"[{self.trace_id}] 环境初始化失败 - task_id: {self.task_id}")
-                
+            
+            all_img = []
             # --- get initial observation as first frame ----
             obs = self.env._get_obs()
             obs_img = obs["screenshot"]
+            all_img.append(obs["image"])
             image_size = Image.open(BytesIO(obs["screenshot"])).size
             frame0 = await storage.save_frame.remote(self.task_root, 0, obs_img)
             self._set_first_frame(obs_img, frame0)
@@ -125,6 +128,32 @@ class TrajectoryRunnerActor:
 
             step, done = 0, False
             logger.info(f"[{self.trace_id}] 环境初始化完成，开始主循环 - task_id: {self.task_id}")
+
+            def format_chat(messages):
+                formatted = ""
+                for m in messages:
+                    content = m["content"]
+
+                    # 如果 content 是 list（多模态消息）
+                    if isinstance(content, list):
+                        # 只取文本部分
+                        texts = [c["text"] for c in content if c.get("type") == "text"]
+                        content_str = "\n".join(texts)
+                    else:
+                        # 普通 string
+                        content_str = content
+
+                    formatted += f"{content_str}<|im_end|>\n"
+
+                return formatted
+
+            base_messages = format_chat(self.base_messages_for_save)
+
+            tokenize_response = await self._call_model_tokenize(
+                            model_pool, base_messages,
+                            self.runner_cfg.model_pool)
+
+            prompt_token_ids = tokenize_response
 
             # --- main loop ----
             # MAX_T, RETRIES, BACKOFF = 10, 3, 2
@@ -178,6 +207,7 @@ class TrajectoryRunnerActor:
                 st = time.time()
                 obs, reward, done, info = await self._run_step_async(action)
                 obs_img = obs["screenshot"]
+                all_img.append(obs["image"])
 
                 env_duration = time.time() - st
                 logger.info(f"[{self.trace_id}] 环境步骤执行完成 - task_id: {self.task_id}, step: {step}, "
@@ -185,22 +215,27 @@ class TrajectoryRunnerActor:
 
 
                 # ---- save screenshot ----
-                frame_path = await storage.save_frame.remote(
-                    self.task_root, step + 1, obs_img)
-                
-                self._add_image(obs_img, frame_path)
+                if action not in ["DONE", "FAIL"]:
+                    frame_path = await storage.save_frame.remote(
+                        self.task_root, step + 1, obs_img)
+                    
+                    self._add_image(obs_img, frame_path)
                 
                 # ---- save current trajectory
                 await storage.save_partial_traj.remote(self.task_root, step + 1, self._build_trajectory())
 
                 # ---- save vllm logp ----
-                await storage.save_partial_pt.remote(self.task_root, step + 1, vllm_logp, None, None)
+                await storage.save_partial_pt.remote(self.task_root, step + 1, vllm_logp, token_ids, prompt_token_ids)
                 
                 step_duration = time.time() - st_step
                 self._log_latency(step, model_duration, env_duration, step_duration)
                 
                 step += 1
-                
+
+            # save img
+            if self.save_img_pt:
+                image_grid_thw, num_patches_list, pixel_values = await model_pool.process_images.remote(all_img)
+                await storage.save_img_pt.remote(self.task_root, all_img, image_grid_thw, num_patches_list, pixel_values)
 
             # calculate and save reward
             reward = self.env.evaluate()
@@ -209,6 +244,14 @@ class TrajectoryRunnerActor:
             
             # save trajectory json
             full_messages = self.base_messages_for_save + self.save_dialogue_full
+            if full_messages:
+                last_msg = full_messages[-1]
+                if (
+                    last_msg.get("role") == "user" and
+                    len(last_msg.get("content", [])) == 1 and
+                    last_msg["content"][0].get("type") == "image_url"
+                ):
+                    full_messages.pop()
             await storage.save_episode.remote(self.task_root, full_messages)
             
             # -------- 拆轨迹逻辑，已停用 --------------chunk表结构已修改，复用时代码需要调整
@@ -332,6 +375,28 @@ class TrajectoryRunnerActor:
                     return None, model_path, None, None
                 await asyncio.sleep(backoff ** attempt)   # 2s, 4s, 8s …
 
+    async def _call_model_tokenize(self, model_pool, messages: str, model_cfg):
+        """
+        调用 tokenize 接口，对格式化后的 base_messages 做 tokenization。
+        返回 token_ids (List[int])。
+        """
+        timeout = model_cfg.timeout
+        retries = model_cfg.retries
+        backoff = model_cfg.backoff
+        DEFAULT_MODEL_PATH = model_cfg.ckpt_path
+
+        for attempt in range(1, retries + 1):
+            try:
+                token_ids = await asyncio.wait_for(
+                    model_pool.tokenize.remote(messages),
+                    timeout=timeout
+                )
+                return token_ids
+            except (asyncio.TimeoutError, ray.exceptions.RayError) as e:
+                if attempt == retries:
+                    logger.error(f"[{self.trace_id}] tokenize 调用失败 - task_id: {self.task_id}, 重试次数: {attempt}, 错误: {e}")
+                    return None
+                await asyncio.sleep(backoff ** attempt) 
     
     async def _call_prelaunched_model(self, messages, model_cfg):
         

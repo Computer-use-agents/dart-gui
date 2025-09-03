@@ -198,7 +198,7 @@ class RemoteDesktopEnv(gym.Env):
                 f"{self.server_url}/server/execute/{self.service_id}",
                 json={"action": "screenshot"},
                 stream=True,
-                timeout=15
+                timeout=10
             )
             if response.status_code == 200:
                 success = True
@@ -216,7 +216,6 @@ class RemoteDesktopEnv(gym.Env):
             raise Exception(f"Failed to get screenshot after {retry} retries, service_id: {self.service_id}")
 
         # Save screenshot to temporary file
-
         # tmp_dir ="./tmp"
         # os.makedirs(tmp_dir,exist_ok=True)
         # screenshot_path = f"./tmp/screenshot_{self.service_id}_{uuid.uuid4()}.png"
@@ -235,19 +234,6 @@ class RemoteDesktopEnv(gym.Env):
         screenshot_data = screenshot_bytes.getvalue()
         screenshot_bytes.seek(0)
         screenshot_img = Image.open(screenshot_bytes).convert("RGB")
-
-
-        # tmp_dir ="./tmp"
-        # os.makedirs(tmp_dir,exist_ok=True)
-        # screenshot_path = f"./tmp/screenshot_{self.service_id}_{uuid.uuid4()}.png"
-        # with open(screenshot_path, 'wb') as f:
-        #     for chunk in response.iter_content(chunk_size=8192):
-        #         f.write(chunk)
-
-        # # Read screenshot
-        # with open(screenshot_path, 'rb') as f:
-        #     screenshot_data = f.read()
-        # os.remove(screenshot_path)
 
         return {
             "screenshot": screenshot_data,
@@ -296,7 +282,7 @@ class RemoteDesktopEnv(gym.Env):
         response = self.session.post(
             f"{self.server_url}/server/execute/{self.service_id}",
             json={"action": python_code},
-            timeout=20
+            timeout=15
         )
         if response.status_code != 200:
             logger.error(f"Request failed with status {response.status_code}\n"

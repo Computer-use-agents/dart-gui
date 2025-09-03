@@ -114,10 +114,12 @@ class TrajectoryRunnerActor:
             # 如果初始化失败，抛出异常
             if not self.env_init_success:
                 raise RuntimeError(f"[{self.trace_id}] 环境初始化失败 - task_id: {self.task_id}")
-                
+            
+            all_img = []
             # --- get initial observation as first frame ----
             obs = self.env._get_obs()
             obs_img = obs["screenshot"]
+            all_img.append(obs["image"])
             image_size = Image.open(BytesIO(obs["screenshot"])).size
             frame0 = await storage.save_frame.remote(self.task_root, 0, obs_img)
             self._set_first_frame(obs_img, frame0)
@@ -202,18 +204,18 @@ class TrajectoryRunnerActor:
                 st = time.time()
                 obs, reward, done, info = await self._run_step_async(action)
                 obs_img = obs["screenshot"]
+                all_img.append(obs["image"])
 
                 env_duration = time.time() - st
                 logger.info(f"[{self.trace_id}] 环境步骤执行完成 - task_id: {self.task_id}, step: {step}, "
                             f"耗时: {env_duration:.2f}s, done: {done}")
 
-
                 # ---- save screenshot ----
-                # Todo ”done fail“ remove image
-                frame_path = await storage.save_frame.remote(
-                    self.task_root, step + 1, obs_img)
-                
-                self._add_image(obs_img, frame_path)
+                if action not in ["DONE", "FAIL"]:
+                    frame_path = await storage.save_frame.remote(
+                        self.task_root, step + 1, obs_img)
+                    
+                    self._add_image(obs_img, frame_path)
                 
                 # ---- save current trajectory
                 await storage.save_partial_traj.remote(self.task_root, step + 1, self._build_trajectory())
@@ -225,15 +227,26 @@ class TrajectoryRunnerActor:
                 self._log_latency(step, model_duration, env_duration, step_duration)
                 
                 step += 1
-                
+
+            # save img
+            image_grid_thw, num_patches_list, pixel_values = await model_pool.process_images.remote(all_img)
+            await storage.save_img_pt.remote(self.task_root, all_img, image_grid_thw, num_patches_list, pixel_values)
+
             # calculate and save reward
             reward = self.env.evaluate()
             await storage.save_reward.remote(self.task_root, reward)
             logger.info(f"[{self.trace_id}] 任务评估完成 - task_id: {self.task_id}, reward: {reward}")
             
             # save trajectory json
-            # Todo remove last img
             full_messages = self.base_messages_for_save + self.save_dialogue_full
+            if full_messages:
+                last_msg = full_messages[-1]
+                if (
+                    last_msg.get("role") == "user" and
+                    len(last_msg.get("content", [])) == 1 and
+                    last_msg["content"][0].get("type") == "image_url"
+                ):
+                    full_messages.pop()
             await storage.save_episode.remote(self.task_root, full_messages)
             
             # split and save trajectory

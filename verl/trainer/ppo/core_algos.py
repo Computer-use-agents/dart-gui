@@ -704,8 +704,8 @@ def compute_policy_loss(
         print(f"Zero rows found at batch indices: {zero_row_indices},Total zero rows: {len(zero_row_indices)}")
         
         vllm_log_prob = torch.where(zero_rows.unsqueeze(-1), old_log_prob, vllm_log_prob)
-        ratio_iv = torch.exp(old_log_prob - vllm_log_prob)
-        w = torch.clamp(ratio_iv, max=0.5) # 0.2~0.28
+        ratio_iv_mean =  torch.sum(vllm_log_prob * loss_mask, dim=-1) / torch.sum(loss_mask, dim=-1)  # (bs,)
+        w = torch.clamp(ratio_iv, max=1.0) # 0.2~0.28
         pg_losses = w *  pg_losses
     else:
         ratio_iv = None
@@ -719,7 +719,7 @@ def compute_policy_loss(
         sft_mask = ratio_mask * reward_mask
         pg_loss = pg_loss + verl_F.masked_mean(sft_loss, sft_mask)
 
-    return pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower, pg_loss_no_old, ratio_iv 
+    return pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower, pg_loss_no_old, ratio_iv_mean 
 
 
 @register_policy_loss("clip_cov")
