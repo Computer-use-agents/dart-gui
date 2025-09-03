@@ -25,7 +25,9 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50/actor/huggingface
+
+#/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
 
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
@@ -39,17 +41,17 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 # export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
 # export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
 
-export ROOT_DATA_DIR=rollouter/results/pass16_20250901_train15_pass16_gpu2_env20_vllm_logp_maxstep15
-export RUN_ID=results/pass16_20250901_train15_pass16_gpu2_env20_vllm_logp_maxstep15
+export ROOT_DATA_DIR=rollouter/results/pass16_20250902_train90_pass16_gpu2_env20_vllm_logp_maxstep30
+export RUN_ID=results/pass16_20250902_train90_pass16_gpu2_env20_vllm_logp_maxstep30
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-# export EXPERIMENT_NAME=w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-export EXPERIMENT_NAME=w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250902_0nope0fv
+export EXPERIMENT_NAME=w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
 
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.139.126:15959
+export ROLLOUT_SERVER_URL=http://172.19.140.153:15959
 
 # training parameters
 adv_estimator=grpo
@@ -57,7 +59,7 @@ adv_estimator=grpo
 use_kl_in_reward=False
 kl_coef=0.0
 use_kl_loss=True
-kl_loss_coef=0.1
+kl_loss_coef=0.02
 
 clip_ratio_low=0.1
 clip_ratio_high=0.28
@@ -72,9 +74,9 @@ loss_agg_mode="seq-mean-token-mean"
 
 train_bz_min=4
 train_bz_max=8
-train_prompt_bsz=8
+train_prompt_bsz=4
 rollout_n=8
-train_prompt_mini_bsz=64
+train_prompt_mini_bsz=128
 
 # Performance Related Parameter
 sp_size=4
@@ -89,9 +91,10 @@ fsdp_size=32
 ## message splitter
 limit_messages=35
 splitter=stepwise
+splitter_parallel=True
 window_size=5 
 stride_size=5
-max_steps=15
+max_steps=30
 
 use_vllm_logp=True
 use_sft_loss=False
@@ -159,7 +162,7 @@ python3 -m verl.trainer.main_ppo_async \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \
-    +trainer.splitter_parallel=True\
+    +trainer.splitter_parallel=${splitter_parallel} \
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=$ENGINE \

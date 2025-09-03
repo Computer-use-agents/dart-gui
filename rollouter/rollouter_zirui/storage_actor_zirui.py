@@ -76,7 +76,6 @@ class StorageActor:
         fn = save_dir / f"task_config.json"
         async with aiofiles.open(fn, "w") as f:
             await f.write(json.dumps(task_config, ensure_ascii=False, indent=2))
-        return str(self.root)
             
     # ---- split and save full trajectory json ----
     async def split_episode(self, 

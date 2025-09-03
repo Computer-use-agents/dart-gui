@@ -62,6 +62,27 @@ class ModelServicePool:
                 except (KeyError, IndexError, TypeError) as e:
                     raise Exception(f"Failed to parse response: {e}. Full response: {response_data}")
 
+    async def tokenize(self, messages: str, **kwargs) -> List[int]:
+        """
+        调用模型服务池的 tokenize 接口。
+        """
+        payload = {
+            "prompt": messages,
+            "parameters": kwargs
+        }
+        tokenize_endpoint = self.service_url + "/tokenize"
+        async with aiohttp.ClientSession() as session:
+            async with session.post(tokenize_endpoint, json=payload) as response:
+                if not response.ok:
+                    error_text = await response.text()
+                    raise Exception(f"Tokenize API failed with status {response.status}: {error_text}")
+                
+                response_data = await response.json()
+                try:
+                    return response_data["tokens"]
+                except (KeyError, IndexError, TypeError) as e:
+                    raise Exception(f"Failed to parse tokenize response: {e}. Full response: {response_data}")
+
     async def reload(self, new_ckpt_path: str, batch_size: int = 1):
         """
         平滑地重新加载所有模型服务实例到新的检查点路径。

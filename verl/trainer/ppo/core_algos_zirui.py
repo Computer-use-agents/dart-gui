@@ -255,66 +255,6 @@ def compute_grpo_outcome_advantage(
     return scores, scores
 
 
-# # NOTE(sgm): this implementation only consider outcome supervision, where the reward is a scalar.
-# @register_adv_est(AdvantageEstimator.GRPO_TRAJ)  # or simply: @register_adv_est("grpo")
-# def compute_grpo_outcome_advantage(
-#     token_level_rewards: torch.Tensor,
-#     response_mask: torch.Tensor,
-#     index: np.ndarray,
-#     epsilon: float = 1e-6,
-#     norm_adv_by_std_in_grpo: str = True,
-# ):
-#     """
-#     Compute advantage for GRPO, operating only on Outcome reward
-#     (with only one scalar reward for each response).
-
-#     Args:
-#         token_level_rewards: `(torch.Tensor)`
-#             shape is (bs, response_length)
-#         response_mask: `(torch.Tensor)`
-#             shape is (bs, response_length)
-#         norm_adv_by_std_in_grpo: (bool)
-#             whether to scale the GRPO advantage.
-#             If True, the advantage is scaled by the std, as in the original GRPO.
-#             If False, the advantage is not scaled, as in Dr.GRPO (https://arxiv.org/abs/2503.20783).
-
-#     Returns:
-#         advantages: `(torch.Tensor)`
-#             shape is (bs, response_length)
-#         Returns: `(torch.Tensor)`
-#             shape is (bs, response_length)
-#     """
-#     scores = token_level_rewards.sum(dim=-1)
-#     print("compute_grpo_outcome_advantage token_level_rewards", scores)
-#     id2score = defaultdict(list)
-#     id2mean = {}
-#     id2std = {}
-
-#     with torch.no_grad():
-#         bsz = scores.shape[0]
-#         for i in range(bsz):
-#             id2score[index[i]].append(scores[i])
-#         for idx in id2score:
-#             print("compute_grpo_outcome_advantage idx", len(id2score[idx]))
-#             if len(id2score[idx]) == 1:
-#                 id2mean[idx] = torch.tensor(0.0)
-#                 id2std[idx] = torch.tensor(1.0)
-#             elif len(id2score[idx]) > 1:
-#                 id2mean[idx] = torch.mean(torch.tensor(id2score[idx]))
-#                 id2std[idx] = torch.std(torch.tensor([id2score[idx]]))
-#             else:
-#                 raise ValueError(f"no score in prompt index: {idx}")
-#         for i in range(bsz):
-#             if norm_adv_by_std_in_grpo:
-#                 scores[i] = (scores[i] - id2mean[index[i]]) / (id2std[index[i]] + epsilon)
-#             else:
-#                 scores[i] = scores[i] - id2mean[index[i]]
-#         scores = scores.unsqueeze(-1) * response_mask
-#     print("compute_grpo_outcome_advantage_traj_level", id2mean, id2std)
-#     return scores, scores
-
-
-
 @register_adv_est(AdvantageEstimator.GRPO_PASSK)  # or simply: @register_adv_est("grpo_passk")
 def compute_grpo_passk_outcome_advantage(
     token_level_rewards: torch.Tensor,
@@ -597,7 +537,7 @@ def agg_loss(loss_mat: torch.Tensor, loss_mask: torch.Tensor, loss_agg_mode: str
         loss: `a scalar torch.Tensor`
             aggregated loss
     """
-    if loss_agg_mode == "token-mean": 
+    if loss_agg_mode == "token-mean":
         loss = verl_F.masked_mean(loss_mat, loss_mask)
     elif loss_agg_mode == "seq-mean-token-sum":
         seq_losses = torch.sum(loss_mat * loss_mask, dim=-1)  # token-sum
@@ -620,17 +560,17 @@ def agg_loss(loss_mat: torch.Tensor, loss_mask: torch.Tensor, loss_agg_mode: str
 
 def compute_policy_loss(
     old_log_prob,
+    vllm_log_prob,
+    reward,
+    sft_loss,
     log_prob,
     advantages,
     response_mask,
-    vllm_log_prob = None,
-    reward = None,
-    sft_loss = None,
     cliprange=None,
     cliprange_low=None,
     cliprange_high=None,
     clip_ratio_c=3.0,
-    loss_agg_mode: str = "token-mean",  
+    loss_agg_mode: str = "token-mean",
 ):
     """
     Compute the clipped policy objective and related metrics for PPO.
@@ -662,11 +602,15 @@ def compute_policy_loss(
     """
     assert clip_ratio_c > 1.0, "The lower bound of the clip_ratio_c for dual-clip PPO should be greater than 1.0," + f" but get the value: {clip_ratio_c}."
 
+    ratio_iv = torch.exp(old_log_prob - vllm_log_prob)
+    w = torch.clamp(ratio_iv, max=0.5) # 0.2~0.28
 
-
+    ratio_iv_seq = torch.exp(torch.sum(old_log_prob - vllm_log_prob, dim=-1))  # (bs,)
+    ratio_mask = (ratio_iv_seq < 0.2).float()
+    reward_mask = (reward == 1).float()
+    sft_mask = ratio_mask * reward_mask
 
     negative_approx_kl = log_prob - old_log_prob
-    # negative_approx_kl = log_prob 
     # Clamp negative_approx_kl for stability
     negative_approx_kl = torch.clamp(negative_approx_kl, min=-20.0, max=20.0)
     ratio = torch.exp(negative_approx_kl)
@@ -695,31 +639,12 @@ def compute_policy_loss(
     pg_clipfrac_lower = verl_F.masked_mean(torch.gt(clip_pg_losses1, pg_losses3) * (advantages < 0).float(), response_mask)
 
     pg_losses = torch.where(advantages < 0, clip_pg_losses2, clip_pg_losses1)
-
-
-    if vllm_log_prob is not None:
-        # Check for rows that are all zeros in vllm_log_prob and replace them with old_log_prob
-        zero_rows = torch.all(vllm_log_prob.abs() < 1e-9, dim=-1)  # Shape: [bs]
-        zero_row_indices = torch.nonzero(zero_rows, as_tuple=False).squeeze(-1).tolist()
-        print(f"Zero rows found at batch indices: {zero_row_indices},Total zero rows: {len(zero_row_indices)}")
-        
-        vllm_log_prob = torch.where(zero_rows.unsqueeze(-1), old_log_prob, vllm_log_prob)
-        ratio_iv = torch.exp(old_log_prob - vllm_log_prob)
-        w = torch.clamp(ratio_iv, max=0.5) # 0.2~0.28
-        pg_losses = w *  pg_losses
-    else:
-        ratio_iv = None
-    
+    pg_losses = w * pg_losses
     pg_loss = agg_loss(loss_mat=pg_losses, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
     
-    if reward is not None and sft_loss is not None:
-        ratio_iv_seq = torch.exp(torch.sum(old_log_prob - vllm_log_prob, dim=-1))  # (bs,)
-        ratio_mask = (ratio_iv_seq < 0.2).float()
-        reward_mask = (reward == 1).float()
-        sft_mask = ratio_mask * reward_mask
-        pg_loss = pg_loss + verl_F.masked_mean(sft_loss, sft_mask)
+    final_loss = pg_loss + (sft_mask * sft_loss).mean()
 
-    return pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower, pg_loss_no_old, ratio_iv 
+    return final_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower, pg_loss_no_old
 
 
 @register_policy_loss("clip_cov")

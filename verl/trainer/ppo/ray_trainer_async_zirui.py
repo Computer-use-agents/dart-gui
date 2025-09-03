@@ -92,12 +92,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
 
         self.global_steps = 0
 
-        # insert initial checkpoint path
-        db_manager = create_database_manager()
-        db_manager.insert_checkpoint(self.config.actor_rollout_ref.model.path, run_id=self.run_id, initial=True)
-        db_manager.close_database()
         # load checkpoint before doing anything
-        
         self._load_checkpoint()
 
         # perform validation before training
@@ -133,7 +128,8 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             stride_size=self.config.data.stride_size,
                             max_prompt_length=self.config.data.max_prompt_length,
                             max_response_length=self.config.data.max_response_length,
-                            truncation=self.config.data.truncation
+                            truncation=self.config.data.truncation,
+                            traj_filter=self.config.data.traj_filter
                         )
                     elif self.config.trainer.splitter == "last_n":
                         print("Using last n splitter")
@@ -154,22 +150,22 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             max_prompt_length=self.config.data.max_prompt_length,
                             max_response_length=self.config.data.max_response_length,
                             truncation=self.config.data.truncation,
-                            use_vllm_logp=self.config.actor_rollout_ref.actor.use_vllm_logp
-                        )  
+                            traj_filter=self.config.data.traj_filter,
+                            use_pt=self.config.data.use_pt
+                        )
                     else:
                         raise ValueError(f"Unhandled splitter type: {self.config.trainer}")
                     old_batch = batch
                     dataset_ids = old_batch.non_tensor_batch["dataset_ids"]
+                    rollout_log_probs_list = old_batch.non_tensor_batch["rollout_log_probs_list"]
+                    token_ids_list = old_batch.non_tensor_batch["token_ids_list"]
+                    prompt_token_ids_list = old_batch.non_tensor_batch["prompt_token_ids_list"]
                     reward_tensor = old_batch.batch["reward_tensors"]
-
-
-                    print(f"Begin to split trajectories, {len(dataset_ids)} samples.")
-                    time_start = time.time()
                     if self.config.trainer.splitter_parallel:
                         batch = splitter.split_parallel(dataset_ids, reward_tensor)
                     else:
-                        batch = splitter.split(dataset_ids, reward_tensor)
-                    
+                        batch = splitter.split(dataset_ids, reward_tensor, rollout_log_probs_list, token_ids_list, prompt_token_ids_list)
+                                         
                     if self.global_steps == 1:               
                         save_path = save_batch_for_viz(
                             batch, json_path="viz/batch_step1.json",
@@ -180,8 +176,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     # make batch cannot be devidec by world_size_gpu
                     
                     batch = DataProto.from_single_dict(batch)
-                    print(f"Trajectory splitting done, got {len(batch)} samples, time cost {time.time() - time_start:.2f} seconds.")
-                    
+
                     config = self.actor_rollout_wg.get_config()
                     if isinstance(config, list):
                         print("Warning: config is a list?", config)
@@ -330,7 +325,6 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             multi_turn=self.config.actor_rollout_ref.rollout.multi_turn.enable,
                             config=self.config.algorithm,
                         )
-                    
 
                     # update critic
                     if self.use_critic:
@@ -393,38 +387,8 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             db_manager.insert_checkpoint(abs_path_actor_hf, run_id=self.run_id)
                             
                             #统计第step-2个版本模型的平均成功率
-                            # avg_nonneg, count_all, distinct_task_cnt = db_manager.get_nth_newest_model_success(run_id=self.run_id, n=3)
+                            avg_nonneg, count_all, distinct_task_cnt = db_manager.get_nth_newest_model_success(run_id=self.run_id, n=3)
                             # rollout metrics
-                            # metrics.update(
-                            #     {
-                            #         "rollout/succ_rate": avg_nonneg,
-                            #         "rollout/traj_count": count_all,
-                            #         "rollout/task_count": distinct_task_cnt
-                            #     }
-                            # )
-                            db_manager.close_database()
-                            print("Checkpoint path inserted into MySQL database.")
-
-                            print("Reloading model in rollouter...")
-                            # Reload model in rollouter
-                            reload_result = reload_model(
-                                service_url=self.config.actor_rollout_ref.rollout.server_url,
-                                new_ckpt_path=abs_path_actor_hf
-                            )
-                            print(f"Reload result status: {reload_result}")
-                        
-                        self._last_ckpt_time = time.monotonic()
-                        # val_metrics: dict = self._validate()
-                        # if is_last_step:
-                            # last_val_metrics = val_metrics
-                        # metrics.update(val_metrics)
-                    if (self.global_steps % self.config.trainer.save_freq == 0) or self.global_steps == 1:
-                        db_manager = create_database_manager()
-                        
-                        #统计第step-2个版本模型的平均成功率
-                        avg_nonneg, count_all, distinct_task_cnt = db_manager.get_nth_newest_model_success(run_id=self.run_id, n=3)
-                        # rollout metrics
-                        if avg_nonneg > 0:
                             metrics.update(
                                 {
                                     "rollout/succ_rate": avg_nonneg,
@@ -432,8 +396,22 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                                     "rollout/task_count": distinct_task_cnt
                                 }
                             )
-                        db_manager.close_database()
-                        
+                            db_manager.close_database()
+                            print("Checkpoint path inserted into MySQL database.")
+
+                            print("Reloading model in rollouter...")
+                            # Reload model in rollouter
+                            # reload_result = reload_model(
+                            #     service_url=self.config.actor_rollout_ref.rollout.server_url,
+                            #     new_ckpt_path=abs_path_actor_hf
+                            # )
+                            
+                        self._last_ckpt_time = time.monotonic()
+                        # val_metrics: dict = self._validate()
+                        # if is_last_step:
+                            # last_val_metrics = val_metrics
+                        # metrics.update(val_metrics)
+
                 # training metrics
                 metrics.update(
                     {
@@ -481,7 +459,6 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
 
     def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
         n_mod = world_size * ppo_mini_batch_size
-        print("WORLD_SIZE and PPO mini batch size and N mod:", world_size, ppo_mini_batch_size, n_mod)
         if len(batch) % n_mod == 0:
             return batch
        
@@ -507,4 +484,3 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
             print("_up_sample failed due to", e)
 
         return batch    
-# # 

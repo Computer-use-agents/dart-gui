@@ -376,8 +376,7 @@ class DataParallelPPOActor(BasePPOActor):
 
         temperature = data.meta_info["temperature"]  # temperature must be in the data.meta_info to avoid silent error
         multi_turn = data.meta_info.get("multi_turn", False)
-
-        select_keys = ["responses", "input_ids", "attention_mask", "position_ids", "old_log_probs", "advantages"]
+        select_keys = ["responses", "input_ids", "attention_mask", "position_ids", "old_log_probs", "advantages", "token_level_scores", "rollout_log_probs"]
         if multi_turn:
             select_keys.append("loss_mask")
         if self.config.use_kl_loss:
@@ -396,6 +395,7 @@ class DataParallelPPOActor(BasePPOActor):
                 data.batch.batch_size[0], 
                 self.config.ppo_mini_batch_size
             )
+            print(f"data.batch.batch_size[0] = {data.batch.batch_size}, mini bz = {self.config.ppo_mini_batch_size}, chunks = {num_mini_batches}")
             dataloader = data.select(select_keys, non_tensor_select_keys).chunk(num_mini_batches)
         else:
             dataloader = batch.split(self.config.ppo_mini_batch_size)
@@ -456,6 +456,10 @@ class DataParallelPPOActor(BasePPOActor):
                         response_mask = attention_mask[:, -response_length:]
 
                     old_log_prob = data["old_log_probs"]
+                    if self.config.use_vllm_logp:
+                        vllm_log_prob = data["rollout_log_probs"]
+                    else: 
+                        vllm_log_prob = data["old_log_probs"]
                     advantages = data["advantages"]
 
                     clip_ratio = self.config.clip_ratio
@@ -471,11 +475,16 @@ class DataParallelPPOActor(BasePPOActor):
                         calculate_entropy = True
                     entropy, log_prob = self._forward_micro_batch(micro_batch=data, temperature=temperature, calculate_entropy=calculate_entropy)
 
+                    sft_loss = -agg_loss(loss_mat=log_prob, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
+
                     loss_mode = self.config.policy_loss.get("loss_mode", "vanilla")
 
                     if self.config.policy_loss.loss_mode == "vanilla":
-                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower = compute_policy_loss(
+                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower, pg_loss_no_old = compute_policy_loss(
                             old_log_prob=old_log_prob,
+                            vllm_log_prob=vllm_log_prob,
+                            reward=data["token_level_scores"][:, 0],
+                            sft_loss=sft_loss,
                             log_prob=log_prob,
                             advantages=advantages,
                             response_mask=response_mask,
@@ -487,7 +496,7 @@ class DataParallelPPOActor(BasePPOActor):
                         )
                     else:
                         policy_loss_fn = get_policy_loss_fn(loss_mode)
-                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower = policy_loss_fn(old_log_prob, log_prob, advantages, response_mask, loss_agg_mode, self.config)
+                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower, pg_loss_no_old = policy_loss_fn(old_log_prob, log_prob, advantages, response_mask, loss_agg_mode, self.config)
 
                     if entropy_coeff != 0:
                         entropy_loss = agg_loss(loss_mat=entropy, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
@@ -515,14 +524,23 @@ class DataParallelPPOActor(BasePPOActor):
                     loss.backward()
 
                     data = {
+                        "actor/advantages_mean": advantages.mean().detach().item(),
+                        "actor/advantages_std": advantages.std().detach().item(),
+                        "actor/log_prob_mean": log_prob.mean().detach().item(),
+                        "actor/old_log_prob_mean": old_log_prob.mean().detach().item(),
                         "actor/pg_loss": pg_loss.detach().item(),
+                        "actor/pg_loss_no_old": pg_loss_no_old.detach().item(),
+                        "actor/loss": loss.detach().item(),
                         "actor/pg_clipfrac": pg_clipfrac.detach().item(),
                         "actor/ppo_kl": ppo_kl.detach().item(),
                         "actor/pg_clipfrac_lower": pg_clipfrac_lower.detach().item(),
+                        # "actor/pg_loss0": pg_loss0.detach().item(),
+                        "actor/sft_loss": sft_loss.detach().item(),
                     }
                     append_to_dict(metrics, data)
 
                 grad_norm = self._optimizer_step()
+                print("call optimizer step, update actor")
                 data = {"actor/grad_norm": grad_norm.detach().item()}
                 append_to_dict(metrics, data)
         self.actor_optimizer.zero_grad()

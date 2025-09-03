@@ -190,7 +190,6 @@ class DataParallelPPOActor(BasePPOActor):
                     if calculate_entropy:
                         inplace_backward = False
 
-                    print("_forward_micro_batch Before logprobs_from_logits", logits_rmpad.shape, input_ids_rmpad_rolled.shape, inplace_backward)
                     log_probs = logprobs_from_logits(
                         logits=logits_rmpad,
                         labels=input_ids_rmpad_rolled,
@@ -384,6 +383,13 @@ class DataParallelPPOActor(BasePPOActor):
             select_keys.append("loss_mask")
         if self.config.use_kl_loss:
             select_keys.append("ref_log_prob")
+        if self.config.use_vllm_logp:
+            select_keys.append("rollout_log_probs")
+            print("Using vllm log probs for ppo update")
+            if self.config.use_sft_loss:
+                print("Also using sft loss")
+                select_keys.append("token_level_scores")
+
         batch = data.select(batch_keys=select_keys).batch
         has_multi_modal_inputs = "multi_modal_inputs" in data.non_tensor_batch.keys()
 
@@ -459,6 +465,13 @@ class DataParallelPPOActor(BasePPOActor):
                         response_mask = attention_mask[:, -response_length:]
 
                     old_log_prob = data["old_log_probs"]
+                    
+                    if self.config.use_vllm_logp:
+                        vllm_log_prob = data["rollout_log_probs"]
+                    else: 
+                        vllm_log_prob = None
+                        sft_loss = None
+                        reward = None
                     advantages = data["advantages"]
 
                     clip_ratio = self.config.clip_ratio
@@ -473,15 +486,26 @@ class DataParallelPPOActor(BasePPOActor):
                     if entropy_coeff != 0:
                         calculate_entropy = True
                     entropy, log_prob = self._forward_micro_batch(micro_batch=data, temperature=temperature, calculate_entropy=calculate_entropy)
+                    if vllm_log_prob is not None:
+                        if self.config.use_sft_loss:
+                            print("Using sft loss, aggregating sft loss")
+                            sft_loss = -agg_loss(loss_mat=log_prob, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
+                            reward = data["token_level_scores"][:,0]
+                        else:
+                            sft_loss = None
+                            reward = None
 
                     loss_mode = self.config.policy_loss.get("loss_mode", "vanilla")
 
                     if self.config.policy_loss.loss_mode == "vanilla":
-                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower,pg_loss_no_old = compute_policy_loss(
+                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower,pg_loss_no_old, oldlogp_vllm_ratio = compute_policy_loss(
                             old_log_prob=old_log_prob,
                             log_prob=log_prob,
                             advantages=advantages,
                             response_mask=response_mask,
+                            vllm_log_prob=vllm_log_prob,
+                            reward=reward,
+                            sft_loss=sft_loss,
                             cliprange=clip_ratio,
                             cliprange_low=clip_ratio_low,
                             cliprange_high=clip_ratio_high,
@@ -529,6 +553,13 @@ class DataParallelPPOActor(BasePPOActor):
                         "actor/ppo_kl": ppo_kl.detach().item(),
                         "actor/pg_clipfrac_lower": pg_clipfrac_lower.detach().item(),
                     }
+                    if vllm_log_prob is not None:
+                        data["actor/vllm_log_prob_mean"] = vllm_log_prob.mean().detach().item()
+                        data["actor/oldlogp_vllm_ratio"] = oldlogp_vllm_ratio.detach().tolist()
+                        
+                    if sft_loss is not None:
+                        data["actor/sft_loss"] = sft_loss.detach().item()
+
                     append_to_dict(metrics, data)
 
                 grad_norm = self._optimizer_step()

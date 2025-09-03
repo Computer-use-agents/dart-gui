@@ -8,15 +8,14 @@ import torch
 from PIL import Image
 from transformers import AutoProcessor
 import ray
-from pathlib import Path
-
 
 import verl.utils.torch_functional as verl_F
 from verl import DataProto
 from verl.models.transformers.qwen2_vl import get_rope_index
 from verl.utils.dataset.vision_utils import process_image
 from verl.utils.osworld import limit_images_in_messages
-from tqdm import tqdm
+
+import time
 
 def replace_image_url(obj):
     if isinstance(obj, dict):
@@ -81,6 +80,7 @@ class TrajectorySplitter:
             truncation: str = "error",
             limit_images: int = 5,
             limit_messages: int = 35,
+            traj_filter: bool = False
         ) -> None:
         self.processor = processor
         self.root_dir = root_dir
@@ -91,24 +91,40 @@ class TrajectorySplitter:
         self.max_response_length = max_response_length
         self.limit_images = limit_images
         self.limit_messages = limit_messages
+        self.traj_filter = traj_filter
 
     def split(
             self, 
             dataset_ids: list[str], 
-            reward_tensor: torch.Tensor | None = None
+            reward_tensor: torch.Tensor | None = None,
+            rollout_log_probs_list: list[list[torch.Tensor]] = None
         ) -> DataProto:
         batch_output = []
 
+        if self.traj_filter:
+            positive_lengths = []
+            for idx, dataset_id in enumerate(dataset_ids):
+                if reward_tensor[idx].item() > 0:
+                    dataset_dir = os.path.join(self.root_dir, dataset_id)
+                    message_path = os.path.join(dataset_dir, "final_messages.json")
+                    with open(message_path) as f:
+                        dataset = json.load(f)
+                    assistant_count = sum(1 for msg in dataset if msg["role"] == "assistant")
+                    positive_lengths.append(assistant_count)
+
+            avg_len = int(sum(positive_lengths) / len(positive_lengths)) if positive_lengths else 0
+        else:
+            avg_len = 0
+
         for idx, dataset_id in enumerate(dataset_ids):
-            batch_messages = self.split_dataset_id(dataset_id)
+            rollout_log_probs = rollout_log_probs_list[idx]
+            batch_messages = self.split_dataset_id(dataset_id, reward=reward_tensor[idx].item(), avg_len=avg_len, rollout_log_probs=rollout_log_probs)
             batch_tokenized_messages = self.tokenize(
                 batch_messages, 
                 dataset_id,
                 reward=reward_tensor[idx].item()
             )
             batch_output += batch_tokenized_messages
-        # pengxiang debug
-        # batch_output = batch_output[:128]
         batch_output = collate_fn(batch_output)
         return batch_output
 
@@ -159,7 +175,7 @@ class TrajectorySplitter:
         batch_output = collate_fn(batch_output)
         return batch_output
     
-    def split_dataset_id(self, dataset_id: str) -> list[list[dict]]:
+    def split_dataset_id(self, dataset_id: str, reward: float, avg_len: int, rollout_log_probs: list[torch.Tensor]) -> list[list[dict]]:
         dataset_dir = os.path.join(self.root_dir, dataset_id)
         message_path = os.path.join(dataset_dir, "final_messages.json")
         with open(message_path) as f:
@@ -169,27 +185,45 @@ class TrajectorySplitter:
         with open(config_path) as f:
             task_config = json.load(f)
 
-        start = 1
-        end = start + 2 * self.window_size
         n_msg = len(dataset)
+        assistant_indices = [i for i, msg in enumerate(dataset) if msg["role"] == "assistant"]
+
+        if reward == 0 and avg_len > 0:
+            if len(assistant_indices) <= avg_len:
+                return []  # 整条轨迹太短，丢掉
+            start = assistant_indices[avg_len] + 1  # 从第 avg_len 个 assistant 后的下一条消息开始
+        else:
+            start = 1  # 正样本窗口从第一个 user 开始
+
+        end = start + 2 * self.window_size
         if end > n_msg:
             end = n_msg
         batch_data = []
         instruction = copy.deepcopy(dataset[1])
         is_first_turn = True
+
         while start < n_msg:
             if end > n_msg:
                 end = n_msg
             assert dataset[start]["role"] == "user"
             if len(dataset[start]["content"]) == 1:
-                # remove image from instruction
                 instruction["content"] = instruction["content"][:1]
             item = self._process_item(dataset, copy.deepcopy(instruction), start, end, is_first_turn)
             is_first_turn = False
-            
-            batch_data.append((item, copy.deepcopy(task_config)))
+
+            assistant_in_window = [i for i in assistant_indices if start <= i < end]
+            if assistant_in_window:
+                last_assistant_idx = assistant_in_window[-1]
+                last_assistant_logp_idx = assistant_indices.index(last_assistant_idx)
+                rollout_log_prob = rollout_log_probs[last_assistant_logp_idx]
+            else:
+                rollout_log_prob = None
+                continue
+
+            batch_data.append((item, copy.deepcopy(task_config), rollout_log_prob))
             start += 2 * self.stride_size
             end = start + 2 * self.window_size
+
         return batch_data
 
     def _process_item(self, dataset, instruction, start, end, is_first_turn: bool) -> list:
@@ -215,7 +249,7 @@ class TrajectorySplitter:
     def tokenize(self, batch_data: list[list[dict]], dataset_id: str, reward: float) -> list[list[dict]]:
         tokenized_batch_data = []
         # print("Tokenize with", dataset_id, "reward =", reward)
-        for (messages, task_config) in batch_data:
+        for (messages, task_config, rollout_log_prob) in batch_data:
             row_dict = dict()
             input_ids, attention_mask, position_ids, _, _ = self._get_inputs(messages, dataset_id)
             input_attention_mask = attention_mask
@@ -227,6 +261,7 @@ class TrajectorySplitter:
             valid_response_length = response_attention_mask.sum()
             # debuging valid response length
             reward_tensor[valid_response_length-1] = reward
+            rollout_log_prob = verl_F.pad_2d_list_to_length(rollout_log_prob.unsqueeze(0), self.processor.tokenizer.pad_token_id, max_length=self.max_response_length)
             row_dict["prompts"] = input_ids[0]
             row_dict["responses"] = response_ids[0]
             row_dict["attention_mask"] = attention_mask[0]
@@ -238,6 +273,7 @@ class TrajectorySplitter:
             row_dict["raw_messages"] = messages
             row_dict["dataset_ids"] = dataset_id
             row_dict["uid"] = task_config["id"]
+            row_dict["rollout_log_prob"] = rollout_log_prob[0]
             self.compute_mask(row_dict)
             tokenized_batch_data.append(row_dict)
         return tokenized_batch_data
@@ -494,8 +530,8 @@ class StepwiseTrajectorySplitter:
             truncation: str = "error",
             limit_images: int = 5,
             limit_messages: int = 35,
-            use_vllm_logp: bool = False,
-            
+            traj_filter: bool = False,
+            use_pt: bool = False
         ) -> None:
         self.processor = processor
         self.root_dir = root_dir
@@ -506,40 +542,104 @@ class StepwiseTrajectorySplitter:
         self.max_response_length = max_response_length
         self.limit_images = limit_images
         self.limit_messages = limit_messages
-        self.use_vllm_logp = use_vllm_logp
+        self.traj_filter = traj_filter
+        self.use_pt = use_pt
+        self.img_ids = {
+            "<|vision_start|>": self.processor.tokenizer.convert_tokens_to_ids("<|vision_start|>"),
+            "<|vision_end|>": self.processor.tokenizer.convert_tokens_to_ids("<|vision_end|>"),
+            "<|image_pad|>": self.processor.tokenizer.convert_tokens_to_ids("<|image_pad|>"),
+            "<|im_start|>": self.processor.tokenizer.convert_tokens_to_ids("<|im_start|>"),
+            "<|im_end|>": self.processor.tokenizer.convert_tokens_to_ids("<|im_end|>"),
+            "\n": self.processor.tokenizer.encode("\n", add_special_tokens=False)[0],
+            "user": self.processor.tokenizer.convert_tokens_to_ids("user"),
+            "assistant": self.processor.tokenizer.convert_tokens_to_ids("assistant"),
+            "system": self.processor.tokenizer.convert_tokens_to_ids("system"),
+        }
 
     def split(
             self, 
             dataset_ids: list[str], 
-            reward_tensor: torch.Tensor | None = None
+            reward_tensor: torch.Tensor | None = None,
+            rollout_log_probs_list: list[list[torch.Tensor]] = None, 
+            token_ids_list: list[list[torch.Tensor]] = None, 
+            prompt_token_ids_list: list[list[torch.Tensor]] = None
         ) -> DataProto:
-        batch_output = [] 
+        batch_output = []
+
+        if self.traj_filter:
+            positive_lengths = []
+            for idx, dataset_id in enumerate(dataset_ids):
+                if reward_tensor[idx].item() > 0:
+                    dataset_dir = os.path.join(self.root_dir, dataset_id)
+                    message_path = os.path.join(dataset_dir, "final_messages.json")
+                    with open(message_path) as f:
+                        dataset = json.load(f)
+                    assistant_count = sum(1 for msg in dataset if msg["role"] == "assistant")
+                    positive_lengths.append(assistant_count)
+
+            avg_len = int(sum(positive_lengths) / len(positive_lengths)) if positive_lengths else 0
+        else:
+            avg_len = 0
+
+        start_time_all = time.time()
+
+        start_time_split_tokenize = time.time()
 
         for idx, dataset_id in enumerate(dataset_ids):
-            if self.use_vllm_logp:
-                batch_messages = self.split_dataset_id_from_pt(dataset_id)
-                batch_tokenized_messages = self.tokenize_from_pt(
-                batch_messages, 
-                dataset_id,
-                reward=reward_tensor[idx].item()
-            )
-            else:
+            rollout_log_probs = rollout_log_probs_list[idx]
+            token_ids = token_ids_list[idx]
+            prompt_token_ids = prompt_token_ids_list[idx]
+            if not self.use_pt:
                 batch_messages = self.split_dataset_id(dataset_id)
                 batch_tokenized_messages = self.tokenize(
-                batch_messages, 
-                dataset_id,
-                reward=reward_tensor[idx].item()
-            )
+                    batch_messages, 
+                    dataset_id,
+                    reward=reward_tensor[idx].item()
+                )
+            else:
+                start_time_split = time.time()
+                batch_messages = self.split_dataset_id_from_pt(dataset_id, reward=reward_tensor[idx].item(), avg_len=avg_len, 
+                                                        rollout_log_probs=rollout_log_probs,
+                                                        token_ids=token_ids,
+                                                        prompt_token_ids=prompt_token_ids)
+                end_time_split = time.time()
+                duration_split = end_time_split - start_time_split
+                with open("runtime_log.txt", "a") as f:
+                    f.write(f"----split block runtime: {duration_split:.6f} sec\n")
+
+                start_time_tokenize = time.time()
+                batch_tokenized_messages = self.tokenize_from_pt(
+                    batch_messages, 
+                    dataset_id,
+                    reward=reward_tensor[idx].item()
+                )
+                end_time_tokenize = time.time()
+                duration_tokenize = end_time_tokenize - start_time_tokenize
+                with open("runtime_log.txt", "a") as f:
+                    f.write(f"----tokenize block runtime: {duration_tokenize:.6f} sec\n")
             batch_output += batch_tokenized_messages
+        end_time_split_tokenize = time.time()
+        duration_split_tokenize = end_time_split_tokenize - start_time_split_tokenize
+        
+        start_time_collate_fn = time.time()
         batch_output = collate_fn(batch_output)
+        end_time_collate_fn = time.time()
+        duration_collate_fn = end_time_collate_fn - start_time_collate_fn
+
+        end_time_all = time.time()
+        duration_all = end_time_all - start_time_all
+        with open("runtime_log.txt", "a") as f:
+            f.write(f"------split_tokenize block runtime: {duration_split_tokenize:.6f} sec\n")
+            f.write(f"------collate_fn block runtime: {duration_collate_fn:.6f} sec\n")
+            f.write(f"--------all block runtime: {duration_all:.6f} sec\n")
+        xxx
         return batch_output
 
     def split_parallel(
             self, 
             dataset_ids: list[str], 
             reward_tensor: torch.Tensor | None = None,
-            num_cpus: int = 4,
-            parallel_size: int = 64,
+            num_cpus: int = 4
         ) -> DataProto:
         """
         Parallel version of split using Ray for distributed processing.
@@ -557,50 +657,29 @@ class StepwiseTrajectorySplitter:
         
         # Create remote function for processing a single dataset
         @ray.remote
-        def process_single_dataset(splitter, dataset_id, reward, use_vllm_logp):
-            if use_vllm_logp:
-                batch_messages = splitter.split_dataset_id_from_pt(dataset_id)
-                batch_tokenized_messages = splitter.tokenize_from_pt(
-                    batch_messages, 
-                    dataset_id,
-                    reward=reward
-                )
-            else:
-                batch_messages = splitter.split_dataset_id(dataset_id)
-                batch_tokenized_messages = splitter.tokenize(
-                    batch_messages, 
-                    dataset_id,
-                    reward=reward
-                )
+        def process_single_dataset(splitter, dataset_id, reward):
+            batch_messages = splitter.split_dataset_id(dataset_id)
+            batch_tokenized_messages = splitter.tokenize(
+                batch_messages, 
+                dataset_id,
+                reward=reward
+            )
             return batch_tokenized_messages
         
         # Submit all tasks to Ray
         futures = []
         for idx, dataset_id in enumerate(dataset_ids):
             reward = reward_tensor[idx].item() if reward_tensor is not None else 0.0
-            future = process_single_dataset.remote(self, dataset_id, reward, self.use_vllm_logp)
+            future = process_single_dataset.remote(self, dataset_id, reward)
             futures.append(future)
         
-        # # Collect results
-        # batch_output = []
-        # for i in range(0, len(futures), parallel_size):
-        #     batch_futures = futures[i:i + parallel_size]
-        #     results = ray.get(batch_futures)
-        #     for result in results:
-        #         batch_output += result
-        #     del results
-
         # Collect results
         batch_output = []
         results = ray.get(futures)
         for result in results:
             batch_output += result
-        del results
+            
         batch_output = collate_fn(batch_output)
-        # return batch_output
-        # return batch_output
-            # return batch_tokenized_messages
-        
         return batch_output
     
     def split_dataset_id(self, dataset_id: str) -> list[list[dict]]:
@@ -616,30 +695,26 @@ class StepwiseTrajectorySplitter:
         n_msg = len(dataset)
 
         batch_data = []
+        instruction = copy.deepcopy(dataset[1])
+        is_first_turn = True
         for end in range(3, n_msg, 2):
             pre_start = max(0, end - self.limit_messages * 2 - 1)
-            item = self._process_item(
-                dataset, 
-                pre_start, 
-                end
-            )
+            start = max(1, end - 5 * 2)
+            assert dataset[start]["role"] == "user"
+            if len(dataset[start]["content"]) == 1:
+                instruction["content"] = instruction["content"][:1]
+            item = self._process_item(dataset, copy.deepcopy(instruction), pre_start, start, end, is_first_turn)
+            is_first_turn = False
+
             batch_data.append((item, copy.deepcopy(task_config)))
-
         return batch_data
-
-    def split_dataset_id_from_pt(self, dataset_id: str) -> list[list[dict]]:
+    
+    def split_dataset_id_from_pt(self, dataset_id: str, reward: float, avg_len: int, 
+                        rollout_log_probs: list[torch.Tensor],
+                        token_ids: list[torch.Tensor],
+                        prompt_token_ids: list[torch.Tensor]) -> list[list[dict]]:
         dataset_dir = os.path.join(self.root_dir, dataset_id)
         message_path = os.path.join(dataset_dir, "final_messages.json")
-        # load vllm logp from pt files
-        pt_data_files = sorted(Path(dataset_dir).glob("data_for_step_*.pt"),key=lambda x: int(x.stem.split("_")[-1]))
-        pt_data_list = [torch.load(f) for f in pt_data_files]
-        rollout_log_probs = [d["logp"] for d in pt_data_list]
-
-        
-        # TODO: pre tokenize
-        # token_ids_list = [d["token_ids"] for d in pt_data_list]
-        # prompt_token_ids_list = [d["prompt_token_ids"] for d in pt_data_list]
-
         with open(message_path) as f:
             dataset = json.load(f)
         dataset = replace_image_url(dataset)
@@ -650,17 +725,25 @@ class StepwiseTrajectorySplitter:
         n_msg = len(dataset)
         assistant_indices = [i for i, msg in enumerate(dataset) if msg["role"] == "assistant"]
 
+        if reward == 0 and avg_len > 0:
+            if len(assistant_indices) <= avg_len:
+                return []  # 整条轨迹太短，丢掉
+            start = assistant_indices[avg_len-1] + 1  # 从最后一个 assistant 后的下一条消息开始
+        else:
+            start = 1  # 正样本从第一个 user 开始
+
         batch_data = []
         instruction = copy.deepcopy(dataset[1])
         is_first_turn = True
         for end in range(3, n_msg, 2):
+            if end <= start+1:  
+                continue  # reward=0: 丢掉前面没达到 avg_len 的 step
             pre_start = max(0, end - self.limit_messages * 2 - 1)
             start = max(1, end - 5 * 2)
             assert dataset[start]["role"] == "user"
             if len(dataset[start]["content"]) == 1:
                 instruction["content"] = instruction["content"][:1]
-            # item = self._process_item(dataset, copy.deepcopy(instruction), pre_start, start, end, is_first_turn)
-            item = self._process_item(dataset, pre_start, end)
+            item = self._process_item(dataset, copy.deepcopy(instruction), pre_start, start, end, is_first_turn)
             is_first_turn = False
 
             assistant_in_window = [i for i in assistant_indices if pre_start <= i < end]
@@ -668,22 +751,31 @@ class StepwiseTrajectorySplitter:
                 last_assistant_idx = assistant_in_window[-1]
                 last_assistant_logp_idx = assistant_indices.index(last_assistant_idx)
                 rollout_log_prob = rollout_log_probs[last_assistant_logp_idx]
+
+                # current_step_idx = last_assistant_logp_idx
+                # core_tokens = prompt_token_ids[current_step_idx]
+                # sp_tokens = self.img_ids["<|im_end|>"]
+                # split_idx = (core_tokens == sp_tokens).nonzero(as_tuple=True)[0]
+                # if len(split_idx) == 2:
+                #     split_idx = split_idx[0].item()
+                #     system_tokens = core_tokens[:split_idx+1]
+                #     instruction_tokens = core_tokens[split_idx+2:-1]
+                # else:
+                #     raise ValueError(f"Expected exactly 2 sp tokens, but got {len(split_idx)}: {core_tokens}")
+                # input_ids = [system_tokens, instruction_tokens]
+                # start_step = max(0, current_step_idx - self.limit_messages + 1)
+                # for step_idx in range(start_step, current_step_idx):
+                #     input_ids.append(token_ids[step_idx])
+                # response_ids = token_ids[current_step_idx]
             else:
                 continue
 
-            batch_data.append((item, copy.deepcopy(task_config), rollout_log_prob))
+            batch_data.append((item, copy.deepcopy(task_config), rollout_log_prob, input_ids, response_ids))
         return batch_data
 
-    def _process_item(self, dataset, start, end) -> list:
-        item = []
-        if start > 0:
-            system_prompt = dataset[0]
-            item.append(copy.deepcopy(system_prompt))
-            instruction = copy.deepcopy(dataset[1])
-            instruction["content"] = instruction["content"][:1]
-            item.append(instruction)
-        item += limit_images_in_messages(dataset[start:end], limit_images=self.limit_images)
-        return item
+    def _process_item(self, dataset, instruction, pre_start, start, end, is_first_turn: bool) -> list:
+
+        return limit_images_in_messages(dataset[pre_start:end], limit_images=self.limit_images)
     
     def tokenize(self, batch_data: list, dataset_id: str, reward: float) -> list[list[dict]]:
         tokenized_batch_data = []
@@ -726,23 +818,34 @@ class StepwiseTrajectorySplitter:
     def tokenize_from_pt(self, batch_data: list, dataset_id: str, reward: float) -> list[list[dict]]:
         tokenized_batch_data = []
         # print("Tokenize with", dataset_id, "reward =", reward)
-
-        for (messages, task_config, rollout_log_prob) in batch_data:
+        for (messages, task_config, rollout_log_prob, input_ids, response_ids) in batch_data:
             # print(messages)
             # print("messages", json.dumps(messages, indent=2, ensure_ascii=False))
             row_dict = dict()
 
-            input_ids, attention_mask, position_ids, multi_modal_data, model_inputs = self._get_inputs(messages, dataset_id)
+            start_time_get_inputs = time.time()
+            input_ids, attention_mask, position_ids, multi_modal_data, model_inputs = self._get_inputs_from_pt(messages, dataset_id, input_ids)
+            end_time_get_inputs = time.time()
+            duration_get_inputs = end_time_get_inputs - start_time_get_inputs
+            with open("runtime_log.txt", "a") as f:
+                f.write(f"--get_inputs block runtime: {duration_get_inputs:.6f} sec\n")
+
             input_attention_mask = attention_mask
 
+            start_time_get_responses = time.time()
             try:
-                response_ids, response_attention_mask, response_position_ids, _, _ = self._get_responses(
-                    messages, dataset_id, model_inputs, position_ids)
+                response_ids, response_attention_mask, response_position_ids, _, _ = self._get_responses_from_pt(
+                    messages, dataset_id, model_inputs, position_ids, response_ids, attention_mask)
             except Exception as e:
                 print("failed", e)
                 print("messages", json.dumps(messages, indent=2, ensure_ascii=False))
                 raise e
+            end_time_get_responses = time.time()
+            duration_get_responses = end_time_get_responses - start_time_get_responses
+            with open("runtime_log.txt", "a") as f:
+                f.write(f"--get_responses block runtime: {duration_get_responses:.6f} sec\n")
 
+            start_time_post_process = time.time()
             position_ids = torch.cat([position_ids[0], response_position_ids[0]], dim=-1)
             attention_mask = torch.cat([attention_mask, response_attention_mask], dim=-1)
             seq = torch.cat([input_ids, response_ids], dim=-1)
@@ -750,13 +853,7 @@ class StepwiseTrajectorySplitter:
             valid_response_length = response_attention_mask.sum()
             # debuging valid response length
             reward_tensor[valid_response_length-1] = reward
-            if rollout_log_prob.shape[0] != valid_response_length:
-                print(f"[ERROR] rollout_log_prob length {rollout_log_prob.shape[0]} does not match valid_response_length {valid_response_length} for {dataset_id}, truncating or padding as needed.")
-                # Create a tensor with same shape as rollout_log_prob filled with -inf
-                rollout_log_prob = torch.zeros_like(torch.zeros(valid_response_length))
-                rollout_log_prob = verl_F.pad_2d_list_to_length(rollout_log_prob.unsqueeze(0), 0, max_length=self.max_response_length)
-            else:    
-                rollout_log_prob = verl_F.pad_2d_list_to_length(rollout_log_prob.unsqueeze(0), 0, max_length=self.max_response_length)
+            rollout_log_prob = verl_F.pad_2d_list_to_length(rollout_log_prob.unsqueeze(0), self.processor.tokenizer.pad_token_id, max_length=self.max_response_length)
             row_dict["prompts"] = input_ids[0]
             row_dict["responses"] = response_ids[0]
             row_dict["attention_mask"] = attention_mask[0]
@@ -771,6 +868,10 @@ class StepwiseTrajectorySplitter:
             row_dict["rollout_log_probs"] = rollout_log_prob[0]
             self.compute_mask(row_dict)
             tokenized_batch_data.append(row_dict)
+            end_time_post_process = time.time()
+            duration_post_process = end_time_post_process - start_time_post_process
+            with open("runtime_log.txt", "a") as f:
+                f.write(f"--post_process block runtime: {duration_post_process:.6f} sec\n")
         return tokenized_batch_data
     
     def _locate_context(self, messages: list[dict]):
@@ -794,10 +895,8 @@ class StepwiseTrajectorySplitter:
         images = [process_image(Image.open(image)) for image in image_paths]
         multi_modal_data["image"] = images
         model_inputs = self.processor(text=[raw_prompt], images=images, return_tensors="pt")
-
         input_ids = model_inputs.pop("input_ids")
         attention_mask = model_inputs.pop("attention_mask")
-
         if "second_per_grid_ts" in model_inputs:
             model_inputs.pop("second_per_grid_ts")
 
@@ -820,6 +919,192 @@ class StepwiseTrajectorySplitter:
             )
         ]
         multi_modal_data["image"] = images
+
+        return input_ids, attention_mask, position_ids, multi_modal_data, model_inputs
+
+    def _get_inputs_from_pt(self, messages: list[dict], dataset_id: str, input_ids):
+        context_len = self._locate_context(messages)\
+        
+        start_time_get_images = time.time()
+        multi_modal_data = {}
+        image_paths = []
+        for msg in messages:
+            if isinstance(msg["content"], str):
+                continue
+            if isinstance(msg["content"], list):
+                for c in msg["content"]:
+                    if c["type"] == "image":
+                        if '.png' in c['image']:
+                            image_paths.append(os.path.join(self.root_dir, dataset_id, c['image']))
+                        else:
+                            image_paths.append(os.path.join(self.root_dir, dataset_id, f"{c['image']}.png"))
+        images = [process_image(Image.open(image)) for image in image_paths]
+        multi_modal_data["image"] = images
+        end_time_get_images = time.time()
+        duration_get_images = end_time_get_images - start_time_get_images
+        with open("runtime_log.txt", "a") as f:
+            f.write(f"get_images block runtime: {duration_get_images:.6f} sec\n")
+
+        start_time_process_images = time.time()
+        dummy_texts = [self.processor.image_token] * len(images)
+        model_inputs = self.processor(text=dummy_texts, images=images, return_tensors="pt")
+        model_inputs.pop("input_ids")
+        model_inputs.pop("attention_mask")
+        image_grid_thw = model_inputs["image_grid_thw"]  # tensor of shape [num_images, T, H, W]
+        num_patches_list = (image_grid_thw[:, 0] * image_grid_thw[:, 1] * image_grid_thw[:, 2]).tolist()
+        end_time_process_images = time.time()
+        duration_process_images = end_time_process_images - start_time_process_images
+        with open("runtime_log.txt", "a") as f:
+            f.write(f"process_images block runtime: {duration_process_images:.6f} sec\n")
+
+        start_time_cat_token = time.time()
+        final_input_ids = []
+        img_num = 0
+        text_num = 0
+        for i, msg in enumerate(messages[:context_len]):
+            if i == 0:
+                segment = [self.img_ids["<|im_start|>"]] + [self.img_ids["system"]] + [self.img_ids["\n"]]
+                segment = torch.cat([torch.tensor(segment), input_ids[0]], dim=0)
+                text_num += 1
+                final_input_ids.append(segment)
+                continue
+
+            if i == 1 and msg["role"] == "user" and isinstance(msg["content"], list):
+                if len(msg["content"]) > 1:
+                    num_patches = int(num_patches_list[img_num]/4)
+                    img_num += 1
+                    segment0 = [self.img_ids["\n"]] + [self.img_ids["<|im_start|>"]] + [self.img_ids["user"]] + [self.img_ids["\n"]]
+                    segment1 = [self.img_ids["<|vision_start|>"]] + [self.img_ids["<|image_pad|>"]] * num_patches + [self.img_ids["<|vision_end|>"]]
+                    segment = torch.cat([torch.tensor(segment0), input_ids[1][:-1], torch.tensor(segment1), input_ids[1][-1:]], dim=0)
+                    text_num += 1
+                    final_input_ids.append(segment)
+                    continue
+                else:
+                    segment0 = [self.img_ids["\n"]] + [self.img_ids["<|im_start|>"]] + [self.img_ids["user"]] + [self.img_ids["\n"]]
+                    segment = torch.cat([torch.tensor(segment0), input_ids[1]], dim=0)
+                    text_num += 1
+                    final_input_ids.append(segment)
+                    continue
+
+            if msg["role"] == "user" and "content" in msg:
+                num_patches = int(num_patches_list[img_num]/4)
+                img_num += 1
+                segment = [self.img_ids["\n"]] + [self.img_ids["<|im_start|>"]] + [self.img_ids["user"]] + [self.img_ids["\n"]] + [self.img_ids["<|vision_start|>"]] + [self.img_ids["<|image_pad|>"]] * num_patches + [self.img_ids["<|vision_end|>"]] + [self.img_ids["<|im_end|>"]]
+                segment = torch.tensor(segment)
+                final_input_ids.append(segment)
+            else:
+                segment = [self.img_ids["\n"]] + [self.img_ids["<|im_start|>"]] + [self.img_ids["assistant"]] + [self.img_ids["\n"]]
+                segment = torch.cat([torch.tensor(segment), input_ids[text_num]], dim=0)
+                text_num += 1
+                final_input_ids.append(segment)
+        final_input_ids.append(torch.tensor([self.img_ids["\n"]]))
+        input_ids = torch.cat(final_input_ids, dim=0).unsqueeze(0)
+        attention_mask = torch.ones_like(input_ids)
+
+        end_time_cat_token = time.time()
+        duration_cat_token = end_time_cat_token - start_time_cat_token
+        with open("runtime_log.txt", "a") as f:
+            f.write(f"cat_token block runtime: {duration_cat_token:.6f} sec\n")
+
+        start_time_raw_prompt = time.time()
+        raw_prompt = self.processor.apply_chat_template(messages[:context_len], add_generation_prompt=False, tokenize=False)
+        end_time_raw_prompt = time.time()
+        duration_raw_prompt = end_time_raw_prompt - start_time_raw_prompt
+        with open("runtime_log.txt", "a") as f:
+            f.write(f"raw_prompt block runtime: {duration_raw_prompt:.6f} sec\n")
+
+        start_time_process = time.time()
+        model_inputs0 = self.processor(text=[raw_prompt], images=images, return_tensors="pt")
+        end_time_process = time.time()
+        duration_process = end_time_process - start_time_process
+        with open("runtime_log.txt", "a") as f:
+            f.write(f"process block runtime: {duration_process:.6f} sec\n")
+
+        # def compare_inputs_ids_and_mask(ids_a, mask_a, ids_b, mask_b, tokenizer):
+        #     ids_a = ids_a[0].tolist() if isinstance(ids_a, torch.Tensor) else ids_a
+        #     mask_a = mask_a[0].tolist() if isinstance(mask_a, torch.Tensor) else mask_a
+        #     ids_b = ids_b[0].tolist() if isinstance(ids_b, torch.Tensor) else ids_b
+        #     mask_b = mask_b[0].tolist() if isinstance(mask_b, torch.Tensor) else mask_b
+
+        #     # 先统计 <|image_pad|> 次数
+        #     image_pad_id = None
+        #     if tokenizer is not None:
+        #         image_pad_id = tokenizer.convert_tokens_to_ids("<|image_pad|>")
+        #         if image_pad_id is not None:
+        #             count_a = ids_a.count(image_pad_id)
+        #             count_b = ids_b.count(image_pad_id)
+        #             if count_a != count_b:
+        #                 print(f"<|image_pad|> count mismatch -> A: {count_a}, B: {count_b}")
+        #         else:
+        #             print("[Warning] Tokenizer中没有找到 <|image_pad|>")
+
+        #     # 对比长度
+        #     if len(ids_a) != len(ids_b):
+        #         print(f"Length mismatch: {len(ids_a)} vs {len(ids_b)}")
+
+        #     if len(mask_a) != len(mask_b):
+        #         print(f"Length mismatch: {len(mask_a)} vs {len(mask_b)}")
+
+        #     from difflib import SequenceMatcher
+        #     matcher = SequenceMatcher(None, ids_a, ids_b)
+
+        #     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        #         if tag == "equal":
+        #             continue
+        #         context=10
+        #         start_a = max(0, i1 - context)
+        #         end_a = min(len(ids_a), i2 + context)
+        #         start_b = max(0, j1 - context)
+        #         end_b = min(len(ids_b), j2 + context)
+
+        #         print(f"\n--- Difference ({tag}) ---")
+        #         print(f" A tokens[{i1}:{i2}] = {ids_a[i1:i2]}")
+        #         print(f" B tokens[{j1}:{j2}] = {ids_b[j1:j2]}")
+
+        #         print("\n--- Context A ---")
+        #         print(tokenizer.decode(ids_a[i1:i2]))
+        #         print(tokenizer.decode(ids_a[start_a:end_a]))
+        #         print("\n--- Context B ---")
+        #         print(tokenizer.decode(ids_b[j1:j2]))
+        #         print(tokenizer.decode(ids_b[start_b:end_b]))
+        #         print("--------------------------------------")
+
+        # compare_inputs_ids_and_mask(input_ids, attention_mask, model_inputs0["input_ids"], model_inputs0["attention_mask"], tokenizer=self.processor.tokenizer)
+
+        if "second_per_grid_ts" in model_inputs:
+            model_inputs.pop("second_per_grid_ts")
+
+        start_time_postprocess = time.time()
+        input_ids, attention_mask = verl_F.postprocess_data(
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                max_length=self.max_prompt_length,
+                pad_token_id=self.processor.tokenizer.pad_token_id,
+                left_pad=True,
+                truncation=self.truncation,
+            )
+        end_time_postprocess = time.time()
+        duration_postprocess = end_time_postprocess - start_time_postprocess
+        with open("runtime_log.txt", "a") as f:
+            f.write(f"postprocess block runtime: {duration_postprocess:.6f} sec\n")
+
+        start_time_position = time.time()
+        position_ids = [
+            get_rope_index(
+                self.processor,
+                input_ids=input_ids[0],
+                image_grid_thw=image_grid_thw,
+                video_grid_thw=None,
+                second_per_grid_ts=None,
+                attention_mask=attention_mask[0],
+            )
+        ]
+        multi_modal_data["image"] = images
+        end_time_position = time.time()
+        duration_position = end_time_position - start_time_position
+        with open("runtime_log.txt", "a") as f:
+            f.write(f"position block runtime: {duration_position:.6f} sec\n")
+
         return input_ids, attention_mask, position_ids, multi_modal_data, model_inputs
 
     def _get_responses(self, messages: list[dict], dataset_id: str, model_inputs: dict, position_ids):
@@ -836,6 +1121,7 @@ class StepwiseTrajectorySplitter:
         attention_mask = model_inputs.pop("attention_mask")
         if "second_per_grid_ts" in model_inputs:
             model_inputs.pop("second_per_grid_ts")
+
         response = verl_F.pad_2d_list_to_length(input_ids, self.processor.tokenizer.pad_token_id, max_length=self.max_response_length)
         response_length = response.size(1)
         delta_position_id = torch.arange(1, response_length + 1)
@@ -848,6 +1134,56 @@ class StepwiseTrajectorySplitter:
             eos_token=self.processor.tokenizer.eos_token_id,
             dtype=attention_mask.dtype            
         )
+
+        # print("response", response.shape, response_attention_mask.shape, response_position_ids.shape)
+        return response, response_attention_mask, [response_position_ids], None, None
+    
+    def _get_responses_from_pt(self, messages: list[dict], dataset_id: str, model_inputs: dict, position_ids, response_ids, attention_mask):
+        context_len = self._locate_context(messages)
+        start_time = time.time()
+        input_ids = response_ids.unsqueeze(0)
+        end_time = time.time()
+        duration1 = end_time - start_time
+
+        start_time = time.time()
+        raw_prompt = self.processor.apply_chat_template(messages[context_len:], add_generation_prompt=False, tokenize=False)
+        raw_prompt = raw_prompt.replace("<|im_start|>system\nYou are a helpful assistant.<|im_end|>", "").strip()
+        raw_prompt = raw_prompt.replace("<|im_start|>assistant\n","").strip()
+        try:
+            model_inputs = self.processor(text=[raw_prompt], images=None, return_tensors="pt")
+        except Exception as e:
+            print('self.processor failed', e, raw_prompt)
+            raise e
+        input_ids = model_inputs.pop("input_ids")
+        attention_mask = model_inputs.pop("attention_mask")
+        if "second_per_grid_ts" in model_inputs:
+            model_inputs.pop("second_per_grid_ts")
+        
+        end_time = time.time()
+        duration2 = end_time - start_time
+
+        with open("runtime_log.txt", "a") as f:
+            f.write(f"response block runtime: {duration1:.6f} sec\n")
+            f.write(f"response_processor block runtime: {duration2:.6f} sec\n")
+
+        start_time_postprocess = time.time()
+        response = verl_F.pad_2d_list_to_length(input_ids, self.processor.tokenizer.pad_token_id, max_length=self.max_response_length)
+        response_length = response.size(1)
+        delta_position_id = torch.arange(1, response_length + 1)
+        delta_position_id = delta_position_id.unsqueeze(0).expand(1, -1)
+        if position_ids[0].dim() == 3:  # qwen2vl mrope
+            delta_position_id = delta_position_id.view(1, 1, -1).expand(1, 3, -1)
+        response_position_ids = position_ids[0][..., -1:] + delta_position_id
+        response_attention_mask = verl_F.get_response_mask(
+            response_id=response,
+            eos_token=self.processor.tokenizer.eos_token_id,
+            dtype=attention_mask.dtype            
+        )
+        end_time_postprocess = time.time()
+        duration_postprocess = end_time_postprocess - start_time_postprocess
+        with open("runtime_log.txt", "a") as f:
+            f.write(f"response_postprocess block runtime: {duration_postprocess:.6f} sec\n")
+
         # print("response", response.shape, response_attention_mask.shape, response_position_ids.shape)
         return response, response_attention_mask, [response_position_ids], None, None
     

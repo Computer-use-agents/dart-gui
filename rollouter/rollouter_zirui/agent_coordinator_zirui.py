@@ -75,7 +75,7 @@ class AgentCoordinator:
 
     def _generate_trace_id(self) -> str:
         """生成唯一的trace_id"""
-        return f"trace-{uuid.uuid4().hex[:12]}-{int(time.time())}"
+        return f"trace_{uuid.uuid4().hex[:12]}_{int(time.time())}"
     
 
     
@@ -85,10 +85,10 @@ class AgentCoordinator:
             # 检查是否需要清理环境
             current_time = time.time()
             time_since_last_cleanup = current_time - self.last_env_cleanup_time
-            logger.info(f"环境清理检查 - 距离上次清理: {time_since_last_cleanup:.1f}秒, 清理间隔: {self.env_cleanup_interval}秒")
+            # logger.info(f"环境清理检查 - 距离上次清理: {time_since_last_cleanup:.1f}秒, 清理间隔: {self.env_cleanup_interval}秒")
             
             if time_since_last_cleanup < self.env_cleanup_interval:
-                logger.info(f"跳过环境清理 - 还没到清理时间 ({time_since_last_cleanup:.1f}s < {self.env_cleanup_interval}s)")
+                # logger.info(f"跳过环境清理 - 还没到清理时间 ({time_since_last_cleanup:.1f}s < {self.env_cleanup_interval}s)")
                 return  # 还没到清理时间
             
             self.last_env_cleanup_time = current_time
@@ -264,9 +264,9 @@ class AgentCoordinator:
                     break
                 
                 # 0.定期清理孤立的环境
-                logger.info("准备调用 _cleanup_orphaned_environments 方法")
+                # logger.info("准备调用 _cleanup_orphaned_environments 方法")
                 await self._cleanup_orphaned_environments(runner_cfg)
-                logger.info("_cleanup_orphaned_environments 方法调用完成")
+                # logger.info("_cleanup_orphaned_environments 方法调用完成")
                 
                 # 1. 填充任务队列（最多填充MAX_TASK_QUEUE_SIZE次）
                 if (self.task_queue.empty() and 
@@ -282,8 +282,10 @@ class AgentCoordinator:
                         for task in new_tasks_batch:
                             task_id = task.get('task_config', {}).get('raw', {}).get('task_id', 'unknown')
                             
+                            finished_rollouts = task.get('task_config', {}).get('raw', {}).get('finished_rollouts', 0)
+                            
                             # 为每个任务创建rollout_n个副本
-                            for rollout_idx in range(self.rollout_n):
+                            for rollout_idx in range(finished_rollouts, self.rollout_n):
                                 # 为每个任务生成trace_id
                                 task_with_trace = copy.deepcopy(task)
                                 trace_id = self._generate_trace_id()
@@ -293,7 +295,11 @@ class AgentCoordinator:
                                 await self.task_queue.put(task_with_trace)
                                 added_count += 1
                                 
-                                logger.info(f"[{trace_id}] 添加任务到队列 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{self.rollout_n}")
+                                logger.info(
+                                    f"[{trace_id}] 添加任务到队列 - task_id: {task_id}, "
+                                    f"rollout_idx: {rollout_idx + 1}/{self.rollout_n}, "
+                                    f"已完成: {finished_rollouts}"
+                                )
                         
                         logger.info(f"第 {self.poll_count} 次填充任务完成，添加了 {added_count} 个任务，当前队列大小: {self.task_queue.qsize()}")
                     else:

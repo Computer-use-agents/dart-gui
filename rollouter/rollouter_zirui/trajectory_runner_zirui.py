@@ -126,6 +126,32 @@ class TrajectoryRunnerActor:
             step, done = 0, False
             logger.info(f"[{self.trace_id}] 环境初始化完成，开始主循环 - task_id: {self.task_id}")
 
+            def format_chat(messages):
+                formatted = ""
+                for m in messages:
+                    content = m["content"]
+
+                    # 如果 content 是 list（多模态消息）
+                    if isinstance(content, list):
+                        # 只取文本部分
+                        texts = [c["text"] for c in content if c.get("type") == "text"]
+                        content_str = "\n".join(texts)
+                    else:
+                        # 普通 string
+                        content_str = content
+
+                    formatted += f"{content_str}<|im_end|>\n"
+
+                return formatted
+
+            base_messages = format_chat(self.base_messages_for_save)
+
+            tokenize_response = await self._call_model_tokenize(
+                            model_pool, base_messages,
+                            self.runner_cfg.model_pool)
+
+            prompt_token_ids = tokenize_response
+
             # --- main loop ----
             # MAX_T, RETRIES, BACKOFF = 10, 3, 2
             while step < self.max_steps and not done:
@@ -136,10 +162,8 @@ class TrajectoryRunnerActor:
 
                 else:
                     st_step = time.time()
-                    print("step start time: ", st_step)
                     # build prompt
                     messages = self._build_messages()
-                    print("len messages: ", len(messages))
 
                     # ---- call vLLM serve ----
 
@@ -150,11 +174,11 @@ class TrajectoryRunnerActor:
                             model_pool, messages,
                             self.runner_cfg.model_pool)
                     # else:
-                        # response = await self._call_prelaunched_model(messages, self.runner_cfg.prelaunched_model)
+                    #     response = await self._call_prelaunched_model(messages, self.runner_cfg.prelaunched_model)
                         
                     model_duration = time.time() - st
                     logger.info(f"[{self.trace_id}] 模型响应 - task_id: {self.task_id}, step: {step}, "
-                               f"耗时: {model_duration:.2f}s, response_length: {len(response) if response else 0}")
+                                f"耗时: {model_duration:.2f}s, response_length: {len(response) if response else 0}")
                     logger.debug(f"[{self.trace_id}] 模型完整响应: {response}")
 
                     if response is None:
@@ -181,10 +205,11 @@ class TrajectoryRunnerActor:
 
                 env_duration = time.time() - st
                 logger.info(f"[{self.trace_id}] 环境步骤执行完成 - task_id: {self.task_id}, step: {step}, "
-                           f"耗时: {env_duration:.2f}s, done: {done}")
+                            f"耗时: {env_duration:.2f}s, done: {done}")
 
 
                 # ---- save screenshot ----
+                # Todo ”done fail“ remove image
                 frame_path = await storage.save_frame.remote(
                     self.task_root, step + 1, obs_img)
                 
@@ -194,48 +219,30 @@ class TrajectoryRunnerActor:
                 await storage.save_partial_traj.remote(self.task_root, step + 1, self._build_trajectory())
 
                 # ---- save vllm logp ----
-                await storage.save_partial_pt.remote(self.task_root, step + 1, vllm_logp, None, None)
+                await storage.save_partial_pt.remote(self.task_root, step + 1, vllm_logp, token_ids, prompt_token_ids)
                 
                 step_duration = time.time() - st_step
                 self._log_latency(step, model_duration, env_duration, step_duration)
                 
                 step += 1
                 
-
             # calculate and save reward
             reward = self.env.evaluate()
             await storage.save_reward.remote(self.task_root, reward)
             logger.info(f"[{self.trace_id}] 任务评估完成 - task_id: {self.task_id}, reward: {reward}")
             
             # save trajectory json
+            # Todo remove last img
             full_messages = self.base_messages_for_save + self.save_dialogue_full
             await storage.save_episode.remote(self.task_root, full_messages)
             
-            # -------- 拆轨迹逻辑，已停用 --------------chunk表结构已修改，复用时代码需要调整
             # split and save trajectory
-            # storage_root, split_dir, split_meta = await storage.split_episode.remote(self.task_root,
-            #                                                          full_messages,
-            #                                                          self.task_cfg,
-            #                                                          reward)
-            # n_chunks = split_meta["num_chunks"]
-            # logger.info(f"[{self.trace_id}] 拆分轨迹完成，共拆分为{n_chunks}条轨迹片段，已存入{split_dir}")
-            
-            # if self.runner_cfg.write_to_mysql:
-            #     meta = {
-            #     'run_id': storage_root,
-            #     'trajectory_id': self.task_root,
-            #     'task_id': self.task_id,
-            #     'trace_id': self.trace_id,
-            #     'split_dir': split_dir,
-            #     'reward': reward,
-            #     'num_chunks': n_chunks,
-            #     'model_version': model_path
-            #     }
-            #     chunks = [{'chunk_index': i, 'json_path': os.path.join(meta["split_dir"], filename)}
-            #             for i, filename in enumerate(split_meta["output_filenames"])]
-            #     await mysql_writer.insert_run_and_chunks.remote(meta, chunks)
-            #     logger.info(f"[{self.trace_id}] 已存入mySQL数据库")
-            
+            storage_root, split_dir, split_meta = await storage.split_episode.remote(self.task_root,
+                                                                        full_messages,
+                                                                        self.task_cfg,
+                                                                        reward)
+            n_chunks = split_meta["num_chunks"]
+            logger.info(f"[{self.trace_id}] 拆分轨迹完成，共拆分为{n_chunks}条轨迹片段，已存入{split_dir}")
             
             # 插入mysql数据库
             if self.runner_cfg.write_to_mysql:
@@ -244,16 +251,20 @@ class TrajectoryRunnerActor:
                 'trajectory_id': self.task_root,
                 'task_id': self.task_id,
                 'trace_id': self.trace_id,
+                'split_dir': split_dir,
                 'reward': reward,
-                'model_version': model_path,
-                'instruction': self.task_cfg["instruction"],
-                'num_chunks' : step     # spliter功能停用，这里保存step步数
+                'num_chunks': n_chunks,
+                'model_version': model_path
                 }
-
-                await mysql_writer.insert_run.remote(meta)
+                chunks = [{'chunk_index': i, 'json_path': os.path.join(meta["split_dir"], filename)}
+                        for i, filename in enumerate(split_meta["output_filenames"])]
+                await mysql_writer.insert_run_and_chunks.remote(meta, chunks)
                 logger.info(f"[{self.trace_id}] 已存入mySQL数据库")
-
-          
+                
+                # # 更新训练数据表
+                # insert_num = await mysql_writer.process_and_insert_trainable_group.remote(storage_root, self.rollout_n)
+                # logger.info(f"Inserted {insert_num} rows into trainable_group")
+            
             logger.info(f"[{self.trace_id}] 任务轨迹执行完成 - task_id: {self.task_id}, 总步数: {step}")
         except Exception as e:
             logger.error(f"[{self.trace_id}] 任务轨迹执行失败 - task_id: {self.task_id}, 错误: {e}")
@@ -332,6 +343,28 @@ class TrajectoryRunnerActor:
                     return None, model_path, None, None
                 await asyncio.sleep(backoff ** attempt)   # 2s, 4s, 8s …
 
+    async def _call_model_tokenize(self, model_pool, messages: str, model_cfg):
+        """
+        调用 tokenize 接口，对格式化后的 base_messages 做 tokenization。
+        返回 token_ids (List[int])。
+        """
+        timeout = model_cfg.timeout
+        retries = model_cfg.retries
+        backoff = model_cfg.backoff
+        DEFAULT_MODEL_PATH = model_cfg.ckpt_path
+
+        for attempt in range(1, retries + 1):
+            try:
+                token_ids = await asyncio.wait_for(
+                    model_pool.tokenize.remote(messages),
+                    timeout=timeout
+                )
+                return token_ids
+            except (asyncio.TimeoutError, ray.exceptions.RayError) as e:
+                if attempt == retries:
+                    logger.error(f"[{self.trace_id}] tokenize 调用失败 - task_id: {self.task_id}, 重试次数: {attempt}, 错误: {e}")
+                    return None
+                await asyncio.sleep(backoff ** attempt) 
     
     async def _call_prelaunched_model(self, messages, model_cfg):
         
