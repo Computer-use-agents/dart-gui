@@ -153,3 +153,4 @@ swanlog/
 .vscode/
 trainingdata_sample
 *.zip
+*zirui.py
