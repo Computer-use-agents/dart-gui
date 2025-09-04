@@ -129,32 +129,32 @@ class TrajectoryRunnerActor:
             step, done = 0, False
             logger.info(f"[{self.trace_id}] 环境初始化完成，开始主循环 - task_id: {self.task_id}")
 
-            def format_chat(messages):
-                formatted = ""
-                for m in messages:
-                    content = m["content"]
+            # def format_chat(messages):
+            #     formatted = ""
+            #     for m in messages:
+            #         content = m["content"]
 
-                    # 如果 content 是 list（多模态消息）
-                    if isinstance(content, list):
-                        # 只取文本部分
-                        texts = [c["text"] for c in content if c.get("type") == "text"]
-                        content_str = "\n".join(texts)
-                    else:
-                        # 普通 string
-                        content_str = content
+            #         # 如果 content 是 list（多模态消息）
+            #         if isinstance(content, list):
+            #             # 只取文本部分
+            #             texts = [c["text"] for c in content if c.get("type") == "text"]
+            #             content_str = "\n".join(texts)
+            #         else:
+            #             # 普通 string
+            #             content_str = content
 
-                    formatted += f"{content_str}<|im_end|>\n"
+            #         formatted += f"{content_str}<|im_end|>\n"
 
-                return formatted
+            #     return formatted
 
-            base_messages = format_chat(self.base_messages_for_save)
+            # base_messages = format_chat(self.base_messages_for_save)
 
-            tokenize_response = await self._call_model_tokenize(
-                            model_pool, base_messages,
-                            self.runner_cfg.model_pool)
+            # tokenize_response = await self._call_model_tokenize(
+            #                 model_pool, base_messages,
+            #                 self.runner_cfg.model_pool)
 
-            prompt_token_ids = tokenize_response
-
+            # prompt_token_ids = tokenize_response
+            prompt_token_ids = await model_pool.process_text.remote(self.base_messages_for_save)
             # --- main loop ----
             # MAX_T, RETRIES, BACKOFF = 10, 3, 2
             while step < self.max_steps and not done:

@@ -120,9 +120,6 @@ def find_subsequence_positions_efficient(tensor, subsequence):
     
     return positions
         
-
-
-
 def get_position_after(pos: torch.Tensor, after: int):
     positions = []
     for i in range(len(pos)):
@@ -188,7 +185,6 @@ class StepwiseTrajectorySplitter:
             limit_images: int = 5,
             limit_messages: int = 35,
             use_vllm_logp: bool = False,
-            use_token_ids_from_pt: bool = False,
             traj_filter: bool = False,
         ) -> None:
         self.processor = processor
@@ -201,7 +197,6 @@ class StepwiseTrajectorySplitter:
         self.limit_images = limit_images
         self.limit_messages = limit_messages
         self.use_vllm_logp = use_vllm_logp
-        self.use_token_ids_from_pt = use_token_ids_from_pt
         self.traj_filter = traj_filter
         self.img_ids = {
             "<|vision_start|>": self.processor.tokenizer.convert_tokens_to_ids("<|vision_start|>"),
@@ -337,7 +332,9 @@ class StepwiseTrajectorySplitter:
             batch_output += result
         del results
         batch_output = collate_fn(batch_output)
-
+        # return batch_output
+        # return batch_output
+            # return batch_tokenized_messages
         
         return batch_output
     
@@ -372,10 +369,16 @@ class StepwiseTrajectorySplitter:
         pt_data_files = sorted(Path(dataset_dir).glob("data_for_step_*.pt"),key=lambda x: int(x.stem.split("_")[-1]))
         pt_data_list = [torch.load(f) for f in pt_data_files]
         rollout_log_probs = [d["logp"] for d in pt_data_list]
-        if self.use_token_ids_from_pt:
-            token_ids = [d["token_ids"] for d in pt_data_list]
-            prompt_token_ids = [d["prompt_token_ids"] for d in pt_data_list]
+        token_ids = [d["token_ids"] for d in pt_data_list]
+        prompt_token_ids = [d["prompt_token_ids"] for d in pt_data_list]
 
+        # torch.serialization.add_safe_globals([Image])
+        # pt_file = Path(dataset_dir) / "images_data.pt"
+        # pt_data = torch.load(pt_file, weights_only=False)
+        # images = pt_data["images"]        
+        # image_grid_thw_list = pt_data["image_grid_thw"] 
+        # num_patches_list = pt_data["num_patches_list"]
+        # pixel_values = pt_data["pixel_values"]
 
         
         # TODO: pre tokenize
@@ -412,17 +415,6 @@ class StepwiseTrajectorySplitter:
             item = self._process_item(dataset, pre_start, end)
             is_first_turn = False
 
-            # fetch limited images and pixel values from pt file
-            # img_end = end // 2
-            # img_start = max(0, img_end - self.limit_images)
-            # image = images[img_start:img_end]
-            # image_grid_thw = image_grid_thw_list[img_start:img_end] 
-            # num_patches = num_patches_list[img_start:img_end]
-
-            # cum_patches = [0] + list(torch.cumsum(torch.tensor(num_patches_list), dim=0).tolist())
-            # start_idx = cum_patches[img_start]
-            # end_idx = cum_patches[img_end]
-            # pixel_value = pixel_values[start_idx:end_idx]     
 
             assistant_in_window = [i for i in assistant_indices if pre_start <= i < end]
             if assistant_in_window:
@@ -431,32 +423,21 @@ class StepwiseTrajectorySplitter:
                 rollout_log_prob = rollout_log_probs[last_assistant_logp_idx]
 
                 # fetch token ids and prompt token ids
-                if self.use_token_ids_from_pt:
-                    current_step_idx = last_assistant_logp_idx
-                    core_tokens = prompt_token_ids[current_step_idx]
-                    sp_tokens = self.img_ids["<|im_end|>"]
-                    split_idx = (core_tokens == sp_tokens).nonzero(as_tuple=True)[0]
-                    if len(split_idx) == 2:
-                        try:
-                            split_idx = split_idx[0].item()
-                            system_tokens = core_tokens[:split_idx+1]
-                            instruction_tokens = core_tokens[split_idx+2:-1]
-                        except Exception as e:
-                            print("Error in splitting tokens:", e)
-                            print(f"Expected exactly 2 sp tokens, but got {len(split_idx)}: {core_tokens}")
-                            continue
-                    else:
-                        print(f"Expected exactly 2 sp tokens, but got {len(split_idx)}: {core_tokens}")
-                        continue
-
-                    input_ids = [system_tokens, instruction_tokens]
-                    start_step = max(0, current_step_idx - self.limit_messages + 1)
-                    for step_idx in range(start_step, current_step_idx):
-                        input_ids.append(token_ids[step_idx])
-                    response_ids = token_ids[current_step_idx]
+                current_step_idx = last_assistant_logp_idx
+                core_tokens = prompt_token_ids[current_step_idx]
+                sp_tokens = self.img_ids["<|im_end|>"]
+                split_idx = (core_tokens == sp_tokens).nonzero(as_tuple=True)[0]
+                if len(split_idx) == 2:
+                    split_idx = split_idx[0].item()
+                    system_tokens = core_tokens[:split_idx+1]
+                    instruction_tokens = core_tokens[split_idx+2:-1]
                 else:
-                    input_ids = None
-                    response_ids = None
+                    raise ValueError(f"Expected exactly 2 sp tokens, but got {len(split_idx)}: {core_tokens}")
+                input_ids = [system_tokens, instruction_tokens]
+                start_step = max(0, current_step_idx - self.limit_messages + 1)
+                for step_idx in range(start_step, current_step_idx):
+                    input_ids.append(token_ids[step_idx])
+                response_ids = token_ids[current_step_idx]
             else:
                 continue
 
@@ -490,7 +471,6 @@ class StepwiseTrajectorySplitter:
                 print("failed", e)
                 print("messages", json.dumps(messages, indent=2, ensure_ascii=False))
                 raise e
-            print("not use_vllm_logp and not use_token_ids_from_pt!!")
             position_ids = torch.cat([position_ids[0], response_position_ids[0]], dim=-1)
             attention_mask = torch.cat([attention_mask, response_attention_mask], dim=-1)
             seq = torch.cat([input_ids, response_ids], dim=-1)
@@ -521,29 +501,16 @@ class StepwiseTrajectorySplitter:
             # print("messages", json.dumps(messages, indent=2, ensure_ascii=False))
             row_dict = dict()
 
-            if self.use_token_ids_from_pt:
-                input_ids, attention_mask, position_ids, multi_modal_data, model_inputs = self._get_inputs_from_pt(messages, dataset_id, input_ids)
-                input_attention_mask = attention_mask
+            input_ids, attention_mask, position_ids, multi_modal_data, model_inputs = self._get_inputs_from_pt(messages, dataset_id, input_ids)
+            input_attention_mask = attention_mask
 
-                try:
-                    response_ids, response_attention_mask, response_position_ids, _, _ = self._get_responses_from_pt(
-                        messages, dataset_id, model_inputs, position_ids, response_ids, attention_mask)
-                except Exception as e:
-                    print("failed", e)
-                    print("messages", json.dumps(messages, indent=2, ensure_ascii=False))
-                    raise e
-                print("use_vllm_logp and use_token_ids_from_pt!!")
-            else:
-                input_ids, attention_mask, position_ids, multi_modal_data, model_inputs = self._get_inputs(messages, dataset_id)
-                input_attention_mask = attention_mask
-                try:
-                    response_ids, response_attention_mask, response_position_ids, _, _ = self._get_responses(
-                        messages, dataset_id, model_inputs, position_ids)
-                except Exception as e:
-                    print("failed", e)
-                    print("messages", json.dumps(messages, indent=2, ensure_ascii=False))
-                    raise e
-                print("use_vllm_logp but not use_token_ids_from_pt!!")
+            try:
+                response_ids, response_attention_mask, response_position_ids, _, _ = self._get_responses_from_pt(
+                    messages, dataset_id, model_inputs, position_ids, response_ids, attention_mask)
+            except Exception as e:
+                print("failed", e)
+                print("messages", json.dumps(messages, indent=2, ensure_ascii=False))
+                raise e
 
             position_ids = torch.cat([position_ids[0], response_position_ids[0]], dim=-1)
             attention_mask = torch.cat([attention_mask, response_attention_mask], dim=-1)
@@ -649,10 +616,6 @@ class StepwiseTrajectorySplitter:
 
         image_grid_thw = model_inputs["image_grid_thw"]
         num_patches_list = (image_grid_thw[:,0]*image_grid_thw[:,1]*image_grid_thw[:,2]).tolist()
-
-        # model_inputs = {}
-        # model_inputs["image_grid_thw"] = image_grid_thw
-        # model_inputs["pixel_values"] = pixel_values
 
         final_input_ids = []
         img_num = 0
@@ -862,3 +825,6 @@ class StepwiseTrajectorySplitter:
         response_mask[self.max_prompt_length:self.max_prompt_length + valid_response_length] = 1
         row_dict["response_mask"] = response_mask[self.max_prompt_length:]
         row_dict["loss_mask"] = response_mask
+
+
+

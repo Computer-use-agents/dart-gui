@@ -128,31 +128,31 @@ class TrajectoryRunnerActor:
             step, done = 0, False
             logger.info(f"[{self.trace_id}] 环境初始化完成，开始主循环 - task_id: {self.task_id}")
 
-            def format_chat(messages):
-                formatted = ""
-                for m in messages:
-                    content = m["content"]
+            # def format_chat(messages):
+            #     formatted = ""
+            #     for m in messages:
+            #         content = m["content"]
 
-                    # 如果 content 是 list（多模态消息）
-                    if isinstance(content, list):
-                        # 只取文本部分
-                        texts = [c["text"] for c in content if c.get("type") == "text"]
-                        content_str = "\n".join(texts)
-                    else:
-                        # 普通 string
-                        content_str = content
+            #         # 如果 content 是 list（多模态消息）
+            #         if isinstance(content, list):
+            #             # 只取文本部分
+            #             texts = [c["text"] for c in content if c.get("type") == "text"]
+            #             content_str = "\n".join(texts)
+            #         else:
+            #             # 普通 string
+            #             content_str = content
 
-                    formatted += f"{content_str}<|im_end|>\n"
+            #         formatted += f"{content_str}<|im_end|>\n"
 
-                return formatted
+            #     return formatted
 
-            base_messages = format_chat(self.base_messages_for_save)
+            # base_messages = format_chat(self.base_messages_for_save)
 
-            tokenize_response = await self._call_model_tokenize(
-                            model_pool, base_messages,
-                            self.runner_cfg.model_pool)
+            # prompt_token_ids = await self._call_model_tokenize(
+            #                 model_pool, base_messages,
+            #                 self.runner_cfg.model_pool)
 
-            prompt_token_ids = tokenize_response
+            prompt_token_ids = await model_pool.process_text.remote(self.base_messages_for_save)
 
             # --- main loop ----
             # MAX_T, RETRIES, BACKOFF = 10, 3, 2
@@ -204,7 +204,6 @@ class TrajectoryRunnerActor:
                 st = time.time()
                 obs, reward, done, info = await self._run_step_async(action)
                 obs_img = obs["screenshot"]
-                all_img.append(obs["image"])
 
                 env_duration = time.time() - st
                 logger.info(f"[{self.trace_id}] 环境步骤执行完成 - task_id: {self.task_id}, step: {step}, "
@@ -216,6 +215,8 @@ class TrajectoryRunnerActor:
                         self.task_root, step + 1, obs_img)
                     
                     self._add_image(obs_img, frame_path)
+
+                    all_img.append(obs["image"])
                 
                 # ---- save current trajectory
                 await storage.save_partial_traj.remote(self.task_root, step + 1, self._build_trajectory())
@@ -227,10 +228,6 @@ class TrajectoryRunnerActor:
                 self._log_latency(step, model_duration, env_duration, step_duration)
                 
                 step += 1
-
-            # save img
-            image_grid_thw, num_patches_list, pixel_values = await model_pool.process_images.remote(all_img)
-            await storage.save_img_pt.remote(self.task_root, all_img, image_grid_thw, num_patches_list, pixel_values)
 
             # calculate and save reward
             reward = self.env.evaluate()
@@ -247,7 +244,13 @@ class TrajectoryRunnerActor:
                     last_msg["content"][0].get("type") == "image_url"
                 ):
                     full_messages.pop()
+                    all_img.pop()
             await storage.save_episode.remote(self.task_root, full_messages)
+
+            # save img
+            if False:
+                image_grid_thw, num_patches_list, pixel_values = await model_pool.process_images.remote(all_img)
+                await storage.save_img_pt.remote(self.task_root, all_img, image_grid_thw, num_patches_list, pixel_values)
             
             # split and save trajectory
             storage_root, split_dir, split_meta = await storage.split_episode.remote(self.task_root,

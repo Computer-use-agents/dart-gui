@@ -50,7 +50,7 @@ from verl.trainer.ppo.metric_utils import (
     process_validation_metrics,
 )
 from verl.trainer.ppo.reward import compute_reward, compute_reward_async
-from verl.trainer.ppo.trajectory_splitter import StepwiseTrajectorySplitter, TrajectorySplitter
+from verl.trainer.ppo.trajectory_splitter import StepwiseTrajectorySplitter
 from verl.utils.checkpoint.checkpoint_manager import BaseCheckpointManager, find_latest_ckpt_path
 from verl.utils.debug import marked_timer
 from verl.utils.metric import (
@@ -1371,18 +1371,8 @@ class RayOSWorldTrainer(RayPPOTrainer):
                             }
                             metrics.update(trajectory_metrics)
                     print("reward_tensor", reward_tensor)
-                    if self.config.trainer.splitter == "sliding_window":
-                        splitter = TrajectorySplitter(
-                            processor=self.processor,
-                            root_dir=self.config.data.root_data_dir,
-                            window_size=self.config.data.window_size,
-                            stride_size=self.config.data.stride_size,
-                            max_prompt_length=self.config.data.max_prompt_length,
-                            max_response_length=self.config.data.max_response_length,
-                            truncation=self.config.data.truncation
-                        )
-                    elif self.config.trainer.splitter == "stepwise":
-                        splitter = StepwiseTrajectorySplitter(
+                    if self.config.trainer.splitter == "stepwise":
+                            splitter = StepwiseTrajectorySplitter(
                             processor=self.processor,
                             root_dir=self.config.data.root_data_dir,
                             max_prompt_length=self.config.data.max_prompt_length,

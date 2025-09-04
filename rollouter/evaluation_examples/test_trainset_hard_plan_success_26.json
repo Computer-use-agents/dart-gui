@@ -1,0 +1,46 @@
+{
+  "multi_apps": [
+    "337d318b-aa07-4f4f-b763-89d9a2dd013f",
+    "f918266a-b3e0-4914-865d-4faa564f1aef",
+    "48c46dc7-fe04-4505-ade7-723cba1aa6f6",
+    "788b3701-3ec9-4b67-b679-418bfa726c22",
+    "f7dfbef3-7697-431c-883a-db8583a4e4f9"
+  ],
+  "libreoffice_writer": [
+    "f178a4a9-d090-4b56-bc4c-4b72a61a035d",
+    "6ada715d-3aae-4a32-a6a7-429b2e43fb93"
+  ],
+  "os": [
+    "3ce045a0-877b-42aa-8d2c-b4a863336ab8",
+    "4127319a-8b79-4410-b58a-7a151e15f3d7"
+  ],
+  "vlc": [
+    "efcf0d81-0835-4880-b2fd-d866e8bc2294",
+    "386dbd0e-0241-4a0a-b6a2-6704fba26b1c",
+    "f3977615-2b45-4ac5-8bba-80c17dbe2a37"
+  ],
+  "chrome": [
+    "7a5a7856-f1b6-42a4-ade9-1ca81ca0f263"
+  ],
+  "thunderbird": [
+    "9b7bc335-06b5-4cd3-9119-1a649c478509"
+  ],
+  "libreoffice_calc": [
+    "a9f325aa-8c05-4e4f-8341-9e4358565f4f",
+    "42e0a640-4f19-4b28-973d-729602b5a4a7",
+    "4f07fbe9-70de-4927-a4d5-bb28bc12c52c",
+    "ecb0df7a-4e8d-4a03-b162-053391d3afaf",
+    "a01fbce3-2793-461f-ab86-43680ccbae25",
+    "357ef137-7eeb-4c80-a3bb-0951f26a8aff"
+  ],
+  "libreoffice_impress": [
+    "ce88f674-ab7a-43da-9201-468d38539e4a",
+    "bf4e9888-f10f-47af-8dba-76413038b73c",
+    "0f84bef9-9790-432e-92b7-eece357603fb",
+    "7dbc52a6-11e0-4c9a-a2cb-1e36cfda80d8",
+    "8979838c-54a5-4454-a2b8-3d135a1a5c8f"
+  ],
+  "gimp": [
+    "d52d6308-ec58-42b7-a2c9-de80e4837b2b"
+  ]
+}

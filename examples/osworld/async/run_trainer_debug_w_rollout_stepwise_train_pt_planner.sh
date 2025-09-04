@@ -25,7 +25,11 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50/actor/huggingface
+MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+
+
+
+#/root/verl/checkpoints/verl_osworld_grpo/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50/actor/huggingface
 
 #/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
 
@@ -41,17 +45,17 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 # export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
 # export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
 
-export ROOT_DATA_DIR=rollouter/results/pass8_20250904_train90_pass8_gpu3_env30_vllm_logp_maxstep30
-export RUN_ID=results/pass8_20250904_train90_pass8_gpu3_env30_vllm_logp_maxstep30
+export ROOT_DATA_DIR=rollouter/results/pass8_20250903_train90_pass8_gpu2_env20_vllm_logp_maxstep15_planner
+export RUN_ID=results/pass8_20250903_train90_pass8_gpu2_env20_vllm_logp_maxstep15_planner
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-export EXPERIMENT_NAME=RESUME_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export EXPERIMENT_NAME=planner_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
 
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.139.178:15959
+export ROLLOUT_SERVER_URL=http://172.19.140.144:15959
 
 # training parameters
 adv_estimator=grpo
@@ -76,7 +80,8 @@ train_bz_min=4
 train_bz_max=8
 train_prompt_bsz=8
 rollout_n=8
-train_prompt_mini_bsz=96
+train_prompt_mini_bsz=64
+
 # Performance Related Parameter
 sp_size=4
 use_dynamic_bsz=False
@@ -93,7 +98,7 @@ splitter=stepwise
 splitter_parallel=True
 window_size=5 
 stride_size=5
-max_steps=30
+max_steps=15
 
 use_vllm_logp=True
 use_sft_loss=False

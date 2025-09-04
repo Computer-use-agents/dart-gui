@@ -39,7 +39,7 @@ from verl.trainer.ppo.metric_utils import (
     compute_timing_metrics,
 )
 from verl.trainer.ppo.ray_trainer import RayOSWorldTrainer, ResourcePoolManager, Role, WorkerType, compute_advantage
-from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter, StepwiseTrajectorySplitter, LastNTrajectorySplitter
+from verl.trainer.ppo.trajectory_splitter import StepwiseTrajectorySplitter
 from verl.utils.debug import marked_timer
 from verl.utils.metric import (
     reduce_metrics,
@@ -124,29 +124,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                 batch: DataProto = DataProto.from_single_dict(batch_dict)
                 is_last_step = self.global_steps >= self.total_training_steps
                 with marked_timer("step", timing_raw):
-                    if self.config.trainer.splitter == "sliding_window":
-                        print("Using sliding window splitter")
-                        splitter = TrajectorySplitter(
-                            processor=self.processor,
-                            root_dir=self.config.data.root_data_dir,
-                            window_size=self.config.data.window_size,
-                            stride_size=self.config.data.stride_size,
-                            max_prompt_length=self.config.data.max_prompt_length,
-                            max_response_length=self.config.data.max_response_length,
-                            truncation=self.config.data.truncation
-                        )
-                    elif self.config.trainer.splitter == "last_n":
-                        print("Using last n splitter")
-                        splitter = LastNTrajectorySplitter(
-                            processor=self.processor,
-                            root_dir=self.config.data.root_data_dir,
-                            window_size=self.config.data.window_size,
-                            stride_size=self.config.data.stride_size,
-                            max_prompt_length=self.config.data.max_prompt_length,
-                            max_response_length=self.config.data.max_response_length,
-                            truncation=self.config.data.truncation
-                        )
-                    elif self.config.trainer.splitter == "stepwise":
+                    if self.config.trainer.splitter == "stepwise":
                         print("Using stepwise splitter")
                         splitter = StepwiseTrajectorySplitter(
                             processor=self.processor,
@@ -154,7 +132,8 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             max_prompt_length=self.config.data.max_prompt_length,
                             max_response_length=self.config.data.max_response_length,
                             truncation=self.config.data.truncation,
-                            use_vllm_logp=self.config.actor_rollout_ref.actor.use_vllm_logp
+                            use_vllm_logp=self.config.actor_rollout_ref.actor.use_vllm_logp,
+                            use_token_ids_from_pt=self.config.actor_rollout_ref.actor.get("use_token_ids_from_pt", False)
                         )  
                     else:
                         raise ValueError(f"Unhandled splitter type: {self.config.trainer}")

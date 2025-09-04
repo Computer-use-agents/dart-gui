@@ -153,12 +153,12 @@ Action: click(start_box='<|box_start|>(227,511)<|box_end|>')<|im_end|>"""
 
 
 def test_splitter_pt():
-    from verl.trainer.ppo.trajectory_splitter import TrajectorySplitter, StepwiseTrajectorySplitter, LastNTrajectorySplitter
+    from verl.trainer.ppo.trajectory_splitter import StepwiseTrajectorySplitter
     processor = AutoProcessor.from_pretrained(
         "/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5",
         use_fast=True
     )
-    root_dir = "rollouter/results/pass16_20250902_train90_pass16_gpu2_env20_vllm_logp_maxstep15_imgpt_test_new/"
+    root_dir = "rollouter/results/pass8_20250903_train15_pass8_gpu2_env20_vllm_logp_maxstep15_imgpt_tokenidpt_train/"
 
 
     splitter = StepwiseTrajectorySplitter(
@@ -170,8 +170,8 @@ def test_splitter_pt():
         use_vllm_logp=True
     )  
 
-    dataset_ids = ['554785e9-4523-4e7a-b8e1-8016f565f56a_trace-b337476848e0-1756907169',
-    '554785e9-4523-4e7a-b8e1-8016f565f56a_trace-72bac16e8fe9-1756907169']
+    dataset_ids = ['0b17a146-2934-46c7-8727-73ff6b6483e8_trace-fd38788b7e92-1756914519',
+    'e4ef0baf-4b52-4590-a47e-d4d464cca2d7_trace-cb8168553f6c-1756914519']
 
     reward_tensor = torch.tensor([0.5, 0.8])
 

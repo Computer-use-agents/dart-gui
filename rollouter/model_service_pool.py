@@ -219,5 +219,26 @@ class ModelServicePool:
 
     async def process_images(self, images):
         return await asyncio.to_thread(self.process_images_sync, images)
+    
+    def process_text_sync(self, messages):
+        formatted = ""
+        for m in messages:
+            content = m["content"]
 
+            # 如果 content 是 list（多模态消息）
+            if isinstance(content, list):
+                # 只取文本部分
+                texts = [c["text"] for c in content if c.get("type") == "text"]
+                content_str = "\n".join(texts)
+            else:
+                # 普通 string
+                content_str = content
+
+            formatted += f"{content_str}<|im_end|>\n"
+        model_inputs = self.processor(text=[formatted], images=None, return_tensors="pt")
+        input_ids = model_inputs.pop("input_ids")
+        return input_ids[0]
+
+    async def process_text(self, messages):
+        return await asyncio.to_thread(self.process_text_sync, messages)
 
