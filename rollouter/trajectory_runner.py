@@ -219,7 +219,7 @@ class TrajectoryRunnerActor:
 
 
                 # ---- save screenshot ----
-                if action not in ["DONE", "FAIL"]:
+                if action not in ["DONE", "FAIL","VLLM ERROR"]:
                     frame_path = await storage.save_frame.remote(
                         self.task_root, step + 1, obs_img)
                     
