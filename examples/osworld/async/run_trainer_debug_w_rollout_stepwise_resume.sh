@@ -44,7 +44,8 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 export ROOT_DATA_DIR=rollouter/results/pass8_20250904_train90_pass8_gpu3_env30_vllm_logp_maxstep30
 export RUN_ID=results/pass8_20250904_train90_pass8_gpu3_env30_vllm_logp_maxstep30
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-export EXPERIMENT_NAME=RESUME_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export EXPERIMENT_NAME=RESUME_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export EXPERIMENT_NAME=RESUME_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250904_cf25sna0
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
 
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 

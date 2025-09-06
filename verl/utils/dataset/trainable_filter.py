@@ -63,6 +63,8 @@ def filter_fn(
 
     # 2) 仅两版(由参数决定) + used==0
     base = d[d["model_version"].isin(top_mvs) & (d["used"] == 0)].copy()
+    base["reward"] = pd.to_numeric(base["reward"], errors="coerce")
+    base = base.loc[base["reward"].notna() & (base["reward"] != -1)].copy()
     #print("len base: ", len(base))
     if base.empty:
         return []

@@ -748,14 +748,18 @@ class StepwiseTrajectorySplitter:
                 print("--------------------------------------")
         # compare for debugging
         # print("Comparing input ids and attention mask with those from pt file")
+
         # raw_prompt = self.processor.apply_chat_template(messages[:context_len], add_generation_prompt=False, tokenize=False)
-        
+        # model_inputs0 = self.processor(text=[raw_prompt], images=images, return_tensors="pt")
         # pixel_values = model_inputs["pixel_values"]
         # compare_inputs_ids_and_mask(input_ids, attention_mask, model_inputs0["input_ids"], model_inputs0["attention_mask"], tokenizer=self.processor.tokenizer)
 
-        # assert torch.equal(model_inputs0["pixel_values"], pixel_values), "Input ids do not match those from pt file"
-        # print(f"Input pixel values match those from pt file: {torch.equal(model_inputs0['pixel_values'], pixel_values)}")
 
+        # if not torch.equal(model_inputs0["pixel_values"], pixel_values):
+        #     print( "Input ids do not match those from pt file")
+
+
+       
         if "second_per_grid_ts" in model_inputs:
             model_inputs.pop("second_per_grid_ts")
 
@@ -827,7 +831,7 @@ class StepwiseTrajectorySplitter:
         #     model_inputs = self.processor(text=[raw_prompt], images=None, return_tensors="pt")
         # except Exception as e:
         #     print('self.processor failed', e, raw_prompt)
-        #     raise e
+        #     pass
         # input_ids0 = model_inputs.pop("input_ids")
 
         # if not torch.equal(input_ids, input_ids0):

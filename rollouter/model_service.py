@@ -904,6 +904,12 @@ class ModelServicePool:
         通过滚动更新的方式，平滑地重新加载模型。
         一次更新 `batch_size` 个实例。
         """
+
+        if self.replicas >= 4:
+            batch_size = max(2, batch_size)
+        if self.replicas < 4:
+            batch_size = 1
+
         logger.info(f"\n--- Rolling reload to new model: {new_ckpt_path} (batch size: {batch_size}) ---")
         
         # 暂停后台监控，防止其干扰更新过程

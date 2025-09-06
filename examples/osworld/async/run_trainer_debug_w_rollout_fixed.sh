@@ -58,17 +58,17 @@ clip_ratio_high=0.28
 
 
 max_prompt_length=32000
-max_response_length=32000
+max_response_length=500
 
 loss_agg_mode="seq-mean-token-sum"
 # loss_agg_mode="token-mean"
 
 
-train_bz_min=1
-train_bz_max=2
-train_prompt_bsz=4
+train_bz_min=4
+train_bz_max=10
+train_prompt_bsz=8
 rollout_n=8
-train_prompt_mini_bsz=4
+train_prompt_mini_bsz=64
 
 # Performance Related Parameter
 sp_size=4
@@ -82,11 +82,16 @@ fsdp_size=4
 
 ## message splitter
 limit_messages=35
-splitter=sliding_window
-# splitter=stepwise
+# splitter=sliding_window
+splitter=stepwise
 window_size=5 
 stride_size=5
 max_steps=100
+
+use_vllm_logp=False
+use_sft_loss=False
+use_token_ids_from_pt=False
+
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
@@ -95,7 +100,7 @@ python3 -m verl.trainer.main_ppo_async \
     data.train_batch_size=${train_prompt_bsz} \
     data.val_batch_size=4 \
     data.max_prompt_length=32000 \
-    data.max_response_length=32000 \
+    data.max_response_length=500 \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
     data.image_key=images \
@@ -131,6 +136,9 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.actor.fsdp_config.param_offload=${offload} \
     actor_rollout_ref.actor.fsdp_config.optimizer_offload=${offload} \
+        +actor_rollout_ref.actor.use_vllm_logp=${use_vllm_logp} \
+    +actor_rollout_ref.actor.use_sft_loss=${use_sft_loss} \
+    +actor_rollout_ref.actor.use_token_ids_from_pt=${use_token_ids_from_pt} \
     actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.grad_clip=20.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
@@ -150,7 +158,7 @@ python3 -m verl.trainer.main_ppo_async \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \
-    +trainer.splitter_parallel=False\
+    +trainer.splitter_parallel=True\
     actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=$ENGINE \

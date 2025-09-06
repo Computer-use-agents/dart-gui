@@ -553,7 +553,7 @@ class DataParallelPPOActor(BasePPOActor):
                         "actor/ppo_kl": ppo_kl.detach().item(),
                         "actor/pg_clipfrac_lower": pg_clipfrac_lower.detach().item(),
                     }
-                    if vllm_log_prob is not None:
+                    if vllm_log_prob is not None and oldlogp_vllm_ratio is not None:
                         data["actor/vllm_log_prob_mean"] = vllm_log_prob.mean().detach().item()
                         data["actor/oldlogp_vllm_ratio"] = oldlogp_vllm_ratio.detach().tolist()
                         

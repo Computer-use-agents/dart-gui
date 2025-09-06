@@ -56,7 +56,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         config.actor_rollout_ref.rollout.root_data_dir = config.data.root_data_dir
         super().__init__(config, tokenizer, role_worker_mapping, resource_pool_manager, ray_worker_group_cls, processor, reward_fn, val_reward_fn, train_dataset, val_dataset, collate_fn, train_sampler, device_name)
         os.makedirs(self.config.data.root_data_dir, exist_ok=True)
-        self.save_interval = config.get("save_interval", 780)
+        self.save_interval = config.get("save_interval", 300)
         self._last_ckpt_time = None
         self.run_id = config.data.run_id
         
@@ -468,20 +468,20 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
             import random
             dataset_ids = batch.non_tensor_batch["dataset_ids"]
 
-            if len(batch) > n_mod:
-                print("[Warning] batch size larger than world size, need downsample! current batch size:", len(batch), n_mod)
-                idx = random.choices(list(range(len(dataset_ids))), k=n_mod)
-                downsampled_batch = batch.select_idxs(idx)
-                return downsampled_batch
-            else:
-                print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
-                target_size = (len(batch) // n_mod + 1) * n_mod
-                up_sample_size = target_size - len(batch)
-                print("Need upsample", up_sample_size)
-                idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
-                upsampel_batch = batch.select_idxs(idx)
-                batch = DataProto.concat([batch, upsampel_batch])
-                print("After upsample", len(batch))
+            # if len(batch) > n_mod:
+            #     print("[Warning] batch size larger than world size, need downsample! current batch size:", len(batch), n_mod)
+            #     idx = random.choices(list(range(len(dataset_ids))), k=n_mod)
+            #     downsampled_batch = batch.select_idxs(idx)
+            #     return downsampled_batch
+            # else:
+            print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
+            target_size = (len(batch) // n_mod + 1) * n_mod
+            up_sample_size = target_size - len(batch)
+            print("Need upsample", up_sample_size)
+            idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
+            upsampel_batch = batch.select_idxs(idx)
+            batch = DataProto.concat([batch, upsampel_batch])
+            print("After upsample", len(batch))
         except Exception as e:
             print("_up_sample failed due to", e)
 

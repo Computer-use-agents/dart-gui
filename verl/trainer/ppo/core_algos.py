@@ -707,10 +707,15 @@ def compute_policy_loss(
 
         ratio_iv = torch.exp(old_log_prob - vllm_log_prob)  # (bs, response_length)
         ratio_iv_mean =  torch.sum(ratio_iv * response_mask, dim=-1) / torch.sum(response_mask, dim=-1)  # (bs,)
-        w = torch.clamp(ratio_iv, max=1.0) # 0.2~0.28
+        w = torch.clamp(ratio_iv, max=1.0) # 
         pg_losses = w *  pg_losses
     else:
         ratio_iv = None
+        ratio_iv_mean = None
+
+    # # pengxiang debug 
+    # ratio_iv = None
+    # ratio_iv_mean = None
     
     pg_loss = agg_loss(loss_mat=pg_losses, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
     
