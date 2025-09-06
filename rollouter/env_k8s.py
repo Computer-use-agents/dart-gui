@@ -270,7 +270,7 @@ class RemoteDesktopEnv(gym.Env):
         info = {}
 
         # Handle special actions
-        if action in ['WAIT', 'FAIL', 'DONE'] or (isinstance(action, dict) and action.get('action_type') in ['WAIT', 'FAIL', 'DONE']):
+        if action in ['WAIT', 'FAIL', 'DONE', 'VLLM ERROR'] or (isinstance(action, dict) and action.get('action_type') in ['WAIT', 'FAIL', 'DONE','VLLM ERROR']):
             if action == 'WAIT':
                 time.sleep(pause)
             elif action == 'FAIL':
@@ -279,6 +279,9 @@ class RemoteDesktopEnv(gym.Env):
             elif action == 'DONE':
                 done = True
                 info = {"done": True}
+            elif action == 'VLLM ERROR':
+                done = True
+                info = {"vllm_error": True}
                 
             python_code = action
 
@@ -336,7 +339,7 @@ class RemoteDesktopEnv(gym.Env):
             logger.error(f"k8s: Evaluation failed: {e}")
             # 重新抛出异常，让调用者知道评估失败
             # TODO 回归测试
-            return -1 
+            return -1
             # raise e
 
     def _evaluate_osworld(self, task_config: dict | None = None) -> float:

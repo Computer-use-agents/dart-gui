@@ -187,8 +187,8 @@ class TrajectoryRunnerActor:
                     logger.debug(f"[{self.trace_id}] 模型完整响应: {response}")
 
                     if response is None:
-                        action = "FAIL"
-                        logger.warning(f"[{self.trace_id}] 模型响应为空，设置动作为FAIL - task_id: {self.task_id}, step: {step}")
+                        action = "VLLM ERROR"
+                        logger.warning(f"[{self.trace_id}] 模型响应为空，设置动作为VLLM ERROR - task_id: {self.task_id}, step: {step}")
 
                     else:
                         self._add_text(response)
@@ -202,6 +202,10 @@ class TrajectoryRunnerActor:
                 # ---- interact with env ----
                 if action in ["DONE", "FAIL"]:
                     logger.info(f"[{self.trace_id}] 任务完成 - task_id: {self.task_id}, step: {step}, action: {action}")
+                
+                if action == "VLLM ERROR":
+                    logger.error(f"[{self.trace_id}] 模型调用失败，任务终止 - task_id: {self.task_id}, step: {step}")
+                    # raise RuntimeError(f"Model call failed, task_id: {self.task_id}, step: {step}")
 
                 # Execute the action
                 st = time.time()
@@ -237,6 +241,8 @@ class TrajectoryRunnerActor:
 
             # calculate and save reward
             reward = self.env.evaluate()
+            if action == "VLLM ERROR":
+                reward = -2
             await storage.save_reward.remote(self.task_root, reward)
             logger.info(f"[{self.trace_id}] 任务评估完成 - task_id: {self.task_id}, reward: {reward}")
             
