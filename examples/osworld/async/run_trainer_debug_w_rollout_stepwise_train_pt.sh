@@ -27,6 +27,10 @@ echo "Detected $N_GPUS GPUs on this machine"
 
 MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
 
+#/root/verl/checkpoints/verl_osworld_grpo/vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_20250906_m3ou6di7/global_step_63/actor/huggingface
+
+#/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+
 # /root/verl/checkpoints/verl_osworld_grpo/pt_test5_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250905_91ww0y85/global_step_6/actor/huggingface
 
 # /capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
@@ -53,6 +57,7 @@ export ROOT_DATA_DIR=rollouter/results/pass8_20250904_train15_pass8_gpu2_env20_v
 export RUN_ID=results/pass8_20250904_train15_pass8_gpu2_env20_vllm_logp_maxstep15_tesl_vllm_logp_test6
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
 export EXPERIMENT_NAME=vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export EXPERIMENT_NAME=vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_20250906_m3ou6di7
 # export EXPERIMENT_NAME=pt_test5_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250905_91ww0y85
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
 
@@ -107,7 +112,7 @@ max_steps=15
 
 use_vllm_logp=True
 use_sft_loss=False
-use_token_ids_from_pt=False
+use_token_ids_from_pt=True
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \

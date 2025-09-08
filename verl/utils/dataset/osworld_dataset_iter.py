@@ -171,7 +171,7 @@ class OSWorldAsyncDataset(IterableDataset):
         self.root_data_dir = getattr(self.config, "root_data_dir", ".")
         self.produced_batches = 0
         self.wait_num = 0 
-        self.max_wait_num = config.get("max_wait_num", 40)
+        self.max_wait_num = config.get("max_wait_num", 200)
         
         # 使用静态数据时，按上一批的最后一个task定锚轮换
         self._last_used_task_id = None
@@ -291,6 +291,7 @@ class OSWorldAsyncDataset(IterableDataset):
                 per_task_limit=self.rollout_n,
                 top_mvs=top_mvs,
                 random_state=self.config.get("random_state", None),
+                acc_max=self.config.get("acc_max", 1.0) 
             )
             # datasets = data
             print("len datasets filtered for this step:", len(datasets))

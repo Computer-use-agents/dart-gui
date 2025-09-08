@@ -400,17 +400,17 @@ class StepwiseTrajectorySplitter:
             start = 1  # 正样本从第一个 user 开始
 
         batch_data = []
-        instruction = copy.deepcopy(dataset[1])
-        is_first_turn = True
-        for end in range(3, n_msg, 2):
+        # instruction = copy.deepcopy(dataset[1])
+        # is_first_turn = True
+        for end in range(start+2, n_msg, 2):
             pre_start = max(0, end - self.limit_messages * 2 - 1)
-            start = max(1, end - self.limit_images * 2)
-            assert dataset[start]["role"] == "user"
-            if len(dataset[start]["content"]) == 1:
-                instruction["content"] = instruction["content"][:1]
+            # start = max(1, end - self.limit_images * 2)
+            # assert dataset[start]["role"] == "user"
+            # if len(dataset[start]["content"]) == 1:
+            #     instruction["content"] = instruction["content"][:1]
             # item = self._process_item(dataset, copy.deepcopy(instruction), pre_start, start, end, is_first_turn)
             item = self._process_item(dataset, pre_start, end)
-            is_first_turn = False
+            # is_first_turn = False
 
             # fetch limited images and pixel values from pt file
             # img_end = end // 2
@@ -555,7 +555,10 @@ class StepwiseTrajectorySplitter:
             if rollout_log_prob.shape[0] != valid_response_length:
                 print(f"[ERROR] rollout_log_prob length {rollout_log_prob.shape[0]} does not match valid_response_length {valid_response_length} for {dataset_id}, truncating or padding as needed.")
                 # Create a tensor with same shape as rollout_log_prob filled with -inf
-                rollout_log_prob = torch.zeros_like(torch.zeros(valid_response_length))
+                if valid_response_length < self.max_response_length:
+                    rollout_log_prob = torch.zeros_like(torch.zeros(valid_response_length))
+                else:
+                    rollout_log_prob = torch.zeros_like(torch.zeros(self.max_response_length))
                 rollout_log_prob = verl_F.pad_2d_list_to_length(rollout_log_prob.unsqueeze(0), 0, max_length=self.max_response_length)
             else:    
                 rollout_log_prob = verl_F.pad_2d_list_to_length(rollout_log_prob.unsqueeze(0), 0, max_length=self.max_response_length)
@@ -790,7 +793,9 @@ class StepwiseTrajectorySplitter:
         context_len = self._locate_context(messages)
         raw_prompt = self.processor.apply_chat_template(messages[context_len:], add_generation_prompt=False, tokenize=False)
         raw_prompt = raw_prompt.replace("<|im_start|>system\nYou are a helpful assistant.<|im_end|>", "").strip()
-        raw_prompt = raw_prompt.replace("<|im_start|>assistant\n","").strip()
+        # raw_prompt = raw_prompt.replace("<|im_start|>assistant\n","").strip()
+        raw_prompt = raw_prompt.replace("assistant\n","").strip()
+        raw_prompt = raw_prompt.replace("<|im_start|>","").strip()
         try:
             model_inputs = self.processor(text=[raw_prompt], images=None, return_tensors="pt")
         except Exception as e:

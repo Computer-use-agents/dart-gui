@@ -34,7 +34,8 @@ def filter_fn(
     data: List,
     per_task_limit: int = 8,
     top_mvs: Optional[List[Any]] = None,      # 需要保留的 model_version 列表
-    random_state: Optional[int] = None        # 用于随机采样的随机种子
+    random_state: Optional[int] = None,        # 用于随机采样的随机种子
+    acc_max: float = 1.0
 ) -> List[Dict]:
     """
     过滤规则：
@@ -75,7 +76,9 @@ def filter_fn(
         cnt=("trajectory_id", "size"),
         mean_reward=("reward", "mean")
     )
-    eligible = grp[(grp["cnt"] >= per_task_limit) & (grp["mean_reward"].ge(0) & grp["mean_reward"].lt(1))]
+    # eligible = grp[(grp["cnt"] >= per_task_limit) & (grp["mean_reward"].ge(0) & grp["mean_reward"].lt(1))]
+    eligible = grp[(grp["cnt"] >= per_task_limit) & (grp["mean_reward"].ge(0) & grp["mean_reward"].lt(acc_max))]
+    
     if eligible.empty:
         return []
 

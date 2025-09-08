@@ -1,0 +1,70 @@
+task:
+  task_file: /root/verl/rollouter/evaluation_examples/test_trainset_15.json
+  osworld_root: /root/verl/rollouter/evaluation_examples/examples_processed
+  resume: false
+storage:
+  root: results/pass8_20250907_train_acc_lt_0.7_pass8_gpu2_env18_vllm_logp_maxstep15
+  splitter:
+    output_dir: splitted_traj
+    window_size: 5
+    stride_size: 5
+    max_images: 5
+    max_texts: 35
+model:
+  ckpt_path: /capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+  replicas: 2
+  base_port: 8000
+  host: 0.0.0.0
+  service_port: 15959
+  service_endpoint: http://localhost:15959
+  vllm_params:
+    gpu_memory_utilization: 0.9
+env:
+  server_url: http://47.93.220.59:4999
+  user_token: usr6
+coordinator:
+  max_concurrent_envs: 18
+  max_task_queue_size: 1000
+  rollout_n: 8
+runner:
+  max_steps: 15
+  max_images: 5
+  max_texts: 35
+  write_to_mysql: true
+  rollout_n: 8
+  save_img_pt: false
+  env:
+    server_url: http://47.93.220.59:4999
+    user_token: usr6
+    max_retries: 3
+    action_space: pyautogui
+    screen_size: (1920, 1080)
+    headless: true
+    os_type: Ubuntu
+    require_a11y_tree: false
+  prelaunched_model:
+    base_url: https://sv-98272fdc-4f22-4a25-ba0e-7d51a37448d3-8000-x-defau-51acffd7d9.sproxy.hd-01.alayanew.com:22443/v1
+    model: ui_tars_1.5
+    frequency_penalty: 1
+    max_tokens: 500
+    temperature: 0.7
+    top_p: 1
+    seed: 1
+  model_pool:
+    timeout: 10
+    retries: 5
+    backoff: 2
+    frequency_penalty: 1
+    temperature: 1.0
+    top_p: 1
+    max_tokens: 500
+    seed: 1
+    logprobs: true
+    return_tokens_as_token_ids: true
+    ckpt_path: /capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+mysql:
+  username: teamx
+  password: '#C!D123^-c12'
+  host: 112.125.88.107
+  port: 5906
+  database: TeamX_BIGAI

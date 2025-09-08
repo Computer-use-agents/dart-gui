@@ -1,11 +1,20 @@
 task:
   #task_root: "./evaluation_examples/"  # 从此目录中读取修改时间最靠后的json，作为任务列表
-  task_file: "/root/verl/rollouter/evaluation_examples/test_trainset_15.json"
-  osworld_root: "/root/verl/rollouter/evaluation_examples/examples_processed"  # root of task detail json, organized by domain
+  task_file: /root/verl/rollouter/evaluation_examples/test_trainset_hard_plan_success_26.json
+  # 
+  
+  # /root/verl/rollouter/evaluation_examples/test_trainset_hard_plan_success_26.json
+  # /root/verl/rollouter/evaluation_examples/test_trainset_libreoffice_calc.json
+  #"/root/verl/rollouter/evaluation_examples/test_trainset_90.json"
+  osworld_root: /root/verl/rollouter/evaluation_examples/examples_processed_o3_plan_image 
+  #/root/verl/rollouter/evaluation_examples/examples_processed
+  # /root/verl/rollouter/evaluation_examples/examples_processed_o3_plan_image  # root of task detail json, organized by domain
   resume: False # 是否忽略已经跑出结果的task，测pass@1时可设为True
 
-storage:
-  root: "results/pass8_20250904_train15_pass8_gpu2_env20_vllm_logp_maxstep15_tesl_vllm_logp_test6" ##runid of trainer
+storage: 
+  root: results/planner_pass8_20250907_train_pass8_gpu3_env28_vllm_logp_maxstep15
+  
+  #"results/pass8_20250907_train_single_app_cal_pass8_gpu2_env18_vllm_logp_maxstep15" ##runid of trainer
   
   splitter:
     output_dir: "splitted_traj"  # 基于storage.root的相对路径
@@ -15,7 +24,11 @@ storage:
     max_texts: &max_texts 35   # 最多保留的文本条数
 
 model:
-  ckpt_path: &default_ckpt_path "/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"
+  ckpt_path: &default_ckpt_path /capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+  
+  # /root/verl/checkpoints/verl_osworld_grpo/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50/actor/huggingface
+  
+  #"/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"
   
   
   #  "/root/verl/checkpoints/verl_osworld_grpo/pt_test5_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250905_91ww0y85/global_step_6/actor/huggingface"
@@ -27,7 +40,7 @@ model:
   #"/root/verl/checkpoints/verl_osworld_grpo/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50/actor/huggingface"
   #"/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"
   #"/root/verl/checkpoints/verl_osworld_grpo/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50/actor/huggingface" #"/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"
-  replicas:   3          # 并行启动的vllm serve数量，可以写很大，实际最大不超过GPU数
+  replicas:  3          # 并行启动的vllm serve数量，可以写很大，实际最大不超过GPU数
   base_port:  8000
   host: &service_host "0.0.0.0"
   service_port: &service_port 15959
@@ -38,7 +51,7 @@ model:
 env:
   server_url: &server "http://47.93.220.59:4999"
   user_token: &token "4Px6dAeZbVcYfGhUjMk9oL2iN3wS5rT"
-  #7W7sE4pR2tY84|1oP3ZX5cV9bN6mKOL
+  #7W7sE4pR2tY84I1oP3zX5cV9bN6mK0L
   # 4Px6dAeZbVcYfGhUjMk9oL2iN3wS5rT
 # qW7sE4pR2tY8uI1oP3zX5cV9bN6mK0e
 # qW7sE4pR2tY8uI1oP3zX5cV9bN6mK0L
@@ -49,7 +62,7 @@ coordinator:
 
 
 runner:
-  max_steps:  15
+  max_steps:  30
   max_images: *max_images    #在storage.splitter的同名字段中修改
   max_texts:  *max_texts    
   write_to_mysql: True     # 数据是否保存至mysql中
