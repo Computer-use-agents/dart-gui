@@ -133,8 +133,9 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             max_response_length=self.config.data.max_response_length,
                             truncation=self.config.data.truncation,
                             use_vllm_logp=self.config.actor_rollout_ref.actor.use_vllm_logp,
-                            use_token_ids_from_pt=self.config.actor_rollout_ref.actor.get("use_token_ids_from_pt", False)
-                        )  
+                            use_token_ids_from_pt=self.config.actor_rollout_ref.actor.get("use_token_ids_from_pt", False),
+                            traj_filter=self.config.actor_rollout_ref.actor.get("use_traj_filter", False),
+                        )
                     else:
                         raise ValueError(f"Unhandled splitter type: {self.config.trainer}")
                     old_batch = batch

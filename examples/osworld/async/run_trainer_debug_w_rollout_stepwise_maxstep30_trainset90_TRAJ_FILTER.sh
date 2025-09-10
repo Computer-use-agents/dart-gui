@@ -127,7 +127,6 @@ python3 -m verl.trainer.main_ppo_async \
     +data.steps_per_epoch=200 \
     +data.train_batch_size_min=${train_bz_min} \
     +data.train_batch_size_max=${train_bz_max} \
-    +data.use_traj_filter=${use_traj_filter} \
     algorithm.adv_estimator=${adv_estimator} \
     algorithm.use_kl_in_reward=${use_kl_in_reward} \
     algorithm.kl_ctrl.kl_coef=${kl_coef} \
@@ -155,6 +154,7 @@ python3 -m verl.trainer.main_ppo_async \
     +actor_rollout_ref.actor.use_vllm_logp=${use_vllm_logp} \
     +actor_rollout_ref.actor.use_sft_loss=${use_sft_loss} \
     +actor_rollout_ref.actor.use_token_ids_from_pt=${use_token_ids_from_pt} \
+    +actor_rollout_ref.actor.use_traj_filter=${use_traj_filter} \
     "trainer.logger=['console','swanlab']" \
     trainer.project_name='verl_osworld_grpo' \
     trainer.experiment_name=$EXPERIMENT_NAME \
