@@ -25,17 +25,7 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/Single_APP_Office_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250909_s0l3ijcu/global_step_12/actor/huggingface
-# /root/verl/checkpoints/verl_osworld_grpo/vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_20250906_m3ou6di7/global_step_63/actor/huggingface
-
-#/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
-
-# /root/verl/checkpoints/verl_osworld_grpo/pt_test5_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250905_91ww0y85/global_step_6/actor/huggingface
-
-# /capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
-
-
-
+MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
 #/root/verl/checkpoints/verl_osworld_grpo/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50/actor/huggingface
 
 #/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
@@ -52,16 +42,19 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 # export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
 # export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
 
-export ROOT_DATA_DIR=rollouter/results/pass8_20250909_libreoffice_calc_pass8_gpu2_env18_vllm_logp_maxstep30
-export RUN_ID=results/pass8_20250909_libreoffice_calc_pass8_gpu2_env18_vllm_logp_maxstep30
+export ROOT_DATA_DIR=rollouter/results/from_scratch_pass8_20250909_train90_pass8_gpu4_env48_vllm_logp_maxstep30_vllm_logp
+export RUN_ID=results/from_scratch_pass8_20250909_train90_pass8_gpu4_env48_vllm_logp_maxstep30_vllm_logp
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
+export EXPERIMENT_NAME=FROM_SCRATCH_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export EXPERIMENT_NAME=RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_v3bba5x0
+# export EXPERIMENT_NAME=RESUME_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_cf25sna0
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
 
-# export EXPERIMENT_NAME=Single_APP_Office_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-
-export EXPERIMENT_NAME=Single_APP_Office_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250909_s0l3ijcu
-
-
+# export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
+# export RUN_ID=pengxiang_test_0802_max_variance
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.131.161:15959
+export ROLLOUT_SERVER_URL=http://172.19.140.83:15959
 
 # training parameters
 adv_estimator=grpo
@@ -87,7 +80,6 @@ train_bz_max=8
 train_prompt_bsz=8
 rollout_n=8
 train_prompt_mini_bsz=32
-
 # Performance Related Parameter
 sp_size=4
 use_dynamic_bsz=False
@@ -104,11 +96,12 @@ splitter=stepwise
 splitter_parallel=True
 window_size=5 
 stride_size=5
-max_steps=15
+max_steps=30
 
 use_vllm_logp=True
 use_sft_loss=False
 use_token_ids_from_pt=True
+# use_traj_filter=True
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
@@ -166,11 +159,11 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=3 \
+    trainer.save_freq=2 \
     trainer.test_freq=10 \
     trainer.val_before_train=False \
     trainer.total_epochs=1 \
-    trainer.max_actor_ckpt_to_keep=2 \
+    trainer.max_actor_ckpt_to_keep=10 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \

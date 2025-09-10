@@ -15,7 +15,7 @@ storage:
     max_texts: &max_texts 35   # 最多保留的文本条数
 
 model:
-  ckpt_path: &default_ckpt_path "/root/verl/checkpoints/verl_osworld_grpo/RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_v3bba5x0/global_step_10/actor/huggingface"
+  ckpt_path: &default_ckpt_path "/root/verl/checkpoints/verl_osworld_grpo/RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_v3bba5x0/global_step_8/actor/huggingface"
   
   #"/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"
   

@@ -25,7 +25,7 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_v3bba5x0/global_step_8/actor/huggingface
+MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_v3bba5x0/global_step_10/actor/huggingface
 #/root/verl/checkpoints/verl_osworld_grpo/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50/actor/huggingface
 
 #/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
@@ -54,7 +54,7 @@ export EXPERIMENT_NAME=RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://:15959
+export ROLLOUT_SERVER_URL=http://172.19.140.42:15959
 
 # training parameters
 adv_estimator=grpo
@@ -79,7 +79,7 @@ train_bz_min=4
 train_bz_max=8
 train_prompt_bsz=8
 rollout_n=8
-train_prompt_mini_bsz=64
+train_prompt_mini_bsz=32
 # Performance Related Parameter
 sp_size=4
 use_dynamic_bsz=False
@@ -101,6 +101,7 @@ max_steps=30
 use_vllm_logp=True
 use_sft_loss=False
 use_token_ids_from_pt=True
+use_traj_filter=True
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \

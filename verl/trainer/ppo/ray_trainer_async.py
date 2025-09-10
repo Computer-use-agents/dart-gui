@@ -468,20 +468,20 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
             import random
             dataset_ids = batch.non_tensor_batch["dataset_ids"]
 
-            # if len(batch) > n_mod:
-            #     print("[Warning] batch size larger than world size, need downsample! current batch size:", len(batch), n_mod)
-            #     idx = random.choices(list(range(len(dataset_ids))), k=n_mod)
-            #     downsampled_batch = batch.select_idxs(idx)
-            #     return downsampled_batch
-            # else:
-            print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
-            target_size = (len(batch) // n_mod + 1) * n_mod
-            up_sample_size = target_size - len(batch)
-            print("Need upsample", up_sample_size)
-            idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
-            upsampel_batch = batch.select_idxs(idx)
-            batch = DataProto.concat([batch, upsampel_batch])
-            print("After upsample", len(batch))
+            if len(batch) > 1024:
+                print("[Warning] batch size larger than 1024, need downsample! current batch size:", len(batch), n_mod)
+                idx = random.choices(list(range(len(dataset_ids))), k=n_mod)
+                downsampled_batch = batch.select_idxs(idx)
+                return downsampled_batch
+            else:
+                print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
+                target_size = (len(batch) // n_mod + 1) * n_mod
+                up_sample_size = target_size - len(batch)
+                print("Need upsample", up_sample_size)
+                idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
+                upsampel_batch = batch.select_idxs(idx)
+                batch = DataProto.concat([batch, upsampel_batch])
+                print("After upsample", len(batch))
         except Exception as e:
             print("_up_sample failed due to", e)
 

@@ -419,8 +419,8 @@ class TrajectoryRunnerActor:
         parsed_responses = parse_action_to_structure_output(
             response,
             factor=1000,  # TODO: Make this configurable
-            origin_resized_height=image_size[0],
-            origin_resized_width=image_size[1],
+            origin_resized_height=image_size[1],
+            origin_resized_width=image_size[0],
             model_type="qwen25vl",
             max_pixels=16384*28*28,
             min_pixels=100*28*28
@@ -430,8 +430,8 @@ class TrajectoryRunnerActor:
         # Convert to pyautogui code
         action_code = parsing_response_to_pyautogui_code(
             parsed_responses,
-            image_height=image_size[0],
-            image_width=image_size[1],
+            image_height=image_size[1],
+            image_width=image_size[0],
             input_swap=False  # TODO: Make this configurable
         )
         

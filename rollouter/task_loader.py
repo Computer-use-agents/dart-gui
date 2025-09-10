@@ -180,10 +180,30 @@ def build_task(raw: Dict, osworld_root: Path, use_call_user: bool = False) -> Ta
 
     instruction = task_data["instruction"]
 
+    # if "human-ground-truth" in task_data and "single-action" in task_data["human-ground-truth"]:
+    #     plan = task_data["human-ground-truth"]["single-action"]
+    #     plan_text = "\n".join(plan)
+    #     instruction = instruction.strip() + "\nHere is an instruction to help you complete the task: \n" + plan_text
     if "human-ground-truth" in task_data and "single-action" in task_data["human-ground-truth"]:
         plan = task_data["human-ground-truth"]["single-action"]
         plan_text = "\n".join(plan)
-        instruction = instruction.strip() + "\nHere is an instruction to help you complete the task: \n" + plan_text
+
+        plan_mode = "always"
+        use_plan = False
+        if plan_mode == "always":
+            use_plan = True
+        elif plan_mode == "never":
+            use_plan = False
+        elif plan_mode == "random":
+            import random
+            use_plan = random.choice([True, False])
+        else:
+            raise ValueError(f"Unknown plan_mode: {plan_mode}")
+        
+        if use_plan:
+            instruction = instruction.strip() + "\nHere is an instruction to help you complete the task: \n" + plan_text
+
+            
 
     system_prompt = COMPUTER_USE_PROMPT if not use_call_user else COMPUTER_USE_PROMPT_WITH_CALL_USER
     messages = [
