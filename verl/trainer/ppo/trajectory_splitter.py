@@ -693,7 +693,13 @@ class StepwiseTrajectorySplitter:
                 final_input_ids.append(segment)
             else:
                 segment = [self.img_ids["\n"]] + [self.img_ids["<|im_start|>"]] + [self.img_ids["assistant"]] + [self.img_ids["\n"]]
-                segment = torch.cat([torch.tensor(segment), input_ids[text_num]], dim=0)
+                #pengxiang debug
+                try:
+                    segment = torch.cat([torch.tensor(segment), input_ids[text_num]], dim=0)
+                except Exception as e:
+                    print("Error in concatenating input_ids:", e)
+                    print(f"ERROR in TRACE {dataset_id}. Index: {text_num}, input_ids length: {len(input_ids)}")
+                    raise e
                 text_num += 1
                 final_input_ids.append(segment)
         final_input_ids.append(torch.tensor([self.img_ids["\n"]]))

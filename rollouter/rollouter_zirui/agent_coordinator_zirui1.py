@@ -4,9 +4,12 @@ import copy
 import time
 import logging
 import uuid
+import os
+import json
 from typing import List, Dict, Set, Optional
 from trajectory_runner import TrajectoryRunnerActor, ResourceExhaustedException
 from log_config import setup_logging
+from datetime import datetime
 
 # 设置统一的日志系统
 setup_logging()
@@ -42,6 +45,8 @@ class AgentCoordinator:
             'total_failed': 0,
             'start_time': time.time()
         }
+        self.task_info_dir = "task_info"
+        os.makedirs(self.task_info_dir, exist_ok=True)
         
         logger.info(f"AgentCoordinator初始化 - 最大并发环境数: {self.max_concurrent_envs}, 最多填充任务: {self.max_task_queue_size} 次, rollout_n: {self.rollout_n}")
         logger.info(f"环境清理配置 - 清理间隔: {self.env_cleanup_interval}秒, 清理超时: {self.env_cleanup_timeout}秒")
@@ -75,7 +80,7 @@ class AgentCoordinator:
 
     def _generate_trace_id(self) -> str:
         """生成唯一的trace_id"""
-        return f"trace_{uuid.uuid4().hex[:12]}_{int(time.time())}"
+        return f"trace-{uuid.uuid4().hex[:12]}-{int(time.time())}"
     
 
     
@@ -85,10 +90,10 @@ class AgentCoordinator:
             # 检查是否需要清理环境
             current_time = time.time()
             time_since_last_cleanup = current_time - self.last_env_cleanup_time
-            # logger.info(f"环境清理检查 - 距离上次清理: {time_since_last_cleanup:.1f}秒, 清理间隔: {self.env_cleanup_interval}秒")
+            logger.info(f"环境清理检查 - 距离上次清理: {time_since_last_cleanup:.1f}秒, 清理间隔: {self.env_cleanup_interval}秒")
             
             if time_since_last_cleanup < self.env_cleanup_interval:
-                # logger.info(f"跳过环境清理 - 还没到清理时间 ({time_since_last_cleanup:.1f}s < {self.env_cleanup_interval}s)")
+                logger.info(f"跳过环境清理 - 还没到清理时间 ({time_since_last_cleanup:.1f}s < {self.env_cleanup_interval}s)")
                 return  # 还没到清理时间
             
             self.last_env_cleanup_time = current_time
@@ -234,7 +239,27 @@ class AgentCoordinator:
         # 由于我们无法直接从Ray对象引用中获取service_id，
         # 我们需要在任务启动时记录，在任务完成时移除
         pass
-
+    
+    async def save_task_info_to_jsonl(self, task_id, traj_counts, success_rate, dynamic_rollout_n):
+        """保存任务信息到当前poll_count对应的JSONL文件"""
+        task_info = {
+            "task_id": task_id,
+            "traj_counts": traj_counts,
+            "success_rate": float(success_rate),
+            "dynamic_rollout_n": int(dynamic_rollout_n),
+            "timestamp": datetime.now().isoformat(),
+            "poll_count": self.poll_count  # 使用实例的poll_count
+        }
+        
+        jsonl_file = os.path.join(self.task_info_dir, f"task_info_poll{self.poll_count}.jsonl")  # 使用实例的poll_count
+        
+        try:
+            with open(jsonl_file, 'a', encoding='utf-8') as f:
+                f.write(json.dumps(task_info, ensure_ascii=False) + '\n')
+            
+            # logger.debug(f"任务信息已保存到 {jsonl_file}")
+        except Exception as e:
+            logger.error(f"保存任务信息到{jsonl_file}失败: {e}")
     async def start_rollout(self, task_loader, runner_cfg, model_pool, storage, mysql_writer):
         """主循环：持续处理任务"""
         # 确保异常处理器已设置（现在event loop已经运行）
@@ -264,9 +289,9 @@ class AgentCoordinator:
                     break
                 
                 # 0.定期清理孤立的环境
-                # logger.info("准备调用 _cleanup_orphaned_environments 方法")
+                logger.info("准备调用 _cleanup_orphaned_environments 方法")
                 await self._cleanup_orphaned_environments(runner_cfg)
-                # logger.info("_cleanup_orphaned_environments 方法调用完成")
+                logger.info("_cleanup_orphaned_environments 方法调用完成")
                 
                 # 1. 填充任务队列（最多填充MAX_TASK_QUEUE_SIZE次）
                 if (self.task_queue.empty() and 
@@ -279,28 +304,27 @@ class AgentCoordinator:
                         self.poll_count += 1  # 增加填充次数
                         added_count = 0
                         
-                        for task in new_tasks_batch:
-                            task_id = task.get('task_config', {}).get('raw', {}).get('task_id', 'unknown')
+                        # 先按成功率排序任务
+                        sorted_tasks = task_loader.sort_tasks_by_success_rate(new_tasks_batch)
+                        
+                        for task in sorted_tasks:
+                            task_id = task.get('task_config', {}).get('raw', {}).get('task_id', 'unknown') # debug liuyang
                             
-                            finished_rollouts = task.get('task_config', {}).get('raw', {}).get('finished_rollouts', 0)
-                            
-                            # 为每个任务创建rollout_n个副本
-                            for rollout_idx in range(finished_rollouts, self.rollout_n):
-                                # 为每个任务生成trace_id
+                            # 获取动态 rollout_n 值
+                            traj_counts, success_rate, dynamic_rollout_n = task_loader.get_dynamic_rollout_n(task_id, self.rollout_n) # 成功率高于阈值的task也会采样，实时监测，一旦成功率低于阈值，会重新采样self.rollout_n条轨迹
+                            await self.save_task_info_to_jsonl(task_id, traj_counts, success_rate, dynamic_rollout_n)
+                            # 为每个任务创建 dynamic_rollout_n 个副本
+                            for rollout_idx in range(dynamic_rollout_n):
                                 task_with_trace = copy.deepcopy(task)
                                 trace_id = self._generate_trace_id()
                                 task_with_trace['trace_id'] = trace_id
                                 task_with_trace['rollout_idx'] = rollout_idx  # 添加rollout索引
+                                task_with_trace['dynamic_rollout_n'] = dynamic_rollout_n  # 添加动态rollout_n信息
                                 
                                 await self.task_queue.put(task_with_trace)
                                 added_count += 1
                                 
-                                logger.info(
-                                    f"[{trace_id}] 添加任务到队列 - task_id: {task_id}, "
-                                    f"rollout_idx: {rollout_idx + 1}/{self.rollout_n}, "
-                                    f"已完成: {finished_rollouts}"
-                                )
-                        
+                                logger.info(f"[{trace_id}] 添加任务到队列 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{dynamic_rollout_n}")
                         logger.info(f"第 {self.poll_count} 次填充任务完成，添加了 {added_count} 个任务，当前队列大小: {self.task_queue.qsize()}")
                     else:
                         # 没有新任务但未达到填充次数限制，等待一下再试
@@ -319,9 +343,10 @@ class AgentCoordinator:
                         trace_id = task_info.get('trace_id', 'unknown_trace')
                         task_id = task_info.get('task_config', {}).get('raw', {}).get('task_id', 'unknown')
                         rollout_idx = task_info.get('rollout_idx', 0)
-                        
-                        logger.info(f"[{trace_id}] 开始启动任务 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{self.rollout_n}")
-                        
+                        dynamic_rollout_n = task_info.get('dynamic_rollout_n', self.rollout_n)
+                            
+                        logger.info(f"[{trace_id}] 开始启动任务 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{dynamic_rollout_n}")
+                            
                         try:
                             actor = TrajectoryRunnerActor.options(num_cpus=0.5).remote(task_info, runner_cfg)
                             task_ref = actor.run_episode.remote(model_pool, storage, mysql_writer)
@@ -338,11 +363,11 @@ class AgentCoordinator:
                            
                             self.stats['total_started'] += 1
                             started_count += 1
-                            logger.info(f"[{trace_id}] 任务启动成功 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{self.rollout_n}, 当前活跃任务数: {len(self.active_tasks)}")
+                            logger.info(f"[{trace_id}] 任务启动成功 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{dynamic_rollout_n}, 当前活跃任务数: {len(self.active_tasks)}")
                         except ray.exceptions.RayTaskError as e:
                             logger.warning(f"[{trace_id}] Ray任务创建失败: {e}")
                         except Exception as e:
-                            logger.error(f"[{trace_id}] 启动任务失败 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{self.rollout_n}, 错误: {e}")
+                            logger.error(f"[{trace_id}] 启动任务失败 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{dynamic_rollout_n}, 错误: {e}")
                             
                     except asyncio.TimeoutError:
                         break  # 队列为空，跳出循环

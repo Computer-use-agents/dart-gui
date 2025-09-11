@@ -5,7 +5,7 @@ task:
   resume: False # 是否忽略已经跑出结果的task，测pass@1时可设为True
 
 storage:
-  root: "results/pass8_20250909_libreoffice_calc_pass8_gpu2_env18_vllm_logp_maxstep30" ##runid of trainer
+  root: "results/pass8_20250909_libreoffice_calc_pass8_gpu2_env18_vllm_logp_maxstep50" ##runid of trainer
   
   splitter:
     output_dir: "splitted_traj"  # 基于storage.root的相对路径
@@ -15,7 +15,9 @@ storage:
     max_texts: &max_texts 35   # 最多保留的文本条数
 
 model:
-  ckpt_path: &default_ckpt_path "/root/verl/checkpoints/verl_osworld_grpo/Single_APP_Office_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250909_s0l3ijcu/global_step_12/actor/huggingface"
+  ckpt_path: &default_ckpt_path "/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"
+  
+  #"/root/verl/checkpoints/verl_osworld_grpo/Single_APP_Office_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250909_s0l3ijcu/global_step_12/actor/huggingface"
   
   #"/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"
   
@@ -32,7 +34,7 @@ model:
     gpu_memory_utilization: 0.9
 env:
   server_url: &server "http://47.93.220.59:4999"
-  user_token: &token "user5"
+  user_token: &token "qW7sE4pR2tY8uI1oP3zX5cV9bN6mK0L"
   #7W7sE4pR2tY84|1oP3ZX5cV9bN6mKOL
   # 4Px6dAeZbVcYfGhUjMk9oL2iN3wS5rT
 # qW7sE4pR2tY8uI1oP3zX5cV9bN6mK0e
@@ -44,7 +46,7 @@ coordinator:
 
 
 runner:
-  max_steps:  30
+  max_steps:  50
   max_images: *max_images    #在storage.splitter的同名字段中修改
   max_texts:  *max_texts    
   write_to_mysql: True     # 数据是否保存至mysql中

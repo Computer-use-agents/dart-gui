@@ -134,20 +134,20 @@ def get_result(target_dir,filter_json = None):
     daily_all = vlc + thunderbird + chrome
     professional_all = gimp + vs_code
     
-    if office_all:
-        office_rate = sum(office_all) / len(office_all) * 100
-        stats['office'] = (len(office_all), sum(office_all), office_rate)
-        print(f"Office Success Rate: {office_rate:.3f}%")
+    # if office_all:
+    #     office_rate = sum(office_all) / len(office_all) * 100
+    #     stats['office'] = (len(office_all), sum(office_all), office_rate)
+    #     print(f"Office Success Rate: {office_rate:.3f}%")
     
-    if daily_all:
-        daily_rate = sum(daily_all) / len(daily_all) * 100
-        stats['daily'] = (len(daily_all), sum(daily_all), daily_rate)
-        print(f"Daily Success Rate: {daily_rate:.3f}%")
+    # if daily_all:
+    #     daily_rate = sum(daily_all) / len(daily_all) * 100
+    #     stats['daily'] = (len(daily_all), sum(daily_all), daily_rate)
+    #     print(f"Daily Success Rate: {daily_rate:.3f}%")
     
-    if professional_all:
-        prof_rate = sum(professional_all) / len(professional_all) * 100
-        stats['professional'] = (len(professional_all), sum(professional_all), prof_rate)
-        print(f"Professional Success Rate: {prof_rate:.3f}%")
+    # if professional_all:
+    #     prof_rate = sum(professional_all) / len(professional_all) * 100
+    #     stats['professional'] = (len(professional_all), sum(professional_all), prof_rate)
+    #     print(f"Professional Success Rate: {prof_rate:.3f}%")
     
     if infeasible_result:
         infeasible_rate = sum(infeasible_result)/len(infeasible_result)*100
@@ -248,22 +248,33 @@ def main():
 
     # baseline_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_0"
     # baseline_dir = "/capacity/userdata/vcfenxd75jiv/workshops/workshop-3c968795-bb00-4072-bb11-ee466e4046b2/computer-use-rollout-dev-zzh/results/pass@1_UI-TARS-1.5-7B"
-    baseline_dir= "validation/results/ui_tars_1.5/trainset152"
+    # baseline_dir= "validation/results/ui_tars_1.5/trainset152" 
+    baseline_dir= "/root/verl/validation/results/ui_tars_1.5/maxstep15_trainset15"
+    # baseline_dir= "/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_train154_maxstep30_tmp07_uitars"
+    # baseline_dir="/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_train154_maxstep30_tmp0_uitars"
+    # baseline_dir="/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_train154_maxstep30_tmp0_20250830_1230_step130"
     # baseline_dir="/root/verl/validation/results/ui_tars_1.5/trainset62"
 
     # current_dir = "/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_trainset90_px_08220031_step30"
     # current_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_31"
     # # current_dir = "validation/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_22"
     # current_dir = "/root/verl/validation/results/planner_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250908_cyj5yzdp/global_step_24"
-    current_dir = "/root/verl/validation/results/FROM_SCRATCH_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250909_qktoqon9/global_step_38"
+    # current_dir = "/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_train154_maxstep30_tmp07_px_step74"
+    current_dir = "validation/results/FROM_SCRATCH_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250909_qktoqon9/global_step_76"
+    current_dir= "/root/verl/validation/results/liuyang_dynamic_sampling_maxstep15/global_step_32"
     # current_dir="validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50_62_max15"
     # current_dir = "validation/results/wo_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_mpo87w96/global_step_36"
     # current_dir = "validation/results/w_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_w4jryw5c/global_step_16"
     #
     # current_dir = '/root/verl/validation/results/RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_v3bba5x0/global_step_4'
     # 对比两个实验
-    # filter_json="validation/evaluation_examples/test_trainset_hard_plan_success_26.json"
     filter_json=None
+    filter_json="validation/evaluation_examples/test_trainset_15.json"
+    # filter_json="validation/evaluation_examples/test_trainset_hard_plan_success_26.json"
+    # current_dir="/root/verl/validation/results/RANDOM_planner_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250910_0p3mszz3/global_step_62"
+    
+
+
     compare_results(baseline_dir, current_dir, "Baseline", "Ours",filter_json=filter_json)
     
     # 也可以对比多个实验
