@@ -34,17 +34,24 @@ def main(config):
 # Define a function to run the PPO-like training process
 def run_ppo(config) -> None:
     # Check if Ray is not initialized
+
     if not ray.is_initialized():
         # Initialize Ray with a local cluster configuration
         # Set environment variables in the runtime environment to control tokenizer parallelism,
         # NCCL debug level, VLLM logging level, and allow runtime LoRA updating
         # `num_cpus` specifies the number of CPU cores Ray can use, obtained from the configuration
-        ray.init(
-            runtime_env={"env_vars": {"TOKENIZERS_PARALLELISM": "true", "NCCL_DEBUG": "WARN", "VLLM_LOGGING_LEVEL": "WARN", "VLLM_ALLOW_RUNTIME_LORA_UPDATING": "true"}},
-            num_cpus=config.ray_init.num_cpus,
-            dashboard_host="0.0.0.0",
-            # object_store_memory=800 * 1024**3,  # 00GB for object store
-        )
+        if config.trainer.nnodes > 1:
+            ray.init(
+                dashboard_host="0.0.0.0",
+                runtime_env={"env_vars": {"TOKENIZERS_PARALLELISM": "true", "NCCL_DEBUG": "WARN", "VLLM_LOGGING_LEVEL": "WARN", "VLLM_ALLOW_RUNTIME_LORA_UPDATING": "true"}},
+            )
+        else:
+            ray.init(
+                runtime_env={"env_vars": {"TOKENIZERS_PARALLELISM": "true", "NCCL_DEBUG": "WARN", "VLLM_LOGGING_LEVEL": "WARN", "VLLM_ALLOW_RUNTIME_LORA_UPDATING": "true"}},
+                num_cpus=config.ray_init.num_cpus,
+                dashboard_host="0.0.0.0",
+                object_store_memory=500 * 1024**3,  # 00GB for object store
+            )
 
     # Create a remote instance of the TaskRunner class, and
     # Execute the `run` method of the TaskRunner instance remotely and wait for it to complete

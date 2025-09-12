@@ -12,6 +12,9 @@ import random
 from prompts import COMPUTER_USE_PROMPT, COMPUTER_USE_PROMPT_WITH_CALL_USER
 from log_config import setup_logging
 
+# 添加 MySQL ORM 导入
+from mysql_rollout import MySQLRolloutORM, DB_CONFIG
+
 # 设置统一的日志系统
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -25,6 +28,34 @@ class TaskLoader:
         self._latest_sha: Optional[str] = None
         self.storage_root = storage_root
         self.resume = task_cfg.resume
+        # 动态 rollout_n 相关参数
+        self.success_rate_threshold = getattr(task_cfg, 'success_rate_threshold', 0.6)  # 成功率阈值
+        self.min_rollout_n = getattr(task_cfg, 'min_rollout_n', 1)  # 最小 rollout_n
+        self.run_id = getattr(task_cfg, 'run_id', None)  # 运行ID，用于查询数据库
+        self.db_enabled = getattr(task_cfg, 'db_enabled', False)  # 是否启用数据库功能
+        
+        # 初始化数据库连接
+        self.mysql_orm = None
+        if self.db_enabled and self.run_id:
+            try:
+                self.mysql_orm = MySQLRolloutORM(DB_CONFIG)
+                logger.info("MySQL ORM 初始化成功")
+            except Exception as e:
+                logger.error(f"MySQL ORM 初始化失败: {e}")
+                self.mysql_orm = None
+        
+        # # 任务采样计数字典
+        # self.task_sample_count: Dict[str, int] = {}
+        # import pdb; pdb.set_trace()
+        # 任务成功率映射
+        self.mapping_task_success: Dict[str, float] = {}
+        # 任务轨迹数映射
+        self.mapping_task_counts: Dict[str, float] = {}
+        self.mapping_task_dynamic_n: Dict[str, float] = {}
+
+        
+        # 定期更新任务成功率映射
+        self._update_mapping_task_success()
 
     # def poll_for_tasks(self) -> List[Dict]:
     #     """find new tasks json file
@@ -43,6 +74,9 @@ class TaskLoader:
         else return []
         """
         self._maybe_refresh_dataset()
+        
+        # 更新任务成功率映射
+        self._update_mapping_task_success()
         
         tasks_list = [task.to_dict() for task in self._tasks]
         random.shuffle(tasks_list)
@@ -154,6 +188,71 @@ class TaskLoader:
                 h.update(chunk)
         return h.hexdigest()
 
+    def _update_mapping_task_success(self):
+        """更新任务成功率映射"""
+        if not self.mysql_orm or not self.run_id:
+            logger.info("数据库未启用或未配置 run_id，跳过更新任务成功率映射")
+            return
+        
+        try:
+            # 获取最新的模型版本的成功率数据
+            # avg_nonneg, count_all, distinct_task_cnt, mapping_task_success = \
+            #     self.mysql_orm.get_nth_newest_model_success(self.run_id, 1)
+            avg_nonneg, count_all, distinct_task_cnt, mapping_task_success, mapping_task_counts = self.mysql_orm.get_latest_success_for_each_task(self.run_id, self.mapping_task_dynamic_n)
+            self.mapping_task_success = mapping_task_success
+            self.mapping_task_counts = mapping_task_counts
+            logger.info(f"更新任务成功率和轨迹数映射完成，共 {len(mapping_task_success)} 个任务")
+        except Exception as e:
+            logger.error(f"更新任务成功率和轨迹数映射失败: {e}")
+
+    def get_dynamic_rollout_n(self, task_id: str, rollout_n) -> int:
+        """
+        根据任务成功率动态计算 rollout_n 值
+        - 成功率低于阈值的任务保持最大采样次数
+        - 成功率高于阈值的任务采用反比例函数调整采样次数
+        """
+        # 获取任务成功率，默认为0
+        success_rate = self.mapping_task_success.get(task_id, 0.0)
+        traj_counts = self.mapping_task_counts.get(task_id, 0.0)
+        
+        # # 获取该任务已被采样的次数
+        # sample_count = self.task_sample_count.get(task_id, 0)
+        
+        # 如果成功率低于阈值，保持最大采样次数
+        if success_rate < self.success_rate_threshold:
+            dynamic_rollout_n = rollout_n
+            logger.info(f"任务 {task_id} 轨迹数 {traj_counts} 成功率 {success_rate:.2%} 低于阈值 {self.success_rate_threshold:.2%}，使用默认采样次数: {dynamic_rollout_n}")
+        else:
+            # weight = 1.0 / (success_rate * (sample_count + 1))
+            # 为了避免除零和过小值，增加一个小常数
+            # weight = 1.0 / (success_rate * (sample_count + 1) + 1e-8)
+            dynamic_rollout_n = int(9 / success_rate - 7)
+            dynamic_rollout_n = max(self.min_rollout_n, dynamic_rollout_n)
+            logger.info(f"任务 {task_id} 轨迹数 {traj_counts} 成功率 {success_rate:.2%} 高于阈值 {self.success_rate_threshold:.2%}，使用动态采样次数: {dynamic_rollout_n} (计算值: {int(9 / success_rate - 7)})")
+
+        
+        # # 更新采样计数
+        # self.task_sample_count[task_id] = sample_count + 1
+        self.mapping_task_dynamic_n[task_id] = dynamic_rollout_n
+        logger.info(f"任务 {task_id} 的动态 rollout_n: {dynamic_rollout_n} 成功率: {success_rate:.2%}")
+        return traj_counts, success_rate, dynamic_rollout_n
+
+    def sort_tasks_by_success_rate(self, tasks: List[Dict]) -> List[Dict]:
+        """
+        根据任务成功率对任务进行排序
+        - 未在映射中的任务排在前面
+        - 映射中的任务按成功率升序排列
+        """
+        def sort_key(task):
+            task_id = task.get('task_config', {}).get('raw', {}).get('task_id', '')
+            # 如果任务不在成功率映射中，排在前面（返回-1）
+            if task_id not in self.mapping_task_success:
+                return (-1, 0)  # (优先级, 成功率)
+            # 如果任务在映射中，按成功率排序
+            return (0, self.mapping_task_success[task_id])
+        
+        # 使用稳定排序
+        return sorted(tasks, key=sort_key)
 
 @dataclass
 class TaskInfo:
@@ -230,3 +329,4 @@ def build_task(raw: Dict, osworld_root: Path, use_call_user: bool = False) -> Ta
         instruction = instruction,
         task_config = task_data
     )
+

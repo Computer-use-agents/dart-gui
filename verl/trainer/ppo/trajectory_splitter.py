@@ -450,7 +450,7 @@ class StepwiseTrajectorySplitter:
                         continue
 
                     input_ids = [system_tokens, instruction_tokens]
-                    start_step = max(0, current_step_idx - self.limit_messages + 1)
+                    start_step = max(0, current_step_idx - self.limit_messages)
                     for step_idx in range(start_step, current_step_idx):
                         input_ids.append(token_ids[step_idx])
                     response_ids = token_ids[current_step_idx]

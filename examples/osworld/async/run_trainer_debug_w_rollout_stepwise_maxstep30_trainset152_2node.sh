@@ -42,8 +42,8 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 # export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
 # export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
 
-export ROOT_DATA_DIR=/root/verl/rollouter/results/pass8_20250909_trainset15_gpu2_env18_vllm_logp_maxstep50_node2
-export RUN_ID=results/pass8_20250909_trainset15_gpu2_env18_vllm_logp_maxstep50_node2
+export ROOT_DATA_DIR=/root/verl/rollouter/results/pass8_20250909_trainset152_gpu6_env18_vllm_logp_maxstep30_node2
+export RUN_ID=results/pass8_20250909_trainset152_gpu6_env18_vllm_logp_maxstep30_node2
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
 export EXPERIMENT_NAME=NODE2_maxstep15_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export EXPERIMENT_NAME=RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_v3bba5x0
@@ -54,7 +54,7 @@ export EXPERIMENT_NAME=NODE2_maxstep15_w_KL_trainset15_vllm_logp_osworld_reward_
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.72.131:15959
+export ROLLOUT_SERVER_URL=http://172.19.102.155:15959
 
 # training parameters
 adv_estimator=grpo
@@ -96,13 +96,13 @@ splitter=stepwise
 splitter_parallel=True
 window_size=5 
 stride_size=5
-max_steps=15
+max_steps=30
 
 use_vllm_logp=True
 use_sft_loss=False
 use_token_ids_from_pt=True
 # use_traj_filter=True
-ray job submit --address="http://172.19.156.91:8265" \
+ray job submit --address="http://172.19.164.173:8265" \
     --runtime-env=verl/trainer/runtime_env.yaml \
     --no-wait \
     -- \

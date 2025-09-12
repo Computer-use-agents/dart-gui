@@ -154,3 +154,5 @@ swanlog/
 trainingdata_sample
 *.zip
 **/*zirui.py
+
+ray_log

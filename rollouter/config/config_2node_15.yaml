@@ -1,11 +1,12 @@
 task:
   #task_root: "./evaluation_examples/"  # 从此目录中读取修改时间最靠后的json，作为任务列表
-  task_file: "/root/verl/rollouter/evaluation_examples/test_trainset_libreoffice_calc.json"
+  task_file: "/root/verl/rollouter/evaluation_examples/test_trainset_15.json"
   osworld_root: "/root/verl/rollouter/evaluation_examples/examples_processed"  # root of task detail json, organized by domain
   resume: False # 是否忽略已经跑出结果的task，测pass@1时可设为True
 
 storage:
-  root: "results/pass8_20250909_libreoffice_calc_pass8_gpu2_env18_vllm_logp_maxstep50" ##runid of trainer
+  root: "results/pass8_20250909_trainset15_gpu2_env18_vllm_logp_maxstep50_node2" ##runid of trainer
+  
   splitter:
     output_dir: "splitted_traj"  # 基于storage.root的相对路径
     window_size: 5
@@ -33,7 +34,7 @@ model:
     gpu_memory_utilization: 0.9
 env:
   server_url: &server "http://47.93.220.59:4999"
-  user_token: &token "qW7sE4pR2tY8uI1oP3zX5cV9bN6mK0L"
+  user_token: &token "7W7sE4pR2tY84I1oP3zX5cV9bN6mK0L"
   #7W7sE4pR2tY84|1oP3ZX5cV9bN6mKOL
   # 4Px6dAeZbVcYfGhUjMk9oL2iN3wS5rT
 # qW7sE4pR2tY8uI1oP3zX5cV9bN6mK0e
@@ -45,7 +46,7 @@ coordinator:
 
 
 runner:
-  max_steps:  50
+  max_steps:  15
   max_images: *max_images    #在storage.splitter的同名字段中修改
   max_texts:  *max_texts    
   write_to_mysql: True     # 数据是否保存至mysql中

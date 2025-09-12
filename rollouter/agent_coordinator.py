@@ -4,9 +4,12 @@ import copy
 import time
 import logging
 import uuid
+import os
+import json
 from typing import List, Dict, Set, Optional
 from trajectory_runner import TrajectoryRunnerActor, ResourceExhaustedException
 from log_config import setup_logging
+from datetime import datetime
 
 # 设置统一的日志系统
 setup_logging()
@@ -22,6 +25,7 @@ class AgentCoordinator:
         self.poll_count = 0  # 跟踪已经获取任务的次数
         self.max_task_queue_size = coordinator_cfg.max_task_queue_size # 最多从task_loader获取任务的次数
         self.rollout_n = getattr(coordinator_cfg, 'rollout_n', 1)  # 每个任务重复rollout的次数，默认为1
+        self.dynamic_rollout = getattr(coordinator_cfg, 'dynamic_rollout', False)  # 是否启用动态rollout_n
         
         # 环境清理相关
         self.env_cleanup_interval = getattr(coordinator_cfg, 'env_cleanup_interval', 10)  # 环境清理间隔（秒）
@@ -279,22 +283,32 @@ class AgentCoordinator:
                         self.poll_count += 1  # 增加填充次数
                         added_count = 0
                         
-                        for task in new_tasks_batch:
-                            task_id = task.get('task_config', {}).get('raw', {}).get('task_id', 'unknown')
+                        # 先按成功率排序任务
+                        # if self.dynamic_rollout:
+                        #     sorted_tasks = task_loader.sort_tasks_by_success_rate(new_tasks_batch)
+                        # else:   
+                        sorted_tasks = new_tasks_batch
+                                                
+                        for task in sorted_tasks:
+                            task_id = task.get('task_config', {}).get('raw', {}).get('task_id', 'unknown') # debug liuyang
                             
-                            # 为每个任务创建rollout_n个副本
-                            for rollout_idx in range(self.rollout_n):
-                                # 为每个任务生成trace_id
+                            if self.dynamic_rollout:
+                                # 获取动态 rollout_n 值
+                                traj_counts, success_rate, dynamic_rollout_n = task_loader.get_dynamic_rollout_n(task_id, self.rollout_n) # 成功率高于阈值的task也会采样，实时监测，一旦成功率低于阈值，会重新采样self.rollout_n条轨迹
+                            else:
+                                dynamic_rollout_n = self.rollout_n
+                            # 为每个任务创建 dynamic_rollout_n 个副本
+                            for rollout_idx in range(dynamic_rollout_n):
                                 task_with_trace = copy.deepcopy(task)
                                 trace_id = self._generate_trace_id()
                                 task_with_trace['trace_id'] = trace_id
                                 task_with_trace['rollout_idx'] = rollout_idx  # 添加rollout索引
+                                task_with_trace['dynamic_rollout_n'] = dynamic_rollout_n  # 添加动态rollout_n信息
                                 
                                 await self.task_queue.put(task_with_trace)
                                 added_count += 1
                                 
-                                logger.info(f"[{trace_id}] 添加任务到队列 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{self.rollout_n}")
-                        
+                                logger.info(f"[{trace_id}] 添加任务到队列 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{dynamic_rollout_n}")
                         logger.info(f"第 {self.poll_count} 次填充任务完成，添加了 {added_count} 个任务，当前队列大小: {self.task_queue.qsize()}")
                     else:
                         # 没有新任务但未达到填充次数限制，等待一下再试
@@ -313,9 +327,10 @@ class AgentCoordinator:
                         trace_id = task_info.get('trace_id', 'unknown_trace')
                         task_id = task_info.get('task_config', {}).get('raw', {}).get('task_id', 'unknown')
                         rollout_idx = task_info.get('rollout_idx', 0)
-                        
-                        logger.info(f"[{trace_id}] 开始启动任务 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{self.rollout_n}")
-                        
+                        dynamic_rollout_n = task_info.get('dynamic_rollout_n', self.rollout_n)
+                            
+                        logger.info(f"[{trace_id}] 开始启动任务 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{dynamic_rollout_n}")
+                            
                         try:
                             actor = TrajectoryRunnerActor.options(num_cpus=0.5).remote(task_info, runner_cfg)
                             task_ref = actor.run_episode.remote(model_pool, storage, mysql_writer)
@@ -332,11 +347,11 @@ class AgentCoordinator:
                            
                             self.stats['total_started'] += 1
                             started_count += 1
-                            logger.info(f"[{trace_id}] 任务启动成功 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{self.rollout_n}, 当前活跃任务数: {len(self.active_tasks)}")
+                            logger.info(f"[{trace_id}] 任务启动成功 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{dynamic_rollout_n}, 当前活跃任务数: {len(self.active_tasks)}")
                         except ray.exceptions.RayTaskError as e:
                             logger.warning(f"[{trace_id}] Ray任务创建失败: {e}")
                         except Exception as e:
-                            logger.error(f"[{trace_id}] 启动任务失败 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{self.rollout_n}, 错误: {e}")
+                            logger.error(f"[{trace_id}] 启动任务失败 - task_id: {task_id}, rollout_idx: {rollout_idx + 1}/{dynamic_rollout_n}, 错误: {e}")
                             
                     except asyncio.TimeoutError:
                         break  # 队列为空，跳出循环
