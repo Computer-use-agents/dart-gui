@@ -9,13 +9,13 @@ from datetime import datetime
 from typing import List, Dict, Any, Optional
 
 from sqlalchemy import (
-    create_engine, Column, String, Integer, BigInteger, Text, func, select, update, text, Enum, TIMESTAMP, case, literal
+    create_engine, Column, String, Integer, BigInteger, Text, func, select, update, text, Enum, TIMESTAMP, case, literal, cast
 )
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.dialects import mysql
 from sqlalchemy.engine import URL
 from sqlalchemy.exc import IntegrityError
-
+from sqlalchemy.dialects.mysql import INTEGER as MYSQL_INTEGER
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -167,10 +167,36 @@ class MySQLRolloutORM:
             return result.rowcount or 0
 
     # ---- 3) 插入 checkpoint：source=train, status=PENDING, version 自增 v1,v2...
-    def insert_checkpoint(self, path: str, run_id: str) -> Dict[str, Any]:
+    def insert_checkpoint(self, path: str, run_id: str, initial: bool = False) -> Dict[str, Any]:
         source = "train"
         status = "PENDING"
         with self.session_scope() as s:
+            if initial: #插入初始版本
+                # 检查同一 run_id 下是否已有 v0
+                exists_v0 = s.execute(
+                    select(Checkpoint.id, Checkpoint.path).where(
+                        Checkpoint.run_id == run_id,
+                        Checkpoint.version == "v0",
+                    ).limit(1)
+                ).first()
+
+                if exists_v0:
+                    print(f"[WARN] initial checkpoint v0 already exists for run_id={run_id}, path={path}; skip insert.")
+                    return None
+
+                # 插入固定版本 v0
+                cp = Checkpoint(
+                    source="initial",
+                    status=status,
+                    version="v0",
+                    run_id=run_id,
+                    path=path,
+                )
+                s.add(cp)
+                s.flush()
+                print(f"[INFO] inserted initial checkpoint: run_id={run_id}, path={path}")
+                return cp.to_dict()
+            
             # 仅在同一 run_id 下计算 version
             existing_versions = s.execute(
                 select(Checkpoint.version).where(
@@ -202,18 +228,19 @@ class MySQLRolloutORM:
     # ---- 4) 取出 checkpoint 最新n条 path ------------------------------------
     def get_latest_n_checkpoint_paths(self, run_id: str, n: int = 2) -> List[str]:
         with self.session_scope() as s:
+            order_key = cast(func.substr(Checkpoint.version, 2), MYSQL_INTEGER(unsigned=True))
             rows = (
                 s.query(Checkpoint.path)
                 .filter(Checkpoint.run_id == run_id)
-                .order_by(Checkpoint.created_at.desc(), Checkpoint.id.desc())
+                .order_by(order_key.desc())
                 .limit(n)
                 .all()
             )
             result = [r[0] for r in rows]
 
-            # 若列表长度不足，添加默认路径
-            if len(result) < n:
-                result.append("/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5")
+            # # 若列表长度不足，添加默认路径
+            # if len(result) < n:
+            #     result.append("/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5")
             return result
         
     # 删除指定 run_id 的全部 rollout_run 记录，返回受影响行数
@@ -370,19 +397,19 @@ def create_database_manager() -> MySQLRolloutORM:
         
 if __name__ == "__main__":
     
-    DB_CONFIG = {
-    'host': '112.125.88.107',
-    'user': 'teamx',
-    'password': '#C!D123^-c12',
-    'database': 'TeamX_BIGAI',
-    'port': 5906,
-    'charset': 'utf8mb4'
-    }
+    # DB_CONFIG = {
+    # 'host': '112.125.88.107',
+    # 'user': 'teamx',
+    # 'password': '#C!D123^-c12',
+    # 'database': 'TeamX_BIGAI',
+    # 'port': 5906,
+    # 'charset': 'utf8mb4'
+    # }
 
     orm = MySQLRolloutORM(DB_CONFIG, create_tables_if_missing=True)
     # print(orm.get_rollouts_by_run_id("results/test_for_train_pass8_gpu8_env77_20250817_1345")[0])
     # print(orm.update_rollout_used("results/test_for_train_pass8_gpu8_env77_20250817_1345", "9439a27b-18ae-42d8-9778-5f68f891805e_trace_e635d5e3af17_1755501336"))
     # print(orm.insert_checkpoint("/mnt/checkpoints/model-abc/weights.bin"))
-    # print(orm.get_latest_n_checkpoint_paths("results/pass@32_trainset90", 1))
-    for i in range(1, 4):
-        print(orm.get_nth_newest_model_success("results/trainset8_pass8_gpu8_env64_20250826_1854", i))
+    # print(orm.get_latest_n_checkpoint_paths("results/trainset15_pass8_gpu2_env20_maxstep30_20250902_2305", 2))
+    for i in range(1, 26):
+        print(orm.get_nth_newest_model_success("results/singlehard_pass8_gpu2_env20_maxstep30_tmp1_20250910_1555", i))

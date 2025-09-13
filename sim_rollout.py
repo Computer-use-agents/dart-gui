@@ -61,14 +61,14 @@ def latest_model_version(db_manager, run_id) -> str:
     # Prefer module-level function if available
     if _get_latest_n_checkpoint_paths_fn is not None:
         try:
-            paths = _get_latest_n_checkpoint_paths_fn(run_id, 1) or []
+            paths = _get_latest_n_checkpoint_paths_fn(run_id, 1) or ["/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"]
         except Exception as e:
             print(f"[warn] module-level get_latest_n_checkpoint_paths failed: {e}")
 
     # Fallback: check if db_manager exposes the method
     if not paths and hasattr(db_manager, "get_latest_n_checkpoint_paths"):
         try:
-            paths = db_manager.get_latest_n_checkpoint_paths(run_id, 1) or []
+            paths = db_manager.get_latest_n_checkpoint_paths(run_id, 1) or ["/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5"]
         except Exception as e:
             print(f"[warn] db_manager.get_latest_n_checkpoint_paths failed: {e}")
 
@@ -201,14 +201,16 @@ def simulate_rollout(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simulated rollout producer for trainer unit tests.")
-    parser.add_argument("--json", default="data/train/data_pass@8_train1.json", help="Path to the static JSON data.")
-    parser.add_argument("--run-id", default="wjr_test_pass8_train1_rft", help="Run ID to write into DB rows.")
-    parser.add_argument("--rate", type=int, default=16, help="Insert rate per minute.")
+    #parser.add_argument("--json", default="data/train/data_pass@8_train1.json", help="Path to the static JSON data.")
+    parser.add_argument("--json", default="debug_datasets/singlehard_pass8_gpu2_env20_maxstep30_20250909_0929/datasets_step6_20250909-031743.json", help="Path to the static JSON data.")
+    #parser.add_argument("--run-id", default="wjr_test_pass8_train1_rft", help="Run ID to write into DB rows.")
+    parser.add_argument("--run-id", default="wjr_sync_singlehard_20250909_step6_oridata", help="Run ID to write into DB rows.")
+    parser.add_argument("--rate", type=int, default=4, help="Insert rate per minute.")
     parser.add_argument("--start-index", type=int, default=0, help="Start from this index in the JSON list.")
     parser.add_argument("--limit", type=int, default=None, help="Only process this many items.")
     parser.add_argument("--dry-run", action="store_true", help="Don't write to DB; just print what would happen.")
     parser.add_argument("--loops", type=int, default=1, help="Maximum number of full loops over the JSON (default: 10).")
-    parser.add_argument("--bootstrap", type=int, default=64, help="Number of items to insert immediately at startup (default: 256).")
+    parser.add_argument("--bootstrap", type=int, default=8, help="Number of items to insert immediately at startup (default: 256).")
     parser.add_argument(
         "--delete-existing",
         action="store_true",

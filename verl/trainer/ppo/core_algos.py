@@ -226,7 +226,7 @@ def compute_grpo_outcome_advantage(
             shape is (bs, response_length)
     """
     scores = token_level_rewards.sum(dim=-1)
-    print("compute_grpo_outcome_advantage token_level_rewards", scores)
+    print("compute_grpo_outcome_advantage ", scores)
     id2score = defaultdict(list)
     id2mean = {}
     id2std = {}
@@ -521,6 +521,110 @@ def compute_rewards(token_level_scores, old_log_prob, ref_log_prob, kl_ratio):
     kl = old_log_prob - ref_log_prob
     return token_level_scores - kl * kl_ratio
 
+def save_loss_matrices(
+    loss_mat: torch.Tensor,
+    loss_mask: torch.Tensor,
+    out_dir: str = "loss_dump",
+    prefix: str = "run1",
+    mat_fmt: str = "%.6f",
+    mask_fmt: str = "%d",
+    delimiter: str = "\t",
+    append: bool = True,
+    save_counts: bool = True,          # 新增：是否保存每行非零个数
+    counts_which: str = "both",        # "mask" | "mat" | "both"
+) -> dict:
+    """
+    将 loss_mat 与 loss_mask 以 txt 形式保存；可选择追加写入。可选同时保存每行非零元素个数。
+    - counts_which="mask": 只保存 mask 的非零计数（等价于有效 token 数）
+      counts_which="mat" : 只保存 loss_mat 的非零计数
+      counts_which="both": 两列依次是 nnz_loss, nnz_mask
+    """
+    # --- 基本校验 ---
+    if loss_mat.shape != loss_mask.shape:
+        raise ValueError(f"Shape mismatch: loss_mat {loss_mat.shape} vs loss_mask {loss_mask.shape}")
+    if loss_mat.dim() not in (1, 2) or loss_mask.dim() not in (1, 2):
+        raise ValueError("Expect 1D/2D tensors.")
+
+    # 保证二维（1×L 也写成一行）
+    if loss_mat.dim() == 1:
+        loss_mat = loss_mat.unsqueeze(0)
+    if loss_mask.dim() == 1:
+        loss_mask = loss_mask.unsqueeze(0)
+
+    bs, L = loss_mat.shape
+
+    from pathlib import Path
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    mat_file = out / f"{prefix}_loss_mat.txt"
+    mask_file = out / f"{prefix}_loss_mask.txt"
+    cnt_file = out / f"{prefix}_counts.txt"
+
+    # 转 numpy
+    mat_np = loss_mat.detach().to(torch.float32).cpu().numpy()
+    mask_np = (loss_mask.detach().to(torch.float32) > 0).to(torch.int64).cpu().numpy()
+
+    # 选择写入模式
+    mode = "a" if append else "w"
+
+    # 是否已存在（决定是否写 header）
+    mat_exists = mat_file.exists()
+    mask_exists = mask_file.exists()
+    cnt_exists = cnt_file.exists()
+
+    # header 仅首次写
+    mat_header = f"shape={bs}x{L} (rows=batch, cols=response_length)" if not (append and mat_exists) else ""
+    mask_header = f"shape={bs}x{L} (rows=batch, cols=response_length)" if not (append and mask_exists) else ""
+
+    # --- 写 loss_mat ---
+    with open(mat_file, mode, encoding="utf-8") as f:
+        np.savetxt(
+            f, mat_np, fmt=mat_fmt, delimiter=delimiter,
+            header=mat_header, comments="# " if mat_header else ""
+        )
+
+    # --- 写 loss_mask ---
+    with open(mask_file, mode, encoding="utf-8") as f:
+        np.savetxt(
+            f, mask_np, fmt=mask_fmt, delimiter=delimiter,
+            header=mask_header, comments="# " if mask_header else ""
+        )
+
+    # --- 写每行非零计数（可选）---
+    paths = {"loss_mat": str(mat_file), "loss_mask": str(mask_file)}
+
+    if save_counts:
+        # 说明：
+        # - nnz_mask：mask 中 >0 的个数（等价于有效 token 数）
+        # - nnz_loss：loss_mat 中 !=0 的个数（注意 NaN 会被计为非零；若需排除 NaN，可改为 ~np.isnan(mat_np) & (mat_np != 0)）
+        nnz_mask = mask_np.sum(axis=1)
+        nnz_loss = np.count_nonzero(mat_np, axis=1)
+
+        if counts_which == "mask":
+            counts = nnz_mask[:, None]
+            cnt_header = "cols: nnz_mask (per-row nonzeros in loss_mask)"
+        elif counts_which == "mat":
+            counts = nnz_loss[:, None]
+            cnt_header = "cols: nnz_loss (per-row nonzeros in loss_mat)"
+        elif counts_which == "both":
+            counts = np.stack([nnz_loss, nnz_mask], axis=1)
+            cnt_header = "cols: nnz_loss\tnnz_mask (per-row)"
+        else:
+            raise ValueError("counts_which must be one of {'mask','mat','both'}")
+
+        # 首次写 header，后续不写
+        header = cnt_header if not (append and cnt_exists) else ""
+
+        with open(cnt_file, mode, encoding="utf-8") as f:
+            np.savetxt(
+                f, counts, fmt="%d", delimiter=delimiter,
+                header=header, comments="# " if header else ""
+            )
+
+        paths["counts"] = str(cnt_file)
+
+    return paths
 
 def agg_loss(loss_mat: torch.Tensor, loss_mask: torch.Tensor, loss_agg_mode: str):
     """
@@ -629,6 +733,16 @@ def compute_policy_loss(
     pg_clipfrac_lower = verl_F.masked_mean(torch.gt(clip_pg_losses1, pg_losses3) * (advantages < 0).float(), response_mask)
 
     pg_losses = torch.where(advantages < 0, clip_pg_losses2, clip_pg_losses1)
+    
+    # paths = save_loss_matrices(
+    #     pg_losses,
+    #     response_mask,
+    #     out_dir="loss_dump",
+    #     prefix="minibs30",
+    #     append=True
+    # )
+    # print("Saved files:", paths)
+    
     pg_loss = agg_loss(loss_mat=pg_losses, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
 
     return pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower, pg_loss_no_old

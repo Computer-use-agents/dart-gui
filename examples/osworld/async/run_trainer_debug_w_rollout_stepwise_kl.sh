@@ -36,24 +36,31 @@ export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
 # export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-export ROOT_DATA_DIR=results/trainset15_pass16_gpu2_env20_maxstep15_20250828_1422
-export RUN_ID=results/trainset15_pass16_gpu2_env20_maxstep15_20250828_1422
-export EXPERIMENT_NAME=async_pass8_train15_lr1e-6_bz8_minibs32_downsample_slidingwindow_kl_maxstep15
+export ROOT_DATA_DIR=results/trainset15_pass8_gpu4_env40_maxstep50_20250908_1215
+export RUN_ID=results/trainset15_pass8_gpu4_env40_maxstep50_20250908_1215
+export EXPERIMENT_NAME=async_pass8_train15_lr1e-6_bz4_minibs64_downsample_stepwise_kl_maxstep50
+
+# export ROOT_DATA_DIR=results/pass@32_trainset90_0826
+# export RUN_ID=wjr_test_pass8_train1_rft
+# export EXPERIMENT_NAME=test_paddingmask_attention_eff_minibs32
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export osworld_all_feasible_reward_script_grpo_k8s_20250826_ypwbn244
 
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
-export ROLLOUT_SERVER_URL=http://172.19.17.62:15959
+export ROLLOUT_SERVER_URL=http://172.19.162.111:15959
 
 # training parameters
 adv_estimator=grpo
 
+use_padding_mask=false
 use_kl_in_reward=False
 kl_coef=0.0
 use_kl_loss=True
 kl_loss_coef=0.1
+# use_kl_loss=False
+# kl_loss_coef=0.0
 
 clip_ratio_low=0.1
 clip_ratio_high=0.28
@@ -67,10 +74,10 @@ loss_agg_mode="seq-mean-token-mean"
 
 
 train_bz_min=4
-train_bz_max=8
+train_bz_max=4
 train_prompt_bsz=8
 rollout_n=8
-train_prompt_mini_bsz=32
+train_prompt_mini_bsz=64
 
 # Performance Related Parameter
 sp_size=4
@@ -85,9 +92,9 @@ fsdp_size=32
 ## message splitter
 limit_messages=35
 splitter=stepwise
-window_size=5 
+window_size=5
 stride_size=5
-max_steps=15
+max_steps=50
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
@@ -103,16 +110,18 @@ python3 -m verl.trainer.main_ppo_async \
     data.custom_cls.path=verl/utils/dataset/osworld_dataset_iter.py \
     data.custom_cls.name=OSWorldAsyncDataset \
     data.shuffle=false \
-    +data.rotate_task_groups=true \
+    +data.use_padding_mask=${use_padding_mask} \
+    +data.rotate_task_groups=false \
     +data.root_data_dir=$ROOT_DATA_DIR \
     +data.window_size=${window_size} \
     +data.stride_size=${stride_size} \
     +data.max_steps=${max_steps} \
     +data.num_workers=0 \
     +data.run_id=$RUN_ID \
-    +data.steps_per_epoch=50 \
+    +data.steps_per_epoch=200 \
     +data.train_batch_size_min=${train_bz_min} \
     +data.train_batch_size_max=${train_bz_max} \
+c
     algorithm.adv_estimator=${adv_estimator} \
     algorithm.use_kl_in_reward=${use_kl_in_reward} \
     algorithm.kl_ctrl.kl_coef=${kl_coef} \
@@ -142,11 +151,11 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=2 \
+    trainer.save_freq=1 \
     trainer.test_freq=10 \
     trainer.val_before_train=False \
     trainer.total_epochs=1 \
-    trainer.max_actor_ckpt_to_keep=5 \
+    trainer.max_actor_ckpt_to_keep=3 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \

@@ -382,6 +382,8 @@ class DataParallelPPOActor(BasePPOActor):
             select_keys.append("loss_mask")
         if "padding_mask" in data.batch.keys():
             select_keys.append("padding_mask")
+        if "attention_mask_eff" in data.batch.keys():
+            select_keys.append("attention_mask_eff")
         if multi_turn:
             select_keys.append("loss_mask")
         if self.config.use_kl_loss:
@@ -457,11 +459,10 @@ class DataParallelPPOActor(BasePPOActor):
                     attention_mask = data["attention_mask"]
                     if multi_turn:
                         response_mask = data["loss_mask"][:, -response_length:]
-                    else: # jingrong debug
+                    elif  "attention_mask_eff" in data.keys():
+                        response_mask = data["attention_mask_eff"][:, -response_length:]
+                    else:
                         response_mask = attention_mask[:, -response_length:]
-                        # response_mask = data["loss_mask"][:, -response_length:]
-                        # response_mask = data["loss_mask"][:, -response_length:] * data["padding_mask"].unsqueeze(1)
-                        # response_mask = attention_mask[:, -response_length:] * data["padding_mask"].unsqueeze(1)
 
                     old_log_prob = data["old_log_probs"]
                     advantages = data["advantages"]
@@ -520,6 +521,26 @@ class DataParallelPPOActor(BasePPOActor):
                         loss = policy_loss * (len(data) / self.config.ppo_mini_batch_size)
                     else:
                         loss = policy_loss / self.gradient_accumulation
+                        
+                    def _check_finite(name, t):
+                        if torch.is_tensor(t):
+                            if not torch.isfinite(t).all():
+                                print(f"[NaN/Inf] {name}")
+
+                    valid = (response_mask > 0.5)
+
+                    _check_finite("log_prob", log_prob)
+                    _check_finite("old_log_prob", old_log_prob)
+                    if self.config.use_kl_loss:
+                        _check_finite("ref_log_prob", data["ref_log_prob"])
+                    _check_finite("advantages", advantages)
+                    _check_finite("response_mask", response_mask)
+
+                    # 尤其看“被掩掉的位置”是否已经是坏的
+                    bad_ratio = torch.exp((log_prob - old_log_prob))
+                    _check_finite("ratio", bad_ratio)
+                    _check_finite("ratio_on_mask0", bad_ratio[~valid])
+                    
                     loss.backward()
 
                     data = {
@@ -535,11 +556,17 @@ class DataParallelPPOActor(BasePPOActor):
                         "actor/pg_clipfrac_lower": pg_clipfrac_lower.detach().item(),
                     }
                     append_to_dict(metrics, data)
-
+                
+                for n,p in self.actor_module.named_parameters():
+                    if p.grad is not None and torch.isnan(p.grad).any():
+                        print("NaN grad at", n)
                 grad_norm = self._optimizer_step()
                 print("call optimizer step, update actor")
                 data = {"actor/grad_norm": grad_norm.detach().item()}
                 append_to_dict(metrics, data)
+                with open("loss_dump/minibs32_adv_mean.txt", 'a', encoding='utf-8') as f:
+                    line_to_write = " ".join(map(str, metrics["actor/advantages_mean"])) + "\n"
+                    f.write(line_to_write)
         self.actor_optimizer.zero_grad()
 
         return metrics
