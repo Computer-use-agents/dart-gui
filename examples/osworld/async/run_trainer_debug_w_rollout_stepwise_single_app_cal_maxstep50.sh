@@ -25,7 +25,7 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/Single_APP_EXCEL_maxstep50_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250912_mns7rfwp/global_step_45/actor/huggingface
 # /root/verl/checkpoints/verl_osworld_grpo/vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_20250906_m3ou6di7/global_step_63/actor/huggingface
 
 #/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
@@ -55,7 +55,8 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 export ROOT_DATA_DIR=rollouter/results/pass8_20250909_libreoffice_calc_pass8_gpu2_env18_vllm_logp_maxstep50
 export RUN_ID=results/pass8_20250909_libreoffice_calc_pass8_gpu2_env18_vllm_logp_maxstep50
 
-export EXPERIMENT_NAME=Single_APP_EXCEL_maxstep50_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export EXPERIMENT_NAME=Single_APP_EXCEL_maxstep50_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export EXPERIMENT_NAME=Single_APP_EXCEL_maxstep50_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250912_mns7rfwp
 
 # export EXPERIMENT_NAME=Single_APP_Office_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250909_s0l3ijcu
 

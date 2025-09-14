@@ -468,10 +468,10 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         try:
             import random
             dataset_ids = batch.non_tensor_batch["dataset_ids"]
-
-            if len(batch) > 1024*2:
-                print("[Warning] batch size larger than 2048, need downsample! current batch size:", len(batch), n_mod)
-                idx = random.choices(list(range(len(dataset_ids))), k=n_mod)
+            target_size = 16*32*2
+            if len(batch) > target_size:
+                print("[Warning] batch size larger than 16*32*2, need downsample! current batch size:", len(batch), n_mod)
+                idx = random.choices(list(range(len(dataset_ids))), k=target_size)
                 downsampled_batch = batch.select_idxs(idx)
                 return downsampled_batch
             else:

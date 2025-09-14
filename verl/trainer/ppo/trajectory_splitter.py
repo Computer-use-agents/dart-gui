@@ -261,7 +261,7 @@ class StepwiseTrajectorySplitter:
             dataset_ids: list[str], 
             reward_tensor: torch.Tensor | None = None,
             num_cpus: int = 4,
-            parallel_size: int = 64,
+            parallel_size: int = 16,
         ) -> DataProto:
         """
         Parallel version of split using Ray for distributed processing.
@@ -295,6 +295,7 @@ class StepwiseTrajectorySplitter:
                 dataset_id,
                 reward=reward
             )
+            del batch_messages
             return batch_tokenized_messages
         
         # compute average length for positive reward trajectories
@@ -320,8 +321,14 @@ class StepwiseTrajectorySplitter:
             reward = reward_tensor[idx].item() if reward_tensor is not None else 0.0
             future = process_single_dataset.remote(self, dataset_id, reward, self.use_vllm_logp,avg_len)
             futures.append(future)
+        # # Collect results in once
+        batch_output = []
+        results = ray.get(futures)
+        for result in results:
+            batch_output += result
+        del results
         
-        # # Collect results
+        # # Collect results in batches to avoid memory issues
         # batch_output = []
         # for i in range(0, len(futures), parallel_size):
         #     batch_futures = futures[i:i + parallel_size]
@@ -330,12 +337,7 @@ class StepwiseTrajectorySplitter:
         #         batch_output += result
         #     del results
 
-        # Collect results
-        batch_output = []
-        results = ray.get(futures)
-        for result in results:
-            batch_output += result
-        del results
+        
         batch_output = collate_fn(batch_output)
 
         

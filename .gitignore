@@ -155,4 +155,9 @@ trainingdata_sample
 *.zip
 **/*zirui.py
 
-ray_log
+ray_log/
+job_logs/
+ray_job_logs/
+outputs/
+computer-use-rollout-dev-zzh.zip
+pengxiang_traj.tar.gz

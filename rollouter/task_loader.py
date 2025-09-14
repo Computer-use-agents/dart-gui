@@ -29,7 +29,7 @@ class TaskLoader:
         self.storage_root = storage_root
         self.resume = task_cfg.resume
         # 动态 rollout_n 相关参数
-        self.success_rate_threshold = getattr(task_cfg, 'success_rate_threshold', 0.6)  # 成功率阈值
+        self.success_rate_threshold = getattr(task_cfg, 'success_rate_threshold', 1.0)  # 成功率阈值
         self.min_rollout_n = getattr(task_cfg, 'min_rollout_n', 1)  # 最小 rollout_n
         self.run_id = getattr(task_cfg, 'run_id', None)  # 运行ID，用于查询数据库
         self.db_enabled = getattr(task_cfg, 'db_enabled', False)  # 是否启用数据库功能

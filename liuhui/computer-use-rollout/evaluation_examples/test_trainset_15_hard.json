@@ -1,0 +1,33 @@
+{
+  "chrome": [
+    "f3b19d1e-2d48-44e9-b4e1-defcae1a0197",
+    "9f935cce-0a9f-435f-8007-817732bfc0a5"
+  ],
+  "gimp": [
+    "f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+    "e2dd0213-26db-4349-abe5-d5667bfd725c"
+  ],
+  "libreoffice_calc": [
+    "1e8df695-bd1b-45b3-b557-e7d599cf7597",
+    "4172ea6e-6b77-4edb-a9cc-c0014bd1603b"
+  ],
+  "libreoffice_impress": [
+    "ac9bb6cb-1888-43ab-81e4-a98a547918cd"
+  ],
+  "libreoffice_writer": [
+    "0e763496-b6bb-4508-a427-fad0b6c3e195"
+  ],
+  "multi_apps": [
+    "36037439-2044-4b50-b9d1-875b5a332143",
+    "81c425f5-78f3-4771-afd6-3d2973825947",
+    "b337d106-053f-4d37-8da0-7f9c4043a66b"
+  ],
+  "os": [
+    "bedcedc4-4d72-425e-ad62-21960b11fe0d",
+    "13584542-872b-42d8-b299-866967b5c3ef",
+    "23393935-50c7-4a86-aeea-2b78fd089c5c"
+  ],
+  "thunderbird": [
+    "9bc3cc16-074a-45ac-9bdc-b2a362e1daf3"
+  ]
+}

@@ -1,0 +1,25 @@
+logs/
+*.log
+
+
+config/config.yaml
+>>>>>>> feature/liuhui_20250729_parallel_computing
+# 忽略结果目录
+results/
+
+# 忽略Python缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 忽略环境文件
+.env
+.venv
+.vscode/
+env/
+venv/
+tmp/
+output/
+outputs/
+timings.jsonl
+results_splitted/
