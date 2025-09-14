@@ -71,7 +71,6 @@ def filter_fn(
         return []
 
     # 3) 分组 size>=limit & mean(reward)∈[0,1)
-    base["reward"] = pd.to_numeric(base["reward"], errors="coerce")
     grp = base.groupby("task_id").agg(
         cnt=("trajectory_id", "size"),
         mean_reward=("reward", "mean")

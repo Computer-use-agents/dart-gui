@@ -29,29 +29,32 @@ MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-
 
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K #rI0ezs9zkbORI8oUMsgHT
+export SWANLAB_API_KEY=rI0ezs9zkbORI8oUMsgHT #4wEX4aVA4guJHGZ553g4K
 export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-defau-bddf300d21.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
 # export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36_kl
-export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36_kl
-# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-# export EXPERIMENT_NAME=w_KL_trainset152_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-export EXPERIMENT_NAME=w_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_w4jryw5c
-# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
+export ROOT_DATA_DIR=results/trainset15_pass8_gpu4_env40_maxstep50_20250908_1215
+export RUN_ID=results/trainset15_pass8_gpu4_env40_maxstep50_20250908_1215
+export EXPERIMENT_NAME=async_pass8_train15_lr1e-6_bz4_minibs64_downsample_stepwise_kl_maxstep50
 
-# export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
+# export ROOT_DATA_DIR=results/pass@32_trainset90_0826
+# export RUN_ID=wjr_test_pass8_train1_rft
+# export EXPERIMENT_NAME=test_paddingmask_attention_eff_minibs32
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export osworld_all_feasible_reward_script_grpo_k8s_20250826_ypwbn244
+
+# export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
-# export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.72.140:15959
+export ROLLOUT_SERVER_URL=http://172.19.162.111:15959
 
 # training parameters
 adv_estimator=grpo
 
+use_padding_mask=false
 use_kl_in_reward=False
 kl_coef=0.0
 use_kl_loss=True
@@ -105,6 +108,7 @@ python3 -m verl.trainer.main_ppo_async \
     data.custom_cls.path=verl/utils/dataset/osworld_dataset_iter.py \
     data.custom_cls.name=OSWorldAsyncDataset \
     data.shuffle=false \
+    +data.use_padding_mask=${use_padding_mask} \
     +data.rotate_task_groups=true \
     +data.root_data_dir=$ROOT_DATA_DIR \
     +data.window_size=${window_size} \
@@ -144,11 +148,11 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=2 \
+    trainer.save_freq=1 \
     trainer.test_freq=10 \
     trainer.val_before_train=False \
     trainer.total_epochs=1 \
-    trainer.max_actor_ckpt_to_keep=10 \
+    trainer.max_actor_ckpt_to_keep=3 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \
