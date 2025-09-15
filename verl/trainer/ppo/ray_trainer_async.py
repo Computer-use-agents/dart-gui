@@ -99,14 +99,8 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         # insert initial checkpoint path
         db_manager = create_database_manager()
         db_manager.insert_checkpoint(self.config.actor_rollout_ref.model.path, run_id=self.run_id, initial=True)
-        db_manager.close_database()
-
-        # insert initial checkpoint path
-        db_manager = create_database_manager()
-        db_manager.insert_checkpoint(self.config.actor_rollout_ref.model.path, run_id=self.run_id, initial=True)
-        db_manager.close_database()
-        # load checkpoint before doing anything
         
+        # load checkpoint before doing anything
         self._load_checkpoint()
 
         # perform validation before training
@@ -398,13 +392,11 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             abs_path_actor_hf = os.path.abspath(actor_local_path_hf)
                             # Insert checkpoint path into MySQL database
                             print("Inserting checkpoint path into MySQL database...")
-                            db_manager = create_database_manager()
                             db_manager.insert_checkpoint(abs_path_actor_hf, run_id=self.run_id)
                             
                             #统计第step-k个版本模型的平均成功率
                             k = self.config.data.get('top_mvs_n', 2)
                             avg_nonneg, count_all, distinct_task_cnt = db_manager.get_nth_newest_model_success(run_id=self.run_id, n=k+1)
-                            db_manager.close_database()
                             print("Checkpoint path inserted into MySQL database.")
                             
                             if self.global_steps >= self.config.trainer.save_freq * k:
