@@ -95,13 +95,12 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         )
 
         self.global_steps = 0
-
+        
         # insert initial checkpoint path
         db_manager = create_database_manager()
         db_manager.insert_checkpoint(self.config.actor_rollout_ref.model.path, run_id=self.run_id, initial=True)
-        db_manager.close_database()
-        # load checkpoint before doing anything
         
+        # load checkpoint before doing anything
         self._load_checkpoint()
 
         # perform validation before training
@@ -170,12 +169,30 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     if isinstance(config, list):
                         print("Warning: config is a list?", config)
                         config = config[0]
+                    
                     print("Do upsample!", type(self.actor_rollout_wg), len(config), config.actor)
-                    batch = self._up_sample(
-                        batch, 
-                        self.actor_rollout_wg.world_size, 
-                        config.actor.ppo_mini_batch_size
-                    )
+                    if self.use_padding_mask:
+                        batch, sample_ratio = self._up_sample_with_padding(
+                            batch,
+                            self.actor_rollout_wg.world_size,
+                            config.actor.ppo_mini_batch_size
+                        )
+                        print("[Trainer] padding_mask.mean(): ", batch.batch['padding_mask'].mean().item())
+
+                        # # # 创建padding后的token level mask
+                        # pm = batch.batch["padding_mask"].unsqueeze(1)
+                        # batch.batch["attention_mask_eff"] = batch.batch["attention_mask"] * pm
+                        # batch.batch["response_mask_eff"]  = batch.batch["response_mask"] * pm
+                        # batch.batch["loss_mask_eff"]      = batch.batch["loss_mask"] * pm
+                        
+                        
+                    else:
+                        batch = self._up_sample(
+                            batch, 
+                            self.actor_rollout_wg.world_size, 
+                            config.actor.ppo_mini_batch_size,
+                            metrics
+                        )
 
                     if "reward_tensor" in batch.batch.keys():
                         reward_tensor = batch.batch.pop("reward_tensor")
@@ -189,14 +206,13 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         }    
                         metrics.update(trajectory_metrics)
                     # compute global_valid tokens
-                    batch.meta_info["global_token_num"] = torch.sum(batch.batch["attention_mask"], dim=-1).tolist()
-
+                    batch.meta_info["global_token_num"] = batch.batch["attention_mask"].sum(-1).tolist()
 
 
 
                     # recompute old_log_probs
                     with marked_timer("old_log_prob", timing_raw):
-                        old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)
+                        old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)                                    
                         entropys = old_log_prob.batch["entropys"]
                         response_masks = batch.batch["response_mask"]
                         loss_agg_mode = self.config.actor_rollout_ref.actor.loss_agg_mode
@@ -314,7 +330,10 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             multi_turn=self.config.actor_rollout_ref.rollout.multi_turn.enable,
                             config=self.config.algorithm,
                         )
-                    
+                        # update advantage
+                        if self.use_padding_mask:
+                            batch.batch["advantages"] *= sample_ratio
+                            print(f"advantage multipled by sample_ratio: ", sample_ratio)
 
                     # update critic
                     if self.use_critic:
@@ -373,7 +392,6 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                             abs_path_actor_hf = os.path.abspath(actor_local_path_hf)
                             # Insert checkpoint path into MySQL database
                             print("Inserting checkpoint path into MySQL database...")
-                            db_manager = create_database_manager()
                             db_manager.insert_checkpoint(abs_path_actor_hf, run_id=self.run_id)
                             
                             #统计第step-k个版本模型的平均成功率
@@ -406,21 +424,6 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         # if is_last_step:
                             # last_val_metrics = val_metrics
                         # metrics.update(val_metrics)
-                    # if (self.global_steps % self.config.trainer.save_freq == 0) or self.global_steps == 1:
-                    #     db_manager = create_database_manager()
-                        
-                    #     #统计第step-2个版本模型的平均成功率
-                    #     avg_nonneg, count_all, distinct_task_cnt = db_manager.get_nth_newest_model_success(run_id=self.run_id, n=3)
-                    #     # rollout metrics
-                    #     if avg_nonneg > 0:
-                    #         metrics.update(
-                    #             {
-                    #                 "rollout/succ_rate": avg_nonneg,
-                    #                 "rollout/traj_count": count_all,
-                    #                 "rollout/task_count": distinct_task_cnt
-                    #             }
-                    #         )
-                    #     db_manager.close_database()
                         
                 # training metrics
                 metrics.update(
@@ -445,54 +448,172 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     pprint(f"Final validation metrics: {last_val_metrics}")
                     progress_bar.close()
                     return
-    
+
     # def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
-    #     n_mod = ppo_mini_batch_size
+    #     n_mod = world_size * ppo_mini_batch_size
     #     if len(batch) % n_mod == 0:
     #         return batch
-    #     print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
+       
     #     try:
-    #         import random
     #         dataset_ids = batch.non_tensor_batch["dataset_ids"]
-    #         target_size = (len(batch) // n_mod + 1) * n_mod
-    #         up_sample_size = target_size - len(batch)
-    #         print("Need upsample", up_sample_size)
-    #         # idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
-    #         idx = list(range(up_sample_size))
-    #         upsampel_batch = batch.select_idxs(idx)
-    #         batch = DataProto.concat([batch, upsampel_batch])
-    #         print("After upsample", len(batch))
+
+    #         if len(batch) > 1024*2:
+    #             print("[Warning] batch size larger than 2048, need downsample! current batch size:", len(batch), n_mod)
+    #             idx = random.choices(list(range(len(dataset_ids))), k=n_mod)
+    #             downsampled_batch = batch.select_idxs(idx)
+    #             return downsampled_batch
+    #         else:
+    #             print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
+    #             target_size = (len(batch) // n_mod + 1) * n_mod
+    #             up_sample_size = target_size - len(batch)
+    #             print("Need upsample", up_sample_size)
+    #             idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
+    #             upsampel_batch = batch.select_idxs(idx)
+    #             batch = DataProto.concat([batch, upsampel_batch])
+    #             print("After upsample", len(batch))
     #     except Exception as e:
     #         print("_up_sample failed due to", e)
 
-    #     return batch
+    #     return batch  
+    
+    def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int, metrics: dict) -> DataProto:
 
-    def _up_sample(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
+        def _now_str(): return time.strftime("%Y-%m-%d %H:%M:%S")
+        def _yyyymmdd(): return time.strftime("%Y%m%d")
+        def _count(ids): return Counter(ids)
+        def _append_jsonl(path, obj):
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(obj, ensure_ascii=False) + "\n")
+        def _group_by_task(counts: Counter):
+            agg = defaultdict(int)
+            for ds_id, c in counts.items():
+                s = str(ds_id)
+                task_id = s.split("_", 1)[0] if "_" in s else s
+                agg[task_id] += c
+            return dict(agg)
+
         n_mod = world_size * ppo_mini_batch_size
-        print("WORLD_SIZE and PPO mini batch size and N mod:", world_size, ppo_mini_batch_size, n_mod)
-        if len(batch) % n_mod == 0:
-            return batch
-       
-        try:
-            import random
-            dataset_ids = batch.non_tensor_batch["dataset_ids"]
-            target_size = 16*32*2
-            if len(batch) > target_size:
-                print("[Warning] batch size larger than 16*32*2, need downsample! current batch size:", len(batch), n_mod)
-                idx = random.choices(list(range(len(dataset_ids))), k=target_size)
-                downsampled_batch = batch.select_idxs(idx)
-                return downsampled_batch
+        dump_dir = f"debug_datasets/{self.run_id.split('/')[-1]}_{_yyyymmdd()}"
+        jsonl_path = os.path.join(dump_dir, "sampling_stats.jsonl")
+
+        dataset_ids = batch.non_tensor_batch.get("dataset_ids", None)
+        original_size = len(batch)
+        orig_counts_ds = _count(dataset_ids)
+        orig_counts_task = _group_by_task(orig_counts_ds)  # 按 task_id 聚合
+
+        op = "noop"
+        target_size = original_size
+
+        if original_size % n_mod != 0:
+            if original_size > 1024*2:
+                # 下采样到最近的下整除倍数；不放回抽样
+                target_size = max((original_size // n_mod) * n_mod, n_mod)
+                print("[Warning] batch size larger than 2048, need downsample!",
+                    "current batch size:", original_size, "n_mod:", n_mod, "-> target:", target_size)
+                keep_idxs = sorted(random.sample(range(original_size), k=target_size))
+                batch = batch.select_idxs(keep_idxs)
+                op = "downsample"
             else:
-                print("[Warning] cannot divided by world size, need upsample! current batch size:", len(batch), n_mod)
-                target_size = (len(batch) // n_mod + 1) * n_mod
-                up_sample_size = target_size - len(batch)
-                print("Need upsample", up_sample_size)
-                idx = random.choices(list(range(len(dataset_ids))), k=up_sample_size)
-                upsampel_batch = batch.select_idxs(idx)
-                batch = DataProto.concat([batch, upsampel_batch])
-                print("After upsample", len(batch))
+                # 上采样到最近的上整除倍数；有放回抽样
+                target_size = ((original_size + n_mod - 1) // n_mod) * n_mod
+                need = target_size - original_size
+                print("[Warning] cannot divided by world size, need upsample!",
+                    "current batch size:", original_size, "n_mod:", n_mod, "-> target:", target_size)
+                print("Need upsample", need)
+                extra_idxs = random.choices(range(original_size), k=need)
+                extra_batch = batch.select_idxs(extra_idxs)
+                batch = type(batch).concat([batch, extra_batch])
+                op = "upsample"
+
+        final_size = len(batch)
+        final_ids = batch.non_tensor_batch.get("dataset_ids", None)
+        final_counts_ds = _count(final_ids)
+        final_counts_task = _group_by_task(final_counts_ds)  # 按 task_id 聚合
+
+        # ---- 统计合并：delta 正为新增，负为删除 ----
+        per_task = {}
+        all_tasks = set(orig_counts_task.keys()) | set(final_counts_task.keys())
+        for t in all_tasks:
+            o = orig_counts_task.get(t, 0)
+            f = final_counts_task.get(t, 0)
+            per_task[str(t)] = {"original": o, "final": f, "delta": f - o}
+
+        total_delta = final_size - original_size  # 上采样为正，下采样为负，noop 为 0
+
+        record = {
+            "timestamp": _now_str(),
+            "step": self.global_steps,
+            "n_mod": n_mod,
+            "op": op,                         # "upsample" / "downsample" / "noop"
+            "original_size": original_size,
+            "total_delta": total_delta,       # downsample 用负值表示
+            "per_task": per_task,            # {ds_id: {original, final, delta}}
+        }
+        #_append_jsonl(jsonl_path, record)
+        
+        # 更新到metrics中
+        metrics.update(
+                    {
+                        "training/n_mod": n_mod,
+                        "training/upsample_delta": total_delta,
+                    }
+                )
+
+        if op != "noop":
+            print("After", op, "final_size:", final_size)
+
+        return batch
+
+    def _up_sample_with_padding(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
+        n_mod = world_size * ppo_mini_batch_size
+        orig_size = len(batch)
+        if orig_size % n_mod == 0:
+            padding_mask = torch.ones(orig_size, dtype=torch.float32, device=batch.batch["input_ids"].device)
+            batch.batch['padding_mask'] = padding_mask
+            return batch
+
+        try:
+            dataset_ids = batch.non_tensor_batch.get("dataset_ids", None)
+
+            print("[Warning] cannot divided by world size, need upsample! current batch size:",
+                len(batch), "n_mod:", n_mod)
+            target_size = (len(batch) // n_mod + 1) * n_mod
+            up_sample_size = target_size - len(batch)
+            print("Need upsample", up_sample_size)
+
+            # 用已有样本随机复制补齐
+            idx = random.choices(range(len(dataset_ids)), k=up_sample_size)
+            upsample_batch = batch.select_idxs(idx)
+            batch = DataProto.concat([batch, upsample_batch])
+            
+            print("After upsample", len(batch))
+                     
+            # --- 对补齐出来的切片进行标注与置零 ---
+            if up_sample_size > 0:
+                # 1) padding_mask
+                device = batch.batch["input_ids"].device
+                padding_mask = torch.ones(target_size, dtype=torch.float32, device=device)
+                padding_mask[orig_size:] = 0.0
+                batch.batch["padding_mask"] = padding_mask
+
+                # 2) 把补齐段的 uid 设为 "padding"
+                uids_src = batch.non_tensor_batch["uid"]
+                # 构造新的、长度为 target_size 的 object 数组，避免 Unicode 长度截断
+                uids = np.empty(target_size, dtype=object)
+                # 将原前半段复制过来（只保留前 orig_size 的真实样本）
+                uids[:orig_size] = uids_src[:orig_size]
+                # 将补齐段改为 "padding"
+                uids[orig_size:] = "padding"
+                batch.non_tensor_batch["uid"] = uids
+
+                # 3) 把补齐段的 reward_tensor 置为 0
+                batch.batch["reward_tensor"][orig_size:] = 0.0
+
         except Exception as e:
             print("_up_sample failed due to", e)
 
-        return batch    
+        return batch, target_size/orig_size
+
+
 # # 

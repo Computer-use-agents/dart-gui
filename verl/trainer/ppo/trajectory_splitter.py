@@ -273,12 +273,13 @@ class StepwiseTrajectorySplitter:
             
         Returns:
             DataProto: Collated batch output
+            
         """
         if not ray.is_initialized():
             ray.init(num_cpus=num_cpus)
         
         # Create remote function for processing a single dataset
-        @ray.remote
+        @ray.remote(scheduling_strategy="SPREAD")
         def process_single_dataset(splitter, dataset_id, reward, use_vllm_logp, avg_len):
             if self.use_vllm_logp:
                 batch_messages = self.split_dataset_id_from_pt(dataset_id,reward=reward, avg_len=avg_len)

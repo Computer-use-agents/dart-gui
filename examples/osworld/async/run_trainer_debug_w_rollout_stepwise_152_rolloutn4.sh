@@ -62,7 +62,7 @@ export EXPERIMENT_NAME=rollout_n4_1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_r
 
 
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.72.51:15959
+export ROLLOUT_SERVER_URL=http://172.19.72.98:15959
 
 # training parameters
 adv_estimator=grpo

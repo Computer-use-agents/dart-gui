@@ -248,8 +248,8 @@ def main():
 
     # baseline_dir = "validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250826_kx3b6cmj/global_step_0"
     # baseline_dir = "/capacity/userdata/vcfenxd75jiv/workshops/workshop-3c968795-bb00-4072-bb11-ee466e4046b2/computer-use-rollout-dev-zzh/results/pass@1_UI-TARS-1.5-7B"
-    # baseline_dir= "validation/results/ui_tars_1.5/trainset152" 
-    baseline_dir= "/root/verl/validation/results/ui_tars_1.5/maxstep15_trainset15"
+    baseline_dir= "validation/results/ui_tars_1.5/trainset152" 
+    # baseline_dir= "/root/verl/validation/results/ui_tars_1.5/maxstep15_trainset15"
     # baseline_dir= "/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_train154_maxstep30_tmp07_uitars"
     # baseline_dir="/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_train154_maxstep30_tmp0_uitars"
     # baseline_dir="/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_train154_maxstep30_tmp0_20250830_1230_step130"
@@ -262,6 +262,7 @@ def main():
     # current_dir = "/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_train154_maxstep30_tmp07_px_step74"
     current_dir = "validation/results/FROM_SCRATCH_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250909_qktoqon9/global_step_76"
     current_dir= "/root/verl/validation/results/liuyang_dynamic_sampling_maxstep15/global_step_32"
+    current_dir = "/root/verl/validation/results/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250914_hroqypgw/global_step_102"
     # current_dir="validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50_62_max15"
     # current_dir = "validation/results/wo_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_mpo87w96/global_step_36"
     # current_dir = "validation/results/w_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_w4jryw5c/global_step_16"
@@ -269,7 +270,7 @@ def main():
     # current_dir = '/root/verl/validation/results/RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_v3bba5x0/global_step_4'
     # 对比两个实验
     filter_json=None
-    filter_json="validation/evaluation_examples/test_trainset_15.json"
+    # filter_json="validation/evaluation_examples/test_trainset_15.json"
     # filter_json="validation/evaluation_examples/test_trainset_hard_plan_success_26.json"
     # current_dir="/root/verl/validation/results/RANDOM_planner_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250910_0p3mszz3/global_step_62"
     

@@ -16,7 +16,8 @@ mkdir -p "$LOG_DIR"
 # GPU / 节点检测
 # ================================
 N_NODES=2
-N_GPUS=$(nvidia-smi --list-gpus | wc -l) 
+# N_GPUS=$(nvidia-smi --list-gpus | wc -l) 
+N_GPUS=8
 N_GPUS_PER_NODE=$N_GPUS
 
 # # 生成带时间戳的唯一文件ID，后台运行
@@ -30,7 +31,8 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/NODE2_maxstep30_w_KL_trainset15220250914_s6mvjfhk/global_step_2/actor/huggingface
+MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+# /root/verl/checkpoints/verl_osworld_grpo/NODE2_maxstep30_w_KL_trainset15220250914_s6mvjfhk/global_step_2/actor/huggingface
 # /capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
 #/root/verl/checkpoints/verl_osworld_grpo/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50/actor/huggingface
 
@@ -109,7 +111,7 @@ use_vllm_logp=True
 use_sft_loss=False
 use_token_ids_from_pt=True
 # use_traj_filter=True
-ray job submit --address="http://172.19.72.105:8265" \
+ray job submit --address="http://172.19.56.120:8265" \
     --runtime-env=verl/trainer/runtime_env.yaml \
     --no-wait \
     -- \
