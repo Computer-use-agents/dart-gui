@@ -50,7 +50,7 @@ def run_ppo(config) -> None:
                 runtime_env={"env_vars": {"TOKENIZERS_PARALLELISM": "true", "NCCL_DEBUG": "WARN", "VLLM_LOGGING_LEVEL": "WARN", "VLLM_ALLOW_RUNTIME_LORA_UPDATING": "true"}},
                 num_cpus=config.ray_init.num_cpus,
                 dashboard_host="0.0.0.0",
-                object_store_memory=500 * 1024**3,  # 00GB for object store
+                object_store_memory=800 * 1024**3,  # 00GB for object store
             )
 
     # Create a remote instance of the TaskRunner class, and

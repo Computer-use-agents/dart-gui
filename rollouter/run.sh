@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 # start.sh - 先起 model_service，就绪后再跑 run.py；run.py 结束后退出 model_service
 # 用法：chmod +x start.sh；作为容器入口执行
-cd /root/verl/
-
-source .venv/bin/activate 
-
+source /root/miniconda3/bin/activate 
+conda activate verl
 cd /root/verl/rollouter/
 set -euo pipefail
 
