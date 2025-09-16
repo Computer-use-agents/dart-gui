@@ -354,9 +354,9 @@ class OSWorldAsyncDataset(IterableDataset):
             try:
                 dt = time.strftime("%Y%m%d")
                 ts = time.strftime("%Y%m%d-%H%M%S")
-                dump_dir = f"debug_datasets/{self.run_id.split('/')[-1]}_{dt}"
+                dump_dir = f"debug_datasets/{self.run_id.split('/')[-1]}"
                 os.makedirs(dump_dir, exist_ok=True)
-                dump_base = f"datasets_step{self.produced_batches}_{ts}"
+                dump_base = f"datasets_step{self.produced_batches+1}_{ts}"
 
                 # 保存完整样本列表
                 with open(os.path.join(dump_dir, dump_base + ".json"), "w", encoding="utf-8") as f:

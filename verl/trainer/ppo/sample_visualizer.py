@@ -219,6 +219,7 @@ body { background: var(--bg); color: var(--text); font-family: ui-monospace,SFMo
         responses_ids = self._get_list(batch.get("responses"), i)
         response_mask = self._get_list(batch.get("response_mask"), i)
         attention_mask = self._get_list(batch.get("attention_mask"), i)  # optional
+        
 
         # Trim pads for prompts/responses
         pad_id = getattr(tokenizer, "pad_token_id", None)
@@ -551,7 +552,7 @@ def save_batch_for_viz(
     if fields is None:
         # 你可以按需增删；下列是 SampleVisualizer 直接可用的键
         fields = [
-            "prompts", "responses", "response_mask", "attention_mask",
+            "prompts", "responses", "response_mask", "attention_mask", "loss_mask", 
             "dataset_ids", "uids", "uid", "ids"
         ]
 

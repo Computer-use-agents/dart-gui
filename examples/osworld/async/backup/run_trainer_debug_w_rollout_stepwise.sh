@@ -29,30 +29,27 @@ MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-
 
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K #rI0ezs9zkbORI8oUMsgHT
+export SWANLAB_API_KEY=rI0ezs9zkbORI8oUMsgHT #4wEX4aVA4guJHGZ553g4K
 export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-defau-bddf300d21.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
 # export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-# export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
-# export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
+export ROOT_DATA_DIR=results/trainset154_pass8_gpu4_env40_maxstep30_20250829_1122
+export RUN_ID=results/trainset154_pass8_gpu4_env40_maxstep30_20250829_1122
+export EXPERIMENT_NAME=async_pass8_train154_lr1e-6_bz4_minibs64_downsample_stepwise_maxstep30
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export osworld_all_feasible_reward_script_grpo_k8s_20250826_ypwbn244
 
-export ROOT_DATA_DIR=rollouter/results/pass16_20250901_train15_pass16_gpu2_env20_vllm_logp_maxstep15
-export RUN_ID=results/pass16_20250901_train15_pass16_gpu2_env20_vllm_logp_maxstep15
-# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-# export EXPERIMENT_NAME=w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-export EXPERIMENT_NAME=w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250902_0nope0fv
-
-# export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
+# export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
-# export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.139.126:15959
+export ROLLOUT_SERVER_URL=http://172.19.72.14:15959
 
 # training parameters
 adv_estimator=grpo
+use_padding_mask=false
 
 use_kl_in_reward=False
 kl_coef=0.0
@@ -91,7 +88,7 @@ limit_messages=35
 splitter=stepwise
 window_size=5 
 stride_size=5
-max_steps=15
+max_steps=30
 
 use_vllm_logp=True
 use_sft_loss=False
@@ -120,6 +117,7 @@ python3 -m verl.trainer.main_ppo_async \
     +data.steps_per_epoch=200 \
     +data.train_batch_size_min=${train_bz_min} \
     +data.train_batch_size_max=${train_bz_max} \
+    +data.use_padding_mask=${use_padding_mask} \
     algorithm.adv_estimator=${adv_estimator} \
     algorithm.use_kl_in_reward=${use_kl_in_reward} \
     algorithm.kl_ctrl.kl_coef=${kl_coef} \
@@ -142,7 +140,7 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.grad_clip=2.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     "actor_rollout_ref.actor.checkpoint.save_contents=['model', 'optimizer', 'extra', 'hf_model']" \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.ref.fsdp_config.param_offload=${offload} \
     +actor_rollout_ref.actor.use_vllm_logp=${use_vllm_logp} \
     +actor_rollout_ref.actor.use_sft_loss=${use_sft_loss} \
@@ -155,7 +153,7 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.test_freq=10 \
     trainer.val_before_train=False \
     trainer.total_epochs=1 \
-    trainer.max_actor_ckpt_to_keep=10 \
+    trainer.max_actor_ckpt_to_keep=5 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \

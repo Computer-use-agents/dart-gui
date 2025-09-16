@@ -379,6 +379,12 @@ class DataParallelPPOActor(BasePPOActor):
         multi_turn = data.meta_info.get("multi_turn", False)
 
         select_keys = ["responses", "input_ids", "attention_mask", "position_ids", "old_log_probs", "advantages"]
+        if "loss_mask" in data.batch.keys():
+            select_keys.append("loss_mask")
+        if "padding_mask" in data.batch.keys():
+            select_keys.append("padding_mask")
+        if "attention_mask_eff" in data.batch.keys():
+            select_keys.append("attention_mask_eff")
         if multi_turn:
             select_keys.append("loss_mask")
         if self.config.use_kl_loss:
@@ -461,6 +467,8 @@ class DataParallelPPOActor(BasePPOActor):
                     attention_mask = data["attention_mask"]
                     if multi_turn:
                         response_mask = data["loss_mask"][:, -response_length:]
+                    elif  "attention_mask_eff" in data.keys():
+                        response_mask = data["attention_mask_eff"][:, -response_length:]
                     else:
                         response_mask = attention_mask[:, -response_length:]
 
@@ -514,7 +522,20 @@ class DataParallelPPOActor(BasePPOActor):
                         )
                     else:
                         policy_loss_fn = get_policy_loss_fn(loss_mode)
-                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower,pg_loss_no_old = policy_loss_fn(old_log_prob, log_prob, advantages, response_mask, loss_agg_mode, self.config)
+                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower,pg_loss_no_old, oldlogp_vllm_ratio = policy_loss_fn(
+                            old_log_prob=old_log_prob,
+                            log_prob=log_prob,
+                            advantages=advantages,
+                            response_mask=response_mask,
+                            vllm_log_prob=vllm_log_prob,
+                            reward=reward,
+                            sft_loss=sft_loss,
+                            cliprange=clip_ratio,
+                            cliprange_low=clip_ratio_low,
+                            cliprange_high=clip_ratio_high,
+                            clip_ratio_c=clip_ratio_c,
+                            loss_agg_mode=loss_agg_mode,
+                        )
 
                     if entropy_coeff != 0:
                         entropy_loss = agg_loss(loss_mat=entropy, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)
@@ -539,6 +560,26 @@ class DataParallelPPOActor(BasePPOActor):
                         loss = policy_loss * (len(data) / self.config.ppo_mini_batch_size)
                     else:
                         loss = policy_loss / self.gradient_accumulation
+                        
+                    def _check_finite(name, t):
+                        if torch.is_tensor(t):
+                            if not torch.isfinite(t).all():
+                                print(f"[NaN/Inf] {name}")
+
+                    valid = (response_mask > 0.5)
+
+                    _check_finite("log_prob", log_prob)
+                    _check_finite("old_log_prob", old_log_prob)
+                    if self.config.use_kl_loss:
+                        _check_finite("ref_log_prob", data["ref_log_prob"])
+                    _check_finite("advantages", advantages)
+                    _check_finite("response_mask", response_mask)
+
+                    # 尤其看“被掩掉的位置”是否已经是坏的
+                    bad_ratio = torch.exp((log_prob - old_log_prob))
+                    _check_finite("ratio", bad_ratio)
+                    _check_finite("ratio_on_mask0", bad_ratio[~valid])
+                    
                     loss.backward()
 
                     data = {
@@ -561,11 +602,17 @@ class DataParallelPPOActor(BasePPOActor):
                         data["actor/sft_loss"] = sft_loss.detach().item()
 
                     append_to_dict(metrics, data)
-
+                
+                for n,p in self.actor_module.named_parameters():
+                    if p.grad is not None and torch.isnan(p.grad).any():
+                        print("NaN grad at", n)
                 grad_norm = self._optimizer_step()
                 print("call optimizer step, update actor")
                 data = {"actor/grad_norm": grad_norm.detach().item()}
                 append_to_dict(metrics, data)
+                with open("loss_dump/minibs32_adv_mean.txt", 'a', encoding='utf-8') as f:
+                    line_to_write = " ".join(map(str, metrics["actor/advantages_mean"])) + "\n"
+                    f.write(line_to_write)
         self.actor_optimizer.zero_grad()
 
         return metrics

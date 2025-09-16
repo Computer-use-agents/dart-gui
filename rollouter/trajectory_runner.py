@@ -233,7 +233,7 @@ class TrajectoryRunnerActor:
                 await storage.save_partial_pt.remote(self.task_root, step + 1, vllm_logp, token_ids, prompt_token_ids)
                 
                 step_duration = time.time() - st_step
-                self._log_latency(step, model_duration, env_duration, step_duration)
+                # self._log_latency(step, model_duration, env_duration, step_duration)
                 
                 step += 1
 
@@ -301,7 +301,7 @@ class TrajectoryRunnerActor:
                 'reward': reward,
                 'model_version': model_path,
                 'instruction': self.task_cfg["instruction"],
-                'num_chunks' : step     # spliter功能停用，这里保存step步数
+                'num_chunks' : step if action == 'DONE' else step-1     # spliter功能停用，这里保存step步数
                 }
 
                 await mysql_writer.insert_run.remote(meta)
