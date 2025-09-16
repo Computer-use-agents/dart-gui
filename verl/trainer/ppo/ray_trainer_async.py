@@ -506,10 +506,10 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         target_size = original_size
 
         if original_size % n_mod != 0:
-            if original_size > 1024*2:
+            if original_size > 1024:
                 # 下采样到最近的下整除倍数；不放回抽样
                 target_size = max((original_size // n_mod) * n_mod, n_mod)
-                print("[Warning] batch size larger than 2048, need downsample!",
+                print("[Warning] batch size larger than 1024, need downsample!",
                     "current batch size:", original_size, "n_mod:", n_mod, "-> target:", target_size)
                 keep_idxs = sorted(random.sample(range(original_size), k=target_size))
                 batch = batch.select_idxs(keep_idxs)
@@ -568,12 +568,23 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
     def _up_sample_with_padding(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
         n_mod = world_size * ppo_mini_batch_size
         orig_size = len(batch)
+        max_size = 1024
         if orig_size % n_mod == 0:
             padding_mask = torch.ones(orig_size, dtype=torch.float32, device=batch.batch["input_ids"].device)
             batch.batch['padding_mask'] = padding_mask
-            return batch
+            return batch, 1
 
-        try:
+        elif orig_size > max_size:
+            # 下采样到最近的下整除倍数；不放回抽样
+            target_size = max_size
+            print("[Warning] batch size larger than max size, need downsample!",
+                "current batch size:", orig_size, "n_mod:", n_mod, "-> target:", target_size)
+            keep_idxs = sorted(random.sample(range(orig_size), k=target_size))
+            batch = batch.select_idxs(keep_idxs)
+            padding_mask = torch.ones(target_size, dtype=torch.float32, device=batch.batch["input_ids"].device)
+            batch.batch['padding_mask'] = padding_mask
+            
+        else:
             dataset_ids = batch.non_tensor_batch.get("dataset_ids", None)
 
             print("[Warning] cannot divided by world size, need upsample! current batch size:",
@@ -592,8 +603,7 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
             # --- 对补齐出来的切片进行标注与置零 ---
             if up_sample_size > 0:
                 # 1) padding_mask
-                device = batch.batch["input_ids"].device
-                padding_mask = torch.ones(target_size, dtype=torch.float32, device=device)
+                padding_mask = torch.ones(target_size, dtype=torch.float32, device=batch.batch["input_ids"].device)
                 padding_mask[orig_size:] = 0.0
                 batch.batch["padding_mask"] = padding_mask
 
@@ -609,9 +619,6 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
 
                 # 3) 把补齐段的 reward_tensor 置为 0
                 batch.batch["reward_tensor"][orig_size:] = 0.0
-
-        except Exception as e:
-            print("_up_sample failed due to", e)
 
         return batch, target_size/orig_size
 

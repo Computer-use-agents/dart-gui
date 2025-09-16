@@ -522,7 +522,20 @@ class DataParallelPPOActor(BasePPOActor):
                         )
                     else:
                         policy_loss_fn = get_policy_loss_fn(loss_mode)
-                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower,pg_loss_no_old = policy_loss_fn(old_log_prob, log_prob, advantages, response_mask, loss_agg_mode, self.config)
+                        pg_loss, pg_clipfrac, ppo_kl, pg_clipfrac_lower,pg_loss_no_old, oldlogp_vllm_ratio = policy_loss_fn(
+                            old_log_prob=old_log_prob,
+                            log_prob=log_prob,
+                            advantages=advantages,
+                            response_mask=response_mask,
+                            vllm_log_prob=vllm_log_prob,
+                            reward=reward,
+                            sft_loss=sft_loss,
+                            cliprange=clip_ratio,
+                            cliprange_low=clip_ratio_low,
+                            cliprange_high=clip_ratio_high,
+                            clip_ratio_c=clip_ratio_c,
+                            loss_agg_mode=loss_agg_mode,
+                        )
 
                     if entropy_coeff != 0:
                         entropy_loss = agg_loss(loss_mat=entropy, loss_mask=response_mask, loss_agg_mode=loss_agg_mode)

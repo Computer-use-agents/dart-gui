@@ -411,5 +411,5 @@ if __name__ == "__main__":
     # print(orm.update_rollout_used("results/test_for_train_pass8_gpu8_env77_20250817_1345", "9439a27b-18ae-42d8-9778-5f68f891805e_trace_e635d5e3af17_1755501336"))
     # print(orm.insert_checkpoint("/mnt/checkpoints/model-abc/weights.bin"))
     # print(orm.get_latest_n_checkpoint_paths("results/trainset15_pass8_gpu2_env20_maxstep30_20250902_2305", 2))
-    for i in range(1, 26):
-        print(orm.get_nth_newest_model_success("results/singlehard_pass8_gpu2_env20_maxstep30_tmp1_20250910_1555", i))
+    for i in range(1, 2):
+        print(orm.get_nth_newest_model_success("results/trainset15_pass8_gpu2_env20_maxstep30_tmp1_20250914_2059", i))

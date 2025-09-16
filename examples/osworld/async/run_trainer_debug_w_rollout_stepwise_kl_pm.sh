@@ -40,16 +40,17 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 # export ROOT_DATA_DIR=results/singlehard_pass8_gpu2_env20_maxstep30_20250909_1441
 # export RUN_ID=results/singlehard_pass8_gpu2_env20_maxstep30_20250909_1441
 # export EXPERIMENT_NAME=async_pass8_singlehard_lr1e-6_bz1_minibs30_paddingmask_stepwise_kl_maxstep30_250909
-export ROOT_DATA_DIR=results/trainset15_pass16_gpu2_env20_maxstep30_tmp1_20250911_2025
-export RUN_ID=results/trainset15_pass16_gpu2_env20_maxstep30_tmp1_20250911_2025
-export EXPERIMENT_NAME=async_pass8_train15_lr1e-6_bz4_minibs64_paddingmask_stepwise_kl_maxstep30_tmp1
+export ROOT_DATA_DIR=rollouter/results/trainset154_pass8_gpu4_env36_maxstep30_tmp1_20250915_2333
+export RUN_ID=results/trainset154_pass8_gpu4_env36_maxstep30_tmp1_20250915_2333
+export EXPERIMENT_NAME=async_pass8_train154_lr1e-6_bz8_minibs64_paddingmask_stepwise_kl_maxstep30_logp_gspo
 
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 
-export ROLLOUT_SERVER_URL=http://172.19.171.147:15959
+export ROLLOUT_SERVER_URL=http://172.19.217.166:15959
 
 # training parameters
 adv_estimator=grpo
+loss_mode=gspo #default vanilla
 
 use_padding_mask=true
 use_kl_in_reward=False
@@ -71,7 +72,7 @@ loss_agg_mode="seq-mean-token-mean"
 
 
 train_bz_min=4
-train_bz_max=4
+train_bz_max=8
 train_prompt_bsz=8
 rollout_n=8
 train_prompt_mini_bsz=64
@@ -89,9 +90,14 @@ fsdp_size=32
 ## message splitter
 limit_messages=35
 splitter=stepwise
+splitter_parallel=True
 window_size=5
 stride_size=5
 max_steps=30
+
+use_vllm_logp=True
+use_sft_loss=False
+use_token_ids_from_pt=True
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
@@ -108,14 +114,14 @@ python3 -m verl.trainer.main_ppo_async \
     data.custom_cls.name=OSWorldAsyncDataset \
     data.shuffle=false \
     +data.use_padding_mask=${use_padding_mask} \
-    +data.rotate_task_groups=false \
+    +data.rotate_task_groups=true \
     +data.root_data_dir=$ROOT_DATA_DIR \
     +data.window_size=${window_size} \
     +data.stride_size=${stride_size} \
     +data.max_steps=${max_steps} \
     +data.num_workers=0 \
     +data.run_id=$RUN_ID \
-    +data.steps_per_epoch=100 \
+    +data.steps_per_epoch=200 \
     +data.train_batch_size_min=${train_bz_min} \
     +data.train_batch_size_max=${train_bz_max} \
     +data.top_mvs_n=2 \
@@ -141,8 +147,12 @@ python3 -m verl.trainer.main_ppo_async \
     actor_rollout_ref.actor.grad_clip=2.0 \
     actor_rollout_ref.actor.loss_agg_mode=${loss_agg_mode} \
     "actor_rollout_ref.actor.checkpoint.save_contents=['model', 'optimizer', 'extra', 'hf_model']" \
-    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=2 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=1 \
     actor_rollout_ref.ref.fsdp_config.param_offload=${offload} \
+    +actor_rollout_ref.actor.use_vllm_logp=${use_vllm_logp} \
+    +actor_rollout_ref.actor.use_sft_loss=${use_sft_loss} \
+    +actor_rollout_ref.actor.use_token_ids_from_pt=${use_token_ids_from_pt} \
+    actor_rollout_ref.actor.policy_loss.loss_mode=${loss_mode} \
     "trainer.logger=['console','swanlab']" \
     trainer.project_name='verl_osworld_grpo' \
     trainer.experiment_name=$EXPERIMENT_NAME \
@@ -152,12 +162,12 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.test_freq=10 \
     trainer.val_before_train=False \
     trainer.total_epochs=1 \
-    trainer.max_actor_ckpt_to_keep=5 \
+    trainer.max_actor_ckpt_to_keep=10 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \
-    +trainer.splitter_parallel=False\
-    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=1 \
+    +trainer.splitter_parallel=${splitter_parallel} \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=2 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=$ENGINE \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
