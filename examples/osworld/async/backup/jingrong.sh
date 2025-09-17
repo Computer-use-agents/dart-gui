@@ -25,47 +25,47 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl/global_step_10/actor/huggingface
-#/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
-# /root/verl/checkpoints/verl_osworld_grpo/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250916_8ik050h8/global_step_8/actor/huggingface
-# /capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
- 
+MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+# MODEL_PATH=/workspace/computer-use/verl/checkpoints/verl_osworld_grpo/async_pass8_singlehard_lr1e-6_bz1_minibs30_paddingmask_stepwise_kl_maxstep30/global_step_22_bak/actor/huggingface
+
 # If you are using vllm<=0.6.3, you might need to set the following environment variable to avoid bugs:
 # export VLLM_ATTENTION_BACKEND=XFORMERS
-export SWANLAB_API_KEY=4wEX4aVA4guJHGZ553g4K #rI0ezs9zkbORI8oUMsgHT
+export SWANLAB_API_KEY=rI0ezs9zkbORI8oUMsgHT #4wEX4aVA4guJHGZ553g4K
 export REWARD_SERVER_URL=https://sv-2c09d3fa-da78-42c8-ad5b-724aad65a530-8000-x-defau-bddf300d21.sproxy.hd-01.alayanew.com:22443/v1
 export REWARD_MODEL=qwen2.5_vl_7b
-# export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
+export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
 # export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-# export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
-# export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
+# export ROOT_DATA_DIR=results/singlehard_pass8_gpu2_env20_maxstep30_20250909_1441
+# export RUN_ID=results/singlehard_pass8_gpu2_env20_maxstep30_20250909_1441
+# export EXPERIMENT_NAME=async_pass8_singlehard_lr1e-6_bz1_minibs30_paddingmask_stepwise_kl_maxstep30_250909
+export ROOT_DATA_DIR=rollouter/results/trainset154_pass8_gpu4_env36_maxstep30_tmp1_20250915_2333
+export RUN_ID=results/trainset154_pass8_gpu4_env36_maxstep30_tmp1_20250915_2333
+export EXPERIMENT_NAME=async_pass8_train154_lr1e-6_bz8_minibs64_paddingmask_stepwise_kl_maxstep30_logp_gspo
 
-export ROOT_DATA_DIR=rollouter/results/pass8_20250916_trainset152_gpu2_env18_vllm_logp_maxstep30
-export RUN_ID=results/pass8_20250916_trainset152_gpu2_env18_vllm_logp_maxstep30
+# export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 
-# export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl
-# export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250916_8ik050h8
-
-# export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.131.99:15959
+export ROLLOUT_SERVER_URL=http://172.19.217.166:15959
 
 # training parameters
 adv_estimator=grpo
+loss_mode=gspo #default vanilla
 
+use_padding_mask=true
 use_kl_in_reward=False
 kl_coef=0.0
-use_kl_loss=False
+use_kl_loss=True
 kl_loss_coef=0.1
+# use_kl_loss=False
+# kl_loss_coef=0.0
 
 clip_ratio_low=0.1
 clip_ratio_high=0.28
 
 
 max_prompt_length=32000
-max_response_length=500
+max_response_length=1000
 
 # loss_agg_mode="token-mean"
 loss_agg_mode="seq-mean-token-mean"
@@ -87,16 +87,13 @@ gen_tp=4
 fsdp_size=32
 
 
-
-use_padding_mask=False
-
 ## message splitter
 limit_messages=35
 splitter=stepwise
 splitter_parallel=True
-window_size=5 
+window_size=5
 stride_size=5
-max_steps=15
+max_steps=30
 
 use_vllm_logp=True
 use_sft_loss=False
@@ -155,16 +152,17 @@ python3 -m verl.trainer.main_ppo_async \
     +actor_rollout_ref.actor.use_vllm_logp=${use_vllm_logp} \
     +actor_rollout_ref.actor.use_sft_loss=${use_sft_loss} \
     +actor_rollout_ref.actor.use_token_ids_from_pt=${use_token_ids_from_pt} \
+    actor_rollout_ref.actor.policy_loss.loss_mode=${loss_mode} \
     "trainer.logger=['console','swanlab']" \
     trainer.project_name='verl_osworld_grpo' \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=2 \
+    trainer.save_freq=1 \
     trainer.test_freq=10 \
     trainer.val_before_train=False \
     trainer.total_epochs=1 \
-    trainer.max_actor_ckpt_to_keep=5 \
+    trainer.max_actor_ckpt_to_keep=10 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \

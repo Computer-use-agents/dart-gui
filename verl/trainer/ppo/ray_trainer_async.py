@@ -120,6 +120,8 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         self.global_steps += 1
         last_val_metrics = None
 
+        # raise RuntimeError("pengxiang debugging")
+
         for epoch in range(self.config.trainer.total_epochs):
             for batch_dict in self.train_dataloader:
                 metrics = {}
@@ -424,24 +426,6 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                         # if is_last_step:
                             # last_val_metrics = val_metrics
                         # metrics.update(val_metrics)
-<<<<<<< HEAD
-                    # if (self.global_steps % self.config.trainer.save_freq == 0) or self.global_steps == 1:
-                    #     db_manager = create_database_manager()
-                        
-                    #     #统计第step-2个版本模型的平均成功率
-                    #     avg_nonneg, count_all, distinct_task_cnt = db_manager.get_nth_newest_model_success(run_id=self.run_id, n=3)
-                    #     # rollout metrics
-                    #     if avg_nonneg > 0:
-                    #         metrics.update(
-                    #             {
-                    #                 "rollout/succ_rate": avg_nonneg,
-                    #                 "rollout/traj_count": count_all,
-                    #                 "rollout/task_count": distinct_task_cnt
-                    #             }
-                    #         )
-                    #     db_manager.close_database()
-=======
->>>>>>> origin/debug/vllm_logp_wjr
                         
                 # training metrics
                 metrics.update(
@@ -512,21 +496,6 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
             return dict(agg)
 
         n_mod = world_size * ppo_mini_batch_size
-<<<<<<< HEAD
-        print("WORLD_SIZE and PPO mini batch size and N mod:", world_size, ppo_mini_batch_size, n_mod)
-        if len(batch) % n_mod == 0:
-            return batch
-       
-        try:
-            import random
-            dataset_ids = batch.non_tensor_batch["dataset_ids"]
-            target_size = 16*32*2
-            if len(batch) > target_size:
-                print("[Warning] batch size larger than 16*32*2, need downsample! current batch size:", len(batch), n_mod)
-                idx = random.choices(list(range(len(dataset_ids))), k=target_size)
-                downsampled_batch = batch.select_idxs(idx)
-                return downsampled_batch
-=======
         dump_dir = f"debug_datasets/{self.run_id.split('/')[-1]}_{_yyyymmdd()}"
         jsonl_path = os.path.join(dump_dir, "sampling_stats.jsonl")
 
@@ -541,13 +510,12 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         if original_size % n_mod != 0:
             if original_size > 1024:
                 # 下采样到最近的下整除倍数；不放回抽样
-                target_size = max((original_size // n_mod) * n_mod, n_mod)
-                print("[Warning] batch size larger than 1024, need downsample!",
+                target_size = 1024
+                print("[Warning] batch size larger than 2048, need downsample!",
                     "current batch size:", original_size, "n_mod:", n_mod, "-> target:", target_size)
                 keep_idxs = sorted(random.sample(range(original_size), k=target_size))
                 batch = batch.select_idxs(keep_idxs)
                 op = "downsample"
->>>>>>> origin/debug/vllm_logp_wjr
             else:
                 # 上采样到最近的上整除倍数；有放回抽样
                 target_size = ((original_size + n_mod - 1) // n_mod) * n_mod
@@ -602,23 +570,12 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
     def _up_sample_with_padding(self, batch: DataProto, world_size: int, ppo_mini_batch_size: int) -> DataProto:
         n_mod = world_size * ppo_mini_batch_size
         orig_size = len(batch)
-        max_size = 1024
         if orig_size % n_mod == 0:
             padding_mask = torch.ones(orig_size, dtype=torch.float32, device=batch.batch["input_ids"].device)
             batch.batch['padding_mask'] = padding_mask
-            return batch, 1
+            return batch
 
-        elif orig_size > max_size:
-            # 下采样到最近的下整除倍数；不放回抽样
-            target_size = max_size
-            print("[Warning] batch size larger than max size, need downsample!",
-                "current batch size:", orig_size, "n_mod:", n_mod, "-> target:", target_size)
-            keep_idxs = sorted(random.sample(range(orig_size), k=target_size))
-            batch = batch.select_idxs(keep_idxs)
-            padding_mask = torch.ones(target_size, dtype=torch.float32, device=batch.batch["input_ids"].device)
-            batch.batch['padding_mask'] = padding_mask
-            
-        else:
+        try:
             dataset_ids = batch.non_tensor_batch.get("dataset_ids", None)
 
             print("[Warning] cannot divided by world size, need upsample! current batch size:",
@@ -637,7 +594,8 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
             # --- 对补齐出来的切片进行标注与置零 ---
             if up_sample_size > 0:
                 # 1) padding_mask
-                padding_mask = torch.ones(target_size, dtype=torch.float32, device=batch.batch["input_ids"].device)
+                device = batch.batch["input_ids"].device
+                padding_mask = torch.ones(target_size, dtype=torch.float32, device=device)
                 padding_mask[orig_size:] = 0.0
                 batch.batch["padding_mask"] = padding_mask
 
@@ -653,6 +611,9 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
 
                 # 3) 把补齐段的 reward_tensor 置为 0
                 batch.batch["reward_tensor"][orig_size:] = 0.0
+
+        except Exception as e:
+            print("_up_sample failed due to", e)
 
         return batch, target_size/orig_size
 
