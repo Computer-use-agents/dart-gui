@@ -263,6 +263,7 @@ def main():
     current_dir = "validation/results/FROM_SCRATCH_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250909_qktoqon9/global_step_76"
     current_dir= "/root/verl/validation/results/liuyang_dynamic_sampling_maxstep15/global_step_32"
     current_dir = "/root/verl/validation/results/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250914_hroqypgw/global_step_102"
+    current_dir = "/root/verl/validation/results/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl/global_step_42"
     # current_dir="validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50_62_max15"
     # current_dir = "validation/results/wo_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_mpo87w96/global_step_36"
     # current_dir = "validation/results/w_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_w4jryw5c/global_step_16"

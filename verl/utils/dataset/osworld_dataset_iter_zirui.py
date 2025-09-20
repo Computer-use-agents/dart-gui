@@ -293,9 +293,14 @@ class OSWorldAsyncDataset(IterableDataset):
         while (self.steps_per_epoch == 0) or (self.produced_batches < self.steps_per_epoch):
             #try:
             # 1) 获取全部候选 rollouts（原始数据）
-            data = self.db_manager.get_rollouts_by_run_id(run_id=self.run_id)
-            print("len all data in SQL:", len(data))
-
+            try:
+                data = self.db_manager.get_rollouts_by_run_id(run_id=self.run_id)
+                print("len all data in SQL:", len(data))
+            except Exception as e:
+                logger.error(f"[worker {worker_id}] get_rollouts_by_run_id error: {e}")
+                time.sleep(self.poll_interval_sec)
+                self.wait_num += 1
+                continue
             # 2) 获取最近的若干 checkpoint 对应的 model_versions（top_mvs）
             top_n = int(self.config.get("top_mvs_n", 2))
             top_mvs = self.db_manager.get_latest_n_checkpoint_paths(run_id=self.run_id, n=top_n)

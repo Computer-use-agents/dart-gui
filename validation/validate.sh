@@ -1,6 +1,4 @@
-cd /root/verl/
-
-source .venv/bin/activate 
+source /root/miniconda3/bin/activate verl
 
 cd /root/verl/validation/
 

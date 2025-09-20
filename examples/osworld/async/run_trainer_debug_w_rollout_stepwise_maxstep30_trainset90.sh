@@ -42,10 +42,12 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 # export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
 # export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
 
-export ROOT_DATA_DIR=rollouter/results/from_scratch_pass8_20250909_train90_pass8_gpu4_env48_vllm_logp_maxstep30_vllm_logp
-export RUN_ID=results/from_scratch_pass8_20250909_train90_pass8_gpu4_env48_vllm_logp_maxstep30_vllm_logp
+# export ROOT_DATA_DIR=rollouter/results/from_scratch_pass8_20250909_train90_pass8_gpu4_env48_vllm_logp_maxstep30_vllm_logp
+# export RUN_ID=results/from_scratch_pass8_20250909_train90_pass8_gpu4_env48_vllm_logp_maxstep30_vllm_logp
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-export EXPERIMENT_NAME=FROM_SCRATCH_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export ROOT_DATA_DIR=rollouter/results/pass8_202509018_train90_pass8_gpu2_env18_vllm_logp_maxstep30
+export RUN_ID=results/pass8_202509018_train90_pass8_gpu2_env18_vllm_logp_maxstep30
+export EXPERIMENT_NAME=Lipx_FROM_SCRATCH_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export EXPERIMENT_NAME=RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_v3bba5x0
 # export EXPERIMENT_NAME=RESUME_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_cf25sna0
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
@@ -54,7 +56,7 @@ export EXPERIMENT_NAME=FROM_SCRATCH_maxstep30_w_KL_trainset90_vllm_logp_osworld_
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.140.83:15959
+export ROLLOUT_SERVER_URL=http://172.19.17.61:15959
 
 # training parameters
 adv_estimator=grpo
@@ -75,11 +77,11 @@ max_response_length=500
 loss_agg_mode="seq-mean-token-mean"
 
 
-train_bz_min=2
+train_bz_min=4
 train_bz_max=8
 train_prompt_bsz=8
 rollout_n=8
-train_prompt_mini_bsz=32
+train_prompt_mini_bsz=64
 # Performance Related Parameter
 sp_size=4
 use_dynamic_bsz=False

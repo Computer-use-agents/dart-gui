@@ -25,7 +25,8 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl/global_step_10/actor/huggingface
+MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/Newenv_181_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250919_6oe5izen/global_step_16/actor/huggingface
+# /root/verl/checkpoints/verl_osworld_grpo/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl/global_step_38/actor/huggingface
 #/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
 # /root/verl/checkpoints/verl_osworld_grpo/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250916_8ik050h8/global_step_8/actor/huggingface
 # /capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
@@ -42,22 +43,23 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 # export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
 # export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
 
-export ROOT_DATA_DIR=rollouter/results/pass8_20250916_trainset152_gpu2_env18_vllm_logp_maxstep30
-export RUN_ID=results/pass8_20250916_trainset152_gpu2_env18_vllm_logp_maxstep30
+export ROOT_DATA_DIR=rollouter/results/pass8_20250919_trainset181_gpu4_env40_vllm_logp_maxstep30_osworld_new
+export RUN_ID=results/pass8_20250919_trainset181_gpu4_env40_vllm_logp_maxstep30_osworld_new
 
-# export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
-export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl
+# export EXPERIMENT_NAME=Newenv_181_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export EXPERIMENT_NAME=Newenv_181_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250919_6oe5izen
+# export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl
 # export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250916_8ik050h8
 
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.131.99:15959
+export ROLLOUT_SERVER_URL=http://172.19.5.213:15959
 
 # training parameters
 adv_estimator=grpo
 
 use_kl_in_reward=False
 kl_coef=0.0
-use_kl_loss=False
+use_kl_loss=True
 kl_loss_coef=0.1
 
 clip_ratio_low=0.1
@@ -71,8 +73,8 @@ max_response_length=500
 loss_agg_mode="seq-mean-token-mean"
 
 
-train_bz_min=4
-train_bz_max=8
+train_bz_min=6
+train_bz_max=10
 train_prompt_bsz=8
 rollout_n=8
 train_prompt_mini_bsz=64
@@ -82,7 +84,7 @@ sp_size=4
 use_dynamic_bsz=False
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
-offload=True
+offload=False
 gen_tp=4
 fsdp_size=32
 
