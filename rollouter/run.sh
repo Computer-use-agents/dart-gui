@@ -6,6 +6,10 @@ conda activate verl
 cd /root/verl/rollouter/
 set -euo pipefail
 
+mkdir -p /root/verl/rollouter/gpu_util_log
+MONITOR_ID="/root/verl/rollouter/gpu_util_log/gpu_monitor_$(date +%Y%m%d_%H%M%S)_$$"
+nohup nvidia-smi --query-gpu=index,timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 1 > "${MONITOR_ID}.csv" 2>&1 &
+
 # ===== 可调参数（支持环境变量覆盖）=====
 PORT="${PORT:-15959}"
 HEALTH_ENDPOINT="${HEALTH_ENDPOINT:-http://127.0.0.1:${PORT}}"

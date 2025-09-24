@@ -264,6 +264,8 @@ def main():
     current_dir= "/root/verl/validation/results/liuyang_dynamic_sampling_maxstep15/global_step_32"
     current_dir = "/root/verl/validation/results/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250914_hroqypgw/global_step_102"
     current_dir = "/root/verl/validation/results/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl/global_step_42"
+
+    current_dir = "/capacity/userdata/vcq6utwivdsv/verl/computer-use/computer-use-rollout/results/val_nogdrive_maxstep30_tmp0_20250918_1130_step61_v1"
     # current_dir="validation/results/osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d/global_step_50_62_max15"
     # current_dir = "validation/results/wo_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_mpo87w96/global_step_36"
     # current_dir = "validation/results/w_KL_trainset152_osworld_reward_script_grpo_k8s_20250829_w4jryw5c/global_step_16"
@@ -271,6 +273,7 @@ def main():
     # current_dir = '/root/verl/validation/results/RESUME_maxstep30_w_KL_trainset90_vllm_logp_osworld_reward_script_grpo_k8s_20250907_v3bba5x0/global_step_4'
     # 对比两个实验
     filter_json=None
+    filter_json="validation/evaluation_examples/test_nogdrive.json"
     # filter_json="validation/evaluation_examples/test_trainset_15.json"
     # filter_json="validation/evaluation_examples/test_trainset_hard_plan_success_26.json"
     # current_dir="/root/verl/validation/results/RANDOM_planner_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250910_0p3mszz3/global_step_62"

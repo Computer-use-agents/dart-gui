@@ -37,6 +37,14 @@ class StorageActor:
         async with aiofiles.open(fn, "w") as f:
             await f.write(json.dumps(partial_traj, ensure_ascii=False, indent=2))
 
+        # ---- save partial trajectory json ----
+    async def save_timestamp(self, task_root: str, trace_id: str, step: int, timestamp_info: dict):
+        save_dir = self.root / task_root
+        save_dir.mkdir(exist_ok=True)
+        fn = save_dir / f"{trace_id}/{trace_id}/timestamp_info_{step}.json"
+        async with aiofiles.open(fn, "w") as f:
+            await f.write(json.dumps(timestamp_info, ensure_ascii=False, indent=2))
+
     # ---- save vllm logp ----
     async def save_partial_pt(self, task_root: str, step: int, logp: list[float], token_ids: list[int] = None, prompt_token_ids: list[int] = None):
         

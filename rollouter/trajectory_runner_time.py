@@ -41,6 +41,10 @@ class TrajectoryRunnerActor:
         self.save_img_pt = self.runner_cfg.save_img_pt
         # self.rollout_n = self.runner_cfg.rollout_n
 
+        self.timestamp_save_path = "/root/verl/rollouter/sampling_log/sync"
+        if not os.path.exists(self.timestamp_save_path):
+            os.makedirs(self.timestamp_save_path, exist_ok=True)
+
         # --- process task info for running ---
         self.base_messages: List = deepcopy(task_info["messages"])
         self.base_messages_for_save: List = deepcopy(task_info["messages"])
@@ -165,6 +169,8 @@ class TrajectoryRunnerActor:
                     logger.warning(f"[{self.trace_id}] 达到最大步数限制，设置动作为FAIL - task_id: {self.task_id}, step: {step}")
 
                 else:
+                    timestamp_info = {}
+                    timestamp_info["step_start_time"] = datetime.datetime.now().isoformat()
                     st_step = time.time()
                     print("step start time: ", st_step)
                     # build prompt
@@ -181,11 +187,17 @@ class TrajectoryRunnerActor:
                             self.runner_cfg.model_pool)
                     # else:
                         # response = await self._call_prelaunched_model(messages, self.runner_cfg.prelaunched_model)
-                        
-                    model_duration = time.time() - st
+                    
+                    et = time.time()
+                    model_duration = et - st
+
+                    timestamp_info["model_call_end_time"] = datetime.datetime.fromtimestamp(et).isoformat()
                     logger.info(f"[{self.trace_id}] 模型响应 - task_id: {self.task_id}, step: {step}, "
                                f"耗时: {model_duration:.2f}s, response_length: {len(response) if response else 0}")
                     logger.debug(f"[{self.trace_id}] 模型完整响应: {response}")
+
+                    timestamp_info["model_call_duration"] = model_duration
+
 
                     if response is None:
                         action = "VLLM ERROR"
@@ -214,7 +226,10 @@ class TrajectoryRunnerActor:
                 obs_img = obs["screenshot"]
                 # all_img.append(obs["image"])
 
-                env_duration = time.time() - st
+                et = time.time()
+                env_duration = et - st
+                timestamp_info["env_step_end_time"] = datetime.datetime.fromtimestamp(et).isoformat()
+                timestamp_info["env_step_duration"] = env_duration
                 logger.info(f"[{self.trace_id}] 环境步骤执行完成 - task_id: {self.task_id}, step: {step}, "
                            f"耗时: {env_duration:.2f}s, done: {done}")
 
@@ -232,8 +247,17 @@ class TrajectoryRunnerActor:
 
                 # ---- save vllm logp ----
                 await storage.save_partial_pt.remote(self.task_root, step + 1, vllm_logp, token_ids, prompt_token_ids)
-                
+
+
                 step_duration = time.time() - st_step
+                timestamp_info["step_end_time"] = datetime.datetime.now().isoformat()
+                timestamp_info["step_duration"] = step_duration
+#                 # ---- save timestamp info ----
+                timestamp_info["step"] = step
+                timestamp_info["task_id"] = self.task_id
+                timestamp_info["trace_id"] = self.trace_id
+                await storage.save_timestamp.remote(self.timestamp_save_path, self.trace_id, step + 1, timestamp_info)
+                
                 # self._log_latency(step, model_duration, env_duration, step_duration)
                 
                 step += 1

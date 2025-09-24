@@ -48,13 +48,13 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 export ROOT_DATA_DIR=rollouter/results/ablation_novllm_logp_pass8_20250920_trainset45_gpu2_env20_vllm_logp_maxstep30_osworld_new
 export RUN_ID=results/ablation_novllm_logp_pass8_20250920_trainset45_gpu2_env20_vllm_logp_maxstep30_osworld_new
 
-export EXPERIMENT_NAME=Newenv_45_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export EXPERIMENT_NAME=Newenv_45_no_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export EXPERIMENT_NAME=Newenv_181_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250919_6oe5izen
 # export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl
 # export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250916_8ik050h8
 
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.131.148:15959
+export ROLLOUT_SERVER_URL=http://172.19.72.238:15959
 
 # training parameters
 adv_estimator=grpo
@@ -102,7 +102,7 @@ window_size=5
 stride_size=5
 max_steps=30
 
-use_vllm_logp=True
+use_vllm_logp=False
 use_sft_loss=False
 use_token_ids_from_pt=True
 
