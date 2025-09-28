@@ -149,20 +149,19 @@
       <div class="author-list">
         <span class="org">
           <span class="ind">1</span>
-          Beijing Institute of Technology
+          BIT
         </span>
         <span class="org">
           <span class="ind">2</span>
-          Beijing Institute for General Artificial Intelligence
+          BIGAI
         </span>
-        <br>
         <span class="org">
           <span class="ind">3</span>
           DataCanvas 
         </span>
         <span class="org">
           <span class="ind">4</span>
-          Beijing University of Posts and Telecommunications
+          BUPT
         </span>
         <span class="org">
           <span class="ind">5</span>
@@ -270,7 +269,7 @@
     </div>
 
     <div class="tldr">
-      <p><b>TL;DR</b> This paper introduces DART, a decoupled RL framework for GUI agents that improves efficiency via asynchronous system design and facilitates effective learning from abundant samples through adaptive data curation.</p>
+      <p><b>TL;DR</b> This paper introduces <b>DART</b>, a decoupled agentic RL framework for training GUI agents, achieving a success rate of <b>42.13% on OSWorld </b>.</p>
     </div>
 
     <div class="section">
