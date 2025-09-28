@@ -1,0 +1,47 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules
+.pnpm-store/
+
+# Build outputs
+dist
+dist-ssr
+*.local
+.vite/
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# Cache directories
+.npm
+.eslintcache
+.stylelintcache
+
+# Optional: Uncomment if using Cypress for testing
+# cypress/videos/
+# cypress/screenshots/

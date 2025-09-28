@@ -1,0 +1,25 @@
+image: node:22
+
+stages:
+  - pages
+
+pages:
+  stage: pages
+  before_script:
+    - corepack enable
+    - corepack prepare pnpm@latest-9 --activate
+    - pnpm config set store-dir .pnpm-store
+  script:
+    - pnpm install # install dependencies
+    - pnpm run build --base=/fire-web/
+    - rm -rf public/*
+    - cp -a dist/. public/
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+  artifacts:
+    paths:
+      - public
