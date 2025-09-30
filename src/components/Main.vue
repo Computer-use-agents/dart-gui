@@ -60,7 +60,7 @@
     <div class="section header">
       <div class="title">
         <img class="mat-icon" src="/icon.png" alt="DART icon">
-        DART
+        DART-GUI
       </div>
       <div class="subtitle">
         Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation
