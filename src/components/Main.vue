@@ -27,7 +27,7 @@
     </div>
     <div class="research-link-wrapper">
       <a class="research-link" href="https://tongui-agent.github.io/" target="_blank">
-        TongUI <span class="conf-tag">[Arxiv]</span>
+        TongUI <span class="conf-tag">[arXiv 2025]</span>
       </a>
       <div class="preview-popup">
         <iframe src="https://tongui-agent.github.io/" frameborder="0"></iframe>
