@@ -5,7 +5,7 @@
   line-height:1.25;
   text-align:center;
   margin:0 0 10px;">
-  DART-GUI <br>Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation 
+  DART-GUI: Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation 
 </h1>
 
 <p align="center">
