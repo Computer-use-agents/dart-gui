@@ -170,7 +170,7 @@
       </div>
 
       <span class="link-block">
-        <a href="" class="external-link button is-normal is-rounded is-dark">
+        <a href="https://arxiv.org/pdf/2509.23866" class="external-link button is-normal is-rounded is-dark">
           <span class="icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="1.0em" height="1.0em" viewBox="0 0 24 24">
               <path fill="currentColor"
@@ -181,7 +181,7 @@
         </a>
       </span>
       <span class="link-block">
-        <a href="" class="external-link button is-normal is-rounded is-dark">
+        <a href="https://github.com/Computer-use-agents/dart-gui" class="external-link button is-normal is-rounded is-dark">
           <span class="icon">
             <i class="fab fa-github"></i>
           </span>
@@ -445,19 +445,24 @@
 
   <section class="section" id="BibTeX" style="text-align: left;">
     <div class="container is-max-desktop content" style="max-width: 100%; margin: 0 auto;">
-      <h3 class="title" style="font-size: small;">
-        BibTeX
-      </h3>
+      <div class="bibtex-header">
+        <h3 class="title" style="font-size: small;">
+          BibTeX
+        </h3>
+        <button @click="copyBibtex" class="copy-button" :class="{ 'copied': copySuccess }">
+          <i class="fas" :class="copySuccess ? 'fa-check' : 'fa-copy'"></i>
+          {{ copySuccess ? 'Copied!' : 'Copy' }}
+        </button>
+      </div>
       <div class="bibtex-container">
         <pre><code class="language-bibtex">
-    @inproceedings{li2025iterative,
-      title={Iterative Trajectory Exploration for Multimodal Agents}, 
-      author={Li, Pengxiang and Gao, Zhi and Zhang, Bofei and Mi, Yapeng and Ma, Xiaojian and Shi, Chenrui and Yuan, Tao and Wu, Yuwei and Jia, Yunde and Zhu, Song-Chun and Li, Qing},
-      year={2025},
-      eprint={2504.21561},
-      archivePrefix={arXiv},
-      url={https://arxiv.org/abs/2504.21561}, 
-      }
+@article{li2025dart,
+  title = {Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation},
+  author={Li, Pengxiang and Hu, Zechen and Shang, Zirui and Wu, Jingrong and Liu, Yang and Liu, Hui and Gao, Zhi and Shi, Chenrui and Zhang, Bofei and Zhang, Zihao and Shi, Xiaochuan and Yu, Zedong and Wu, Yuwei and Wu, Xinxiao and Jia, Yunde and Xiang, Liuyu and He, Zhaofeng and Li, Qing},
+  journal={arXiv preprint arXiv:2509.23866},
+  year={2025}
+  url = {https://arxiv.org/abs/2509.23866}
+}
 </code></pre>
       </div>
     </div>
@@ -491,6 +496,41 @@ const dataset3 = ref([])
 const loadData3 = async () => {
   const resp3 = await fetch('./data/demo-bench.json')
   dataset3.value = await resp3.json()
+}
+
+// Copy functionality for BibTeX
+const copySuccess = ref(false)
+
+const bibtexText = `@article{li2025dart,
+  title = {Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation},
+  author = {Pengxiang Li and Zechen Hu and Zirui Shang and Jingrong Wu and Yang Liu and Hui Liu and Zhi Gao and Chenrui Shi and Bofei Zhang and Zihao Zhang and Xiaochuan Shi and Zedong Yu and Yuwei Wu and Xinxiao Wu and Yunde Jia and Liuyu Xiang and Zhaofeng He and Qing Li},
+  journal = {arXiv preprint},
+  volume = {arXiv:2509.23866},
+  year = {2025},
+  url = {https://arxiv.org/abs/2509.23866},
+}`
+
+const copyBibtex = async () => {
+  try {
+    await navigator.clipboard.writeText(bibtexText)
+    copySuccess.value = true
+    setTimeout(() => {
+      copySuccess.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Failed to copy: ', err)
+    // Fallback for older browsers
+    const textArea = document.createElement('textarea')
+    textArea.value = bibtexText
+    document.body.appendChild(textArea)
+    textArea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textArea)
+    copySuccess.value = true
+    setTimeout(() => {
+      copySuccess.value = false
+    }, 2000)
+  }
 }
 
 onMounted(() => {
@@ -673,6 +713,46 @@ onMounted(() => {
 .external-link .icon {
   margin-right: 10px;
   color: #f3e5f5;
+}
+
+.bibtex-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #f3e5f5;
+  border: 1px solid #ce93d8;
+  border-radius: 6px;
+  color: #4a148c;
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-button:hover {
+  background: #7b1fa2;
+  color: #fff;
+  border-color: #6a1b9a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px 0 rgba(123, 31, 162, 0.15);
+}
+
+.copy-button.copied {
+  background: #4caf50;
+  color: #fff;
+  border-color: #388e3c;
+}
+
+.copy-button i {
+  font-size: 0.85em;
 }
 
 .bibtex-container {
