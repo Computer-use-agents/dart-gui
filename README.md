@@ -43,8 +43,8 @@
         </a>
     </td>
     <td align="center">
-        <a href="">
-            <img src="" width="75px;" alt="Jingrong Wu"/>
+        <a href="https://github.com/RubyNg">
+            <img src="https://github.com/RubyNg.png" width="75px;" alt="Jingrong Wu"/>
             <br />
             <sub><b>Jingrong Wu</b></sub>
         </a>
