@@ -439,7 +439,7 @@
       We visualize the trajectory comparison between the baseline and our model. The task requires saving a webpage to the bookmarks bar for quick access. The baseline model (top) makes a critical error by clicking "Done" without changing the bookmark folder from the default "All Bookmarks" to "Bookmarks bar," resulting in task failure. Our DART-GUI-7B model (bottom) correctly identifies the need to switch the folder dropdown to "Bookmarks bar" before confirming, successfully completing the task. This demonstrates our model's ability to understand subtle but crucial UI requirements that determine task success, learned through RL training on rare successful trajectories.
     </p>
     <el-card class="stats-img-2">
-      <el-image src="./poster.png"></el-image>
+      <el-image src="./stats/visualization.png"></el-image>
     </el-card>
   </div>
 
