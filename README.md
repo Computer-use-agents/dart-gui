@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="https://computer-use-agents.github.io/dart-gui/stats/teaser.png" alt="DART-GUI" style="height: 400px; width: auto;">
+  <img src="https://computer-use-agents.github.io/dart-gui/stats/teaser.png" alt="DART-GUI" style="height: 500px; width: auto;">
 </p>
 
 
