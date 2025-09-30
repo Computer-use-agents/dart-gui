@@ -1,16 +1,12 @@
-<p align="center">
 <h1 style="
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
-  font-size:30px;
+  font-size:40px;
   font-weight:700;
   line-height:1.25;
   text-align:center;
-  margin:0 0 10px;">
-  <img src="https://computer-use-agents.github.io/dart-gui/icon.png" alt="DART-GUI" style="height: 30px;"> DART-GUI 
-  <br>
-    <span style="font-size:22px;">Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation</span>
-  </h1>
-</p>
+  margin:0 0 24px;">
+  <img src="https://computer-use-agents.github.io/dart-gui/icon.png" alt="DART-GUI" style="height: 30px;"> DART-GUI <br>
+  <span style="font-size:22px;">Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation</span>
+</h1>
 
 
 <p align="center">
