@@ -25,7 +25,7 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+MODEL_PATH=/root/verl/checkpoints/verl_osworld_grpo/Newenv_45_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250921_x0d74m8j/global_step_34/actor/huggingface
 
 # /root/verl/checkpoints/verl_osworld_grpo/Newenv_181_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250919_6oe5izen/global_step_16/actor/huggingface
 # /root/verl/checkpoints/verl_osworld_grpo/1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl/global_step_38/actor/huggingface
@@ -45,16 +45,16 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 # export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
 # export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
 
-export ROOT_DATA_DIR=rollouter/results/ablation_novllm_logp_pass8_20250920_trainset45_gpu2_env20_vllm_logp_maxstep30_osworld_new
-export RUN_ID=results/ablation_novllm_logp_pass8_20250920_trainset45_gpu2_env20_vllm_logp_maxstep30_osworld_new
+export ROOT_DATA_DIR=rollouter/results/resume_ablation_logp_pass8_20250924_trainset45_gpu2_env20_vllm_logp_maxstep30_osworld_new
+export RUN_ID=results/resume_ablation_logp_pass8_20250924_trainset45_gpu2_env20_vllm_logp_maxstep30_osworld_new
 
-export EXPERIMENT_NAME=Newenv_45_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export EXPERIMENT_NAME=Newenv_45_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export EXPERIMENT_NAME=Newenv_181_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250919_6oe5izen
 # export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250917_y7mx07hl
-# export EXPERIMENT_NAME=1NODE_152_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250916_8ik050h8
+export EXPERIMENT_NAME=Newenv_45_vllm_logp_pt_w_KL_trainset_osworld_reward_script_grpo_k8s_20250921_x0d74m8j
 
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.131.148:15959
+export ROLLOUT_SERVER_URL=http://172.19.131.92:15959
 
 # training parameters
 adv_estimator=grpo
