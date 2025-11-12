@@ -59,7 +59,7 @@ async def async_main(config=None):
     #     return
 
      # env环境清空
-    release_env(config.env.server_url,config.env.user_token)
+    # release_env(config.env.server_url,config.env.user_token)
 
     while True:
         try:

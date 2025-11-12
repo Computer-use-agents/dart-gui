@@ -178,7 +178,7 @@ class TrajectoryRunnerActor:
                     if model_pool:
                         response, model_path, vllm_logp, token_ids = await self._call_model(
                             model_pool, messages,
-                            self.runner_cfg.model_pool)
+                            self.runner_cfg.model_pool, step)
                     # else:
                         # response = await self._call_prelaunched_model(messages, self.runner_cfg.prelaunched_model)
                         
@@ -259,7 +259,9 @@ class TrajectoryRunnerActor:
                     full_messages.pop()
                     all_img.pop()
                     logger.info(f"[{self.trace_id}] 去除最后一条仅含图片的用户消息 - task_id: {self.task_id}")
-            await storage.save_episode.remote(self.task_root, full_messages)
+            await storage.save_episode.remote(self.task_root, full_messages, self.task_id, self.trace_id)
+
+            await model_pool.save_messages_reward.remote(full_messages, reward)
 
             # save img
             if self.save_img_pt:
@@ -330,16 +332,29 @@ class TrajectoryRunnerActor:
         max_retries = env_cfg.max_retries
         for attempt in range(max_retries):
             try:
-                self.env = RemoteDesktopEnv(
-                    server_url=env_cfg.server_url,
-                    user_token=env_cfg.user_token,
-                    action_space=env_cfg.action_space,
-                    screen_size=env_cfg.screen_size,
-                    headless=env_cfg.headless,
-                    os_type=env_cfg.os_type,
-                    require_a11y_tree=env_cfg.require_a11y_tree,
-                    task_config=self.task_cfg
-                )
+                if env_cfg.env_type == "remote_desktop":
+                    self.env = RemoteDesktopEnv(
+                        server_url=env_cfg.server_url,
+                        user_token=env_cfg.user_token,
+                        action_space=env_cfg.action_space,
+                        screen_size=env_cfg.screen_size,
+                        headless=env_cfg.headless,
+                        os_type=env_cfg.os_type,
+                        require_a11y_tree=env_cfg.require_a11y_tree,
+                        task_config=self.task_cfg
+                    )
+                elif env_cfg.env_type == "desktop_env":
+                    from desktop_env.desktop_env import DesktopEnv
+                    import os 
+                    os.environ["OSWORLD_TOKEN"] = 'alpha'
+                    os.environ["OSWORLD_BASE_URL"] = 'http://10.1.110.48:50003'
+                    self.env = DesktopEnv(
+                                action_space="pyautogui",
+                                provider_name="docker_server",
+                                os_type='Ubuntu',
+                            )
+                    self.env.reset(task_config=self.task_cfg)
+                    time.sleep(60)
                 logger.info(f"[{self.trace_id}] 环境初始化成功 - task_id: {self.task_id}, 尝试次数: {attempt + 1}")
                 break
             except Exception as e:
@@ -350,7 +365,7 @@ class TrajectoryRunnerActor:
                 logger.info(f"[{self.trace_id}] 准备重试 - task_id: {self.task_id}, 下次尝试: {attempt + 2}/{max_retries}")
 
 
-    async def _call_model(self, model_pool, messages: str, model_cfg):
+    async def _call_model(self, model_pool, messages: str, model_cfg, step):
         """
         调模型；失败重试 RETRIES 次，指数退避 (backoff**attempt) 秒。
         返回 response (str) 或 None.
@@ -371,7 +386,10 @@ class TrajectoryRunnerActor:
                                                seed=model_cfg.seed,
                                                logprobs=model_cfg.logprobs,
                                                return_tokens_as_token_ids=model_cfg.return_tokens_as_token_ids), 
-                    timeout=timeout
+                    timeout=timeout,
+                    task_id=self.task_id,
+                    trace_id=self.trace_id,
+                    step=step
                 )
                 return response, model_path, vllm_logp, token_ids
             except (asyncio.TimeoutError, ray.exceptions.RayError) as e:

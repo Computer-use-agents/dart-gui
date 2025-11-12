@@ -268,9 +268,9 @@ class AgentCoordinator:
                     break
                 
                 # 0.定期清理孤立的环境
-                logger.info("准备调用 _cleanup_orphaned_environments 方法")
-                await self._cleanup_orphaned_environments(runner_cfg)
-                logger.info("_cleanup_orphaned_environments 方法调用完成")
+                # logger.info("准备调用 _cleanup_orphaned_environments 方法")
+                # await self._cleanup_orphaned_environments(runner_cfg)
+                # logger.info("_cleanup_orphaned_environments 方法调用完成")
                 
                 # 1. 填充任务队列（最多填充MAX_TASK_QUEUE_SIZE次）
                 if (self.task_queue.empty() and 
