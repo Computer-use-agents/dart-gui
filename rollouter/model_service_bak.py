@@ -86,12 +86,6 @@ class GenerationRequest(BaseModel):
 class TokenizeRequest(BaseModel):
     prompt: str
     parameters: Optional[Dict] = None
-
-class SaveRequest(BaseModel):
-    messages: List[Dict]
-    reward: float
-    task_id: str
-    trace_id: str
     
 # class GenerationRequest(BaseModel):
 #     """
@@ -210,7 +204,6 @@ class ModelServicePool:
         self.replicas = model_cfg.replicas
         self.vllm_params = model_cfg.vllm_params
         self.gpu_memory_utilization = model_cfg.vllm_params.get("gpu_memory_utilization", 0.9)
-        self.save_local = model_cfg.get("save_local", False)
         
         # 优化后的细粒度锁机制
         self.instances_lock = asyncio.Lock()  # 保护service_instances字典
@@ -786,27 +779,6 @@ class ModelServicePool:
                 
                 url = f"{instance.endpoint}/v1/chat/completions"
                 data = {"model": instance.ckpt_path, "messages": messages, **kwargs}
-
-                if self.save_local:
-                    try:
-                        last_image_item = messages[-1]["content"][-1]
-                        assert last_image_item.get("type") == "image_url
-                        last_image_url = last_image_item.get("image_url", {}).get("url", "")
-                        assert last_image_url.startswith("data:image")
-                        header, encoded = last_image_url.split(",", 1)
-
-                        task_id = kwargs.get("task_id")
-                        trace_id = kwargs.get("trace_id")
-                        step = kwargs.get("step")
-                        save_dir = os.path.join(f"./{task_id}_trace-{trace_id}")
-                        os.makedirs(save_dir, exist_ok=True)
-                        save_path = os.path.join(save_dir, f"image_{int(step) - 1}.png")
-                        with open(save_path, "wb") as f:
-                            f.write(base64.b64decode(encoded))
-                    except Exception as e:
-                        logger.error(f"❌ Failed to decode or save image: {e}")
-                        raise
-
                 # logger.debug(f"messages -> {messages}")
                 async with aiohttp.ClientSession() as session:
                     async with session.post(url, json=data) as response:
@@ -815,52 +787,6 @@ class ModelServicePool:
                             raise HTTPException(status_code=response.status, detail=f"API call failed: {error_text}")
                         
                         response_data = await response.json()
-                        
-                        if self.save_local:
-                            try:
-                                content = response_data["choices"][0]["message"]["content"]
-                                model = response_data["model"]
-
-                                logp_list, token_id_list = None, None
-
-                                # 如果请求参数中要求 logprobs
-                                if kwargs.get("logprobs", False):
-                                    try:
-                                        logp_list = [
-                                            item["logprob"]
-                                            for item in response_data["choices"][0]["logprobs"]["content"]
-                                        ]
-                                    except (KeyError, IndexError, TypeError):
-                                        logp_list = None
-
-                                # 如果请求参数中要求返回 token_id
-                                if kwargs.get("return_tokens_as_token_ids", False):
-                                    try:
-                                        token_id_list = [
-                                            int(item["token"].split("token_id:")[1])
-                                            for item in response_data["choices"][0]["logprobs"]["content"]
-                                            if "token_id:" in item["token"]
-                                        ]
-                                    except (KeyError, IndexError, TypeError, ValueError):
-                                        token_id_list = None
-                                
-                                task_id = kwargs.get("task_id")
-                                trace_id = kwargs.get("trace_id")
-                                step = kwargs.get("step")
-                                save_dir = os.path.join(f"./{task_id}_trace-{trace_id}")
-                                os.makedirs(save_dir, exist_ok=True)
-                                save_path = os.path.join(save_dir, f"data_for_step_{int(step)}.pt")
-
-                                data_to_save = {
-                                    "logp": torch.tensor(logp_list).cpu() if logp_list is not None else torch.tensor([]).cpu(),
-                                    "token_ids": torch.tensor(token_id_list).cpu() if token_id_list is not None else torch.tensor([]).cpu(),
-                                }
-
-                                torch.save(data_to_save, save_path)
-                            except Exception as e:
-                                logger.error(f"❌ Failed to save logp/token_id tensors: {e}")
-                                raise
-
                         try:
                             return response_data
                         except (KeyError, IndexError, TypeError) as e:
@@ -872,29 +798,6 @@ class ModelServicePool:
         except Exception as e:
             logger.error(f"Error during generate call: {e}")
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-
-    async def save(self, messages: List[Dict], reward: float, task_id: str, trace_id: str):
-        try:
-            save_dir = os.path.join(os.getcwd(), f"{task_id}_trace-{trace_id}")
-            os.makedirs(save_dir, exist_ok=True)
-
-            # 保存 messages
-            messages_path = os.path.join(save_dir, f"final_messages.json")
-            with open(messages_path, "w", encoding="utf-8") as f:
-                json.dump(messages, f, ensure_ascii=False, indent=2)
-
-            # 保存 reward
-            reward_path = os.path.join(save_dir, f"reward.txt")
-            with open(reward_path, "w") as f:
-                f.write(str(reward))
-
-            return {"status": "success"}
-
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to save data: {e}"
-            )
         
     async def tokenize(self, input_text: str, **kwargs) -> Dict[str, Any]:
         """调用模型服务池的 /v1/tokenize 接口"""
@@ -1118,8 +1021,7 @@ def main(cfg: DictConfig):
         ckpt_path=cfg.model.ckpt_path,
         base_port=cfg.model.base_port,
         replicas=cfg.model.replicas,
-        vllm_params=OmegaConf.to_container(cfg.model.vllm_params),
-        save_local=cfg.model.save_local
+        vllm_params=OmegaConf.to_container(cfg.model.vllm_params)
     )
 
     # 定义并创建 lifespan 函数的闭包
@@ -1167,16 +1069,6 @@ def main(cfg: DictConfig):
     async def tokenize_text(request: TokenizeRequest, pool: ModelServicePool = Depends(get_model_pool)):
         kwargs = request.parameters or {}
         return await pool.tokenize(request.prompt, **kwargs)
-
-    @app.post("/save")
-    async def save_messages_reward(request: SaveRequest, pool: ModelServicePool = Depends(get_model_pool)):
-        return await pool.save(
-            messages=request.messages,
-            reward=request.reward,
-            task_id=request.task_id,
-            trace_id=request.trace_id
-        )
-
     @app.post("/reload", summary="Reload model with rolling update")
     async def reload_model(request: ReloadRequest, pool: ModelServicePool = Depends(get_model_pool)):
         """通过滚动更新的方式重新加载模型。"""

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OSWorld Docker Server Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --muted: #94a3b8;
+      --text: #e2e8f0;
+      --accent: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --link: #60a5fa;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+      background: linear-gradient(180deg, #0b1220, #0f172a);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 24px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(30, 41, 59, 0.35);
+      backdrop-filter: blur(6px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .muted { color: var(--muted); font-size: 14px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-12 { grid-column: span 12; }
+
+    .card {
+      background: linear-gradient(180deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    .card h2 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+    .stats {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      flex: 1 1 160px;
+      background: rgba(51,65,85,0.3);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 10px;
+    }
+    .stat .label { font-size: 12px; color: var(--muted); }
+    .stat .value { font-size: 20px; margin-top: 6px; font-weight: 600; }
+
+    .progress {
+      height: 8px;
+      border-radius: 999px;
+      background: #0b1220;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress > div {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #16a34a);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .progress.warn > div { background: linear-gradient(90deg, #f59e0b, #eab308); }
+    .progress.danger > div { background: linear-gradient(90deg, #ef4444, #dc2626); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    th { color: #cbd5e1; font-weight: 600; }
+    tr:hover td { background: rgba(51,65,85,0.2); }
+
+    .row-actions {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 8px 12px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(51,65,85,0.3);
+      color: var(--text); cursor: pointer; text-decoration: none;
+    }
+    .btn:hover { background: rgba(51,65,85,0.5); }
+    .btn.primary { border-color: #166534; background: rgba(22,101,52,0.35); }
+    .btn.warn { border-color: #92400e; background: rgba(146,64,14,0.25); }
+    .btn.danger { border-color: #7f1d1d; background: rgba(127,29,29,0.25); }
+
+    form.inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    input, select {
+      background: #0b1220; color: var(--text);
+      border: 1px solid var(--border);
+      outline: none; border-radius: 8px; padding: 8px 10px;
+    }
+    input:focus, select:focus { border-color: #334155; }
+
+    .footer {
+      margin-top: 24px; padding: 16px;
+      border-top: 1px solid var(--border);
+      color: var(--muted); font-size: 12px;
+      text-align: center;
+    }
+    .success { color: var(--accent); }
+    .warn-txt { color: var(--warn); }
+    .danger-txt { color: var(--danger); }
+    a { color: var(--link); }
+    code { background: #0b1220; border: 1px solid var(--border); padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>OSWorld Docker Server Dashboard</h1>
+      <div class="muted">Live view of per-token usage, active emulators, and server load</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="grid">
+      <div class="col-12 card">
+        <h2>Overview</h2>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Uptime</div>
+            <div class="value"><span id="uptime">-</span></div>
+          </div>
+          <div class="stat">
+            <div class="label">CPU Usage</div>
+            <div class="value"><span id="cpu">-</span>%</div>
+            <div class="progress" id="cpuBar"><div></div></div>
+          </div>
+          <div class="stat">
+            <div class="label">Memory Usage</div>
+            <div class="value"><span id="mem">-</span>%</div>
+            <div class="progress" id="memBar"><div></div></div>
+          </div>
+          <div class="stat">
+            <div class="label">Active Emulators</div>
+            <div class="value"><span id="totalEmus">-</span></div>
+          </div>
+          <div class="stat">
+            <div class="label">Containers (image)</div>
+            <div class="value"><span id="containers">-</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 card">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap: 12px;">
+          <h2>Token Usage</h2>
+          <form class="inline" id="limitForm" onsubmit="return setLimit(event)">
+            <label>Token</label>
+            <input id="limitToken" placeholder="token name (e.g., loadtest)" required />
+            <label>Limit</label>
+            <input id="limitValue" type="number" min="0" step="1" placeholder="e.g., 100" required />
+            <button class="btn primary" type="submit">Set Token Limit</button>
+            <span id="limitMsg" class="muted"></span>
+          </form>
+        </div>
+        <div style="overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Current</th>
+                <th>Limit</th>
+                <th>Available</th>
+              </tr>
+            </thead>
+            <tbody id="tokensBody">
+              <tr><td colspan="4" class="muted">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-12 card">
+        <h2>Active Emulators</h2>
+        <div style="overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Emulator ID</th>
+                <th>Token</th>
+                <th>Ports (server/chrome/vnc/vlc)</th>
+                <th>Started</th>
+                <th>Duration</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="emuBody">
+              <tr><td colspan="6" class="muted">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-12 card">
+        <h2>Recent Requests</h2>
+        <div style="overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Time (UTC)</th>
+                <th>Method</th>
+                <th>Path</th>
+                <th>Token</th>
+                <th>JSON</th>
+              </tr>
+            </thead>
+            <tbody id="reqBody">
+              <tr><td colspan="5" class="muted">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-12 card">
+        <h2>Utilities</h2>
+        <div class="row-actions">
+          <a class="btn warn" href="javascript:void(0)" onclick="cleanupAll()">Run remove_all.sh</a>
+          <span class="muted">This will remove stale containers using scripts/remove_all.sh on the server.</span>
+          <span id="cleanupMsg" class="muted"></span>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Server API endpoints: <code>/status</code>, <code>/tokens</code>, <code>/emulators</code>, <code>/set_token_limit</code>, <code>/request_logs</code>. Dashboard auto-refresh every 3 seconds.
+    </div>
+  </main>
+
+  <script>
+    const fmtUptime = (secs) => {
+      if (!secs && secs !== 0) return "-";
+      const d = Math.floor(secs / 86400);
+      const h = Math.floor((secs % 86400) / 3600);
+      const m = Math.floor((secs % 3600) / 60);
+      const s = secs % 60;
+      const parts = [];
+      if (d) parts.push(d + "d");
+      if (h) parts.push(h + "h");
+      if (m) parts.push(m + "m");
+      parts.push(s + "s");
+      return parts.join(" ");
+    };
+
+    function setBar(barEl, pct) {
+      const inner = barEl.querySelector("div");
+      const cl = barEl.classList;
+      cl.remove("warn", "danger");
+      if (pct >= 90) cl.add("danger");
+      else if (pct >= 70) cl.add("warn");
+      inner.style.width = Math.max(0, Math.min(100, pct)) + "%";
+    }
+
+    async function fetchStatus() {
+      try {
+        const resp = await fetch("/status");
+        const js = await resp.json();
+        document.getElementById("uptime").textContent = fmtUptime(js.uptime_seconds);
+        const cpu = js.cpu_percent ?? 0;
+        const mem = js.memory_percent ?? 0;
+        document.getElementById("cpu").textContent = String(cpu);
+        document.getElementById("mem").textContent = String(mem);
+        setBar(document.getElementById("cpuBar"), cpu);
+        setBar(document.getElementById("memBar"), mem);
+        document.getElementById("totalEmus").textContent = js.total_emulators ?? "-";
+        document.getElementById("containers").textContent = js.total_containers_for_image ?? "-";
+
+        const tbody = document.getElementById("tokensBody");
+        tbody.innerHTML = "";
+        (js.tokens || []).forEach(t => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${t.token}</td>
+            <td>${t.current}</td>
+            <td>${t.limit}</td>
+            <td>${t.available}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        if (!js.tokens || js.tokens.length === 0) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td colspan="4" class="muted">No tokens initialized yet.</td>`;
+          tbody.appendChild(tr);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function fetchEmulators() {
+      try {
+        const resp = await fetch("/emulators");
+        const arr = await resp.json();
+        const tbody = document.getElementById("emuBody");
+        tbody.innerHTML = "";
+        (arr || []).forEach(e => {
+          const tr = document.createElement("tr");
+          const started = e.start_time ? new Date(e.start_time * 1000).toLocaleString() : "-";
+          tr.innerHTML = `
+            <td><code>${e.emulator_id}</code></td>
+            <td>${e.token || "-"}</td>
+            <td>${e.server_port}/${e.chromium_port}/${e.vnc_port}/${e.vlc_port}</td>
+            <td>${started}</td>
+            <td>${e.duration_minutes} min</td>
+            <td>
+              <div class="row-actions">
+                <a href="javascript:void(0)" class="btn danger" onclick="stopEmu('${e.emulator_id}')">Stop</a>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+        if (!arr || arr.length === 0) {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td colspan="6" class="muted">No active emulators.</td>`;
+          tbody.appendChild(tr);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function stopEmu(eid) {
+      try {
+        const resp = await fetch("/stop_emulator", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ emulator_id: eid })
+        });
+        const js = await resp.json();
+        await fetchStatus();
+        await fetchEmulators();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function setLimit(ev) {
+      ev.preventDefault();
+      const t = document.getElementById("limitToken").value.trim();
+      const v = document.getElementById("limitValue").value.trim();
+      const msg = document.getElementById("limitMsg");
+      msg.textContent = "Setting...";
+      try {
+        const resp = await fetch("/set_token_limit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: t, limit: Number(v) })
+        });
+        const js = await resp.json();
+        msg.textContent = js.message || "Updated";
+        setTimeout(() => msg.textContent = "", 2000);
+        await fetchStatus();
+      } catch (e) {
+        console.error(e);
+        msg.textContent = "Error updating limit";
+      }
+      return false;
+    }
+
+    async function cleanupAll() {
+      const msg = document.getElementById("cleanupMsg");
+      msg.textContent = "Triggering cleanup...";
+      try {
+        const resp = await fetch("/cleanup", { method: "POST" });
+        const js = await resp.json().catch(() => ({}));
+        msg.textContent = (js && js.message) ? js.message : "Cleanup executed";
+        await fetchStatus();
+        await fetchEmulators();
+        setTimeout(() => { msg.textContent = ""; }, 2000);
+      } catch (e) {
+        console.error(e);
+        msg.textContent = "Error triggering cleanup";
+      }
+    }
+
+    async function fetchRequests() {
+      try {
+        const resp = await fetch("/request_logs?limit=200");
+        const arr = await resp.json();
+        const tbody = document.getElementById("reqBody");
+        tbody.innerHTML = "";
+        const list = Array.isArray(arr) ? arr : [];
+        if (list.length === 0) {
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          td.colSpan = 5;
+          td.className = "muted";
+          td.textContent = "No recent requests.";
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+          return;
+        }
+        // Show newest first
+        list.slice().reverse().forEach(r => {
+          const tr = document.createElement("tr");
+          const tdTs = document.createElement("td"); tdTs.textContent = r.ts || "-";
+          const tdM = document.createElement("td"); tdM.textContent = r.method || "-";
+          const tdP = document.createElement("td"); tdP.textContent = r.path || "-";
+          const tdT = document.createElement("td"); tdT.textContent = r.token || "-";
+          const tdJ = document.createElement("td"); tdJ.textContent = (r && "json" in r && r.json != null) ? JSON.stringify(r.json) : "";
+          tr.append(tdTs, tdM, tdP, tdT, tdJ);
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function refreshAll() {
+      await Promise.all([fetchStatus(), fetchEmulators(), fetchRequests()]);
+    }
+    refreshAll();
+    setInterval(refreshAll, 3000);
+  </script>
+</body>
+</html>

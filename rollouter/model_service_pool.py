@@ -149,6 +149,22 @@ class ModelServicePool:
                 except (KeyError, IndexError, TypeError) as e:
                     raise Exception(f"Failed to parse tokenize response: {e}. Full response: {response_data}")
 
+    async def save_messages_reward(self, messages, reward, task_id, trace_id):
+        payload = {
+            "messages": messages,
+            "reward": reward,
+            "task_id": task_id,
+            "trace_id": trace_id,
+        }
+        save_endpoint = self.service_url + "/save"
+        async with aiohttp.ClientSession() as session:
+            async with session.post(save_endpoint, json=payload) as response:
+                if not response.ok:
+                    error_text = await response.text()
+                    raise Exception(f"Save API call failed with status {response.status}: {error_text}")
+
+                return await response.json()
+
     async def reload(self, new_ckpt_path: str, batch_size: int = 1):
         """
         平滑地重新加载所有模型服务实例到新的检查点路径。

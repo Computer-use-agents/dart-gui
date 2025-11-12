@@ -1,0 +1,16 @@
+remote_docker_server:
+  ip: "10.1.110.48" # change this to your own ip . 
+  port: 50003
+  path_to_vm: "/home/shichenrui/TongGUI/ubuntu_env/desktop_env/Ubuntu.qcow2"
+
+# Token-based quota configuration
+tokens:
+  alpha: 24
+  enqi: 4  
+
+# Authentication settings for the remote docker server API
+auth:
+  require_token: true
+  header_name: "Authorization"
+  bearer_prefix: "Bearer "
+
