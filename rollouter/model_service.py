@@ -874,6 +874,9 @@ class ModelServicePool:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
     async def save(self, messages: List[Dict], reward: float, task_id: str, trace_id: str):
+        if not self.save_local:
+            return {"status": "skipped"}
+
         try:
             save_dir = os.path.join(os.getcwd(), f"{task_id}_trace-{trace_id}")
             os.makedirs(save_dir, exist_ok=True)
