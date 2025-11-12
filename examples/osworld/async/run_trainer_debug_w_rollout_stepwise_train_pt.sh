@@ -3,7 +3,8 @@ pip install cryptography
 
 set -x
 ENGINE=${1:-vllm_osworld}
-cd /root/verl
+
+cd /workspace/codes/verl
 
 # Initialize Ray cluster for multi-node training
 # Make sure Ray is running on all nodes before executing this script
@@ -11,7 +12,12 @@ cd /root/verl
 # On worker nodes: ray start --address='head_node_ip:6379'
 # Detect number of GPUs on the current machine
 N_NODES=1
-N_GPUS=$(nvidia-smi --list-gpus | wc -l) 
+# Check if nvidia-smi is available and working
+if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then
+    N_GPUS=$(nvidia-smi --list-gpus | wc -l)
+else
+    N_GPUS=0
+fi
 N_GPUS_PER_NODE=$N_GPUS
 
 # # 生成带时间戳的唯一文件ID，后台运行
@@ -25,7 +31,7 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/capacity/userdata/vcfenxd75jiv/shichenrui/ui_tars/ByteDance-Seed/UI-TARS-1.5
+MODEL_PATH=/workspace/huggingface/dart-gui-7b
 
 #/root/verl/checkpoints/verl_osworld_grpo/vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_20250906_m3ou6di7/global_step_63/actor/huggingface
 
@@ -53,10 +59,10 @@ export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-
 # export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
 # export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
 
-export ROOT_DATA_DIR=rollouter/results/pass8_20250904_train15_pass8_gpu2_env20_vllm_logp_maxstep15_tesl_vllm_logp_test6
-export RUN_ID=results/pass8_20250904_train15_pass8_gpu2_env20_vllm_logp_maxstep15_tesl_vllm_logp_test6
+export ROOT_DATA_DIR=pass32_uitars_0928
+export RUN_ID=pass32_uitars_0928
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-export EXPERIMENT_NAME=vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export EXPERIMENT_NAME=Fixed_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
 # export EXPERIMENT_NAME=vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_20250906_m3ou6di7
 # export EXPERIMENT_NAME=pt_test5_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250905_91ww0y85
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
@@ -65,7 +71,7 @@ export EXPERIMENT_NAME=vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=http://172.19.171.243:15959
+export ROLLOUT_SERVER_URL=h0.0.0.0:8888
 
 # training parameters
 adv_estimator=grpo

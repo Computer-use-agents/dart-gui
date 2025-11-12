@@ -25,15 +25,24 @@ logger = logging.getLogger(__name__)
 Base = declarative_base()
 
 # Database configuration
+# DB_CONFIG = {
+#     'host': '112.125.88.107',
+#     'user': 'teamx',
+#     'password': '#C!D123^-c12',
+#     'database': 'TeamX_BIGAI',
+#     'port': 5906,
+#     'charset': 'utf8mb4'
+# }
+
+# 配置信息
 DB_CONFIG = {
-    'host': '112.125.88.107',
-    'user': 'teamx',
-    'password': '#C!D123^-c12',
-    'database': 'TeamX_BIGAI',
-    'port': 5906,
+    'host': '172.17.0.4',
+    'user': 'dart_rollouter',
+    'password': 'Dt8@Rx9p',
+    'database': 'dart_database',
+    'port': 3306,
     'charset': 'utf8mb4'
 }
-
 
 def _serialize(value):
     if isinstance(value, datetime):
@@ -94,8 +103,8 @@ class DatasetUsageEvent(Base):
     __tablename__ = "dataset_usage_events"
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    trajectory_id = Column(String(64), nullable=False)
-    run_id        = Column(String(128), nullable=False)
+    trajectory_id = Column(String(191), nullable=False)
+    run_id        = Column(String(191), nullable=False)
     model_version = Column(String(512))
     used_delta    = Column(Integer, nullable=False, server_default=text("0"))
     event_type    = Column(Enum("INSERT", "UPDATE", "USE", name="dataset_usage_event_type"), nullable=False)
@@ -407,9 +416,10 @@ if __name__ == "__main__":
     # }
 
     orm = MySQLRolloutORM(DB_CONFIG, create_tables_if_missing=True)
+    # print(orm.is_connected())
     # print(orm.get_rollouts_by_run_id("results/test_for_train_pass8_gpu8_env77_20250817_1345")[0])
     # print(orm.update_rollout_used("results/test_for_train_pass8_gpu8_env77_20250817_1345", "9439a27b-18ae-42d8-9778-5f68f891805e_trace_e635d5e3af17_1755501336"))
     # print(orm.insert_checkpoint("/mnt/checkpoints/model-abc/weights.bin"))
     # print(orm.get_latest_n_checkpoint_paths("results/trainset15_pass8_gpu2_env20_maxstep30_20250902_2305", 2))
-    for i in range(1, 2):
-        print(orm.get_nth_newest_model_success("results/trainset15_pass8_gpu2_env20_maxstep30_tmp1_20250914_2059", i))
+    # for i in range(1, 2):
+    #     print(orm.get_nth_newest_model_success("results/trainset15_pass8_gpu2_env20_maxstep30_tmp1_20250914_2059", i))

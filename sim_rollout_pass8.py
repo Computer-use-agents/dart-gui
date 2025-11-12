@@ -83,7 +83,7 @@ def simulate_rollout(
     limit: Optional[int] = None,
     dry_run: bool = False,
     loops = 10,
-    bootstrap_count = 256,
+    bootstrap_count = 2,
     delete_existing: bool = False,
 ) -> None:
     """Simulate rollout by inserting rows at a controlled, steady rate."""
@@ -109,6 +109,7 @@ def simulate_rollout(
 
     # Initialize DB manager
     db_manager = create_database_manager()
+    print(db_manager.engine.url)  # 看连接到哪个库
 
     # Optionally clear previous rows for this run_id
     if delete_existing:
@@ -155,6 +156,8 @@ def simulate_rollout(
 
             # 插入数据
             model_version = latest_model_version(db_manager, run_id)
+            if model_version == "":
+                model_version = "v0"
             payload = dict(
                 trajectory_id=item["trajectory_id"],
                 run_id=run_id,
@@ -201,15 +204,15 @@ def simulate_rollout(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simulated rollout producer for trainer unit tests.")
-    parser.add_argument("--json", default="data/train/data_pass@8_train90.json", help="Path to the static JSON data.")
+    parser.add_argument("--json", default="data/train/pass@32_90_trainingser.json", help="Path to the static JSON data.")
     # parser.add_argument("--run-id", default="pengxiang_test_0824_fixed_4_task", help="Run ID to write into DB rows.")
-    parser.add_argument("--run-id", default="pengxiang_test_0829_stepwise_pass8_multinode", help="Run ID to write into DB rows.")
-    parser.add_argument("--rate", type=int, default=26, help="Insert rate per minute.")
+    parser.add_argument("--run-id", default="pass32_uitars_0928", help="Run ID to write into DB rows.")
+    parser.add_argument("--rate", type=int, default=100, help="Insert rate per minute.")
     parser.add_argument("--start-index", type=int, default=0, help="Start from this index in the JSON list.")
     parser.add_argument("--limit", type=int, default=None, help="Only process this many items.")
     parser.add_argument("--dry-run", action="store_true", help="Don't write to DB; just print what would happen.")
     parser.add_argument("--loops", type=int, default=10000, help="Maximum number of full loops over the JSON (default: 10).")
-    parser.add_argument("--bootstrap", type=int, default=512, help="Number of items to insert immediately at startup (default: 256).")
+    parser.add_argument("--bootstrap", type=int, default=200, help="Number of items to insert immediately at startup (default: 256).")
     parser.add_argument(
         "--delete-existing",
         action="store_true",
