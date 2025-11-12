@@ -211,6 +211,7 @@ class ModelServicePool:
         self.vllm_params = model_cfg.vllm_params
         self.gpu_memory_utilization = model_cfg.vllm_params.get("gpu_memory_utilization", 0.9)
         self.save_local = model_cfg.get("save_local", False)
+        self.save_path = model_cfg.get("save_path", "./")
         
         # 优化后的细粒度锁机制
         self.instances_lock = asyncio.Lock()  # 保护service_instances字典
@@ -798,7 +799,7 @@ class ModelServicePool:
                         task_id = kwargs.get("task_id")
                         trace_id = kwargs.get("trace_id")
                         step = kwargs.get("step")
-                        save_dir = os.path.join(f"./{task_id}_trace-{trace_id}")
+                        save_dir = os.path.join(self.save_path, f"{task_id}_trace-{trace_id}")
                         os.makedirs(save_dir, exist_ok=True)
                         save_path = os.path.join(save_dir, f"image_{int(step) - 1}.png")
                         with open(save_path, "wb") as f:
@@ -847,7 +848,7 @@ class ModelServicePool:
                                 task_id = kwargs.get("task_id")
                                 trace_id = kwargs.get("trace_id")
                                 step = kwargs.get("step")
-                                save_dir = os.path.join(f"./{task_id}_trace-{trace_id}")
+                                save_dir = os.path.join(self.save_path, f"{task_id}_trace-{trace_id}")
                                 os.makedirs(save_dir, exist_ok=True)
                                 save_path = os.path.join(save_dir, f"data_for_step_{int(step)}.pt")
 
@@ -878,7 +879,7 @@ class ModelServicePool:
             return {"status": "skipped"}
 
         try:
-            save_dir = os.path.join(os.getcwd(), f"{task_id}_trace-{trace_id}")
+            save_dir = os.path.join(self.save_path, f"{task_id}_trace-{trace_id}")
             os.makedirs(save_dir, exist_ok=True)
 
             # 保存 messages
@@ -1122,7 +1123,8 @@ def main(cfg: DictConfig):
         base_port=cfg.model.base_port,
         replicas=cfg.model.replicas,
         vllm_params=OmegaConf.to_container(cfg.model.vllm_params),
-        save_local=cfg.model.save_local
+        save_local=cfg.model.save_local,
+        save_path=cfg.storage.root
     )
 
     # 定义并创建 lifespan 函数的闭包
