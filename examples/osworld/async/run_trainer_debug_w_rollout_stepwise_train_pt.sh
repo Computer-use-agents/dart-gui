@@ -1,5 +1,10 @@
 # conda deactivate
 pip install cryptography
+pip install gymnasium
+pip install backoff
+pip install sqlalchemy
+pip install pymysql
+
 
 set -x
 ENGINE=${1:-vllm_osworld}
@@ -31,7 +36,8 @@ echo "To stop monitoring: kill $!"
 
 echo "Detected $N_GPUS GPUs on this machine"
 
-MODEL_PATH=/workspace/huggingface/dart-gui-7b
+# MODEL_PATH=/workspace/huggingface/dart-gui-7b
+MODEL_PATH=/data/liuyang/ByteDance-Seed/UI-TARS-1.5-7B
 
 #/root/verl/checkpoints/verl_osworld_grpo/vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_20250906_m3ou6di7/global_step_63/actor/huggingface
 
@@ -71,7 +77,7 @@ export EXPERIMENT_NAME=Fixed_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=h0.0.0.0:8888
+export ROLLOUT_SERVER_URL=0.0.0.0:8888
 
 # training parameters
 adv_estimator=grpo
@@ -92,8 +98,8 @@ max_response_length=500
 loss_agg_mode="seq-mean-token-mean"
 
 
-train_bz_min=4
-train_bz_max=8
+train_bz_min=2
+train_bz_max=4
 train_prompt_bsz=8
 rollout_n=8
 train_prompt_mini_bsz=32
@@ -116,9 +122,9 @@ window_size=5
 stride_size=5
 max_steps=15
 
-use_vllm_logp=True
+use_vllm_logp=False
 use_sft_loss=False
-use_token_ids_from_pt=True
+use_token_ids_from_pt=False
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \

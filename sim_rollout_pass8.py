@@ -157,7 +157,7 @@ def simulate_rollout(
             # 插入数据
             model_version = latest_model_version(db_manager, run_id)
             if model_version == "":
-                model_version = "v0"
+                model_version = "/data/liuyang/ByteDance-Seed/UI-TARS-1.5-7B"
             payload = dict(
                 trajectory_id=item["trajectory_id"],
                 run_id=run_id,
@@ -204,7 +204,7 @@ def simulate_rollout(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Simulated rollout producer for trainer unit tests.")
-    parser.add_argument("--json", default="data/train/pass@32_90_trainingser.json", help="Path to the static JSON data.")
+    parser.add_argument("--json", default="data/train/data_pass@32_osworldnew_tmp07.json", help="Path to the static JSON data.")
     # parser.add_argument("--run-id", default="pengxiang_test_0824_fixed_4_task", help="Run ID to write into DB rows.")
     parser.add_argument("--run-id", default="pass32_uitars_0928", help="Run ID to write into DB rows.")
     parser.add_argument("--rate", type=int, default=100, help="Insert rate per minute.")

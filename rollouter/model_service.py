@@ -13,6 +13,8 @@ import logging.handlers
 import json
 import hydra
 from omegaconf import DictConfig, OmegaConf
+import base64
+import torch
 
 from fastapi import FastAPI, HTTPException, status, Depends
 from pydantic import BaseModel, Field
@@ -21,6 +23,14 @@ import socket  # 用于端口检查
 from datetime import datetime
 
 from vllm.utils import F
+
+# 全局标记：NVML是否可用
+NVML_AVAILABLE = False
+try:
+    pynvml.nvmlInit()
+    NVML_AVAILABLE = True
+except pynvml.NVMLError as e:
+    logging.warning(f"NVML初始化失败，GPU监控功能将被禁用: {e}")
 
 def set_logger(log_file: str = "logs/model_service.log", log_level: int = logging.INFO):
     """
@@ -74,6 +84,8 @@ class ModelConfig(BaseModel):
     base_port: int = Field(8000, description="vLLM服务使用的基础端口号")
     replicas: int = Field(1, description="期望运行的服务副本数量")
     vllm_params: Dict[str, Any] = Field(default_factory=dict, description="额外的vLLM启动参数")
+    save_local: bool = Field(False, description="是否保存本地")
+    save_path: str = Field(default="./", description="保存路径")
     
 class Message(BaseModel):
     role: str
@@ -141,8 +153,13 @@ class GPUInstance:
 
     def _initialize_gpu(self):
         """初始化GPU句柄，延迟加载NVML"""
+        global NVML_AVAILABLE
+        if not NVML_AVAILABLE:
+            logger.warning(f"GPU {self.gpu_id}: NVML不可用，GPU监控已禁用")
+            self._handle = None
+            return
+            
         try:
-            pynvml.nvmlInit()
             self._handle = pynvml.nvmlDeviceGetHandleByIndex(self.gpu_id)
         except pynvml.NVMLError as e:
             logger.error(f"Failed to initialize GPU {self.gpu_id}: {e}")
@@ -210,8 +227,8 @@ class ModelServicePool:
         self.replicas = model_cfg.replicas
         self.vllm_params = model_cfg.vllm_params
         self.gpu_memory_utilization = model_cfg.vllm_params.get("gpu_memory_utilization", 0.9)
-        self.save_local = model_cfg.get("save_local", False)
-        self.save_path = model_cfg.get("save_path", "./")
+        self.save_local = model_cfg.save_local
+        self.save_path = model_cfg.save_path
         
         # 优化后的细粒度锁机制
         self.instances_lock = asyncio.Lock()  # 保护service_instances字典
@@ -791,7 +808,7 @@ class ModelServicePool:
                 if self.save_local:
                     try:
                         last_image_item = messages[-1]["content"][-1]
-                        assert last_image_item.get("type") == "image_url
+                        assert last_image_item.get("type") == "image_url"
                         last_image_url = last_image_item.get("image_url", {}).get("url", "")
                         assert last_image_url.startswith("data:image")
                         header, encoded = last_image_url.split(",", 1)

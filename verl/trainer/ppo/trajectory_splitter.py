@@ -372,7 +372,7 @@ class StepwiseTrajectorySplitter:
         dataset_dir = os.path.join(self.root_dir, dataset_id)
         message_path = os.path.join(dataset_dir, "final_messages.json")
         # load vllm logp from pt files
-        pt_data_files = sorted(Path(dataset_dir).glob("data_for_step_*.pt"),key=lambda x: int(x.stem.split("_")[-1]))
+        pt_data_files = sorted(Path(dataset_dir).glob("vllm_logp_for_step_*.pt"),key=lambda x: int(x.stem.split("_")[-1]))
         pt_data_list = [torch.load(f) for f in pt_data_files]
         rollout_log_probs = [d["logp"] for d in pt_data_list]
         if self.use_token_ids_from_pt:

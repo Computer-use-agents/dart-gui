@@ -1,14 +1,27 @@
 #!/usr/bin/env bash
 # start.sh - 先起 model_service，就绪后再跑 run.py；run.py 结束后退出 model_service
 # 用法：chmod +x start.sh；作为容器入口执行
-source /root/miniconda3/bin/activate 
+source /home/lipengxiang/miniconda3/bin/activate 
 conda activate verl
-cd /root/verl/rollouter/
+cd /workspace/codes/verl/rollouter/
 set -euo pipefail
 
 mkdir -p /root/verl/rollouter/gpu_util_log
 MONITOR_ID="/root/verl/rollouter/gpu_util_log/gpu_monitor_$(date +%Y%m%d_%H%M%S)_$$"
-nohup nvidia-smi --query-gpu=index,timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 1 > "${MONITOR_ID}.csv" 2>&1 &
+
+# GPU监控诊断 - 检查nvidia-smi是否可用，失败不退出（GPU可能不可用）
+echo "[INFO] 尝试启动GPU监控..."
+if command -v nvidia-smi >/dev/null 2>&1; then
+  # 尝试运行nvidia-smi，如果出现NVML错误，记录但不退出
+  if timeout 5 nvidia-smi > /dev/null 2>&1; then
+    nohup nvidia-smi --query-gpu=index,timestamp,name,pci.bus_id,driver_version,pstate,pcie.link.gen.max,pcie.link.gen.current,temperature.gpu,utilization.gpu,utilization.memory,memory.total,memory.free,memory.used --format=csv -l 1 > "${MONITOR_ID}.csv" 2>&1 &
+    echo "[INFO] GPU监控已启动"
+  else
+    echo "[WARN] nvidia-smi 执行失败，跳过GPU监控（可能是容器环境或驱动问题）"
+  fi
+else
+  echo "[WARN] nvidia-smi 未找到，跳过GPU监控"
+fi
 
 # ===== 可调参数（支持环境变量覆盖）=====
 PORT="${PORT:-15959}"
@@ -62,34 +75,34 @@ python -u model_service.py &
 MODEL_PID=$!
 echo "[INFO] 模型服务已启动，PID=${MODEL_PID}"
 
-# ===== 2) 轮询健康检查，直到就绪或超时 =====
-echo "[INFO] 等待模型服务在 ${HEALTH_ENDPOINT} 就绪（超时 ${STARTUP_TIMEOUT}s）..."
-SECONDS=0
-while true; do
-  # 如服务进程已退出则直接失败
-  if ! kill -0 "${MODEL_PID}" 2>/dev/null; then
-    echo "[ERROR] 模型服务进程提前退出！"
-    exit 1
-  fi
-  # 健康检查
-  if RESP="$(curl -fsS "${HEALTH_ENDPOINT}" 2>/dev/null || true)"; then
-    if grep -q '"Model Service is running."' <<<"${RESP}"; then
-      echo "[INFO] 健康检查通过：${RESP}"
-      break
-    fi
-  fi
-  (( SECONDS >= STARTUP_TIMEOUT )) && { echo "[ERROR] 模型服务未在超时时间内就绪"; exit 1; }
-  sleep "${POLL_INTERVAL}"
-done
+# # ===== 2) 轮询健康检查，直到就绪或超时 =====
+# echo "[INFO] 等待模型服务在 ${HEALTH_ENDPOINT} 就绪（超时 ${STARTUP_TIMEOUT}s）..."
+# SECONDS=0
+# while true; do
+#   # 如服务进程已退出则直接失败
+#   if ! kill -0 "${MODEL_PID}" 2>/dev/null; then
+#     echo "[ERROR] 模型服务进程提前退出！"
+#     exit 1
+#   fi
+#   # 健康检查
+#   if RESP="$(curl -fsS "${HEALTH_ENDPOINT}" 2>/dev/null || true)"; then
+#     if grep -q '"Model Service is running."' <<<"${RESP}"; then
+#       echo "[INFO] 健康检查通过：${RESP}"
+#       break
+#     fi
+#   fi
+#   (( SECONDS >= STARTUP_TIMEOUT )) && { echo "[ERROR] 模型服务未在超时时间内就绪"; exit 1; }
+#   sleep "${POLL_INTERVAL}"
+# done
 
-# ===== 3) 运行主程序（前台等待），结束后清理模型服务 =====
-echo "[INFO] 启动主程序: python run.py $*"
-python -u run.py "$@" &
-RUN_PID=$!
+# # ===== 3) 运行主程序（前台等待），结束后清理模型服务 =====
+# echo "[INFO] 启动主程序: python run.py $*"
+# python -u run.py "$@" &
+# RUN_PID=$!
 
-# 等待 run.py 结束，记录退出码
-wait "${RUN_PID}"; RUN_EXIT=$?
-echo "[INFO] run.py 退出，状态码=${RUN_EXIT}"
+# # 等待 run.py 结束，记录退出码
+# wait "${RUN_PID}"; RUN_EXIT=$?
+# echo "[INFO] run.py 退出，状态码=${RUN_EXIT}"
 
-# 脚本结束会触发 EXIT trap，从而停止模型服务
-exit "${RUN_EXIT}"
+# # 脚本结束会触发 EXIT trap，从而停止模型服务
+# exit "${RUN_EXIT}"

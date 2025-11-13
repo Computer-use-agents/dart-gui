@@ -293,7 +293,7 @@ class OSWorldAsyncDataset(IterableDataset):
                 random_state=self.config.get("random_state", None),
                 acc_max=self.config.get("acc_max", 1.0) 
             )
-            # datasets = data
+            datasets = data
             print("len datasets filtered for this step:", len(datasets))
             
             # 若数量不足，继续轮询等待
