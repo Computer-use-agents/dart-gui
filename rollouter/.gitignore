@@ -28,3 +28,4 @@ loss_dump/
 verl_results/
 *.tar
 loss_dump/
+viz/
