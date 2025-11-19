@@ -1,6 +1,7 @@
 import copy
 import json
 import os
+import re
 from collections import defaultdict
 
 import numpy as np
@@ -214,6 +215,7 @@ class StepwiseTrajectorySplitter:
             "assistant": self.processor.tokenizer.convert_tokens_to_ids("assistant"),
             "system": self.processor.tokenizer.convert_tokens_to_ids("system"),
         }
+        self.system_token_ids = torch.load("evaluation_examples/system_prompt_token_ids/system_prompts.pt")
 
     def split(
             self, 
@@ -350,10 +352,10 @@ class StepwiseTrajectorySplitter:
         with open(message_path) as f:
             dataset = json.load(f)
         dataset = replace_image_url(dataset)
-        config_path = os.path.join(dataset_dir, "task_config.json")
-        with open(config_path) as f:
-            task_config = json.load(f)
-
+        # config_path = os.path.join(dataset_dir, "task_config.json")
+        # with open(config_path) as f:
+        #     task_config = json.load(f)
+        task_config = {"id": dataset_id.split("_")[0]}
         n_msg = len(dataset)
 
         batch_data = []
@@ -371,26 +373,25 @@ class StepwiseTrajectorySplitter:
     def split_dataset_id_from_pt(self, dataset_id: str, reward: float, avg_len: int) -> list[list[dict]]:
         dataset_dir = os.path.join(self.root_dir, dataset_id)
         message_path = os.path.join(dataset_dir, "final_messages.json")
+        task_config = {"id": dataset_id.split("_")[0]}
+        # task_id = task_config["id"]
         # load vllm logp from pt files
-        pt_data_files = sorted(Path(dataset_dir).glob("vllm_logp_for_step_*.pt"),key=lambda x: int(x.stem.split("_")[-1]))
+        pt_data_files = sorted(Path(dataset_dir).glob("data_for_step_*.pt"),key=lambda x: int(x.stem.split("_")[-1]))
         pt_data_list = [torch.load(f) for f in pt_data_files]
         rollout_log_probs = [d["logp"] for d in pt_data_list]
         if self.use_token_ids_from_pt:
             token_ids = [d["token_ids"] for d in pt_data_list]
-            prompt_token_ids = [d["prompt_token_ids"] for d in pt_data_list]
-
-
-        
-        # TODO: pre tokenize
-        # token_ids_list = [d["token_ids"] for d in pt_data_list]
-        # prompt_token_ids_list = [d["prompt_token_ids"] for d in pt_data_list]
+            # prompt_token_ids = [d["prompt_token_ids"] for d in pt_data_list]
+            prompt_token_ids= [self.system_token_ids[task_config["id"]] for d in pt_data_list ]
+             
 
         with open(message_path) as f:
             dataset = json.load(f)
         dataset = replace_image_url(dataset)
-        config_path = os.path.join(dataset_dir, "task_config.json")
-        with open(config_path) as f:
-            task_config = json.load(f)
+        # config_path = os.path.join(dataset_dir, "task_config.json")
+        # with open(config_path) as f:
+        #     task_config = json.load(f)
+        
 
         n_msg = len(dataset)
         assistant_indices = [i for i, msg in enumerate(dataset) if msg["role"] == "assistant"]
@@ -413,26 +414,21 @@ class StepwiseTrajectorySplitter:
             #     instruction["content"] = instruction["content"][:1]
             # item = self._process_item(dataset, copy.deepcopy(instruction), pre_start, start, end, is_first_turn)
             item = self._process_item(dataset, pre_start, end)
-            # is_first_turn = False
-
-            # fetch limited images and pixel values from pt file
-            # img_end = end // 2
-            # img_start = max(0, img_end - self.limit_images)
-            # image = images[img_start:img_end]
-            # image_grid_thw = image_grid_thw_list[img_start:img_end] 
-            # num_patches = num_patches_list[img_start:img_end]
-
-            # cum_patches = [0] + list(torch.cumsum(torch.tensor(num_patches_list), dim=0).tolist())
-            # start_idx = cum_patches[img_start]
-            # end_idx = cum_patches[img_end]
-            # pixel_value = pixel_values[start_idx:end_idx]     
+            
 
             assistant_in_window = [i for i in assistant_indices if pre_start <= i < end]
             if assistant_in_window:
                 last_assistant_idx = assistant_in_window[-1]
                 last_assistant_logp_idx = assistant_indices.index(last_assistant_idx)
-                rollout_log_prob = rollout_log_probs[last_assistant_logp_idx]
-
+                try:
+                    rollout_log_prob = rollout_log_probs[last_assistant_logp_idx]
+                except Exception as e:
+                    print("Error in getting rollout log prob:", e)
+                    print(f"Expected {len(rollout_log_probs)} rollout log probs, but got {last_assistant_logp_idx}")
+                    print(f"dataset_id: {dataset_id}, last_assistant_idx: {last_assistant_idx}, last_assistant_logp_idx: {last_assistant_logp_idx}")
+                    print(f"assistant_indices: {assistant_indices}")
+                    # print(f"rollout_log_probs: {rollout_log_probs}")
+                    continue
                 # fetch token ids and prompt token ids
                 if self.use_token_ids_from_pt:
                     current_step_idx = last_assistant_logp_idx
@@ -647,7 +643,26 @@ class StepwiseTrajectorySplitter:
                             image_paths.append(os.path.join(self.root_dir, dataset_id, c['image']))
                         else:
                             image_paths.append(os.path.join(self.root_dir, dataset_id, f"{c['image']}.png"))
-        images = [process_image(Image.open(image)) for image in image_paths]
+        try:
+            images = [process_image(Image.open(image)) for image in image_paths]
+        except Exception as e:
+            try:
+                images = [
+                    process_image(
+                        Image.open(
+                            os.path.join(
+                                os.path.dirname(image),
+                                re.sub(r'(image_)0*([0-9]+)(\.\w+)$', r'\1\2\3', os.path.basename(image))
+                            )
+                        )
+                    )
+                    for image in image_paths
+                ]
+            except Exception as e:
+                print("Error in processing images:", e)
+                print(f"ERROR in TRACE {dataset_id}. Image paths: {image_paths}")
+                raise e
+
         dummy_texts = [self.processor.image_token] * len(images)
         model_inputs = self.processor(text=dummy_texts, images=images, return_tensors="pt")
         model_inputs.pop("input_ids")

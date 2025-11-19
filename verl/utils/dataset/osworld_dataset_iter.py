@@ -171,7 +171,7 @@ class OSWorldAsyncDataset(IterableDataset):
         self.root_data_dir = getattr(self.config, "root_data_dir", ".")
         self.produced_batches = 0
         self.wait_num = 0 
-        self.max_wait_num = config.get("max_wait_num", 200)
+        self.max_wait_num = config.get("max_wait_num", 20000*30)//30
         
         # 使用静态数据时，按上一批的最后一个task定锚轮换
         self._last_used_task_id = None
@@ -283,7 +283,7 @@ class OSWorldAsyncDataset(IterableDataset):
             top_n = int(self.config.get("top_mvs_n", 2))
             top_mvs = self.db_manager.get_latest_n_checkpoint_paths(run_id=self.run_id, n=top_n)
             # print(data[0])
-            # print(top_mvs)
+            print(top_mvs)
 
             # 3) 通过 filter_fn 选择本次要训练的 datasets（限制每 task 的数量）
             datasets: List[Dict[str, Any]] = filter_fn(
@@ -293,7 +293,7 @@ class OSWorldAsyncDataset(IterableDataset):
                 random_state=self.config.get("random_state", None),
                 acc_max=self.config.get("acc_max", 1.0) 
             )
-            datasets = data
+            # datasets = data
             print("len datasets filtered for this step:", len(datasets))
             
             # 若数量不足，继续轮询等待

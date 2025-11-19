@@ -9,6 +9,8 @@ pip install pymysql
 set -x
 ENGINE=${1:-vllm_osworld}
 
+ray stop
+
 cd /workspace/codes/verl
 
 # Initialize Ray cluster for multi-node training
@@ -37,6 +39,8 @@ echo "To stop monitoring: kill $!"
 echo "Detected $N_GPUS GPUs on this machine"
 
 # MODEL_PATH=/workspace/huggingface/dart-gui-7b
+# MODEL_PATH=/data/liuyang/ByteDance-Seed/UI-TARS-1.5-7B
+# MODEL_PATH=/workspace/codes/verl/checkpoints/verl_osworld_grpo/test_1115_20251115_e7gd4jr2/global_step_19/actor/huggingface
 MODEL_PATH=/data/liuyang/ByteDance-Seed/UI-TARS-1.5-7B
 
 #/root/verl/checkpoints/verl_osworld_grpo/vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_20250906_m3ou6di7/global_step_63/actor/huggingface
@@ -61,23 +65,30 @@ export REWARD_MODEL=qwen2.5_vl_7b
 export SWAN_WX_GROUP_HOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=a68bb693-d0a0-4510-bc56-7efa7b8b546f
 export SWAN_FS_GROUP_HOOK=https://open.feishu.cn/open-apis/bot/v2/hook/793155e5-f0ca-47c4-9a09-bf34cd7a8ebb
 
-# export ROOT_DATA_DIR=data/traj/pass@32_trainset90
-# export ROOT_DATA_DIR=rollouter/results/pass16_20250825_train152_pass16_gpu4_env36
-# export RUN_ID=results/pass16_20250825_train152_pass16_gpu4_env36
 
-export ROOT_DATA_DIR=pass32_uitars_0928
-export RUN_ID=pass32_uitars_0928
+export ROOT_DATA_DIR=rollouter/results/test_1118_no_DA_2
+export RUN_ID=results/test_1118_no_DA_2
+
+# export ROOT_DATA_DIR=rollouter/results/test_1115
+# export RUN_ID=results/test_1115
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250821_vxer2wco
-export EXPERIMENT_NAME=Fixed_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+export EXPERIMENT_NAME=test_1118_no_DA_$(date +%Y%m%d)_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+# export EXPERIMENT_NAME=test_1115_20251115_e7gd4jr2
 # export EXPERIMENT_NAME=vllm_logp_pt_test5_w_KL_trainset15_osworld_reward_script_grpo_k8s_20250906_m3ou6di7
 # export EXPERIMENT_NAME=pt_test5_w_KL_trainset15_vllm_logp_osworld_reward_script_grpo_k8s_20250905_91ww0y85
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_20250827_2txpd14d
+
+# Create logs directory if it doesn't exist
+mkdir -p logs
+
+# Redirect all output to log file (both stdout and stderr) while still displaying on terminal
+exec > >(tee logs/${EXPERIMENT_NAME}_1.log) 2>&1
 
 # export ROOT_DATA_DIR=tmp_async_sql_0802_max_variance 
 # export RUN_ID=pengxiang_test_0802_max_variance
 # export EXPERIMENT_NAME=osworld_all_feasible_reward_script_grpo_k8s_0802_8_mb64_micro8
 # export ROLLOUT_SERVER_URL=http://172.19.47.166:15959
-export ROLLOUT_SERVER_URL=0.0.0.0:8888
+export ROLLOUT_SERVER_URL=http://172.16.0.2:15959
 
 # training parameters
 adv_estimator=grpo
@@ -98,18 +109,18 @@ max_response_length=500
 loss_agg_mode="seq-mean-token-mean"
 
 
-train_bz_min=2
-train_bz_max=4
-train_prompt_bsz=8
+train_bz_min=6
+train_bz_max=8
+train_prompt_bsz=6
 rollout_n=8
-train_prompt_mini_bsz=32
+train_prompt_mini_bsz=48
 
 # Performance Related Parameter
 sp_size=4
 use_dynamic_bsz=False
 actor_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 2))
 infer_ppo_max_token_len=$(((max_prompt_length + max_response_length) * 3))
-offload=True
+offload=False
 gen_tp=4
 fsdp_size=32
 
@@ -120,11 +131,11 @@ splitter=stepwise
 splitter_parallel=True
 window_size=5 
 stride_size=5
-max_steps=15
+max_steps=30
 
 use_vllm_logp=False
 use_sft_loss=False
-use_token_ids_from_pt=False
+use_token_ids_from_pt=True
 
 python3 -m verl.trainer.main_ppo_async \
     algorithm.adv_estimator=grpo \
@@ -182,11 +193,11 @@ python3 -m verl.trainer.main_ppo_async \
     trainer.experiment_name=$EXPERIMENT_NAME \
     trainer.n_gpus_per_node=$N_GPUS_PER_NODE \
     trainer.nnodes=$N_NODES \
-    trainer.save_freq=3 \
+    trainer.save_freq=1 \
     trainer.test_freq=10 \
     trainer.val_before_train=False \
     trainer.total_epochs=1 \
-    trainer.max_actor_ckpt_to_keep=2 \
+    trainer.max_actor_ckpt_to_keep=5 \
     +trainer.run_id=$RUN_ID \
     +trainer.splitter=${splitter} \
     +trainer.limit_messages=${limit_messages} \
@@ -203,7 +214,7 @@ python3 -m verl.trainer.main_ppo_async \
     +actor_rollout_ref.rollout.max_steps=15 \
     +actor_rollout_ref.rollout.limit_images=5 \
     +actor_rollout_ref.rollout.server_url=$ROLLOUT_SERVER_URL \
-    +actor_rollout_ref.actor.offline=false \
+    +actor_rollout_ref.actor.offline=false
     #  +trainer.splitter=sliding_window \
     # 
     #     trainer.experiment_name="osworld_all_feasible_reward_script_grpo_k8s_0802_16_$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 6 | head -n 1)" \

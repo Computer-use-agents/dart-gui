@@ -816,9 +816,10 @@ class ModelServicePool:
                         task_id = kwargs.get("task_id")
                         trace_id = kwargs.get("trace_id")
                         step = kwargs.get("step")
-                        save_dir = os.path.join(self.save_path, f"{task_id}_trace-{trace_id}")
+                        save_dir = os.path.join(self.save_path, f"{task_id}_{trace_id}")
                         os.makedirs(save_dir, exist_ok=True)
-                        save_path = os.path.join(save_dir, f"image_{int(step) - 1}.png")
+                        # save_path = os.path.join(save_dir, f"image_{int(step)}.png")
+                        save_path = os.path.join(save_dir, f"image_{int(step):04d}.png")
                         with open(save_path, "wb") as f:
                             f.write(base64.b64decode(encoded))
                     except Exception as e:
@@ -865,9 +866,9 @@ class ModelServicePool:
                                 task_id = kwargs.get("task_id")
                                 trace_id = kwargs.get("trace_id")
                                 step = kwargs.get("step")
-                                save_dir = os.path.join(self.save_path, f"{task_id}_trace-{trace_id}")
+                                save_dir = os.path.join(self.save_path, f"{task_id}_{trace_id}")
                                 os.makedirs(save_dir, exist_ok=True)
-                                save_path = os.path.join(save_dir, f"data_for_step_{int(step)}.pt")
+                                save_path = os.path.join(save_dir, f"data_for_step_{int(step)+1}.pt")
 
                                 data_to_save = {
                                     "logp": torch.tensor(logp_list).cpu() if logp_list is not None else torch.tensor([]).cpu(),
@@ -896,7 +897,7 @@ class ModelServicePool:
             return {"status": "skipped"}
 
         try:
-            save_dir = os.path.join(self.save_path, f"{task_id}_trace-{trace_id}")
+            save_dir = os.path.join(self.save_path, f"{task_id}_{trace_id}")
             os.makedirs(save_dir, exist_ok=True)
 
             # 保存 messages

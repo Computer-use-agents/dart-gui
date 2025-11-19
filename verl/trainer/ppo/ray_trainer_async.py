@@ -508,10 +508,10 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
         target_size = original_size
 
         if original_size % n_mod != 0:
-            if original_size > 1024:
+            if original_size > 768:
                 # 下采样到最近的下整除倍数；不放回抽样
-                target_size = 1024
-                print("[Warning] batch size larger than 2048, need downsample!",
+                target_size = 768
+                print("[Warning] batch size larger than 768, need downsample!",
                     "current batch size:", original_size, "n_mod:", n_mod, "-> target:", target_size)
                 keep_idxs = sorted(random.sample(range(original_size), k=target_size))
                 batch = batch.select_idxs(keep_idxs)

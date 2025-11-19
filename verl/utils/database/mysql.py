@@ -31,12 +31,12 @@ Base = declarative_base()
 #     'password': '#C!D123^-c12',
 #     'database': 'TeamX_BIGAI',
 #     'port': 5906,
-#     'charset': 'utf8mb4'
+#     'charset': 'utf8mb4'ƒ
 # }
 
 # 配置信息
 DB_CONFIG = {
-    'host': '172.17.0.4',
+    'host': '172.16.0.2',
     'user': 'dart_rollouter',
     'password': 'Dt8@Rx9p',
     'database': 'dart_database',

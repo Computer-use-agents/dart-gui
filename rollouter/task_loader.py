@@ -330,3 +330,140 @@ def build_task(raw: Dict, osworld_root: Path, use_call_user: bool = False) -> Ta
         task_config = task_data
     )
 
+
+
+def hf_processor(name_or_path, **kwargs):
+    """Create a huggingface processor to process multimodal data.
+
+    Args:
+        name_or_path (str): The name of the processor.
+
+    Returns:
+        transformers.ProcessorMixin: The pretrained processor.
+    """
+    from transformers import AutoProcessor
+
+    try:
+        processor = AutoProcessor.from_pretrained(name_or_path, **kwargs)
+    except Exception as e:
+        processor = None
+        # TODO(haibin.lin): try-catch should be removed after adding transformer version req to setup.py to avoid
+        # silent failure
+    # Avoid load tokenizer, see:
+    # https://github.com/huggingface/transformers/blob/v4.49.0/src/transformers/models/auto/processing_auto.py#L344
+    if processor is not None and "Processor" not in processor.__class__.__name__:
+        processor = None
+    return processor
+
+
+def process_text_sync(processor, messages):
+        formatted = ""
+        for m in messages:
+            content = m["content"]
+
+            # 如果 content 是 list（多模态消息）
+            if isinstance(content, list):
+                # 只取文本部分
+                texts = [c["text"] for c in content if c.get("type") == "text"]
+                content_str = "\n".join(texts)
+            else:
+                # 普通 string
+                content_str = content
+
+            formatted += f"{content_str}<|im_end|>\n"
+        model_inputs = processor(text=[formatted], images=None, return_tensors="pt")
+        input_ids = model_inputs.pop("input_ids")
+        return input_ids[0]
+
+
+import os
+import json
+import torch
+
+# 假设这些变量和函数已经在别处定义好了
+# def hf_processor(path, trust_remote_code, use_fast): ...
+# def process_text_sync(processor, messages): ...
+# COMPUTER_USE_PROMPT = "..."
+
+def process_system_prompt(instruction_root='evaluation_examples/examples_linux_osworld_0912'):
+    # 假设 hf_processor 和 COMPUTER_USE_PROMPT 已经定义
+    processor = hf_processor('/workspace/huggingface/dart-gui-7b', trust_remote_code=True, use_fast=True)
+    system_prompt = COMPUTER_USE_PROMPT  
+    
+    # --- 修改点 1: 定义输出文件路径 ---
+    output_dir = 'evaluation_examples/system_prompt_token_ids'
+    os.makedirs(output_dir, exist_ok=True)
+    output_file_path = os.path.join(output_dir, 'system_prompts.pt') # 定义最终的输出文件名
+    print(f"Output will be saved to '{output_file_path}'")
+
+    # --- 修改点 2: 初始化一个字典来收集所有数据 ---
+    all_token_ids = {}
+
+    # 遍历所有子目录
+    for subdir_name in sorted(os.listdir(instruction_root)):
+        subdir_path = os.path.join(instruction_root, subdir_name)
+        if not os.path.isdir(subdir_path):
+            continue
+            
+        # 遍历目录中的所有文件
+        for file_name in sorted(os.listdir(subdir_path)):
+            if not file_name.endswith('.json'):
+                continue
+
+            file_path = os.path.join(subdir_path, file_name)
+            task_id = file_name.split('.')[0]
+            
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                
+                instruction = data.get('instruction')
+                if not instruction:
+                    print(f"Warning: 'instruction' key not found or empty in {file_path}. Skipping.")
+                    continue
+
+                messages = [
+                    {
+                        "role": "system",
+                        "content": "You are a helpful assistant."
+                    },
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text", 
+                                "text": system_prompt.format(
+                                    instruction=instruction, 
+                                    language="English"
+                            )}
+                        ]
+                    }
+                ]
+                
+                input_ids = process_text_sync(processor, messages)
+                
+                # --- 修改点 3: 将结果存入字典，而不是保存为单个文件 ---
+                if input_ids is not None:
+                    all_token_ids[task_id] = input_ids
+                    print(f"Processed and collected token IDs for task: {task_id}")
+                else:
+                    print(f"Warning: process_text_sync returned None for task {task_id}. Skipping.")
+                 
+            except json.JSONDecodeError:
+                print(f"Error: Could not decode JSON from {file_path}. Skipping.")
+            except Exception as e:
+                print(f"An unexpected error occurred while processing {file_path}: {e}")
+
+    # --- 修改点 4: 循环结束后，将整个字典保存到单个文件 ---
+    if all_token_ids:
+        torch.save(all_token_ids, output_file_path)
+        print(f"\nSuccessfully saved {len(all_token_ids)} token ID sets to {output_file_path}")
+    else:
+        print("\nNo token IDs were generated. Output file was not created.")
+
+
+def main():
+    process_system_prompt()
+
+if __name__ == "__main__":
+    main()
