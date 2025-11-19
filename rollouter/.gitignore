@@ -24,3 +24,6 @@ outputs/
 timings.jsonl
 results_splitted/
 pass32_uitars_0928
+loss_dump/
+verl_results/
+*.tar
