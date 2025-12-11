@@ -387,6 +387,8 @@ class DataParallelPPOActor(BasePPOActor):
             select_keys.append("attention_mask_eff")
         if multi_turn:
             select_keys.append("loss_mask")
+        # if "entropy_mask" in data.batch.keys():
+        #     select_keys.append("entropy_mask")
         if self.config.use_kl_loss:
             select_keys.append("ref_log_prob")
         if self.config.use_vllm_logp:
@@ -471,6 +473,9 @@ class DataParallelPPOActor(BasePPOActor):
                         response_mask = data["attention_mask_eff"][:, -response_length:]
                     else:
                         response_mask = attention_mask[:, -response_length:]
+
+                    # if "entropy_mask" in data.keys():
+                    #     response_mask = response_mask * data["entropy_mask"]
 
                     old_log_prob = data["old_log_probs"]
                     

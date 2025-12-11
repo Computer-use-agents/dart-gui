@@ -216,6 +216,16 @@ class RayOSWorldAsyncTrainer(RayOSWorldTrainer):
                     with marked_timer("old_log_prob", timing_raw):
                         old_log_prob = self.actor_rollout_wg.compute_log_prob(batch)                                    
                         entropys = old_log_prob.batch["entropys"]
+                        # entropy_ratio = self.config.actor_rollout_ref.actor.get("entropy_filter", 0)
+                        # if entropy_ratio and entropy_ratio > 0:
+                        #     traj_entropy = entropys.mean(dim=1)
+                        #     k = int(entropy_ratio * traj_entropy.size(0))
+                        #     if k > 0:
+                        #         topk_values, topk_idx = torch.topk(traj_entropy, k)
+                        #         entropy_mask = torch.zeros_like(traj_entropy, dtype=torch.bool)
+                        #         entropy_mask[topk_idx] = True
+                        #         entropy_mask = entropy_mask.unsqueeze(1)
+                        #         batch.batch["entropy_mask"] = entropy_mask
                         response_masks = batch.batch["response_mask"]
                         loss_agg_mode = self.config.actor_rollout_ref.actor.loss_agg_mode
                         print("compute_log_prob", entropys.shape, response_masks.shape)
