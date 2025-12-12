@@ -101,7 +101,8 @@ def test_agent():
         messages = list(np.repeat(batch["messages"], rollout_n, axis=0))
         print("task_configs", len(task_configs), type(task_configs[0]))
         runners = [TrajectoryRunner.remote(task_config) for task_config in task_configs]
-        reflection_agent = create_reflection_agent("openai", base_url="https://dashscope.aliyuncs.com/compatible-mode/v1", model="qwen2.5-32b-instruct", api_key="sk-075466341a4d4bf584ccb233c85cb6c1")
+        api_key = os.getenv("DASHSCOPE_API_KEY", "")
+        reflection_agent = create_reflection_agent("openai", base_url="https://dashscope.aliyuncs.com/compatible-mode/v1", model="qwen2.5-32b-instruct", api_key=api_key)
         
         try:
             run_agent_loop(llm, 

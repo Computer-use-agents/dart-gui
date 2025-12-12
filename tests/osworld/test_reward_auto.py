@@ -12,7 +12,9 @@ def setup_env_vars(monkeypatch):
     # Set environment variables for reward server
     monkeypatch.setenv("REWARD_SERVER_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
     monkeypatch.setenv("REWARD_MODEL", "qwen2.5-32b-instruct")
-    monkeypatch.setenv("REWARD_SERVER_API_KEY", "sk-075466341a4d4bf584ccb233c85cb6c1")
+    # API key should be set via environment variable, not hardcoded
+    reward_api_key = os.getenv("REWARD_SERVER_API_KEY", os.getenv("DASHSCOPE_API_KEY", ""))
+    monkeypatch.setenv("REWARD_SERVER_API_KEY", reward_api_key)
     monkeypatch.setenv("WINDOW_SIZE", "5")
     monkeypatch.setenv("STRIDE_SIZE", "5")
     monkeypatch.setenv("N_COMPLETIONS", "4")

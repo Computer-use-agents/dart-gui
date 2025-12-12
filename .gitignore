@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 *.csv
 **/*.pt
 **/checkpoints
@@ -166,9 +165,8 @@ pass32_uitars_0928
 viz/
 loss_dump/
 pass32_uitars_0928
-rollouter/
-=======
-dist/
+rollouter/dist/
 .DS_Store
 node_modules/
->>>>>>> 9521ee430f6f63fd2827701d44139186350b2b94
+.vscode/
+tests/osworld/
