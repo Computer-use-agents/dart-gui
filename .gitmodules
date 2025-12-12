@@ -1,3 +1,6 @@
 [submodule "GUI-Docker-Env"]
 	path = GUI-Docker-Env
 	url = https://github.com/Computer-use-agents/GUI-Docker-Env.git
+[submodule "dart_rollouter"]
+	path = dart_rollouter
+	url = https://github.com/Computer-use-agents/dart_rollouter.git
