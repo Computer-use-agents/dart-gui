@@ -170,3 +170,4 @@ rollouter/dist/
 node_modules/
 .vscode/
 tests/osworld/
+scripts
