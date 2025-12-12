@@ -181,6 +181,7 @@ Please follow the instructions in the repository below to initialize the environ
 Inside the `rollouter` docker container:
 
 ```bash
+cd dart_rollouter
 sh model_service.sh
 ```
 
@@ -189,6 +190,7 @@ sh model_service.sh
 Inside the configured CPU environment:
 
 ```bash
+cd dart_rollouter
 sh run.sh
 ```
 
