@@ -67,6 +67,7 @@ docker run -dit \
   -p 8881:8881 \
   -p 15959:15959 \
   --shm-size=200g \
+  -v <your workspace>:<your workspace in docker> \
   crpi-iwtwdoj3ikoon38c.cn-beijing.personal.cr.aliyuncs.com/pengxiangli1999/dart-gui:v0
 ```
 
@@ -81,6 +82,7 @@ docker run -dit \
   -p 6009:6008 \
   -p 8882:8881 \
   -p 15960:15959 \
+  -v <your workspace>:<your workspace in docker> \
   --shm-size=1500g \
   crpi-iwtwdoj3ikoon38c.cn-beijing.personal.cr.aliyuncs.com/pengxiangli1999/dart-gui:v0
 ```
