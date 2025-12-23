@@ -501,6 +501,19 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
 
     @register(dispatch_mode=Dispatch.ONE_TO_ALL)
     def init_model(self):
+        # --- [DEBUG] 辅助打印函数 ---
+        import os
+        import socket
+        import sys
+        
+        def trace(msg):
+            # 打印当前进程信息，方便区分是哪个 Rank 卡住了
+            print(f">>> [DEBUG_TRACE][{socket.gethostname()}:PID{os.getpid()}] {msg}", flush=True)
+            sys.stdout.flush()
+        # ---------------------------
+
+        trace("Entering init_model()")
+
         from verl.workers.actor import DataParallelPPOActor
 
         # This is used to import external_lib into the huggingface systems
@@ -511,8 +524,12 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
         use_remove_padding = self.config.model.get("use_remove_padding", False)
         use_shm = self.config.model.get("use_shm", False)
         use_fused_kernels = self.config.model.get("use_fused_kernels", False)
+        
+        trace(f"Config loaded. use_remove_padding={use_remove_padding}, use_shm={use_shm}")
 
+        # === 阶段 1: 构建 Actor 模型 (FSDP) ===
         if self._is_actor or self._is_rollout:
+            trace("Preparing to build Actor Model/Optimizer...")
             # we need the model for actor and rollout
             if self._is_actor:
                 optim_config = self.config.actor.optim
@@ -521,7 +538,11 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
                 optim_config = None
                 fsdp_config = OmegaConf.create()
 
+            trace("Copying model to local path...")
             local_path = copy_to_local(self.config.model.path, use_shm=use_shm)
+            
+            trace(f"Calling _build_model_optimizer (Role: Actor). Path: {local_path}")
+            # !!! 极其容易卡在这里：FSDP 初始化和权重加载 !!!
             (
                 self.actor_module_fsdp,
                 self.actor_optimizer,
@@ -540,31 +561,45 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
                 role="actor",
                 enable_activation_offload=self.config.model.get("enable_activation_offload", False),
             )
+            trace("_build_model_optimizer (Actor) returned successfully.")
 
             # get the original unwrapped module
             if fsdp_version(self.actor_module_fsdp) == 1:
                 self.actor_module = self.actor_module_fsdp._fsdp_wrapped_module
 
             if self._is_offload_param:
+                trace("Offloading parameters to CPU...")
                 offload_fsdp_model_to_cpu(self.actor_module_fsdp)
                 log_gpu_memory_usage("After offload actor model during init", logger=logger)
 
             if self._is_offload_optimizer:
+                trace("Offloading optimizer to CPU...")
                 offload_fsdp_optimizer(optimizer=self.actor_optimizer)
                 log_gpu_memory_usage("After offload actor optimizer during init", logger=logger)
 
         if self._is_actor:
+            trace("Initializing DataParallelPPOActor wrapper...")
             OmegaConf.set_struct(self.config.actor, True)
             with open_dict(self.config.actor):
                 self.config.actor.use_remove_padding = use_remove_padding
                 self.config.actor.use_fused_kernels = use_fused_kernels
             self.actor = DataParallelPPOActor(config=self.config.actor, actor_module=self.actor_module_fsdp, actor_optimizer=self.actor_optimizer)
+            trace("DataParallelPPOActor wrapper initialized.")
 
+        # === 阶段 2: 构建 Rollout (vLLM) ===
         if self._is_rollout:
+            trace("Preparing to build Rollout (vLLM)...")
+            # !!! 极其容易卡在这里：vLLM 显存分配 !!!
             self.rollout, self.rollout_sharding_manager = self._build_rollout(trust_remote_code=self.config.model.get("trust_remote_code", False))
+            trace("_build_rollout (vLLM) returned successfully.")
 
+        # === 阶段 3: 构建 Reference Policy (FSDP) ===
         if self._is_ref:
+            trace("Preparing to build Reference Policy Model...")
             local_path = copy_to_local(self.config.model.path, use_shm=use_shm)
+            
+            trace("Calling _build_model_optimizer (Role: Ref)...")
+            # !!! 如果之前卡在 ref_wg.init_model，就是死在这行 !!!
             self.ref_module_fsdp = self._build_model_optimizer(
                 model_path=local_path,
                 fsdp_config=self.config.ref.fsdp_config,
@@ -576,13 +611,17 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
                 use_liger=self.config.model.get("use_liger", False),
                 role="ref",
             )[0]
+            trace("_build_model_optimizer (Ref) returned successfully.")
+
             OmegaConf.set_struct(self.config.ref, True)
             with open_dict(self.config.ref):
                 self.config.ref.use_remove_padding = use_remove_padding
                 self.config.ref.use_fused_kernels = use_fused_kernels
             self.ref_policy = DataParallelPPOActor(config=self.config.ref, actor_module=self.ref_module_fsdp)
 
+        # === 阶段 4: 初始化 Checkpoint Manager ===
         if self._is_actor:
+            trace("Initializing Checkpoint Manager (Actor)...")
             self.flops_counter = FlopsCounter(self.actor_model_config)
             self.checkpoint_manager = FSDPCheckpointManager(
                 model=self.actor_module_fsdp,
@@ -591,8 +630,10 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
                 processing_class=self.processor if self.processor is not None else self.tokenizer,
                 checkpoint_contents=self.config.actor.checkpoint,
             )
+            trace("Checkpoint Manager (Actor) initialized.")
 
         if not self._is_actor and self._is_rollout:
+            trace("Initializing Checkpoint Manager (Rollout Only)...")
             # If ActorRolloutRefWorker is initialized as a standalone rollout,
             # create a checkpoint manager for FSDP model to allow loading FSDP checkpoints for rollout.
 
@@ -604,6 +645,9 @@ class ActorRolloutRefWorker(Worker, DistProfilerExtension):
                 processing_class=self.processor if self.processor is not None else self.tokenizer,
                 checkpoint_contents=checkpoint_contents,
             )
+            trace("Checkpoint Manager (Rollout Only) initialized.")
+            
+        trace("Exiting init_model() successfully.")
 
     @register(dispatch_mode=Dispatch.DP_COMPUTE_PROTO)
     @DistProfiler.annotate(color="red")

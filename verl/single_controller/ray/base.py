@@ -385,17 +385,27 @@ class RayWorkerGroup(WorkerGroup):
 
                     while time.time() - start_time < self._ray_wait_register_center_timeout:
                         if actor_name in list_named_actors():
-                            register_center_actor = ray.get_actor(actor_name)
-                            break
+                            try:
+                                register_center_actor = ray.get_actor(actor_name)
+                                # Verify the actor is actually ready by calling a method
+                                ray.get(register_center_actor.get_rank_zero_info.remote(), timeout=5)
+                                break
+                            except Exception as e:
+                                logging.debug(f"Register center actor found but not ready yet: {e}")
+                                time.sleep(0.5)
+                                continue
 
                         elapsed = int(time.time() - start_time)
                         if elapsed % 30 == 0:
+                            # Print more diagnostic information
+                            all_named = list_named_actors(all_namespaces=True)
                             logging.warning(
                                 "Waiting for register center actor %s to be ready. Elapsed time: %s seconds out of %s seconds.",
                                 actor_name,
                                 elapsed,
                                 self._ray_wait_register_center_timeout,
                             )
+                            logging.debug(f"Current named actors (first 10): {[str(a) for a in all_named[:10]]}")
                         time.sleep(1)
 
                     if register_center_actor is None:

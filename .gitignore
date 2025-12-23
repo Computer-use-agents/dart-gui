@@ -171,3 +171,5 @@ node_modules/
 .vscode/
 tests/osworld/
 scripts
+
+examples/osworld/async/run_trainer_debug_w_rollout_stepwise_train_pt_huoshan.sh

@@ -124,6 +124,13 @@ class Worker(WorkerHelper):
                 from verl.single_controller.base.register_center.ray import create_worker_group_register_center
 
                 self.register_center = create_worker_group_register_center(name=register_center_name, info=rank_zero_info)
+                # Wait for register center actor to be ready by calling a method
+                # This ensures the actor is fully initialized before we use it
+                try:
+                    ray.get(self.register_center.get_rank_zero_info.remote(), timeout=30)
+                except Exception as e:
+                    import logging
+                    logging.warning(f"Failed to verify register center actor readiness: {e}, but continuing...")
 
             os.environ.update(rank_zero_info)
         else:
