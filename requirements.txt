@@ -92,7 +92,7 @@ jmespath==1.0.1
 jsonschema==4.23.0
 jsonschema-specifications==2025.4.1
 jupyterlab-pygments==0.3.0
-kiwisolver==1.4.8
+kiwisolver==1.4.9
 lark==1.2.2
 litellm==1.67.2
 llguidance==0.7.19
