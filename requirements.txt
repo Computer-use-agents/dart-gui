@@ -100,7 +100,7 @@ llvmlite==0.44.0
 lm-format-enforcer==0.10.11
 markdown-it-py==3.0.0
 markupsafe==3.0.2
-matplotlib==3.10.5
+matplotlib==3.10.8
 mdurl==0.1.2
 mistral-common==1.5.4
 mistune==3.1.3
