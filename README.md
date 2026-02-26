@@ -2,7 +2,7 @@
 ### Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation
 
 <p align="center">
-&nbsp&nbsp🌐 <a href="https://computer-use-agents.github.io/dart-gui/">Website</a>&nbsp&nbsp | &nbsp&nbsp📑 <a href="https://arxiv.org/abs/2509.23866">arXiv</a>&nbsp&nbsp | &nbsp&nbsp🤖 <a href="https://huggingface.co/dart-gui/dart-gui-7b">Model</a>&nbsp&nbsp | &nbsp&nbsp🤗 <a href="https://huggingface.co/dart-gui/dart-gui-7b">Hugging Face</a>&nbsp&nbsp | &nbsp&nbsp📊 <a href="">Dataset (coming soon)</a>&nbsp&nbsp
+&nbsp&nbsp🌐 <a href="https://computer-use-agents.github.io/dart-gui/">Website</a>&nbsp&nbsp | &nbsp&nbsp📑 <a href="https://arxiv.org/abs/2509.23866">arXiv</a>&nbsp&nbsp | &nbsp&nbsp🤖 <a href="https://huggingface.co/dart-gui/dart-gui-7b">Model</a>&nbsp&nbsp | &nbsp&nbsp🤗 <a href="https://huggingface.co/dart-gui/dart-gui-7b">Hugging Face</a>&nbsp&nbsp 
 </p>
 
 <p align="center">
