@@ -41,6 +41,9 @@ coverage
 .npm
 .eslintcache
 .stylelintcache
+.venv-media/
+artifacts/
+__pycache__/
 
 # Optional: Uncomment if using Cypress for testing
 # cypress/videos/

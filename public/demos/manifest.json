@@ -1,0 +1,295 @@
+[
+  {
+    "id": "vibrance",
+    "number": "01",
+    "app": "GIMP",
+    "title": "Make the colors pop",
+    "description": "Enhance a photo with richer, more vibrant colors.",
+    "instruction": "Could you assist me in enhancing the color vibrancy of my photo?",
+    "taskId": "554785e9-4523-4e7a-b8e1-8016f565f56a",
+    "sourceId": "554785e9-4523-4e7a-b8e1-8016f565f56a_trace-2f0c6fab770c-1758785787",
+    "reward": 1.0,
+    "os": "Ubuntu 22.04",
+    "secondsPerStep": 2,
+    "video": "demos/vibrance.mp4",
+    "poster": "demos/vibrance-poster.webp",
+    "preview": "demos/vibrance/06.webp",
+    "posterStep": 6,
+    "steps": [
+      {
+        "image": "demos/vibrance/00.webp",
+        "thought": "I noticed that GIMP is already open, and now I need to enhance the colors in this image. To do that, I first have to locate the color adjustment feature. There\u2019s an option called \"Colors\" in the top menu bar; clicking on it will reveal more tools for adjusting brightness and saturation.",
+        "action": "click(start_box='<|box_start|>(370,78)<|box_end|>')",
+        "point": [
+          19.271,
+          7.222
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/vibrance/01.webp",
+        "thought": "The Colors menu has been expanded, and I've spotted several options related to color adjustments. To make the image more vibrant, adjusting the hue and saturation is a great choice. Let me select the \"Hue-Saturation...\" option so that I can open the adjustment panel and fine-tune these parameters.",
+        "action": "click(start_box='<|box_start|>(428,179)<|box_end|>')",
+        "point": [
+          22.292,
+          16.574
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/vibrance/02.webp",
+        "thought": "The hue-saturation adjustment panel is now open in front of me, and I can see that all three sliders are currently set to zero. To make the colors in this photo more vibrant, I need to increase the saturation value. So, let me drag the saturation slider a bit to add some depth and intensity to the image.",
+        "action": "drag(start_box='<|box_start|>(428,523)<|box_end|>', end_box='<|box_start|>(600,523)<|box_end|>')",
+        "point": [
+          22.292,
+          48.426
+        ],
+        "endPoint": [
+          31.25,
+          48.426
+        ]
+      },
+      {
+        "image": "demos/vibrance/03.webp",
+        "thought": "That's great! The saturation has been adjusted perfectly. Now, all I need to do is click the \"OK\" button in the lower right corner of the dialog box, and these changes will be applied to the image. Let's see how vibrant this photo looks after making those adjustments!",
+        "action": "click(start_box='<|box_start|>(568,658)<|box_end|>')",
+        "point": [
+          29.583,
+          60.926
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/vibrance/04.webp",
+        "thought": "That's fantastic! The colors in the photo have become much more vibrant. To make sure these changes aren't lost, I need to quickly save the file using Ctrl+S. After all, nobody wants their hard work on adjusting the colors to go to waste.",
+        "action": "hotkey(key='ctrl s')",
+        "point": null,
+        "endPoint": null
+      },
+      {
+        "image": "demos/vibrance/05.webp",
+        "thought": "We're almost done! I've already adjusted the colors in the photo, and now there's just one final step left - saving it. I see that the save dialog box is open, and all I need to do is click on the \"Save\" button in the bottom right corner, and these beautiful color adjustments will be permanently saved.",
+        "action": "click(start_box='<|box_start|>(1025,1009)<|box_end|>')",
+        "point": [
+          53.385,
+          93.426
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/vibrance/06.webp",
+        "thought": "I just finished a series of color enhancement steps, starting from opening the hue-saturation panel and adjusting the saturation value, all the way to saving the file. Looking at this photo now, every detail has become much more vibrant and lively. The colors are rich and natural, exactly what we were aiming for.",
+        "action": "finished(content='I have successfully enhanced the color vibrancy of my photo.')",
+        "point": null,
+        "endPoint": null
+      }
+    ]
+  },
+  {
+    "id": "slides",
+    "number": "02",
+    "app": "LibreOffice Impress",
+    "title": "Style a presentation",
+    "description": "Refine a slide title with bold type, size, and an underline.",
+    "instruction": "Bold the text on slide 1. Make the title of size 44pt and underline it on slide 1.",
+    "taskId": "5c1a6c3d-c1b3-47cb-9b01-8d1b7544ffa1",
+    "sourceId": "5c1a6c3d-c1b3-47cb-9b01-8d1b7544ffa1_trace-02fb6b92f81c-1758785787",
+    "reward": 1.0,
+    "os": "Ubuntu 22.04",
+    "secondsPerStep": 2,
+    "video": "demos/slides.mp4",
+    "poster": "demos/slides-poster.webp",
+    "preview": "demos/slides/08.webp",
+    "posterStep": 8,
+    "steps": [
+      {
+        "image": "demos/slides/00.webp",
+        "thought": "I noticed that there\u2019s a title on the first slide that says \"Business Infographic Template.\" In order to adjust its font style, I need to select it first. So now, I\u2019m going to click on this text box with my mouse so that I can start making changes like bolding and adjusting the size.",
+        "action": "click(start_box='<|box_start|>(473,506)<|box_end|>')",
+        "point": [
+          24.635,
+          46.852
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/slides/01.webp",
+        "thought": "The title text has been selected, and now I need to make it bold. There's a prominent \"B\" button on the toolbar, which is exactly what I'm looking for. By clicking this button, the text will instantly become bold.",
+        "action": "click(start_box='<|box_start|>(1557,283)<|box_end|>')",
+        "point": [
+          81.094,
+          26.204
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/slides/02.webp",
+        "thought": "It seems that the bold formatting didn't take effect completely; only some of the text has been changed to bold. Let me try again\u2014first, I'll press Ctrl+A to select all the text in the title box, and then I'll click on that \"B\" button once more. This should apply the bold effect uniformly across everything.",
+        "action": "hotkey(key='ctrl a')",
+        "point": null,
+        "endPoint": null
+      },
+      {
+        "image": "demos/slides/03.webp",
+        "thought": "Alright, the text is now fully selected. I see a \"B\" icon on the toolbar, which is exactly what I need to make the text bold. Let me go ahead and click this button to finalize the bold formatting.",
+        "action": "click(start_box='<|box_start|>(1559,287)<|box_end|>')",
+        "point": [
+          81.198,
+          26.574
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/slides/04.webp",
+        "thought": "I checked the current font size, and it's only 20pt, which is quite a bit smaller than the required 44pt. There's a dropdown menu for font sizes on the toolbar, so I need to click on it and select a larger size. This way, the title will stand out more prominently.",
+        "action": "click(start_box='<|box_start|>(1875,239)<|box_end|>')",
+        "point": [
+          97.656,
+          22.13
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/slides/05.webp",
+        "thought": "The font size dropdown menu has been expanded, and I can see various options ranging from 8pt to 48pt. According to the task requirements, I need to change the title to 44pt. So now, all I have to do is locate the option labeled \"44 pt\" in this list and click on it.",
+        "action": "click(start_box='<|box_start|>(1823,805)<|box_end|>')",
+        "point": [
+          94.948,
+          74.537
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/slides/06.webp",
+        "thought": "The font size has been adjusted, and now let's add an underline to the title. I found the \"U\" shaped icon on the toolbar, which is specifically for adding underlines. Clicking on it will complete our final formatting adjustment.",
+        "action": "click(start_box='<|box_start|>(1634,287)<|box_end|>')",
+        "point": [
+          85.104,
+          26.574
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/slides/07.webp",
+        "thought": "That's great! The title format has been perfectly adjusted according to the requirements. To make sure these changes aren't lost, I need to quickly hit Ctrl+S to save the file. After all, nobody wants their hard work on formatting to go to waste just because they forgot to save.",
+        "action": "hotkey(key='ctrl s')",
+        "point": null,
+        "endPoint": null
+      },
+      {
+        "image": "demos/slides/08.webp",
+        "thought": "I just finished all the formatting adjustments, including making the text bold, changing the font size to 44pt, and adding an underline. I also saved everything using Ctrl+S. Now, looking back at the slide, every detail meets the requirements perfectly.",
+        "action": "finished(content='\u5e7b\u706f\u72471\u4e2d\u7684\u6587\u5b57\u52a0\u7c97\u4e86\uff0c\u6807\u9898\u8c03\u6574\u4e3a44\u78c5\u5927\u5c0f\u5e76\u6dfb\u52a0\u4e86\u4e0b\u5212\u7ebf\u3002')",
+        "point": null,
+        "endPoint": null
+      }
+    ]
+  },
+  {
+    "id": "resize",
+    "number": "03",
+    "app": "GIMP",
+    "title": "Resize with precision",
+    "description": "Resize a husky photo to 512 px high, keeping its proportions.",
+    "instruction": "Could you assist me with resizing the dog layer of an image? I need to adjust the height to 512 pixels while maintaining the original aspect ratio?",
+    "taskId": "d16c99dc-2a1e-46f2-b350-d97c86c85c15",
+    "sourceId": "d16c99dc-2a1e-46f2-b350-d97c86c85c15_trace-0d523480f09f-1758785787",
+    "reward": 1.0,
+    "os": "Ubuntu 22.04",
+    "secondsPerStep": 2,
+    "video": "demos/resize.mp4",
+    "poster": "demos/resize-poster.webp",
+    "preview": "demos/resize/09.webp",
+    "posterStep": 9,
+    "steps": [
+      {
+        "image": "demos/resize/00.webp",
+        "thought": "I noticed that GIMP is already open on the screen, but it\u2019s still blank. In order to resize the dog layer, I first need to import an image. Let me click on the File menu in the top left corner so that I can find and open an image file.",
+        "action": "click(start_box='<|box_start|>(86,76)<|box_end|>')",
+        "point": [
+          4.479,
+          7.037
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/resize/01.webp",
+        "thought": "Great! The image has been successfully imported into GIMP. Now, I need to adjust the height of this dog layer to 512 pixels while keeping the proportions intact. To do this, I'll have to use the Image menu for resizing. Let me click on the \"Image\" option in the top menu bar so that I can access more options related to size adjustments.",
+        "action": "click(start_box='<|box_start|>(270,76)<|box_end|>')",
+        "point": [
+          14.062,
+          7.037
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/resize/02.webp",
+        "thought": "It seems that I didn't click the Image button accurately just now; my mouse pointer slipped a bit. But that's okay, let me try again. This time, I will make sure to precisely position the cursor over the Image option in the top menu bar before clicking it. That way, I can open up more options related to resizing.",
+        "action": "click(start_box='<|box_start|>(274,79)<|box_end|>')",
+        "point": [
+          14.271,
+          7.315
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/resize/03.webp",
+        "thought": "I found the \"Scale Image...\" option under the Image menu, which is exactly what I was looking for. This feature allows me to resize the image while preserving its proportions, perfectly meeting my needs. Now, all I need to do is click on this option to open the dialog box where I can set a height of 512 pixels.",
+        "action": "click(start_box='<|box_start|>(318,358)<|box_end|>')",
+        "point": [
+          16.562,
+          33.148
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/resize/04.webp",
+        "thought": "The zoom dialog box is now open, and I see that the current height of the image is 948 pixels. To achieve our goal, I need to change this value to 512. First, I'll click on the height input field and enter the new value of 512. Since GIMP automatically maintains the aspect ratio for us, there's no need to worry about distortion; adjusting just one dimension will proportionally adjust both.",
+        "action": "click(start_box='<|box_start|>(967,558)<|box_end|>')",
+        "point": [
+          50.365,
+          51.667
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/resize/05.webp",
+        "thought": "The height input box currently shows 948 pixels, and I need to change it to 512. First, I\u2019ll press Ctrl+A to select the entire current value, which will allow me to directly type in the new number without having to delete each digit individually. Once selected, I can simply enter 512.",
+        "action": "hotkey(key='ctrl a')",
+        "point": null,
+        "endPoint": null
+      },
+      {
+        "image": "demos/resize/06.webp",
+        "thought": "The old value has been fully selected, and now I'm going to enter 512 as the new height. Once I finish typing, GIMP will automatically calculate the corresponding width based on the original aspect ratio of the image, ensuring that everything remains proportionate.",
+        "action": "type(content='512')",
+        "point": null,
+        "endPoint": null
+      },
+      {
+        "image": "demos/resize/07.webp",
+        "thought": "The height has been adjusted to 512 pixels, and now we're just one step away from finishing. I see a \"Scale\" button in the bottom right corner of the dialog box; clicking it will apply these changes. Let's go ahead and complete this final adjustment.",
+        "action": "click(start_box='<|box_start|>(1137,766)<|box_end|>')",
+        "point": [
+          59.219,
+          70.926
+        ],
+        "endPoint": null
+      },
+      {
+        "image": "demos/resize/08.webp",
+        "thought": "That's great! The image height has been perfectly adjusted to 512 pixels. To make sure these changes aren't lost, I need to quickly hit Ctrl+S to save the file. After all, nobody wants their hard work on resizing going to waste.",
+        "action": "hotkey(key='ctrl s')",
+        "point": null,
+        "endPoint": null
+      },
+      {
+        "image": "demos/resize/09.webp",
+        "thought": "I checked the status bar, and it shows that the file has been saved successfully. Reflecting on the entire process, we started by opening GIMP, then adjusted the image height to 512 pixels while maintaining its proportions. Finally, we saved all these changes using Ctrl+S. With that done, this image editing task is now complete.",
+        "action": "finished(content='The dog layer\\'s height has been successfully resized to 512 pixels, and all changes have been saved. If you need any further adjustments or have other requests, please let me know.')",
+        "point": null,
+        "endPoint": null
+      }
+    ]
+  }
+]

@@ -1,926 +1,1022 @@
-<template>
-  <div class="research-bar">
-    <span class="research-title">More Research:</span>
-    <div class="research-link-wrapper">
-      <a class="research-link" href="https://clova-tool.github.io/" target="_blank">
-        CLOVA <span class="conf-tag">[CVPR 2024]</span>
-      </a>
-      <div class="preview-popup">
-        <iframe src="https://clova-tool.github.io/" frameborder="0"></iframe>
-      </div>
-    </div>
-    <div class="research-link-wrapper">
-      <a class="research-link" href="https://mm-fire.github.io/#" target="_blank">
-        FIRE <span class="conf-tag">[NeurIPS 2024]</span>
-      </a>
-      <div class="preview-popup">
-        <iframe src="https://mm-fire.github.io/#" frameborder="0"></iframe>
-      </div>
-    </div>
-    <div class="research-link-wrapper">
-      <a class="research-link" href="https://mat-agent.github.io/" target="_blank">
-        MAT <span class="conf-tag">[ICLR 2025]</span>
-      </a>
-      <div class="preview-popup">
-        <iframe src="https://mat-agent.github.io/" frameborder="0"></iframe>
-      </div>
-    </div>
-    <div class="research-link-wrapper">
-      <a class="research-link" href="https://tongui-agent.github.io/" target="_blank">
-        TongUI <span class="conf-tag">[arXiv 2025]</span>
-      </a>
-      <div class="preview-popup">
-        <iframe src="https://tongui-agent.github.io/" frameborder="0"></iframe>
-      </div>
-    </div>
-    <div class="research-link-wrapper">
-      <a class="research-link" href="https://computer-use-agents.github.io/macos/" target="_blank">
-        MacOS Agent <span class="conf-tag">[Open-source Project]</span>
-      </a>
-      <div class="preview-popup">
-        <iframe src="https://computer-use-agents.github.io/macos/" frameborder="0"></iframe>
-      </div>
-    </div>
-    <div class="research-link-wrapper">
-      <a class="research-link" href="https://sport-agents.github.io/" target="_blank">
-        SPORT <span class="conf-tag">[NeurIPS 2025]</span>
-      </a>
-      <div class="preview-popup">
-        <iframe src="https://sport-agents.github.io/" frameborder="0"></iframe>
-      </div>
-    </div>
-  </div>
-
-  <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    <!-- <meta charset="UTF-8"> -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
-  <div class="main">
-    <div class="section header">
-      <div class="title">
-        <img class="mat-icon" src="/icon.png" alt="DART icon">
-        DART-GUI
-      </div>
-      <div class="subtitle">
-        Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation
-      </div>
-
-
-      <div class="author-list">
-        <span class="author">
-          <el-link href="https://pengxiang-li.github.io">Pengxiang Li</el-link>
-          <span class="ind">1,2&#9733;</span>,
-        <span class="author">
-          <el-link href="">Zechen Hu</el-link>
-          <span class="ind">3&#9733;</span>,
-        </span>
-        <span class="author">
-          <el-link href="">Zirui Shang</el-link>
-          <span class="ind">1,2&#9733;</span>,
-        </span>
-        <span class="author">
-          <el-link href="https://scholar.google.com/citations?user=xr7kNGEAAAAJ&hl">Jingrong Wu</el-link>
-          <span class="ind">3&#9733;</span>,
-        </span>
-        </span>
-        <span class="author">
-          <el-link href="">Yang Liu</el-link>
-          <span class="ind">2</span>,
-        </span>
-        <span class="author">
-          <el-link href="">Hui Liu</el-link>
-          <span class="ind">3</span>,
-        </span>
-        <br>
-        <span class="author">
-          <el-link href="https://zhigao2017.github.io/">Zhi Gao</el-link>
-          <span class="ind">1,2&#9993;</span>,
-        </span>
-        <span class="author">
-          <el-link href="https://scholar.google.com/citations?user=DSN0fGIAAAAJ&hl=en">Chenrui Shi</el-link>
-          <span class="ind">1,2</span>,
-        </span>
-        <span class="author">
-          <el-link href="https://bofei5675.github.io/">Bofei Zhang</el-link>
-          <span class="ind">2</span>,
-        </span>
-        <span class="author">
-          <el-link href="">Zihao Zhang</el-link>
-          <span class="ind">3</span>,
-        </span>
-        <span class="author">
-          <el-link href="">Xiaochuan Shi</el-link>
-          <span class="ind">3</span>,
-        </span>
-        <span class="author">
-          <el-link href="">Zedong Yu</el-link>
-          <span class="ind">2,4</span>,
-        </span>
-        <br>
-        <span class="author">
-          <el-link href="https://wu-yuwei-bit.github.io/">Yuwei Wu</el-link>
-          <span class="ind">1,5&#9993;</span>,
-        </span>
-
-        <span class="author">
-          <el-link href="https://wuxinxiao.github.io/">Xinxiao Wu</el-link>
-          <span class="ind">1,5</span>,
-        </span>
-        
-
-        <span class="author">
-          <el-link href="https://scholar.google.com/citations?user=Sl6TV7gAAAAJ&hl=en">Yunde Jia</el-link>
-          <span class="ind">5</span>,
-        </span>
-        <span class="author">
-          <el-link href="">Liuyu Xiang</el-link>
-          <span class="ind">4</span>,
-        </span>
-        <span class="author">
-          <el-link href="">Zhaofeng He</el-link>
-          <span class="ind">4</span>,
-        </span>
-        <span class="author">
-          <el-link href="https://liqing.io/">Qing Li</el-link>
-          <span class="ind">2&#9993;</span>
-        </span>
-      </div>
-      <div class="author-list">
-        <span class="org">
-          <span class="ind">1</span>
-          BIT
-        </span>
-        <span class="org">
-          <span class="ind">2</span>
-          BIGAI
-        </span>
-        <span class="org">
-          <span class="ind">3</span>
-          DataCanvas 
-        </span>
-        <span class="org">
-          <span class="ind">4</span>
-          BUPT
-        </span>
-        <span class="org">
-          <span class="ind">5</span>
-          Shenzhen MSU-BIT University
-        </span>
-      </div>
-
-      <span class="link-block">
-        <a href="https://arxiv.org/pdf/2509.23866" class="external-link button is-normal is-rounded is-dark">
-          <span class="icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="1.0em" height="1.0em" viewBox="0 0 24 24">
-              <path fill="currentColor"
-                d="M3.842 0a1 1 0 0 0-.922.608c-.153.369-.044.627.294 1.111l6.919 8.36l-1.023 1.106a1.04 1.04 0 0 0 .003 1.423l1.23 1.313l-5.44 6.444c-.28.3-.453.823-.297 1.199a1.025 1.025 0 0 0 .959.635a.91.91 0 0 0 .689-.34l5.783-6.126l7.49 8.005a.85.85 0 0 0 .684.26a.96.96 0 0 0 .877-.615c.158-.377-.017-.75-.306-1.14L13.73 13.9l1.064-1.13a.963.963 0 0 0 .009-1.316L4.633.464S4.26.01 3.867 0zm0 .272h.017c.218.005.487.272.564.364l.005.006l.005.005l10.17 10.99a.69.69 0 0 1-.008.946l-1.066 1.133l-1.498-1.772l-8.6-10.39c-.328-.472-.352-.619-.26-.841a.73.73 0 0 1 .671-.44Zm14.341 1.57a.88.88 0 0 0-.655.242l-5.696 6.158l1.694 1.832l5.309-6.514c.325-.433.479-.66.325-1.029a1.12 1.12 0 0 0-.977-.689m-7.655 12.282l1.318 1.414l-5.786 6.13a.65.65 0 0 1-.496.26a.75.75 0 0 1-.706-.467c-.112-.269.036-.687.244-.909l.005-.005l.005-.006z" />
-            </svg>
-          </span>
-          <span>arXiv</span>
-        </a>
-      </span>
-      <span class="link-block">
-        <a href="https://github.com/Computer-use-agents/dart-gui" class="external-link button is-normal is-rounded is-dark">
-          <span class="icon">
-            <i class="fab fa-github"></i>
-          </span>
-          <span>Code</span>
-        </a>
-      </span>
-
-      <!-- Data Link. need changing -->
-      <span class="link-block">
-
-        <a target="_blank" href=""
-          class="external-link button is-normal is-rounded is-dark">
-          <span class="icon">
-            <i class="fa fa-database"></i>
-          </span>
-          <span>Data</span>
-        </a>
-      </span>
-
-      <!-- <span class="link-block">
-
-        <a target="_blank" href="https://www.youtube.com/watch?v=CHtvtR5y8so"
-          class="external-link button is-normal is-rounded is-dark">
-          <span class="icon">
-            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="2 0 32 22"
-            style="fill:#EBEBEB;">
-            <path d="M30.362,8.749c-0.218-1.179-0.989-2.168-2.064-2.647c-0.508-0.228-1.096,0.002-1.32,0.506	c-0.226,0.505,0.001,1.096,0.506,1.32c0.473,0.211,0.814,0.654,0.912,1.185c0.005,0.029,0.009,0.058,0.014,0.087	c0.001,0.093,0.014,0.185-0.002,0.28c-0.145,0.815-0.918,1.362-1.738,1.217c-6.302-1.111-13.09-1.128-20.188-0.053	c-0.518,3.798-0.475,8.104,0.132,11.988c0.127,0.818-0.433,1.586-1.251,1.714c-0.078,0.012-0.156,0.018-0.233,0.018	c-0.361,0-0.699-0.131-0.962-0.353c-0.003-0.002-0.006-0.004-0.008-0.006c-0.119-0.101-0.217-0.226-0.3-0.361	c-0.01-0.017-0.025-0.03-0.035-0.047c-0.085-0.151-0.146-0.319-0.175-0.501c-0.71-4.556-0.697-9.662,0.035-14.01	c0.106-0.632,0.603-1.126,1.233-1.23c0.437-0.073,0.871-0.132,1.306-0.197c5.965-0.766,11.879-0.861,17.592-0.262	c0.567,0.064,1.041-0.342,1.099-0.89c0.058-0.55-0.341-1.042-0.89-1.099C17.738,4.749,11.227,4.896,4.668,5.841	C3.156,6.06,1.93,7.259,1.685,8.759c-0.808,4.979-0.822,9.893-0.043,14.604c0.266,1.597,1.546,2.835,3.113,3.013	c3.665,0.414,7.384,0.621,11.132,0.621c3.772,0,7.575-0.21,11.379-0.63c1.547-0.172,2.827-1.378,3.113-2.934	C31.271,18.569,31.266,13.628,30.362,8.749z M13,13.958c0-0.879,0.944-1.434,1.712-1.007l5.475,3.042c0.79,0.439,0.79,1.576,0,2.015	l-5.475,3.042C13.944,21.476,13,20.92,13,20.042V13.958z"></path>
-            </svg>
-          </span>
-          <span>Video</span>
-        </a>
-      </span> -->
-      <span class="link-block">
-     
-        <a target="_blank" href=""
-          class="external-link button is-normal is-rounded is-dark">
-          <span class="icon">
-            <i class="fa fa-share-square"></i>
-          </span>
-          <span>Model</span>
-        </a>
-      </span>
-      <!-- <span class="link-block">
- 
-        <a target="_blank" href="https://li-qing-fire.hf.space"
-          class="external-link button is-normal is-rounded is-dark">
-          <span class="icon">
-            <i class="fa fa-images"></i>
-          </span>
-          <span>Demo</span>
-        </a>
-      </span> -->
-      <!-- <span class="link-block">
- 
-        <a target="_blank" href="https://x.com/Sealiqing/status/1819279627438973133"
-          class="external-link button is-normal is-rounded is-dark">
-          <span class="icon">
-<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="1.0em" height="1.0em" viewBox="0,0,256,256">
-<g fill="#e9e9e9" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><g transform="scale(5.12,5.12)"><path d="M6.91992,6l14.2168,20.72656l-14.9082,17.27344h3.17773l13.13867,-15.22266l10.44141,15.22266h10.01367l-14.87695,-21.6875l14.08008,-16.3125h-3.17578l-12.31055,14.26172l-9.7832,-14.26172z"></path></g></g>
-</svg>
-          </span>
-          <span>Twitter</span>
-        </a>
-      </span> -->
-      <!-- <span class="link-block">
-            <a href="file/clova_cvpr24_poster.pdf"
-               class="external-link button is-normal is-rounded is-dark">
-              <span class="icon">
-                  <i class="fas fa-file-pdf"></i>
-              </span>
-              <span>Poster (CVPR'24)</span>
-            </a>
-          </span> -->
-
-      <!-- <span class="link-block">
-            <a href="file/clova_slides.pdf"
-               class="external-link button is-normal is-rounded is-dark">
-              <span class="icon">
-                  <i class="fas fa-file-pdf"></i>
-              </span>
-              <span>Slides</span>
-            </a>
-          </span> -->
-
-    </div>
-
-    <div class="tldr">
-      <p><b>TL;DR</b> This paper introduces <b>DART</b>, a decoupled agentic RL framework for training GUI agents, achieving a success rate of <b>42.13% on OSWorld </b>.</p>
-    </div>
-
-    <div class="section">
-      <el-card class="teaser">
-        <el-image src="./stats/teaser.png"></el-image>
-      </el-card>
-    </div>
-
-
-    <div class="section">
-      <div class="section-title">Introduction</div>
-      <p class="intro">
-        Vision-language model (VLM) based GUI agents show promise for automating complex desktop and mobile tasks, 
-        but face significant challenges in applying reinforcement learning (RL): 
-        (1) slow multi-turn interactions with GUI environments for policy rollout, and 
-        (2) insufficient high-quality agent-environment interactions for policy learning.
-        To address these challenges, we propose <b>DART</b>, 
-        a <span class="uns">D</span>ecoupled <span class="uns">A</span>gent <span class="uns">R</span>L <span class="uns">T</span>raining framework for GUI agents, 
-        which coordinates heterogeneous modules in a highly decoupled manner. 
-        DART separates the training system into four asynchronous modules: environment cluster, rollout service, data manager, and trainer. 
-        This design enables non-blocking communication, asynchronous training, rollout-wise trajectory sampling, and per-worker model synchronization, 
-        significantly improving the system efficiency: 
-        <i>1.6× GPU utilization for rollout</i>, 
-        <i>1.9× training throughput</i>, and 
-        <i>5.5× environment utilization</i>.
-        To facilitate effective learning from abundant samples, we introduce an adaptive data curation scheme: 
-        (1) pre-collecting successful trajectories for challenging tasks to supplement sparse success in online sampling; 
-        (2) dynamically adjusting rollout numbers and trajectory lengths based on task difficulty; 
-        (3) training selectively on high-entropy steps to prioritize critical decisions; 
-        (4) stabilizing learning via truncated importance sampling for policy mismatch between policy rollout and updating.
-        On the OSWorld benchmark, <i>DART-GUI-7B</i> achieves a 42.13% task success rate, 
-        a 14.61% absolute gain over the base model, and 7.34% higher than open-source SOTA.
-      </p>
-    </div>
-
-
-
-
-    <!-- <video width="80%" height=auto controls="/poster.png">
-      <source src="/mat-video.mp4" type="video/mp4">
-    </video> -->
-
-    <div class="section">
-      <el-card class="poster">
-        <el-image src="/poster.png"></el-image>
-      </el-card>
-    </div>
-
-
-    <div class="section">
-      <div class="section-title">DART: Decoupled Agentic RL Training Framework</div>
-      <el-card class="teaser">
-        <el-image src="./stats/framework.png"></el-image>
-      </el-card>
-      <p class="intro">Our decoupled RL framework for GUI agents operates through a structured four-module loop that enables asynchronous and highly efficient training:</p>
-      <ol style="margin-left: 0; text-align: left;">
-        <li style="margin-bottom: 0.5em;">
-          <strong>Environment Cluster:</strong>  
-          Hundreds of desktop environments are instantiated to execute tasks in parallel. Each environment receives task instructions from the <em>Data Manager</em> and produces trajectories by executing candidate actions from the current policy.
-        </li>
-        <li style="margin-bottom: 0.5em;">
-          <strong>Rollout Service:</strong>  
-          Idle workers are dynamically assigned to generate actions and thoughts for individual rollouts. By applying <b>rollout-wise sampling</b>—treating each trajectory as an independent scheduling unit—the system maximizes GPU utilization and avoids idle environments.
-        </li>
-        <li style="margin-bottom: 0.5em;">
-          <strong>Data Manager:</strong>  
-          Sampled trajectories, along with their rewards, are stored and filtered according to predefined rules. The manager ensures that high-quality trajectories are selected for policy updates while maintaining a balanced and adaptive data flow.
-        </li>
-        <li style="margin-bottom: 0.5em;">
-          <strong>Trainer:</strong>  
-          Receives filtered trajectories and performs step-wise GRPO updates asynchronously. Updated model weights are synchronized to the Rollout Service using <b>per-worker model synchronization</b>, so each rollout worker receives updated weights gradually without halting others, enabling continuous training and rollout generation.
-        </li>
-      </ol>
-      <p class="intro">Visualization of sampling timelines and model updating timelines: </p>
-      <el-card class="teaser">
-        <div class="image-stack">
-          <el-image src="./stats/rollout.png" fit="contain"></el-image>
-          <div class="dashed-separator"></div>
-          <el-image src="./stats/update.png" fit="contain"></el-image>
-        </div>
-      </el-card>
-
-    </div>
-
-
-    <div class="section">
-      <div class="section-title">Multi-Level Adaptive Data Curation for GUI Tasks</div>
-      <p class="intro">
-        Our DART framework leverages a multi-level adaptive data curation scheme for training GUI agents, composed of four key components:
-      </p>
-      <ol style="margin-left: 0; text-align: left;">
-        <li style="margin-bottom: 0.5em;">
-          <strong>Performance-Aware Task Rollout:</strong>  
-          Each task's rollout frequency and trajectory length are dynamically adjusted based on its learning progress. Easy tasks receive fewer rollouts, while challenging tasks maintain higher sampling to ensure sufficient exploration. Task-specific trajectory lengths are determined by the historical maximum of successful trajectories, preventing wasted computation on unnecessarily long rollouts.
-        </li>
-        <li style="margin-bottom: 0.5em;">
-          <strong>Experience Pool of Trajectories:</strong>  
-          For difficult tasks with extremely low success rates, we maintain a repository of high-quality successful trajectories. When all online rollouts for a task fail, a trajectory is sampled from the pool and included in training, ensuring the agent always receives at least one positive learning signal.
-        </li>
-        <li style="margin-bottom: 0.5em;">
-          <strong>High-Entropy-Driven Step Optimization:</strong>  
-          The agent prioritizes steps with high uncertainty by computing step-level entropy over all generated tokens in a step. Only the top 80\% high-entropy steps are used for training, focusing learning on critical decisions and preventing wasted updates on trivial steps.
-        </li>
-        <li style="margin-bottom: 0.5em;">
-          <strong>Distribution Alignment for OOD Tokens:</strong>  
-          To address policy mismatch between rollout and training, we apply truncated importance sampling based on the probability ratio between the two distributions. Gradient contributions are reweighted accordingly, enabling stable learning across tasks and workers in the decoupled framework.
-        </li>
-      </ol>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Evaluation and Results</div>
-      <div class="intro">
-        We evaluate <b>DART-GUI-7B</b> on the <b>OSWorld</b> benchmark, which includes 10 diverse applications. 
-      </div>
-
-      <div class="intro">
-        <b>Evaluation Protocol.</b> Each trajectory is capped at a maximum number of steps, and success is measured via automated scripts on self-deployed devices using the official codebase and Docker environment. <b>Bold</b> values in tables indicate the best performance among open-source models. Abbreviations: LibreOffice Calc, Impress, and Writer are shown as <i>calc</i>, <i>impress</i>, and <i>writer</i>, respectively. 
-      </div>
-
-      <div class="intro">
-        <b>Main Results.</b> DART-GUI-7B achieves an overall success rate of <b>42.13%</b> using only 30 maximum steps, establishing a new state-of-the-art among open-source models. Compared to the baseline UI-TARS-1.5-7B (27.52% with 100 steps), DART-GUI-7B improves by <b>+12.71%</b>. It also achieves performance comparable to Claude-4-Sonnet (41.39% with 100 steps) and outperforms other models such as OpenAI CUA o3 (23.00% with 100 steps). 
-      </div>
-
-      <div class="intro">
-        DART-GUI-7B consistently improves across all applications, with particularly strong gains in complex system-level tasks: OS tasks improve by <b>31.25%</b> (62.50% vs. 31.25%), LibreOffice Writer by <b>21.73%</b> (60.86% vs. 39.13%), and Thunderbird by <b>20.00%</b> (60.00% vs. 40.00%). These results highlight the framework's ability to handle long-horizon interactions with sparse rewards effectively, thanks to our decoupled asynchronous RL system and multi-level adaptive data curation.
-      </div>
-
-      <el-card class="stats-img-1">
-        <el-image src="./stats/main_result.png"></el-image>
-      </el-card>
-    </div>
-
-
-  </div>
-  
-  <div class="section"> 
-    <div class="section-title">Efficiency Analysis</div>
-    <div class="intro">
-      We evaluate our decoupled framework's efficiency gains across three key metrics, as shown in Table~\ref{tab:efficiency}. Our framework achieves substantial improvements: training throughput nearly doubles from <b>22.6</b> to <b>43.6 actions/min</b> (<b>1.9×</b>), environment utilization increases dramatically from <b>12.2%</b> to <b>67.7%</b> (<b>5.5×</b>), and GPU utilization improves from <b>29.6%</b> to <b>46.7%</b> (<b>1.6×</b>). These gains stem from our decoupled design's elimination of system-wide blocking. Environments continuously generate rollouts without waiting for batch completion, enabling immediate trajectory generation upon task completion. Worker-wise model updates avoid global synchronization, allowing the GPU service to continuously perform inference while some are updating models. This asynchronous operation minimizes idle time across all components, demonstrating that decoupling is essential for efficient GUI agent RL at scale.
-    </div>
-    <br><br>
-    <el-card class="stats-img-2" style="max-width: 70%; margin: 0 auto;">
-      <el-image src="./stats/efficiency.png" style="width: 100%;"></el-image>
-    </el-card>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Ablation</div>
-    <div class="intro">
-      Our ablation study evaluates key components of DART-GUI. <b>Dynamic Rollout and Dynamic Trajectory Length</b> adaptively reduce computational overhead as the model improves, with average rollout frequency dropping from 8.0 to 5.0 and average trajectory length decreasing from 30 to under 10 steps, as shown in <i>Figures (a) and (b)</i>. <b>Experience Pool of Trajectories</b> stabilizes learning on 22 challenging tasks that initially have 0% success rate, progressively improving performance to 46% by incorporating successful trajectories, as illustrated in <i>Figure (c)</i>. <b>High-entropy-driven Step Selection</b> improves success rates from 28.67% to 68.33%, demonstrating its effectiveness in guiding critical decision points. Finally, <b>Distribution Alignment</b> mitigates distribution shift between rollout and training policies, maintaining training stability around 70%, achieving higher peak performance, and preventing catastrophic collapse, as seen in <i>Figure (d)</i>.
-    </div>
-    <br><br>
-
-    <el-card class="teaser">
-      <div class="image-stack">
-        <el-image src="./stats/ablation_table.png" fit="contain" style="max-width: 60%; margin: 0 auto;"></el-image>
-        <div class="dashed-separator"></div>
-        <el-image src="./stats/ablation.png" fit="contain"></el-image>
-      </div>
-    </el-card>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Visualization</div>
-    <p class="intro">
-      We visualize the trajectory comparison between the baseline and our model. The task requires saving a webpage to the bookmarks bar for quick access. The baseline model (top) makes a critical error by clicking "Done" without changing the bookmark folder from the default "All Bookmarks" to "Bookmarks bar," resulting in task failure. Our DART-GUI-7B model (bottom) correctly identifies the need to switch the folder dropdown to "Bookmarks bar" before confirming, successfully completing the task. This demonstrates our model's ability to understand subtle but crucial UI requirements that determine task success, learned through RL training on rare successful trajectories.
-    </p>
-    <el-card class="stats-img-2">
-      <el-image src="./stats/visualization.png"></el-image>
-    </el-card>
-  </div>
-
-  <section class="section" id="BibTeX" style="text-align: left;">
-    <div class="container is-max-desktop content" style="max-width: 100%; margin: 0 auto;">
-      <div class="bibtex-header">
-        <h3 class="title" style="font-size: small;">
-          BibTeX
-        </h3>
-        <button @click="copyBibtex" class="copy-button" :class="{ 'copied': copySuccess }">
-          <i class="fas" :class="copySuccess ? 'fa-check' : 'fa-copy'"></i>
-          {{ copySuccess ? 'Copied!' : 'Copy' }}
-        </button>
-      </div>
-      <div class="bibtex-container">
-        <pre><code class="language-bibtex">
-@article{li2025dart,
-  title = {Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation},
-  author={Li, Pengxiang and Hu, Zechen and Shang, Zirui and Wu, Jingrong and Liu, Yang and Liu, Hui and Gao, Zhi and Shi, Chenrui and Zhang, Bofei and Zhang, Zihao and Shi, Xiaochuan and Yu, Zedong and Wu, Yuwei and Wu, Xinxiao and Jia, Yunde and Xiang, Liuyu and He, Zhaofeng and Li, Qing},
-  journal={arXiv preprint arXiv:2509.23866},
-  year={2025}
-  url = {https://arxiv.org/abs/2509.23866}
-}
-</code></pre>
-      </div>
-    </div>
-  </section>
-
-
-  <div class="footer">
-    This website is inspired by <el-link href="https://mathvista.github.io/">MathVista</el-link> and <el-link
-      href="https://nerfies.github.io/">Nerfies</el-link>.
-  </div>
-</template>
-
 <script setup>
-// import Dialog from './Dialog.vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from "vue";
+import { modules, categories, scores, authors, bibtex } from "../data.js";
 
-import { onMounted, ref } from 'vue'
+const asset = (path) => `${import.meta.env.BASE_URL}${path}`;
+const demos = ref([]);
+const loading = ref(true);
+const loadError = ref(false);
+const selected = ref(0);
+const stepIndex = ref(0);
+const mode = ref("video");
+const video = ref(null);
+const videoError = ref(false);
+const playing = ref(false);
+const currentTime = ref(0);
+const mobileNav = ref(false);
+const budget = ref(100);
+const activeModule = ref(0);
+const copyStatus = ref("Copy BibTeX");
+const activeSection = ref("overview");
+const demo = computed(() => demos.value[selected.value]);
+const step = computed(() => demo.value?.steps[stepIndex.value]);
+const currentVideoStep = computed(() =>
+  Math.min(
+    Math.floor(currentTime.value / 2) + 1,
+    demo.value?.steps.length || 1,
+  ),
+);
+const actionName = computed(() => {
+  const name = step.value?.action.split("(")[0];
+  return (
+    {
+      click: "CLICK",
+      left_double: "DOUBLE-CLICK",
+      right_single: "RIGHT-CLICK",
+      drag: "DRAG",
+      scroll: "SCROLL",
+    }[name] || "ACTION"
+  );
+});
+const results = computed(() => scores[budget.value]);
+const gain = computed(() =>
+  (results.value.total[1] - results.value.total[0]).toFixed(2),
+);
+let observer;
+let copyTimer;
 
-const dataset1 = ref([])
-const loadData1 = async () => {
-  const resp1 = await fetch('./data/demo-100k.json')
-  dataset1.value = await resp1.json()
-}
-
-const dataset2 = ref([])
-const loadData2 = async () => {
-  const resp2 = await fetch('./data/demo-1m.json')
-  dataset2.value = await resp2.json()
-}
-
-const dataset3 = ref([])
-const loadData3 = async () => {
-  const resp3 = await fetch('./data/demo-bench.json')
-  dataset3.value = await resp3.json()
-}
-
-// Copy functionality for BibTeX
-const copySuccess = ref(false)
-
-const bibtexText = `@article{li2025dart,
-  title = {Efficient Multi-turn RL for GUI Agents via Decoupled Training and Adaptive Data Curation},
-  author = {Pengxiang Li and Zechen Hu and Zirui Shang and Jingrong Wu and Yang Liu and Hui Liu and Zhi Gao and Chenrui Shi and Bofei Zhang and Zihao Zhang and Xiaochuan Shi and Zedong Yu and Yuwei Wu and Xinxiao Wu and Yunde Jia and Liuyu Xiang and Zhaofeng He and Qing Li},
-  journal = {arXiv preprint},
-  volume = {arXiv:2509.23866},
-  year = {2025},
-  url = {https://arxiv.org/abs/2509.23866},
-}`
-
-const copyBibtex = async () => {
+async function loadDemos() {
+  loading.value = true;
+  loadError.value = false;
   try {
-    await navigator.clipboard.writeText(bibtexText)
-    copySuccess.value = true
-    setTimeout(() => {
-      copySuccess.value = false
-    }, 2000)
-  } catch (err) {
-    console.error('Failed to copy: ', err)
-    // Fallback for older browsers
-    const textArea = document.createElement('textarea')
-    textArea.value = bibtexText
-    document.body.appendChild(textArea)
-    textArea.select()
-    document.execCommand('copy')
-    document.body.removeChild(textArea)
-    copySuccess.value = true
-    setTimeout(() => {
-      copySuccess.value = false
-    }, 2000)
+    const response = await fetch(asset("demos/manifest.json"));
+    if (!response.ok) throw new Error("Could not load demo data");
+    const data = await response.json();
+    if (
+      !Array.isArray(data) ||
+      !data.length ||
+      data.some((item) => !item.steps?.length)
+    )
+      throw new Error("Invalid demo data");
+    demos.value = data;
+  } catch {
+    loadError.value = true;
+  } finally {
+    loading.value = false;
   }
 }
-
+function selectDemo(index) {
+  video.value?.pause();
+  selected.value = index;
+  stepIndex.value = 0;
+  currentTime.value = 0;
+  videoError.value = false;
+  playing.value = false;
+}
+async function watchDemo() {
+  mode.value = "video";
+  document.getElementById("demo")?.scrollIntoView({
+    behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "instant"
+      : "smooth",
+  });
+  await nextTick();
+  try {
+    await video.value?.play();
+  } catch {
+    /* Native controls remain available. */
+  }
+}
+function setMode(value) {
+  video.value?.pause();
+  mode.value = value;
+  playing.value = false;
+  if (value === "video") currentTime.value = 0;
+}
+function moveStep(delta) {
+  stepIndex.value = Math.min(
+    Math.max(0, stepIndex.value + delta),
+    demo.value.steps.length - 1,
+  );
+}
+async function copyCitation() {
+  try {
+    await navigator.clipboard.writeText(bibtex);
+    copyStatus.value = "Copied!";
+  } catch {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(document.getElementById("citation-code"));
+    selection.removeAllRanges();
+    selection.addRange(range);
+    copyStatus.value = "Selected — press Ctrl/Cmd+C";
+  }
+  clearTimeout(copyTimer);
+  copyTimer = setTimeout(() => {
+    copyStatus.value = "Copy BibTeX";
+  }, 3500);
+}
 onMounted(() => {
-  loadData1(),
-    loadData2(),
-    loadData3()
-})
+  loadDemos();
+  observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries)
+        if (entry.isIntersecting) activeSection.value = entry.target.id;
+    },
+    { rootMargin: "-15% 0px -60% 0px" },
+  );
+  document
+    .querySelectorAll("main > section[id]")
+    .forEach((section) => observer.observe(section));
+});
+onUnmounted(() => {
+  observer?.disconnect();
+  clearTimeout(copyTimer);
+});
 </script>
 
+<template>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a
+        class="brand"
+        href="#overview"
+        aria-label="DART-GUI home"
+        @click="mobileNav = false"
+        ><svg
+          class="brand-mark"
+          viewBox="0 0 32 32"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path d="M4 5h13l11 11-11 11H4l11-11L4 5Z" fill="currentColor" />
+          <path d="m5 12 4 4-4 4" stroke="currentColor" stroke-width="2" /></svg
+        >DART<span class="brand-slash">/</span
+        ><span class="brand-gui">GUI</span></a
+      >
+      <button
+        class="menu-toggle"
+        :aria-expanded="mobileNav"
+        aria-controls="main-nav"
+        @click="mobileNav = !mobileNav"
+      >
+        {{ mobileNav ? "Close −" : "Menu +" }}
+      </button>
+      <nav
+        id="main-nav"
+        :class="{ open: mobileNav }"
+        aria-label="Main navigation"
+      >
+        <a
+          v-for="[id, label] in [
+            ['overview', 'Overview'],
+            ['demo', 'In action'],
+            ['method', 'Method'],
+            ['results', 'Results'],
+          ]"
+          :key="id"
+          :href="`#${id}`"
+          :class="{ active: activeSection === id }"
+          :aria-current="activeSection === id ? 'location' : undefined"
+          @click="mobileNav = false"
+          >{{ label }}</a
+        ><a
+          class="nav-code"
+          href="https://github.com/Computer-use-agents/dart-gui"
+          target="_blank"
+          rel="noopener noreferrer"
+          >View on GitHub <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </div>
+  </header>
 
+  <main id="main">
+    <section id="overview" class="hero section-wrap">
+      <div class="hero-copy">
+        <div class="eyebrow">
+          <span class="status-dot"></span> OPEN-SOURCE COMPUTER-USE RESEARCH
+        </div>
+        <h1>Real desktops.<br />Real <span>learning.</span></h1>
+        <p class="hero-intro">
+          <strong>Meet DART-GUI.</strong> A fully decoupled reinforcement
+          learning framework that turns desktop interactions into better GUI
+          agents.
+        </p>
+        <div class="hero-actions">
+          <button class="button primary" @click="watchDemo">
+            <span class="play-icon" aria-hidden="true">▶</span> Watch it work
+            <span aria-hidden="true">↗</span></button
+          ><a
+            class="button secondary"
+            href="https://arxiv.org/abs/2509.23866"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Read the paper <span aria-hidden="true">↗</span></a
+          >
+          <a
+            class="button secondary"
+            href="https://huggingface.co/PengxiangLi/dart-gui-7b"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              class="service-icon"
+              :src="asset('brand/huggingface.svg')"
+              alt=""
+              width="20"
+              height="20"
+            />
+            Hugging Face <span aria-hidden="true">↗</span>
+          </a>
+          <a
+            class="button secondary"
+            href="https://github.com/Computer-use-agents/dart-gui"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              class="service-icon github-icon"
+              :src="asset('brand/github.svg')"
+              alt=""
+              width="20"
+              height="20"
+            />
+            GitHub <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+        <div class="hero-footnote">
+          <span class="mini-brackets">[ 7B ]</span
+          ><span
+            >Open weights. Real environments.<br />Learning that keeps
+            moving.</span
+          >
+        </div>
+      </div>
+      <div
+        class="hero-art"
+        aria-label="A recorded GIMP desktop connected to the DART asynchronous learning loop"
+      >
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <div class="art-coordinate coordinate-top">
+          FIG. 01 / THE LEARNING LOOP
+        </div>
+        <div class="desktop-window">
+          <div class="window-top">
+            <span class="window-dots"><i></i><i></i><i></i></span
+            ><span>agent@desktop:~</span
+            ><span class="window-tag">DART-GUI-7B</span>
+          </div>
+          <div class="desktop-screen">
+            <img
+              :src="asset('demos/vibrance/06.webp')"
+              alt="Recorded GIMP desktop showing a photo with enhanced colors"
+              fetchpriority="high"
+              width="1440"
+              height="810"
+            /><span class="screen-crosshair" aria-hidden="true">＋</span>
+          </div>
+          <div class="desktop-bottom">
+            <span><span class="status-dot"></span> OBSERVE → ACT → LEARN</span
+            ><span>Ubuntu 22.04</span>
+          </div>
+        </div>
+        <div class="floating-label label-action">
+          <span class="label-icon">↗</span>
+          <div>
+            <span class="mono muted">FEATURED TASK</span
+            ><strong>Enhance photo colors</strong>
+          </div>
+          <span class="tiny-arrow">↗</span>
+        </div>
+        <div class="floating-label label-learning">
+          <span class="loop-icon">⟳</span>
+          <div>
+            <strong>Always in motion.</strong
+            ><span class="mono muted">ASYNCHRONOUS BY DESIGN</span>
+          </div>
+        </div>
+        <div class="art-coordinate coordinate-bottom">
+          <span class="cross">+</span> ENVIRONMENT &nbsp; / &nbsp; POLICY &nbsp;
+          / &nbsp; EXPERIENCE
+        </div>
+      </div>
+      <div
+        class="hero-authors"
+        aria-label="Conference, authors, and affiliations"
+      >
+        <a
+          class="conference-logo"
+          href="https://2026.emnlp.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="EMNLP 2026 conference website"
+        >
+          <span class="mono muted">EMNLP 2026</span>
+          <span class="conference-logo-image"
+            ><img
+              :src="asset('brand/emnlp-2026.png')"
+              alt="EMNLP 2026 Budapest"
+              width="1200"
+              height="209"
+          /></span>
+          <span class="conference-link"
+            >Conference website <span aria-hidden="true">↗</span></span
+          >
+        </a>
+        <div class="author-credit">
+          <h2 class="hero-paper-title">
+            Fully Decoupled Reinforcement Learning with Adaptive Data Curation
+            for GUI Agents
+          </h2>
+          <span class="mono muted">THE AUTHORS</span>
+          <div class="authors">
+            <span v-for="[name, affiliation, url] in authors" :key="name"
+              ><a
+                v-if="url"
+                :href="url"
+                target="_blank"
+                rel="noopener noreferrer"
+                >{{ name }}</a
+              ><span v-else>{{ name }}</span
+              ><sup>{{ affiliation }}</sup></span
+            >
+          </div>
+          <div class="affiliations">
+            <span><sup>1</sup> Beijing Institute of Technology</span
+            ><span><sup>2</sup> BIGAI</span><span><sup>3</sup> DataCanvas</span
+            ><span
+              ><sup>4</sup> Beijing University of Posts and
+              Telecommunications</span
+            ><span><sup>5</sup> Shenzhen MSU-BIT University</span>
+          </div>
+          <p class="author-note">
+            * Equal contribution &nbsp; · &nbsp; † Corresponding authors
+          </p>
+        </div>
+      </div>
+      <div class="hero-metrics">
+        <div>
+          <span class="metric-kicker">01 / CAPABILITY</span
+          ><strong>43.28<span>%</span></strong>
+          <p>OSWorld success rate <small>100 steps</small></p>
+        </div>
+        <div>
+          <span class="metric-kicker">02 / IMPROVEMENT</span
+          ><strong>+15.76<span>pp</span></strong>
+          <p>Over the base model <small>same budget</small></p>
+        </div>
+        <div>
+          <span class="metric-kicker">03 / THROUGHPUT</span
+          ><strong>1.9<span>×</span></strong>
+          <p>Training throughput</p>
+        </div>
+        <div>
+          <span class="metric-kicker">04 / UTILIZATION</span
+          ><strong>5.5<span>×</span></strong>
+          <p>Environment utilization</p>
+        </div>
+      </div>
+    </section>
 
+    <section id="demo" class="demo-section section-wrap section-space">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow muted">01 / DART IN ACTION</div>
+          <h2>
+            One agent.<br /><span class="muted">A world of interfaces.</span>
+          </h2>
+        </div>
+        <p>
+          No special-purpose APIs. Just pixels, mouse,<br
+            class="desktop-only"
+          />
+          keyboard—and a policy that learns by doing.
+        </p>
+      </div>
+      <div v-if="loading" class="demo-loading" role="status">
+        Loading recorded trajectories…
+      </div>
+      <div v-else-if="loadError" class="demo-loading" role="alert">
+        <p>The demo data could not be loaded.</p>
+        <button class="button secondary" @click="loadDemos">Try again ↻</button>
+      </div>
+      <div v-else-if="demo" class="demo-shell">
+        <div class="demo-toolbar">
+          <div class="terminal-title">
+            <span class="status-dot"></span> THE AGENT'S DESKTOP
+            <span class="toolbar-app">/ {{ demo.app }}</span>
+          </div>
+          <div class="segmented" aria-label="Demo view">
+            <button
+              :class="{ selected: mode === 'video' }"
+              :aria-pressed="mode === 'video'"
+              @click="setMode('video')"
+            >
+              Video replay</button
+            ><button
+              :class="{ selected: mode === 'steps' }"
+              :aria-pressed="mode === 'steps'"
+              @click="setMode('steps')"
+            >
+              Step explorer
+            </button>
+          </div>
+        </div>
+        <div class="demo-grid">
+          <div class="demo-stage">
+            <div v-if="mode === 'video'" class="video-wrap">
+              <video
+                :key="demo.id"
+                ref="video"
+                :src="asset(demo.video)"
+                :poster="asset(demo.poster)"
+                controls
+                playsinline
+                preload="metadata"
+                :aria-label="`${demo.app}: ${demo.description} Recorded screenshot replay.`"
+                @timeupdate="currentTime = $event.target.currentTime"
+                @play="playing = true"
+                @pause="playing = false"
+                @ended="playing = false"
+                @error="videoError = true"
+              >
+                Your browser does not support video. Download the MP4 using the
+                link below.
+              </video>
+              <div v-if="videoError" class="video-error" role="alert">
+                Video playback is unavailable.
+                <a :href="asset(demo.video)" download>Download the MP4</a> or
+                use the step explorer.
+              </div>
+            </div>
+            <div
+              v-else
+              class="step-view"
+              @keydown.left.prevent="moveStep(-1)"
+              @keydown.right.prevent="moveStep(1)"
+            >
+              <div class="step-screenshot">
+                <img
+                  :src="asset(step.image)"
+                  :alt="`${demo.app}, recorded observation ${stepIndex + 1} of ${demo.steps.length}`"
+                  width="1440"
+                  height="810"
+                />
+                <svg
+                  v-if="step.endPoint"
+                  class="drag-path"
+                  viewBox="0 0 1440 810"
+                  preserveAspectRatio="none"
+                  aria-hidden="true"
+                >
+                  <defs>
+                    <marker
+                      id="drag-arrow"
+                      viewBox="0 0 10 10"
+                      refX="8"
+                      refY="5"
+                      markerWidth="6"
+                      markerHeight="6"
+                      orient="auto-start-reverse"
+                    >
+                      <path d="M0 0L10 5L0 10Z" fill="#c4f378" />
+                    </marker>
+                  </defs>
+                  <line
+                    :x1="step.point[0] * 14.4"
+                    :y1="step.point[1] * 8.1"
+                    :x2="step.endPoint[0] * 14.4"
+                    :y2="step.endPoint[1] * 8.1"
+                    stroke="#0b100e"
+                    stroke-width="10"
+                  />
+                  <line
+                    :x1="step.point[0] * 14.4"
+                    :y1="step.point[1] * 8.1"
+                    :x2="step.endPoint[0] * 14.4"
+                    :y2="step.endPoint[1] * 8.1"
+                    stroke="#c4f378"
+                    stroke-width="4"
+                    marker-end="url(#drag-arrow)"
+                  />
+                </svg>
+                <span
+                  v-if="step.point"
+                  :key="`${demo.id}-${stepIndex}`"
+                  class="action-marker"
+                  :style="{
+                    left: `${step.point[0]}%`,
+                    top: `${step.point[1]}%`,
+                  }"
+                  aria-label="Recorded action location"
+                  ><span
+                    class="action-marker-label"
+                    :class="{
+                      'label-left': step.point[0] > 65,
+                      'label-above': step.endPoint,
+                    }"
+                    aria-hidden="true"
+                    >{{ String(stepIndex + 1).padStart(2, "0") }} ·
+                    {{ actionName }}</span
+                  ></span
+                >
+              </div>
+              <div class="step-controls">
+                <button
+                  class="icon-button"
+                  :disabled="stepIndex === 0"
+                  aria-label="Previous step"
+                  @click="moveStep(-1)"
+                >
+                  ←</button
+                ><label class="sr-only" for="step-slider">Trajectory step</label
+                ><input
+                  id="step-slider"
+                  v-model.number="stepIndex"
+                  type="range"
+                  min="0"
+                  :max="demo.steps.length - 1"
+                  :aria-valuetext="`Step ${stepIndex + 1} of ${demo.steps.length}`"
+                /><span class="mono"
+                  >{{ String(stepIndex + 1).padStart(2, "0") }} /
+                  {{ demo.steps.length }}</span
+                ><button
+                  class="icon-button"
+                  :disabled="stepIndex === demo.steps.length - 1"
+                  aria-label="Next step"
+                  @click="moveStep(1)"
+                >
+                  →
+                </button>
+              </div>
+            </div>
+            <div class="stage-status">
+              <span
+                ><i :class="{ pulse: playing }"></i>
+                {{
+                  mode === "video"
+                    ? playing
+                      ? "REPLAYING"
+                      : "RECORDED TRAJECTORY"
+                    : "OBSERVATION + ACTION"
+                }}</span
+              ><span>{{
+                mode === "video"
+                  ? `STEP ${String(currentVideoStep).padStart(2, "0")} / ${demo.steps.length}`
+                  : "← → TO EXPLORE"
+              }}</span>
+            </div>
+          </div>
+          <aside class="demo-sidebar" aria-label="Choose a recorded task">
+            <div class="sidebar-label mono muted">CHOOSE A TASK</div>
+            <button
+              v-for="(item, index) in demos"
+              :key="item.id"
+              class="task-option"
+              :class="{ active: selected === index }"
+              :aria-pressed="selected === index"
+              @click="selectDemo(index)"
+            >
+              <span class="task-preview">
+                <img
+                  :src="asset(item.preview)"
+                  alt=""
+                  width="1440"
+                  height="810"
+                  loading="lazy"
+                />
+                <span class="task-number mono">{{ item.number }}</span>
+              </span>
+              <span class="task-text"
+                ><strong>{{ item.title }}</strong
+                ><span>{{ item.description }}</span
+                ><small
+                  >{{ item.app }} · {{ item.steps.length }} steps
+                  <span aria-hidden="true">·</span> {{ item.steps.length * 2 }}s
+                  replay</small
+                ></span
+              ><span class="task-arrow" aria-hidden="true">↗</span>
+            </button>
+            <div class="recorded-result">
+              <span class="check-mark">✓</span>
+              <div>
+                <strong>Successful recorded run</strong>
+                <p>Evaluation reward: {{ demo.reward.toFixed(1) }}</p>
+              </div>
+            </div>
+            <a
+              class="text-link download-link"
+              :href="asset(demo.video)"
+              download
+              >Download this demo <span aria-hidden="true">↓</span></a
+            >
+          </aside>
+        </div>
+        <div v-if="mode === 'steps'" class="step-details" aria-live="polite">
+          <div>
+            <span class="mono muted"
+              >RECORDED REASONING / {{ stepIndex + 1 }}</span
+            >
+            <p>{{ step.thought }}</p>
+          </div>
+          <div>
+            <span class="mono muted">ACTION</span><code>{{ step.action }}</code>
+          </div>
+        </div>
+        <div class="demo-caption">
+          <p>
+            <span class="mono">SOURCE NOTE</span> Replays assembled from
+            archived OSWorld screenshots and actions. Each step is shown for 2
+            seconds; original execution timing is condensed.
+          </p>
+          <a :href="asset('demos/dart-gui-demo.gif')" download
+            >Get the GIF ↗</a
+          >
+        </div>
+      </div>
+      <div class="demo-under">
+        <span>See it. Act on it. Learn from it.</span
+        ><span class="mono muted">REAL TRAJECTORIES / OPEN RESEARCH</span>
+      </div>
+    </section>
 
+    <section id="method" class="method-section section-space">
+      <div class="section-wrap">
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow muted">02 / THE FRAMEWORK</div>
+            <h2>
+              Decouple the system.<br /><span class="accent"
+                >Unlock the learning.</span
+              >
+            </h2>
+          </div>
+          <p>
+            Four independent modules. One continuous loop.<br
+              class="desktop-only"
+            />
+            Less waiting, more useful experience.
+          </p>
+        </div>
+        <div class="architecture-layout">
+          <div class="architecture-canvas">
+            <div class="canvas-top mono muted">
+              <span>DART / SYSTEM ARCHITECTURE</span><span>ASYNC</span>
+            </div>
+            <svg
+              class="connector-svg"
+              viewBox="0 0 600 390"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M145 110H455V280H145M145 110L455 280M145 280L455 110"
+                fill="none"
+                stroke="var(--line-strong)"
+                stroke-width="1.5"
+              />
+              <path
+                class="flow-path"
+                d="M145 110H455V280H145M145 280L455 110"
+                fill="none"
+                stroke="var(--accent)"
+                stroke-width="2"
+                stroke-dasharray="8 100"
+              />
+            </svg>
+            <div class="architecture-nodes">
+              <button
+                v-for="(item, index) in modules"
+                :key="item.name"
+                :class="[
+                  'architecture-node',
+                  `node-${index}`,
+                  { active: activeModule === index },
+                ]"
+                :aria-pressed="activeModule === index"
+                @click="activeModule = index"
+              >
+                <span class="node-top"
+                  ><span class="node-icon">{{ item.icon }}</span
+                  ><span class="mono">0{{ index + 1 }}</span></span
+                ><strong>{{ item.name }}</strong
+                ><span class="mono node-type">{{ item.type }}</span>
+              </button>
+            </div>
+            <div class="loop-center">
+              <span>↻</span><span class="mono">CONTINUOUS<br />LEARNING</span>
+            </div>
+            <div class="canvas-bottom mono muted">
+              SELECT A MODULE TO EXPLORE <span>↗</span>
+            </div>
+          </div>
+          <div class="module-detail" aria-live="polite">
+            <span class="module-counter mono"
+              >0{{ activeModule + 1 }} / 04</span
+            >
+            <div>
+              <div class="eyebrow accent">{{ modules[activeModule].name }}</div>
+              <h3>{{ modules[activeModule].summary }}</h3>
+              <p>{{ modules[activeModule].body }}</p>
+              <span class="module-tag">{{ modules[activeModule].tag }}</span>
+            </div>
+            <div class="module-metric">
+              <strong>{{ modules[activeModule].metric }}</strong
+              ><span>{{ modules[activeModule].metricLabel }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="curation-strip">
+          <div>
+            <span class="mono accent">ADAPTIVE DATA CURATION</span>
+            <h3>Better experience,<br />at every level.</h3>
+          </div>
+          <div
+            v-for="[num, title, text] in [
+              ['01', 'Task', 'Allocate rollout budget by difficulty.'],
+              ['02', 'Trajectory', 'Bootstrap hard tasks with experience.'],
+              ['03', 'Step', 'Focus updates on high-entropy decisions.'],
+              ['04', 'Token', 'Align rollout and training distributions.'],
+            ]"
+            :key="num"
+            class="curation-item"
+          >
+            <span class="mono muted">{{ num }}</span
+            ><strong>{{ title }}</strong>
+            <p>{{ text }}</p>
+          </div>
+        </div>
+        <details class="paper-figure">
+          <summary>
+            Go deeper: the paper’s system diagram <span>+</span>
+          </summary>
+          <figure>
+            <img
+              :src="asset('research/architecture.png')"
+              alt="DART paper figure showing the decoupled environment cluster, rollout service, data manager, and trainer"
+              loading="lazy"
+            />
+            <figcaption>
+              System architecture from the DART manuscript. The interactive
+              diagram above is a simplified view.
+            </figcaption>
+          </figure>
+        </details>
+      </div>
+    </section>
 
+    <section id="results" class="results-section section-wrap section-space">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow muted">03 / MEASURED PROGRESS</div>
+          <h2>
+            Small model.<br /><span class="muted">Meaningful gains.</span>
+          </h2>
+        </div>
+        <div class="result-heading-side">
+          <p>
+            DART-GUI-7B vs. its UI-TARS-1.5-7B base.<br />Same benchmark. Same
+            interaction budget.
+          </p>
+          <div
+            class="segmented budget-toggle"
+            aria-label="Maximum interaction steps"
+          >
+            <button
+              v-for="value in [30, 100]"
+              :key="value"
+              :class="{ selected: budget === value }"
+              :aria-pressed="budget === value"
+              @click="budget = value"
+            >
+              {{ value }} steps
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="result-grid">
+        <div class="overall-card">
+          <span class="mono muted">OSWORLD / OVERALL SUCCESS</span>
+          <div class="overall-value">
+            {{ results.total[1].toFixed(2) }}<span>%</span>
+          </div>
+          <div class="gain-badge">↗ +{{ gain }} percentage points</div>
+          <div class="overall-comparison">
+            <div>
+              <span>UI-TARS-1.5-7B</span
+              ><strong>{{ results.total[0].toFixed(2) }}%</strong>
+            </div>
+            <div class="mini-track">
+              <i :style="{ width: `${results.total[0]}%` }"></i>
+            </div>
+            <div>
+              <span class="accent">DART-GUI-7B</span
+              ><strong class="accent"
+                >{{ results.total[1].toFixed(2) }}%</strong
+              >
+            </div>
+            <div class="mini-track">
+              <i class="ours" :style="{ width: `${results.total[1]}%` }"></i>
+            </div>
+          </div>
+          <p>Maximum {{ budget }} agent–environment interactions per task.</p>
+        </div>
+        <div class="category-chart">
+          <div class="chart-heading">
+            <span class="mono">ACROSS 10 APPLICATION DOMAINS</span>
+            <div class="chart-legend">
+              <span><i></i> Base model</span
+              ><span><i class="ours"></i> DART</span>
+            </div>
+          </div>
+          <div class="chart-axis mono muted">
+            <span>Success rate (%)</span><span>0 — 100</span>
+          </div>
+          <div
+            v-for="(category, index) in categories"
+            :key="category"
+            class="chart-row"
+          >
+            <span class="category-label">{{ category }}</span>
+            <div
+              class="bar-pair"
+              role="img"
+              :aria-label="`${category}: base ${results.baseline[index]}%, DART ${results.ours[index]}%`"
+            >
+              <div
+                class="bar baseline"
+                :style="{ width: `${results.baseline[index]}%` }"
+              ></div>
+              <div
+                class="bar ours"
+                :style="{ width: `${results.ours[index]}%` }"
+              ></div>
+            </div>
+            <span class="chart-value mono">{{
+              results.ours[index].toFixed(2)
+            }}</span>
+          </div>
+        </div>
+      </div>
+      <details class="results-table">
+        <summary>View the exact numbers <span>+</span></summary>
+        <div class="table-scroll">
+          <table>
+            <caption>
+              OSWorld task success rate (%) ·
+              {{
+                budget
+              }}-step maximum
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Application</th>
+                <th scope="col">UI-TARS-1.5-7B</th>
+                <th scope="col">DART-GUI-7B</th>
+                <th scope="col">Gain (pp)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(category, index) in categories" :key="category">
+                <th scope="row">{{ category }}</th>
+                <td>{{ results.baseline[index].toFixed(2) }}</td>
+                <td>{{ results.ours[index].toFixed(2) }}</td>
+                <td>
+                  +{{
+                    (results.ours[index] - results.baseline[index]).toFixed(2)
+                  }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+      <p class="source-note">
+        Results reported in the EMNLP camera-ready manuscript, OSWorld
+        evaluation table. Efficiency gains compare the decoupled and
+        non-decoupled systems under identical hardware and rollout settings. See
+        the paper for full evaluation protocols.
+      </p>
+      <div class="efficiency-row">
+        <div>
+          <span class="mono muted">THROUGHPUT</span>
+          <p>
+            <strong>22.6 <span>→</span> 43.6</strong
+            ><span>actions / minute</span>
+          </p>
+        </div>
+        <div>
+          <span class="mono muted">ENVIRONMENT UTILIZATION</span>
+          <p>
+            <strong>12.2 <span>→</span> 67.7</strong><span>percent</span>
+          </p>
+        </div>
+        <div>
+          <span class="mono muted">ROLLOUT GPU UTILIZATION</span>
+          <p>
+            <strong>29.6 <span>→</span> 46.7</strong><span>percent</span>
+          </p>
+        </div>
+      </div>
+    </section>
 
-<style scoped>
-.main {
-  text-align: center;
-  color: #23272f;
-  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 0 24px;
-  background: linear-gradient(120deg, #f8fbff 0%, #f3f6fa 100%);
-}
+    <section
+      id="resources"
+      class="resources-section section-wrap section-space"
+    >
+      <div class="resources-intro">
+        <div class="eyebrow muted">04 / BUILT TO BE BUILT UPON</div>
+        <h2>Your next agent<br />starts <span class="accent">here.</span></h2>
+        <p>Explore the framework. Run the model.<br />Build on the research.</p>
+      </div>
+      <div class="resource-links">
+        <a
+          href="https://arxiv.org/abs/2509.23866"
+          target="_blank"
+          rel="noopener noreferrer"
+          ><span class="resource-number mono">01</span>
+          <div>
+            <h3>Read the paper</h3>
+            <p>Method, experiments, and analysis</p>
+          </div>
+          <span class="resource-arrow">↗</span></a
+        ><a
+          href="https://github.com/Computer-use-agents/dart-gui"
+          target="_blank"
+          rel="noopener noreferrer"
+          ><span class="resource-number mono">02</span>
+          <div>
+            <h3>Explore the code</h3>
+            <p>Training, rollout, and evaluation</p>
+          </div>
+          <span class="resource-arrow">↗</span></a
+        ><a
+          href="https://huggingface.co/PengxiangLi/dart-gui-7b"
+          target="_blank"
+          rel="noopener noreferrer"
+          ><span class="resource-number mono">03</span>
+          <div>
+            <h3>Get the model</h3>
+            <p>DART-GUI-7B · open weights on Hugging Face</p>
+          </div>
+          <span class="resource-arrow">↗</span></a
+        >
+      </div>
+    </section>
 
-.header {
-  margin: 56px 0 32px 0 !important;
-}
-
-.title {
-  font-size: 3.8em;
-  font-weight: 800;
-  color: #4a148c;
-  letter-spacing: -1px;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-}
-
-.subtitle {
-  font-size: 2.1em;
-  color: #374151;
-  font-weight: 500;
-  line-height: 1.3;
-  max-width: 1100px;
-  margin: 0 auto 12px auto;
-  letter-spacing: 0.01em;
-}
-
-.author-list {
-  margin: 18px 0 0 0;
-  line-height: 1.7;
-  font-size: 1.08em;
-  color: #2b3a4b;
-}
-
-.author a {
-  font-size: 1em;
-  font-weight: 600;
-  color: #7b1fa2;
-  text-decoration: none;
-  border-bottom: 1px dotted #ce93d8;
-  transition: color 0.2s, border-bottom 0.2s;
-}
-.author a:hover {
-  color: #4a148c;
-  border-bottom: 1px solid #7b1fa2;
-}
-
-.org {
-  margin: 0 4px;
-  color: #607d8b;
-  font-size: 0.98em;
-}
-
-.ind {
-  font-size: 0.7em;
-  vertical-align: super;
-  color: #90a4ae;
-}
-
-.section {
-  margin: 36px 0;
-  padding: 0 10px;
-}
-
-.tldr {
-  text-align: left;
-  font-size: 1.08em;
-  max-width: 1100px;
-  line-height: 1.6;
-  margin: 28px auto 24px auto;
-  padding: 18px 24px;
-  background: linear-gradient(90deg, #f3e5f5 0%, #f5fafd 100%);
-  border-left: 4px solid #7b1fa2;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px 0 rgba(123, 31, 162, 0.04);
-}
-
-.section-title {
-  margin: 32px 0 18px;
-  font-size: 1.7em;
-  font-weight: 700;
-  color: #4a148c;
-  text-align: left;
-  letter-spacing: 0.01em;
-}
-
-.conference {
-  text-align: center;
-  margin: 15px;
-  font-size: 1.2em;
-  color: #666;
-}
-
-.uns {
-  text-decoration: underline;
-  text-decoration-color: #7b1fa2;
-}
-
-.mat-icon {
-  width: 1.3em;
-  height: 1.3em;
-  margin-right: 0.1em;
-  vertical-align: middle;
-  display: inline-block;
-}
-
-.teaser, .poster, .stats-img-1 {
-  max-width: 98%;
-  margin: 24px auto;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 2px 12px 0 rgba(123, 31, 162, 0.06);
-  border: 1px solid #e1bee7;
-  overflow: hidden;
-}
-
-.stats-img {
-  height: auto;
-  max-width: 100%;
-  margin: 15px auto;
-}
-
-.intro {
-  text-align: justify;
-  font-size: 1.08em;
-  max-width: 1100px;
-  line-height: 1.6;
-  margin: 0 auto 12px auto;
-  color: #23272f;
-}
-
-.link-block {
-  margin: 18px 0;
-}
-
-.external-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 10px 22px;
-  margin: 6px;
-  border: none;
-  border-radius: 6px;
-  background: linear-gradient(90deg, #7b1fa2 0%, #ba68c8 100%);
-  color: #fff;
-  text-decoration: none;
-  font-size: 1em;
-  font-weight: 600;
-  box-shadow: 0 2px 8px 0 rgba(123, 31, 162, 0.08);
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-}
-.external-link:hover {
-  background: linear-gradient(90deg, #6a1b9a 0%, #ab47bc 100%);
-  box-shadow: 0 4px 16px 0 rgba(123, 31, 162, 0.13);
-  transform: translateY(-2px) scale(1.03);
-}
-.external-link .icon {
-  margin-right: 10px;
-  color: #f3e5f5;
-}
-
-.bibtex-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.copy-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: #f3e5f5;
-  border: 1px solid #ce93d8;
-  border-radius: 6px;
-  color: #4a148c;
-  font-size: 0.9em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.copy-button:hover {
-  background: #7b1fa2;
-  color: #fff;
-  border-color: #6a1b9a;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px 0 rgba(123, 31, 162, 0.15);
-}
-
-.copy-button.copied {
-  background: #4caf50;
-  color: #fff;
-  border-color: #388e3c;
-}
-
-.copy-button i {
-  font-size: 0.85em;
-}
-
-.bibtex-container {
-  background: #f5fafd;
-  padding: 1.2em;
-  border-radius: 8px;
-  text-align: left;
-  white-space: pre;
-  overflow-x: auto;
-  border: 1px solid #e1bee7;
-  margin: 18px 0;
-}
-
-pre {
-  margin: 0;
-  font-family: 'Fira Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-}
-
-code {
-  font-family: 'Fira Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  color: #23272f;
-  font-size: 0.98em;
-}
-
-.footer {
-  color: #90a4ae;
-  margin: 60px 0 30px;
-  font-size: 0.98em;
-  text-align: center;
-}
-.footer a {
-  color: #7b1fa2;
-  text-decoration: none;
-  border-bottom: 1px dotted #ce93d8;
-  transition: color 0.2s, border-bottom 0.2s;
-}
-.footer a:hover {
-  color: #4a148c;
-  border-bottom: 1px solid #7b1fa2;
-}
-
-@media (max-width: 900px) {
-  .main {
-    max-width: 100vw;
-    padding: 0 6px;
-  }
-  .title {
-    font-size: 2.2em;
-  }
-  .subtitle {
-    font-size: 1.1em;
-  }
-  .section {
-    padding: 0 2px;
-  }
-  .stats-img-1, .teaser, .poster {
-    max-width: 100%;
-  }
-  .tldr, .intro {
-    max-width: 98vw;
-  }
-}
-
-.research-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  padding: 18px 0 8px 0;
-  background: transparent;
-  font-size: 1.08em;
-  flex-wrap: wrap;
-  position: relative;
-}
-.research-title {
-  color: #7b1fa2;
-  font-weight: 700;
-  margin-right: 8px;
-}
-.research-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 16px;
-  border-radius: 6px;
-  background: #f3e5f5;
-  color: #4a148c;
-  text-decoration: none;
-  font-weight: 600;
-  margin: 0 2px;
-  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-  box-shadow: 0 1px 4px 0 rgba(123, 31, 162, 0.06);
-}
-.research-link:hover {
-  background: #7b1fa2;
-  color: #fff;
-  box-shadow: 0 2px 8px 0 rgba(123, 31, 162, 0.13);
-}
-.conf-tag {
-  font-size: 0.95em;
-  font-weight: 400;
-  color: #7b1fa2;
-  background: #f3e5f5;
-  border-radius: 4px;
-  padding: 2px 6px;
-  margin-left: 6px;
-  transition: color 0.18s, background 0.18s;
-}
-.research-link:hover .conf-tag {
-  color: #fff;
-  background: #6a1b9a;
-}
-.research-link-wrapper {
-  position: relative;
-  display: inline-block;
-}
-.preview-popup {
-  display: none;
-  position: absolute;
-  left: 50%;
-  top: 110%;
-  transform: translateX(-50%);
-  width: 1000px;
-  height: 600px;
-  background: rgba(255,255,255,0.95);
-  border-radius: 10px;
-  box-shadow: 0 8px 32px 0 rgba(123, 31, 162, 0.18);
-  z-index: 100;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s;
-  overflow: hidden;
-}
-.research-link-wrapper:hover .preview-popup {
-  display: block;
-  opacity: 1;
-  pointer-events: auto;
-}
-.preview-popup iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  opacity: 0.85;
-  border-radius: 10px;
-}
-@media (max-width: 900px) {
-  .preview-popup {
-    display: none !important;
-  }
-}
-
-.image-stack {
-  display: flex;
-  flex-direction: column; /* 上下排列 */
-  gap: 0; /* 移除间距 */
-}
-
-.image-stack >>> .el-image {
-  margin: 0; /* 避免 el-image 默认 margin */
-}
-
-.dashed-separator {
-  border-top: 2px dashed #888; /* 粗细和颜色 */
-  margin: 12px 0; /* 上下间距 */
-  width: 100%;
-
-  /* 控制虚线段长，使用 border-image */
-  border-top-style: dashed;
-  border-top-width: 2px;
-  border-image: repeating-linear-gradient(to right, #888 0, #888 8px, transparent 8px, transparent 16px) 1;
-}
-</style>
+    <section class="paper-section section-wrap">
+      <div class="paper-title">
+        <span class="eyebrow muted">THE RESEARCH</span>
+        <h2>
+          Fully Decoupled Reinforcement Learning with<br class="desktop-only" />
+          Adaptive Data Curation for GUI Agents
+        </h2>
+        <p class="paper-version">
+          EMNLP manuscript title · Original arXiv title: “Efficient Multi-turn
+          RL for GUI Agents via Decoupled Training and Adaptive Data Curation”
+        </p>
+      </div>
+      <details class="abstract">
+        <summary>Abstract <span>+</span></summary>
+        <p>
+          Vision-language models have catalyzed the development of GUI agents
+          for desktop automation. Reinforcement learning remains bottlenecked by
+          idle time inside the rollout stage and imbalanced learning signals
+          from long-horizon, sparse-reward interactions. DART fully decouples
+          the pipeline into four independent modules: environment cluster,
+          rollout service, data manager, and trainer. Rollout-wise scheduling
+          and per-worker model synchronization improve system efficiency, while
+          adaptive curation at the task, trajectory, step, and token levels
+          makes collected experience more useful. DART-GUI-7B achieves a 43.28%
+          task success rate on OSWorld, a 15.76 percentage-point improvement
+          over its base model at the same 100-step budget.
+        </p>
+      </details>
+      <div class="citation-block">
+        <div class="citation-top">
+          <span class="mono">CITE THIS WORK</span
+          ><button class="copy-button" @click="copyCitation" aria-live="polite">
+            {{ copyStatus }} <span aria-hidden="true">⧉</span>
+          </button>
+        </div>
+        <pre id="citation-code" tabindex="0"><code>{{ bibtex }}</code></pre>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer section-wrap">
+    <a class="brand" href="#overview"
+      >DART<span class="brand-slash">/</span
+      ><span class="brand-gui">GUI</span></a
+    ><span>Learning to act. Built in the open.</span
+    ><a
+      href="https://github.com/Computer-use-agents/dart-gui"
+      target="_blank"
+      rel="noopener noreferrer"
+      >GitHub ↗</a
+    ><a href="mailto:dylan.liqing@gmail.com">Get in touch ↗</a
+    ><a href="#overview" class="back-top" aria-label="Back to top">↑</a>
+  </footer>
+</template>
